@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/tebben/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings"
 )
 
 // HttpServer interface consumergroup requires to manage offsets of the consumergroup.

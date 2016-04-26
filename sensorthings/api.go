@@ -1,7 +1,7 @@
 package sensorthings
 
 import (
-	"github.com/tebben/gost/configuration"
+	"github.com/geodan/gost/configuration"
 )
 
 const (

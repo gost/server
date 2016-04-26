@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/tebben/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings"
 )
 
 func NewRouter(api *sensorthings.SensorThingsApi) *mux.Router {

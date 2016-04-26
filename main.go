@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 
-	"github.com/tebben/gost/configuration"
-	"github.com/tebben/gost/gostdb"
-	"github.com/tebben/gost/gosthttp"
-	//"github.com/tebben/gost/mqtt"
-	"github.com/tebben/gost/sensorthings"
+	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/gostdb"
+	"github.com/geodan/gost/gosthttp"
+	//"github.com/geodan/gost/mqtt"
+	"github.com/geodan/gost/sensorthings"
 )
 
 var (

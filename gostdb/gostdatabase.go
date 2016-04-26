@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/tebben/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings"
 	_ "github.com/lib/pq"
 	"database/sql"
 	"time"
