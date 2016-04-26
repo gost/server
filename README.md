@@ -23,7 +23,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 - MQTT
 - Frontend
 - Different storage providers such as MongoDB (Now using PostgreSQL)
-- 
+
 ## TODO
 - [ ] Create a task list
 - [ ] Req 1 Each entity SHALL have the following common control information listed in (page 19) Table 8-1.
