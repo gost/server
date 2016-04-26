@@ -24,3 +24,5 @@ _cgo_export.*
 *.prof
 *.idea
 /debug
+
+gost.iml
