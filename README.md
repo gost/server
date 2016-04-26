@@ -1,4 +1,5 @@
 <img src="gostsite/resources/img/icon.png" width="353">
+[![Build Status](https://drone.io/github.com/Geodan/gost/status.png)](https://drone.io/github.com/Geodan/gost/latest)
 
 GOST (Go-SensorThings) is a sensor platform written in Go that provides access to sensor information and measured observations implementing the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard.
 
@@ -23,3 +24,8 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 - MQTT
 - Frontend
 - Different storage providers such as MongoDB (Now using PostgreSQL)
+
+## TODO
+- [ ] Create a task list
+- [ ] Setup Drone.io for GOST
+- [ ] Req 1 Each entity SHALL have the following common control information listed in (page 19) Table 8-1.
