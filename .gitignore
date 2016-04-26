@@ -6,6 +6,8 @@
 # Folders
 _obj
 _test
+.idea
+.vscode
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -17,8 +19,8 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
-_testmain.go
-
 *.exe
 *.test
 *.prof
+*.idea
+/debug
