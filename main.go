@@ -23,8 +23,8 @@ func main() {
 // Initialises GOST
 // Parse flags, read config, setup database and api
 func init() {
-	var cfgFlag = "config.json"
-	flag.StringVar(&cfgFlag, "config", "config.json", "path of the config file, default = config.json")
+	var cfgFlag = "config.yaml"
+	flag.StringVar(&cfgFlag, "config", "config.yaml", "path of the config file, default = config.yaml")
 	flag.Parse()
 
 	conf = configuration.GetConfig(cfgFlag)

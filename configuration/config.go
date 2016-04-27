@@ -8,20 +8,20 @@ import (
 // GOST configuration, holding the settings for the Http server and databases
 type Config struct {
 	Server struct {
-		Name string `json:"name"`
-		Host string `json:"host"`
-		Port int `json:"port"`
-		ExternalUri string `json:"externalUri"`
-	} `json:"server"`
+		       Name string `yaml:"name"`
+		       Host string `yaml:"host"`
+		       Port int `yaml:"port"`
+		       ExternalUri string `yaml:"externalUri"`
+	       }
 	Database struct {
-	       Host string `json:"host"`
-	       Port int `json:"port"`
-	       User string `json:"user"`
-	       Password string `json:"password"`
-	       Database string `json:"database"`
-	       Schema string `json:"schema"`
-	       SSL bool `json:"ssl"`
-       } `json:"database"`
+		       Host string `yaml:"host"`
+		       Port int `yaml:"port"`
+		       User string `yaml:"user"`
+		       Password string `yaml:"password"`
+		       Database string `yaml:"database"`
+		       Schema string `yaml:"schema"`
+		       SSL bool `yaml:"ssl"`
+	       }
 }
 
 // Get the internal Http server address
