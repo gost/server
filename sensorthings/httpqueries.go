@@ -236,7 +236,7 @@ type QueryOrderBy struct {
 // parse will return an error
 func (q *QueryOrderBy) Parse(value string) error {
 	ob := strings.Split(value, " ")
-	if len(ob) != 2 && (ob[1] != "asc" || ob[1] != "desc") && len(ob[0]) < 1 {
+	if len(ob) != 2 || (ob[1] != "asc" && ob[1] != "desc") || len(ob[0]) < 1 {
 		return errors.New(CreateQueryError(QueryOrderByInvalid, value))
 	}
 

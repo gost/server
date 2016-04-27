@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"log"
 
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"strconv"
+	"time"
+
 	"github.com/geodan/gost/sensorthings"
 	_ "github.com/lib/pq"
-	"database/sql"
-	"time"
-	"strconv"
-	"errors"
-	"encoding/json"
 )
 
 type GostDatabase struct {
@@ -65,7 +66,7 @@ func (gdb *GostDatabase) CreateSchema() {
 
 func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 	intId, err := strconv.Atoi(id)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 
@@ -109,7 +110,7 @@ func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
 		var description string
 		var properties string
 		err2 := rows.Scan(&id, &description, &properties)
-		if err2 != nil{
+		if err2 != nil {
 			return nil, err2
 		}
 
@@ -154,12 +155,12 @@ func (gdb *GostDatabase) PostLocation(location sensorthings.Location) (*sensorth
 
 func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID string) error {
 	tid, err := strconv.Atoi(thingID)
-	if(!gdb.ThingExists(tid) || err != nil){
+	if !gdb.ThingExists(tid) || err != nil {
 		return errors.New(fmt.Sprintf("Thing(%v) does not exist", thingID))
 	}
 
 	lid, err2 := strconv.Atoi(thingID)
-	if(!gdb.ThingExists(lid) || err2 != nil){
+	if !gdb.ThingExists(lid) || err2 != nil {
 		return errors.New(fmt.Sprintf("Location(%v) does not exist", locationID))
 	}
 
@@ -172,15 +173,14 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 	return nil
 }
 
-
 func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	tid, err := strconv.Atoi(thingID)
-	if(!gdb.ThingExists(tid) || err != nil){
+	if !gdb.ThingExists(tid) || err != nil {
 		return errors.New(fmt.Sprintf("Thing(%v) does not exist", thingID))
 	}
 
 	lid, err2 := strconv.Atoi(thingID)
-	if(!gdb.ThingExists(lid) || err2 != nil){
+	if !gdb.ThingExists(lid) || err2 != nil {
 		return errors.New(fmt.Sprintf("Location(%v) does not exist", locationID))
 	}
 
@@ -192,7 +192,7 @@ func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	return nil
 }
 
-func (gdb *GostDatabase) ThingExists(thingID int) bool{
+func (gdb *GostDatabase) ThingExists(thingID int) bool {
 	var result bool
 	err := gdb.Db.QueryRow("SELECT exists (SELECT 1 FROM v1.thing WHERE id = $1 LIMIT 1)", thingID).Scan(&result)
 	if err != nil {
@@ -202,7 +202,7 @@ func (gdb *GostDatabase) ThingExists(thingID int) bool{
 	return result
 }
 
-func (gdb *GostDatabase) LocationExists(locationID int) bool{
+func (gdb *GostDatabase) LocationExists(locationID int) bool {
 	var result bool
 	err := gdb.Db.QueryRow("SELECT exists (SELECT 1 FROM v1.location WHERE id = $1 LIMIT 1)", locationID).Scan(&result)
 	if err != nil {

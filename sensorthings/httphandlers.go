@@ -5,50 +5,55 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"io"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
-// HandleApiRoot will return a JSON array of the available SensorThings resource endpoints.
-func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+// HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
+func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 	a := *api
 	bpi := a.GetBasePathInfo()
 	sendJSONResponse(w, http.StatusOK, bpi)
 }
 
 // HandleVersion retrieves current version information and sends it back to the user
-func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 	a := *api
 	versionInfo := a.GetVersionInfo()
 	sendJSONResponse(w, http.StatusOK, versionInfo)
 }
 
-/* THINGS */
-func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+// HandleGetThings retrieves and sends Things based on the given filter if provided
+func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 	fmt.Println(time.Now())
 	a := *api
-	handle := func(q *QueryOptions) (interface{}, error) {return a.GetThings(q)}
+	handle := func(q *QueryOptions) (interface{}, error) { return a.GetThings(q) }
 	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
 	fmt.Println(time.Now())
 }
 
-func HandleGetThingById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+// HandleGetThingByID retrieves and sends a specific Thing based on the given ID and filter
+func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 	a := *api
-	id := GetEntityID(r)
-	handle := func(q *QueryOptions) (interface{}, error) {return a.GetThing(id, q)}
+	id := getEntityID(r)
+	handle := func(q *QueryOptions) (interface{}, error) { return a.GetThing(id, q) }
 	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
 }
 
-func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+// HandlePostThing tries to insert a new Thing and sends back the created Thing with http.StatusCreated when successful
+func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 	var t Thing
-	if(!tryParseEntity(w, r.Body, &t)) { return }
+	if !tryParseEntity(w, r.Body, &t) {
+		return
+	}
 
 	a := *api
 	nt, err := a.PostThing(t)
-	if(err != nil){
+	if err != nil {
 		sendError(w, http.StatusBadRequest, err)
-	}else{
+	} else {
 		sendJSONResponse(w, http.StatusCreated, nt)
 	}
 
@@ -63,8 +68,7 @@ func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint,
 	handlePostRequest(w, endpoint, r, &handle, Thing{}, http.StatusOK)*/
 }
 
-
-func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(interface{})(interface{}, []error), i interface{}, statusCode int){
+func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(interface{}) (interface{}, []error), i interface{}, statusCode int) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&i)
 	if err != nil {
@@ -82,52 +86,75 @@ func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *f
 	sendJSONResponse(w, statusCode, data)
 }
 
-func HandleDeleteThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+func HandleDeleteThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 
 }
 
-func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 
 }
 
 /* ObserverProperties */
-func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {
+func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
 
 }
 
-func HandleGetObservedPropertyById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleGetObservedPropertyFromDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleDeleteObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
+func HandleGetObservedPropertyById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleGetObservedPropertyFromDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleDeleteObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
 
 /* Locations */
-func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleGetLocationById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostAndLinkLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleDeleteLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
+func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleGetLocationById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostAndLinkLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleDeleteLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
 
 /* Datastreams */
-func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleGetDatastreamById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostAndLinkDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleDeleteDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
+func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleGetDatastreamById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostAndLinkDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleDeleteDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
 
 /* Sensors */
-func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleGetSensorById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePostSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
-func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsApi) {}
+func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleGetSensorById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePostSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
+func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+}
 
-// GetEntityID retrieves the id from the request, for example
+// getEntityID retrieves the id from the request, for example
 // the request http://mysensor.com/V1.0/Things(1236532) returns 1236532 as id
-func GetEntityID(r *http.Request) string {
+func getEntityID(r *http.Request) string {
 	vars := mux.Vars(r)
 	value := vars["id"]
 	substring := value[1 : len(value)-1]
@@ -150,7 +177,7 @@ func getQueryOptions(r *http.Request) (*QueryOptions, []error) {
 
 // tryParseEntity tries to parse a request body into the given entity
 // calls SendError to handle the error if the body can't be parsed to the given entity
-func tryParseEntity(w http.ResponseWriter,r io.ReadCloser, t interface{}) bool {
+func tryParseEntity(w http.ResponseWriter, r io.ReadCloser, t interface{}) bool {
 	decoder := json.NewDecoder(r)
 	err := decoder.Decode(t)
 	if err != nil {
@@ -161,8 +188,8 @@ func tryParseEntity(w http.ResponseWriter,r io.ReadCloser, t interface{}) bool {
 	return true
 }
 
-
-func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(q *QueryOptions)(interface{}, error), statusCode int) {
+// handleGetRequest is the default function to handle incoming GET requests
+func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(q *QueryOptions) (interface{}, error), statusCode int) {
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
 		sendError(w, http.StatusBadRequest, err)
@@ -177,7 +204,7 @@ func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *fu
 
 	handler := *h
 	data, err2 := handler(queryOptions)
-	if(err2 != nil){
+	if err2 != nil {
 		sendError(w, http.StatusInternalServerError, errors)
 		return
 	}
@@ -185,7 +212,7 @@ func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *fu
 	sendJSONResponse(w, statusCode, data)
 }
 
-// SendJSONResponse sends the desired message to the user
+// sendJSONResponse sends the desired message to the user
 // the message will be marshalled into an indented JSON format
 func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -198,7 +225,7 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
 	w.Write(b)
 }
 
-// SendError creates an ErrorResponse message and sets it to the user
+// sendError creates an ErrorResponse message and sets it to the user
 // using SendJSONResponse
 func sendError(w http.ResponseWriter, status int, error []error) {
 	//errors cannot be marshalled, create strings

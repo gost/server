@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	conf       configuration.Config
-	api        sensorthings.SensorThingsApi
+	conf configuration.Config
+	api  sensorthings.SensorThingsAPI
 	//mqttServer mqtt.MQTTServer
 )
 
@@ -34,11 +34,11 @@ func init() {
 	//mqttServer = mqtt.NewMQTTServer()
 	//mqttServer.Start()
 
-	api = sensorthings.NewApi(database, conf)
+	api = sensorthings.NewAPI(database, conf)
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
-func createAndStartServer(api *sensorthings.SensorThingsApi) {
+func createAndStartServer(api *sensorthings.SensorThingsAPI) {
 	gostServer := gosthttp.NewServer(conf.Server.Host, conf.Server.Port, api)
 	gostServer.Start()
 }

@@ -8,8 +8,7 @@ import (
 	"github.com/geodan/gost/sensorthings"
 )
 
-// HttpServer interface consumergroup requires to manage offsets of the consumergroup.
-
+// HTTPServer interface for starting and stopping the a HTTP server
 type HTTPServer interface {
 	Start()
 	Stop()
@@ -20,11 +19,11 @@ type HTTPServer interface {
 type GostServer struct {
 	host string                        // Hostname for example "localhost" or "192.168.1.14"
 	port int                           // Portnumber where you want to run your http server on
-	api  *sensorthings.SensorThingsApi // Sensorthings api to interact with from the HttpServer
+	api  *sensorthings.SensorThingsAPI // Sensorthings api to interact with from the HttpServer
 }
 
 // NewServer intialises a new GOST HTTPServer based on the given parameters
-func NewServer(host string, port int, api *sensorthings.SensorThingsApi) HTTPServer {
+func NewServer(host string, port int, api *sensorthings.SensorThingsAPI) HTTPServer {
 	return &GostServer{
 		host: host,
 		port: port,

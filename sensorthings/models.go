@@ -1,6 +1,6 @@
 package sensorthings
 
-// Specifying the operations that the database needs to support
+// Database specifies the operations that the database provider needs to support
 type Database interface {
 	Start()
 	CreateSchema()
@@ -20,8 +20,8 @@ type Database interface {
 
 // VersionInfo describes the version info for the GOST server version and supported SensorThings API version
 type VersionInfo struct {
-	GostServerVersion      GostServerVersion      `json:"gostServerVersion"`
-	SensorThingsApiVersion SensorThingsApiVersion `json:"sensorThingsApiVersion"`
+	GostServerVersion GostServerVersion `json:"gostServerVersion"`
+	APIVersion        APIVersion        `json:"sensorThingsApiVersion"`
 }
 
 // GostServerVersion contains version information on the GOST server
@@ -29,8 +29,8 @@ type GostServerVersion struct {
 	Version string `json:"version"`
 }
 
-// SensorThingsApiVersion contains version information on the supported SensorThings API version
-type SensorThingsApiVersion struct {
+// APIVersion contains version information on the supported SensorThings API version
+type APIVersion struct {
 	Version string `json:"version"`
 }
 
@@ -51,7 +51,3 @@ type ErrorContent struct {
 	StatusCode int      `json:"code"`
 	Messages   []string `json:"message"`
 }
-
-//type Resource interface {
-//	AreQueryOptionsSupported(QueryOption)
-//}

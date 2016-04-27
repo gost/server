@@ -23,9 +23,9 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 - Tests!
 - MQTT
 - Frontend
+- Benchmarks
 - Different storage providers such as MongoDB (Now using PostgreSQL)
 
 ## TODO
-- [ ] Create a task list
-- [ ] Setup Drone.io for GOST
-- [ ] Req 1 Each entity SHALL have the following common control information listed in (page 19) Table 8-1.
+
+[See wiki](https://github.com/Geodan/gost/wiki/TODO)

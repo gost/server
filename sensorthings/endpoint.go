@@ -9,7 +9,7 @@ import (
 // HTTPOperation describes the HTTP operation such as GET POST DELETE.
 type HTTPOperation string
 
-// HTTPOperation "enumeration".
+// HTTPOperation is a "enumeration" of the HTTP operations needed for all endpoints.
 const (
 	HTTPOperationGet    HTTPOperation = "GET"
 	HTTPOperationPost   HTTPOperation = "POST"
@@ -38,7 +38,7 @@ type EndpointOperation struct {
 }
 
 // HTTPHandler func defines the format of the handler to process the incoming request
-type HTTPHandler func(w http.ResponseWriter, r *http.Request, e *Endpoint, a *SensorThingsApi)
+type HTTPHandler func(w http.ResponseWriter, r *http.Request, e *Endpoint, a *SensorThingsAPI)
 
 // AreQueryOptionsSupported checks if the endpoint supports the requested query and if
 // the values are valid for the given endpoint
@@ -152,7 +152,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 			},
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0/Things", HandleGetThings},
-				{HTTPOperationGet, "/v1.0/Things{id}", HandleGetThingById},
+				{HTTPOperationGet, "/v1.0/Things{id}", HandleGetThingByID},
 				{HTTPOperationPost, "/v1.0/Things", HandlePostThing},
 				{HTTPOperationDelete, "/v1.0/Things{id}", HandleDeleteThing},
 				{HTTPOperationPatch, "/v1.0/Things{id}", HandlePatchThing},
@@ -339,7 +339,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 	// Generate url for endpoints
 	for k := range endpoints {
 		rp := endpoints[k]
-		rp.URL = fmt.Sprintf("%s/%s/%s", externalURL, API_PREFIX, fmt.Sprintf("%v", rp.Name))
+		rp.URL = fmt.Sprintf("%s/%s/%s", externalURL, APIPrefix, fmt.Sprintf("%v", rp.Name))
 		endpoints[k] = rp
 	}
 

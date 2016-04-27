@@ -1,30 +1,21 @@
 package sensorthings
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 // EntityType holds the name and type of an SensorThings entity
 type EntityType string
 
 // List of all EntityTypes
 const (
-	EntityTypeThing          	EntityType = "Thing"
-	EntityTypeLocation         	EntityType = "Location"
-	EntityTypeHistoricalLocation 	EntityType = "HistoricalLocation"
-	EntityTypeDatastream        	EntityType = "Datastream"
-	EntityTypeSensor 		EntityType = "Sensor"
-	EntityTypeObservedProperty      EntityType = "ObservedProperty"
-	EntityTypeObservation    	EntityType = "Observation"
-	EntityTypeFeatureOfInterest    	EntityType = "FeatureOfInterest"
+	EntityTypeThing              EntityType = "Thing"
+	EntityTypeLocation           EntityType = "Location"
+	EntityTypeHistoricalLocation EntityType = "HistoricalLocation"
+	EntityTypeDatastream         EntityType = "Datastream"
+	EntityTypeSensor             EntityType = "Sensor"
+	EntityTypeObservedProperty   EntityType = "ObservedProperty"
+	EntityTypeObservation        EntityType = "Observation"
+	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
 )
-
-// String returns the string representation of the EntityType
-func (e *EntityType) String() string{
-	return fmt.Sprintf("%s", e)
-}
-
 
 // Thing in SensorThings represents a physical object in the real world. A Thing is a good starting
 // point in which to start creating the SensorThings model structure. A Thing has a Location and one or
@@ -43,8 +34,8 @@ type Thing struct {
 	HistoricalLocations    []*HistoricalLocation `json:"HistoricalLocations,omitempty"`
 }
 
-// ContainsMandatoryPostParams checks if all mandatory params are available before posting
-func (t *Thing) ContainsMandatoryPostParams() (bool, []error){
+// ContainsMandatoryPostParams checks if all mandatory params for a Thing are available before posting
+func (t *Thing) ContainsMandatoryPostParams() (bool, []error) {
 	if len(t.Description) == 0 {
 		return false, []error{errors.New("Missing Thing.Description")}
 	}
@@ -52,20 +43,21 @@ func (t *Thing) ContainsMandatoryPostParams() (bool, []error){
 	return true, nil
 }
 
-func (t *Thing) SetLinks(externalUrl string){
-	t.NavSelf = CreateEntitySefLink(externalUrl, "Things", t.ID)
+// SetLinks sets the entity specific navigation links if needed
+func (t *Thing) SetLinks(externalURL string) {
+	t.NavSelf = CreateEntitySefLink(externalURL, "Things", t.ID)
 
 	t.NavLocations = ""
 	t.NavDatastreams = ""
 	t.NavHistoricalLocations = ""
 
-	if(t.Locations == nil) {
+	if t.Locations == nil {
 		t.NavLocations = CreateEntityLink("Things", "Locations", t.ID)
 	}
-	if(t.Datastreams == nil) {
+	if t.Datastreams == nil {
 		t.NavDatastreams = CreateEntityLink("Things", "Datastreams", t.ID)
 	}
-	if(t.HistoricalLocations == nil){
+	if t.HistoricalLocations == nil {
 		t.NavHistoricalLocations = CreateEntityLink("Things", "HistoricalLocations", t.ID)
 	}
 }
@@ -90,7 +82,8 @@ type Location struct {
 	HistoricalLocations    []*HistoricalLocation `json:"HistoricalLocations,omitempty"`
 }
 
-func (l *Location) ContainsMandatoryPostParams() (bool, []error){
+// ContainsMandatoryPostParams checks if all mandatory params for Location are available before posting.
+func (l *Location) ContainsMandatoryPostParams() (bool, []error) {
 	err := []error{}
 	if len(l.Description) == 0 {
 		err = append(err, errors.New("Missing Location.Description"))
@@ -104,11 +97,11 @@ func (l *Location) ContainsMandatoryPostParams() (bool, []error){
 		err = append(err, errors.New("Missing Location.Location"))
 	}
 
-	if(len(err) > 0) {
+	if len(err) > 0 {
 		return false, err
-	}else{
-		return true, nil
 	}
+
+	return true, nil
 }
 
 // Datastream in SensorThings represents a collection of Observations from a Sensor. A physical Sensor will send its
@@ -118,9 +111,9 @@ type Datastream struct {
 	ID                  string            `json:"@iot.id"`
 	NavSelf             string            `json:"@iot.selfLink"`
 	Description         string            `json:"descritption"`
-	unitOfMeasurement   map[string]string `json:"unitOfMeasurement"`
-	observationType     string            `json:"observationType"`
-	observedArea        map[string]string `json:"observedArea"`
+	UnitOfMeasurement   map[string]string `json:"unitOfMeasurement"`
+	ObservationType     string            `json:"observationType"`
+	ObservedArea        map[string]string `json:"observedArea"`
 	NavThings           string            `json:"Things@iot.navigationLink,omitempty"`
 	NavSensors          string            `json:"Sensors@iot.navigationLink,omitempty"`
 	NavObservations     string            `json:"Observations@iot.navigationLink,omitempty"`
