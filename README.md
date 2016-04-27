@@ -1,5 +1,6 @@
 <img src="gostsite/resources/img/icon.png" width="353">  
 [![Build Status](https://drone.io/github.com/Geodan/gost/status.png)](https://drone.io/github.com/Geodan/gost/latest)
+[![Coverage Status](https://coveralls.io/repos/github/Geodan/gost/badge.svg?branch=master)](https://coveralls.io/github/Geodan/gost?branch=master)
 
 GOST (Go-SensorThings) is a sensor platform written in Go that provides access to sensor information and measured observations implementing the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard.
 
