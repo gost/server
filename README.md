@@ -14,27 +14,26 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Getting started
 
-1] Install
-Install GoLang https://golang.org/
+1. Install
+ 1. Install GoLang https://golang.org/
+ 2. Install Postgresql http://www.postgresql.org/
 
-Install Postgresql http://www.postgresql.org/
+2. Clone code
+ 1. git clone https://github.com/Geodan/gost.git
 
-2] Clone code
-git clone https://github.com/Geodan/gost.git
+3. Get dependencies
+ 1. go get gopkg.in/yaml.v2
+ 2. go get github.com/lib/pq
+ 3. go get github.com/gorilla/mux
+ 4. go get github.com/surge/glog
+ 5. go get github.com/surgemq/surgemq
+ 6. go get github.com/surgemq/message
 
-3] Get dependencies
+4. Edit config.yaml
+ 1. Change connection to database
 
-go get gopkg.in/yaml.v2
-
-go get github.com/lib/pq 
-
-go get github.com/gorilla/mux
-
-4] Edit config.yaml
-Change connection to database
-
-5] Start
-go run main.go
+5. Start
+ 1. go run main.go
 
 ## Dependencies
 

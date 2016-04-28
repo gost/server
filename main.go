@@ -8,6 +8,7 @@ import (
 	"github.com/geodan/gost/gosthttp"
 	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings"
+	"log"
 )
 
 var (
@@ -27,7 +28,11 @@ func init() {
 	flag.StringVar(&cfgFlag, "config", "config.yaml", "path of the config file, default = config.yaml")
 	flag.Parse()
 
-	conf = configuration.GetConfig(cfgFlag)
+	conf, err := configuration.GetConfig(cfgFlag)
+	if err != nil{
+		log.Fatal("config read error: ", err)
+	}
+
 	database := gostdb.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
 	database.Start()
 

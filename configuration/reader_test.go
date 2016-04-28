@@ -53,17 +53,25 @@ func TestReadConfig(t *testing.T) {
 	content := []byte(data)
 	cfg, err := readConfig(content)
 	if err != nil{
-		t.Error("Given static config data could not be parsed into onfig struct")
+		t.Error("Given static config data could not be parsed into config struct")
 	}
+	assert.NotNil(t, cfg)
 
 	// check some random params
 	assert.Equal(t, 8080, cfg.Server.Port)
 	assert.Equal(t, false, cfg.Database.SSL)
 	assert.Equal(t, "192.168.40.10", cfg.Database.Host)
+
+	falseContent := []byte("aaabbbccc")
+	cfg, err = readConfig(falseContent)
+	assert.NotNil(t, err, "ReadConfig should have returned an error")
 }
 
 func TestGetConfig(t *testing.T) {
-	cfg := GetConfig(configLocation)
+	cfg, err := GetConfig(configLocation)
+	if err != nil {
+		t.Error("GetConfig returned an error ", err)
+	}
 
 	// Check if there is data
 	assert.NotNil(t, cfg.Server.Host)

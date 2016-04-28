@@ -2,7 +2,6 @@ package configuration
 
 import (
 	"os"
-	"log"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 )
@@ -13,9 +12,9 @@ func readFile(cfgFile string) ([]byte, error){
 		return nil, err
 	}
 
-	source, err := ioutil.ReadFile(cfgFile)
-	if err != nil {
-		return nil, err
+	source, err2 := ioutil.ReadFile(cfgFile)
+	if err2 != nil {
+		return nil, err2
 	}
 
 	return source, nil
@@ -33,16 +32,16 @@ func readConfig(fileContent []byte) (Config, error) {
 
 // GetConfig retrieves a new configuration from the given config file
 // Fatal when config does not exist or cannot be read
-func GetConfig(cfgFile string) Config {
+func GetConfig(cfgFile string) (Config, error) {
 	content, err := readFile(cfgFile)
 	if err != nil {
-		log.Fatal("config read error: ", err)
+		return Config{}, err
 	}
 
-	conf, err2 := readConfig(content);
-	if err2 != nil {
-		log.Fatal("config read error: ", err2)
+	conf, err := readConfig(content);
+	if err != nil {
+		return Config{}, err
 	}
 
-	return conf;
+	return conf, nil;
 }
