@@ -76,7 +76,7 @@ func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 	var thingID int
 	var description string
 	var properties string
-	err2 := gdb.Db.QueryRow("SELECT * FROM v1.thing WHERE id = $1 LIMIT 1", intID).Scan(&thingID, &description, &properties)
+	err2 := gdb.Db.QueryRow("select id, description, properties from v1.thing where id = $1", intID).Scan(&thingID, &description, &properties)
 
 	if err2 != nil {
 		return nil, err
@@ -99,7 +99,7 @@ func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
-	rows, err := gdb.Db.Query("SELECT * FROM v1.thing")
+	rows, err := gdb.Db.Query("SELECT id, description, properties FROM v1.thing")
 	if err != nil {
 		return nil, err
 	}
