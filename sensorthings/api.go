@@ -79,7 +79,7 @@ func (a *APIv1) GetBasePathInfo() *ArrayResponse {
 // GetEndpoints returns all configured endpoints for the HTTP server
 func (a *APIv1) GetEndpoints() *[]Endpoint {
 	if a.endPoints == nil {
-		a.endPoints = CreateEndPoints(a.config.GetExternalServerUri())
+		a.endPoints = CreateEndPoints(a.config.GetExternalServerURI())
 	}
 
 	return &a.endPoints
@@ -93,7 +93,7 @@ func (a *APIv1) GetThing(id string, qo *QueryOptions) (*Thing, error) {
 		return nil, err
 	}
 
-	t.SetLinks(a.config.GetExternalServerUri())
+	t.SetLinks(a.config.GetExternalServerURI())
 	return t, nil
 }
 
@@ -104,7 +104,7 @@ func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerUri()
+	uri := a.config.GetExternalServerURI()
 	for idx, item := range things {
 		i := *item
 		item.SetLinks(uri)
@@ -161,7 +161,7 @@ func (a *APIv1) PostThing(thing Thing) (*Thing, []error) {
 		}
 	}
 
-	nt.SetLinks(a.config.GetExternalServerUri())
+	nt.SetLinks(a.config.GetExternalServerURI())
 	//push to mqtt
 	return nt, nil
 }

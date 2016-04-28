@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/geodan/gost/sensorthings"
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // needed for PostgreSQL integration
 )
 
 // GostDatabase implementation

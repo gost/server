@@ -102,7 +102,7 @@ func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoin
 
 }
 
-// HandleGetObservedPropertyById todo
+// HandleGetObservedPropertyByID todo
 func HandleGetObservedPropertyByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
@@ -126,7 +126,7 @@ func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoin
 func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-// HandleGetLocationById todo
+// HandleGetLocationByID todo
 func HandleGetLocationByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
@@ -150,7 +150,7 @@ func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpo
 func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-// HandleGetDatastreamById todo
+// HandleGetDatastreamByID todo
 func HandleGetDatastreamByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
@@ -178,7 +178,7 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *End
 func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-// HandleGetSensorById todo
+// HandleGetSensorByID todo
 func HandleGetSensorByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 

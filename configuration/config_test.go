@@ -22,13 +22,13 @@ import (
 
 func TestGetExternalUri(t *testing.T) {
 	cfg := Config{}
-	cfg.Server.ExternalUri = "http://test.com/"
-	assert.Equal(t, "http://test.com", cfg.GetExternalServerUri(), "Trailing slash not removed by GetExternalServerUri")
+	cfg.Server.ExternalURI = "http://test.com/"
+	assert.Equal(t, "http://test.com", cfg.GetExternalServerURI(), "Trailing slash not removed by GetExternalServerUri")
 }
 
 func TestGetInternalUri(t *testing.T) {
 	cfg := Config{}
 	cfg.Server.Host = "localhost"
 	cfg.Server.Port = 8080
-	assert.Equal(t, "localhost:8080", cfg.GetInternalServerUri(), "Internal server uri not constructed correctly based on config server host and port")
+	assert.Equal(t, "localhost:8080", cfg.GetInternalServerURI(), "Internal server uri not constructed correctly based on config server host and port")
 }
