@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // HTTPOperation describes the HTTP operation such as GET POST DELETE.
@@ -123,12 +122,14 @@ func CreateEndPoints(externalURL string) []Endpoint {
 	endpoints := []Endpoint{
 		{
 			Name: "Version",
+			URL: fmt.Sprintf("%s/%s", externalURL, "Version"),
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/Version", HandleVersion},
 			},
 		},
 		{
 			Name: "Root",
+			URL: fmt.Sprintf("%s/%s", externalURL, "v1.0"),
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0", HandleAPIRoot},
 			},
@@ -337,12 +338,10 @@ func CreateEndPoints(externalURL string) []Endpoint {
 		},
 	}
 
-	// Generate url for endpoints
+	// Generate url for endpoints where no url is given
 	for k := range endpoints {
 		rp := endpoints[k]
-		if(strings.HasSuffix(rp.Name, "Root")){
-			rp.URL = fmt.Sprintf("%s/%s", externalURL, APIPrefix)
-		}else{
+		if len(rp.URL) == 0 {
 			rp.URL = fmt.Sprintf("%s/%s/%s", externalURL, APIPrefix, fmt.Sprintf("%v", rp.Name))
 		}
 

@@ -39,10 +39,10 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Dependencies
 
-[yaml v2](https://github.com/go-yaml/yaml)
-[pq](https://github.com/lib/pq)
-[mux](https://github.com/gorilla/mux)
-[SurgeMQ](github.com/surgemq/surgemq)  
+[yaml v2](https://github.com/go-yaml/yaml)<br />
+[pq](https://github.com/lib/pq)<br />
+[mux](https://github.com/gorilla/mux)<br />
+[SurgeMQ](github.com/surgemq/surgemq)<br />
 
 ## Roadmap
 
