@@ -14,7 +14,7 @@ func NewRouter(api *sensorthings.SensorThingsAPI) *mux.Router {
 	// problems with interfering endpoints cause of the wildcard used for the (id) in requests
 	a := *api
 	endpoints := *a.GetEndpoints()
-	router := mux.NewRouter().StrictSlash(false)
+	router := mux.NewRouter().StrictSlash(true)
 	router.Path("/").Handler(http.FileServer(http.Dir("./gostsite/")))
 
 	for _, endpoint := range endpoints {

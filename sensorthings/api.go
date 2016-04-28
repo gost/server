@@ -10,6 +10,8 @@ const (
 
 // SensorThingsAPI describes all request and responses to fulfill the SensorThings API standard
 type SensorThingsAPI interface {
+	GetConfig() *configuration.Config
+
 	GetVersionInfo() *VersionInfo
 	GetBasePathInfo() *ArrayResponse
 	GetEndpoints() *[]Endpoint
@@ -46,6 +48,10 @@ func NewAPI(database Database, config configuration.Config) SensorThingsAPI {
 		//mqtt:   mqtt,
 		config: config,
 	}
+}
+
+func (a *API) GetConfig() *configuration.Config{
+	return &a.config
 }
 
 // GetVersionInfo retrieves the version info of the current supported SensorThings API Version and running server version
