@@ -15,7 +15,7 @@ func NewRouter(api *sensorthings.API) *mux.Router {
 	a := *api
 	endpoints := *a.GetEndpoints()
 	router := mux.NewRouter().StrictSlash(true)
-	router.Path("/").Handler(http.FileServer(http.Dir("./gostsite/")))
+	router.Path("/").Handler(http.FileServer(http.Dir("./client/")))
 
 	for _, endpoint := range endpoints {
 		ep := endpoint
