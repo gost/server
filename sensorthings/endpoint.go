@@ -38,7 +38,7 @@ type EndpointOperation struct {
 }
 
 // HTTPHandler func defines the format of the handler to process the incoming request
-type HTTPHandler func(w http.ResponseWriter, r *http.Request, e *Endpoint, a *SensorThingsAPI)
+type HTTPHandler func(w http.ResponseWriter, r *http.Request, e *Endpoint, a *API)
 
 // AreQueryOptionsSupported checks if the endpoint supports the requested query and if
 // the values are valid for the given endpoint
@@ -186,7 +186,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 			},
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0/Datastreams", HandleGetDatastreams},
-				{HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastreamById},
+				{HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastreamByID},
 				{HTTPOperationGet, "/v1.0/Things{id}/Datastreams", HandleGetDatastreamsByThing},
 				{HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
 				{HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostAndLinkDatastream},
@@ -211,7 +211,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 			},
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0/ObservedProperties", HandleGetObservedProperties},
-				{HTTPOperationGet, "/v1.0/ObservedProperty{id}", HandleGetObservedPropertyById},
+				{HTTPOperationGet, "/v1.0/ObservedProperty{id}", HandleGetObservedPropertyByID},
 				{HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperty", HandleGetObservedPropertyFromDatastream},
 				{HTTPOperationPost, "/v1.0/ObservedProperty", HandlePostObservedProperty},
 				{HTTPOperationDelete, "/v1.0/ObservedProperty{id}", HandleDeleteObservedProperty},
@@ -237,7 +237,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 			},
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0/Locations", HandleGetLocations},
-				{HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocationById},
+				{HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocationByID},
 				{HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
 				{HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostAndLinkLocation},
 				{HTTPOperationDelete, "/v1.0/Locations{id}", HandleDeleteLocation},
@@ -261,7 +261,7 @@ func CreateEndPoints(externalURL string) []Endpoint {
 			},
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0/Sensors", HandleGetSensors},
-				{HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensorById},
+				{HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensorByID},
 				{HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
 				{HTTPOperationDelete, "/v1.0/Sensors{id}", HandleDeleteSensor},
 				{HTTPOperationPatch, "/v1.0/Sensors{id}", HandlePatchSensor},

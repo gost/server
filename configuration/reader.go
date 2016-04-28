@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// readfile checks if the given filepath exist and returns the contenst
+// of the file in a byte array
 func readFile(cfgFile string) ([]byte, error) {
 	if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
 		return nil, err
@@ -20,6 +22,7 @@ func readFile(cfgFile string) ([]byte, error) {
 	return source, nil
 }
 
+// readConfig tries to parse the byte data into a config file
 func readConfig(fileContent []byte) (Config, error) {
 	config := Config{}
 	err2 := yaml.Unmarshal(fileContent, &config)

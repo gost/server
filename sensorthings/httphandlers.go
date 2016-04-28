@@ -12,21 +12,21 @@ import (
 )
 
 // HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
-func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 	a := *api
 	bpi := a.GetBasePathInfo()
 	sendJSONResponse(w, http.StatusOK, bpi)
 }
 
 // HandleVersion retrieves current version information and sends it back to the user
-func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 	a := *api
 	versionInfo := a.GetVersionInfo()
 	sendJSONResponse(w, http.StatusOK, versionInfo)
 }
 
 // HandleGetThings retrieves and sends Things based on the given filter if provided
-func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 	fmt.Println(time.Now())
 	a := *api
 	handle := func(q *QueryOptions) (interface{}, error) { return a.GetThings(q) }
@@ -35,7 +35,7 @@ func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *Endpoint,
 }
 
 // HandleGetThingByID retrieves and sends a specific Thing based on the given ID and filter
-func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 	a := *api
 	id := getEntityID(r)
 	handle := func(q *QueryOptions) (interface{}, error) { return a.GetThing(id, q) }
@@ -43,7 +43,7 @@ func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoi
 }
 
 // HandlePostThing tries to insert a new Thing and sends back the created Thing with http.StatusCreated when successful
-func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 	var t Thing
 	if !tryParseEntity(w, r.Body, &t) {
 		return
@@ -68,6 +68,7 @@ func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint,
 	handlePostRequest(w, endpoint, r, &handle, Thing{}, http.StatusOK)*/
 }
 
+// handlePostRequest todo
 func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(interface{}) (interface{}, []error), i interface{}, statusCode int) {
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&i)
@@ -86,70 +87,111 @@ func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *f
 	sendJSONResponse(w, statusCode, data)
 }
 
-func HandleDeleteThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandleDeleteThing todo
+func HandleDeleteThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 
 }
 
-func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandlePatchThing todo
+func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 
 }
 
-/* ObserverProperties */
-func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandleGetObservedProperties todo
+func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 
 }
 
-func HandleGetObservedPropertyById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleGetObservedPropertyFromDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePostObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleDeleteObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandleGetObservedPropertyById todo
+func HandleGetObservedPropertyByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-/* Locations */
-func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleGetLocationById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePostLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePostAndLinkLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleDeleteLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandleGetObservedPropertyFromDatastream todo
+func HandleGetObservedPropertyFromDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-/* Datastreams */
-func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleGetDatastreamById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePostAndLinkDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandleDeleteDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
-}
-func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandlePostObservedProperty todo
+func HandlePostObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
-/* Sensors */
-func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+// HandleDeleteObservedProperty todo
+func HandleDeleteObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
-func HandleGetSensorById(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+
+// HandlePatchObservedProperty todo
+func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
-func HandlePostSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+
+// HandleGetLocations todo
+func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
-func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+
+// HandleGetLocationById todo
+func HandleGetLocationByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
-func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *SensorThingsAPI) {
+
+// HandlePostLocation todo
+func HandlePostLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePostAndLinkLocation todo
+func HandlePostAndLinkLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleDeleteLocation todo
+func HandleDeleteLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePatchLocation todo
+func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleGetDatastreams todo
+func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleGetDatastreamById todo
+func HandleGetDatastreamByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleGetDatastreamsByThing todo
+func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePostDatastream todo
+func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePostAndLinkDatastream todo
+func HandlePostAndLinkDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleDeleteDatastream todo
+func HandleDeleteDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePatchDatastream todo
+func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleGetSensors todo
+func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleGetSensorById todo
+func HandleGetSensorByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePostSensors todo
+func HandlePostSensors(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandleDeleteSensor todo
+func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
+}
+
+// HandlePatchSensor todo
+func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
 }
 
 // getEntityID retrieves the id from the request, for example

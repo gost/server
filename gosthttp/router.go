@@ -9,7 +9,7 @@ import (
 )
 
 // NewRouter creates a new mux.Router and sets up all endpoints defind in the sensothings api
-func NewRouter(api *sensorthings.SensorThingsAPI) *mux.Router {
+func NewRouter(api *sensorthings.API) *mux.Router {
 	// Note: tried julienschmidt/httprouter instead of gorilla/mux but had some
 	// problems with interfering endpoints cause of the wildcard used for the (id) in requests
 	a := *api

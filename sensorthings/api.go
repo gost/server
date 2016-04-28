@@ -5,11 +5,12 @@ import (
 )
 
 const (
-	APIPrefix string = "v1.0" // API Prefix for V1.0 endpoint
+	// APIPrefix for V1.0 endpoint
+	APIPrefix string = "v1.0"
 )
 
-// SensorThingsAPI describes all request and responses to fulfill the SensorThings API standard
-type SensorThingsAPI interface {
+// API describes all request and responses to fulfill the SensorThings API standard
+type API interface {
 	GetConfig() *configuration.Config
 
 	GetVersionInfo() *VersionInfo
@@ -32,30 +33,31 @@ type SensorThingsAPI interface {
 	LinkLocation(thingID string, locationID string) error
 }
 
-// API is the default implementation of SensorThingsApi, API needs a database
+// APIv1 is the default implementation of SensorThingsApi, API needs a database
 // provider, config, endpoint information to setup te needed services
-type API struct {
+type APIv1 struct {
 	db        Database
 	config    configuration.Config
 	endPoints []Endpoint
 	//mqtt      mqtt.MQTTServer
 }
 
-// NewApi Initialise a new SensorThings API
-func NewAPI(database Database, config configuration.Config) SensorThingsAPI {
-	return &API{
+// NewAPI Initialise a new SensorThings API
+func NewAPI(database Database, config configuration.Config) API {
+	return &APIv1{
 		db: database,
 		//mqtt:   mqtt,
 		config: config,
 	}
 }
 
-func (a *API) GetConfig() *configuration.Config {
+// GetConfig return the current configuration.Config set for the api
+func (a *APIv1) GetConfig() *configuration.Config {
 	return &a.config
 }
 
 // GetVersionInfo retrieves the version info of the current supported SensorThings API Version and running server version
-func (a *API) GetVersionInfo() *VersionInfo {
+func (a *APIv1) GetVersionInfo() *VersionInfo {
 	versionInfo := VersionInfo{
 		GostServerVersion: GostServerVersion{configuration.ServerVersion},
 		APIVersion:        APIVersion{configuration.SensorThingsAPIVersion},
@@ -64,8 +66,8 @@ func (a *API) GetVersionInfo() *VersionInfo {
 	return &versionInfo
 }
 
-// Navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
-func (a *API) GetBasePathInfo() *ArrayResponse {
+// GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
+func (a *APIv1) GetBasePathInfo() *ArrayResponse {
 	var rp interface{} = a.GetEndpoints()
 	basePathInfo := ArrayResponse{
 		Data: &rp,
@@ -74,7 +76,8 @@ func (a *API) GetBasePathInfo() *ArrayResponse {
 	return &basePathInfo
 }
 
-func (a *API) GetEndpoints() *[]Endpoint {
+// GetEndpoints returns all configured endpoints for the HTTP server
+func (a *APIv1) GetEndpoints() *[]Endpoint {
 	if a.endPoints == nil {
 		a.endPoints = CreateEndPoints(a.config.GetExternalServerUri())
 	}
@@ -82,7 +85,9 @@ func (a *API) GetEndpoints() *[]Endpoint {
 	return &a.endPoints
 }
 
-func (a *API) GetThing(id string, qo *QueryOptions) (*Thing, error) {
+// GetThing returns a thing entity based on the given id and QueryOptions
+// returns an error when the entity cannot be found
+func (a *APIv1) GetThing(id string, qo *QueryOptions) (*Thing, error) {
 	t, err := a.db.GetThing(id)
 	if err != nil {
 		return nil, err
@@ -92,7 +97,8 @@ func (a *API) GetThing(id string, qo *QueryOptions) (*Thing, error) {
 	return t, nil
 }
 
-func (a *API) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
+// GetThings returns an array of thing entities based on the QueryOptions
+func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 	things, err := a.db.GetThings()
 	if err != nil {
 		return nil, err
@@ -116,7 +122,9 @@ func (a *API) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 	return &response, nil
 }
 
-func (a *API) PostThing(thing Thing) (*Thing, []error) {
+// PostThing checks if a posted thing entity is valid and adds it to the database
+// a posted thing can also contain Locations and DataStreams
+func (a *APIv1) PostThing(thing Thing) (*Thing, []error) {
 	_, err := thing.ContainsMandatoryPostParams()
 	if err != nil {
 		return nil, err
@@ -158,26 +166,33 @@ func (a *API) PostThing(thing Thing) (*Thing, []error) {
 	return nt, nil
 }
 
-func (a *API) DeleteThing(id string) {
+// DeleteThing todo
+func (a *APIv1) DeleteThing(id string) {
 }
 
-func (a *API) PatchThing(thing Thing) {
+// PatchThing todo
+func (a *APIv1) PatchThing(thing Thing) {
 
 }
 
-func (a *API) GetLocation(id string) *Location {
+// GetLocation todo
+func (a *APIv1) GetLocation(id string) *Location {
 	return nil
 }
 
-func (a *API) GetLocations() *ArrayResponse {
+// GetLocations todo
+func (a *APIv1) GetLocations() *ArrayResponse {
 	return nil
 }
 
-func (a *API) PatchLocation(id string) {
+// PatchLocation todo
+func (a *APIv1) PatchLocation(id string) {
 	//	return nil
 }
 
-func (a *API) PostLocation(location Location, thingID string) (*Location, []error) {
+// PostLocation checks if the given location entity is valid and adds it to the database
+// the new location will be linked to a thing if needed
+func (a *APIv1) PostLocation(location Location, thingID string) (*Location, []error) {
 	_, err := location.ContainsMandatoryPostParams()
 	if err != nil {
 		return nil, err
@@ -203,11 +218,13 @@ func (a *API) PostLocation(location Location, thingID string) (*Location, []erro
 	return l, nil
 }
 
-func (a *API) DeleteLocation(id string) {
+// DeleteLocation todo
+func (a *APIv1) DeleteLocation(id string) {
 
 }
 
-func (a *API) LinkLocation(thingID string, locationID string) error {
+// LinkLocation links a thing with a location in the database
+func (a *APIv1) LinkLocation(thingID string, locationID string) error {
 	err3 := a.db.LinkLocation(thingID, locationID)
 	if err3 != nil {
 		return err3
@@ -216,7 +233,9 @@ func (a *API) LinkLocation(thingID string, locationID string) error {
 	return nil
 }
 
-func (a *API) PostHistoricalLocation(thingID string, locationID string) error {
+// PostHistoricalLocation is triggered by code and cannot be used from any endpoint PostHistoricalLocation
+// adds a HistoricalLocation into the database
+func (a *APIv1) PostHistoricalLocation(thingID string, locationID string) error {
 	err := a.db.PostHistoricalLocation(thingID, locationID)
 	if err != nil {
 		return err

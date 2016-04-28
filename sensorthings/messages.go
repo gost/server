@@ -17,7 +17,7 @@ const (
 	QuerySkipNotAvailable    QueryErrorMessage = "Query %s is not available on endpoint %s"
 )
 
-// FormatQueryError formats a query error, adding a value into the defined message
+// CreateQueryError formats a query error, adding a value into the defined message
 // for example the QueryErrorMessage "The value %v for $top is invalid, please provide a non-negative integer"
 // will be formatted into "The value -1 for $top is invalid, please provide a non-negative integer"
 func CreateQueryError(msg QueryErrorMessage, value ...string) string {

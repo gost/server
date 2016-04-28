@@ -2,6 +2,7 @@ package gostdb
 
 import "fmt"
 
+// GetCreateDatabaseQuery returns the database creation script for PostgreSQL
 func GetCreateDatabaseQuery(schema string) string {
 	return fmt.Sprintf("CREATE SCHEMA IF NOT EXISTS %s;"+
 		"SET search_path = %s;"+
