@@ -36,11 +36,16 @@ Change connection to database
 5] Start
 go run main.go
 
+6] Go in browser to http://localhost:8080
+
 ## Dependencies
 
 [yaml v2](https://github.com/go-yaml/yaml)
+
 [pq](https://github.com/lib/pq)  
+
 [mux](https://github.com/gorilla/mux)  
+
 [SurgeMQ](github.com/surgemq/surgemq)  
 
 ## Roadmap
