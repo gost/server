@@ -28,6 +28,6 @@ func TestGetExternalUri(t *testing.T) {
 func TestGetInternalUri(t *testing.T) {
 	cfg := Config{}
 	cfg.Server.Host = "localhost"
-	cfg.Server.Port = "8080"
+	cfg.Server.Port = 8080
 	assert.Equal(t, "localhost:8080", cfg.GetInternalServerUri(), "Internal server uri not constructed correctly based on config server host and port")
 }
