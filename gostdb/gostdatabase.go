@@ -6,7 +6,6 @@ import (
 
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"strconv"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// GostDatabase implementation
 type GostDatabase struct {
 	Host     string
 	Port     int
@@ -25,7 +25,7 @@ type GostDatabase struct {
 	Db       *sql.DB
 }
 
-// Initialize the PostgreSQL database
+// NewDatabase initialises the PostgreSQL database
 //	host = TCP host:port or Unix socket depending on Network.
 //	user = database user
 //	password = database password
@@ -43,6 +43,7 @@ func NewDatabase(host string, port int, user string, password string, database s
 	}
 }
 
+// Start the database
 func (gdb *GostDatabase) Start() {
 	//ToDo: implement SSL
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", gdb.Host, gdb.User, gdb.Password, gdb.Database)
@@ -56,6 +57,7 @@ func (gdb *GostDatabase) Start() {
 	//gdb.CreateSchema()
 }
 
+// CreateSchema creates the needed schema in the database
 func (gdb *GostDatabase) CreateSchema() {
 	create := GetCreateDatabaseQuery(gdb.Schema)
 	_, err := gdb.Db.Exec(create)
@@ -64,23 +66,24 @@ func (gdb *GostDatabase) CreateSchema() {
 	}
 }
 
+// GetThing returns a thing entity based on id and query
 func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
-	intId, err := strconv.Atoi(id)
+	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
 	}
 
-	var thingId int
+	var thingID int
 	var description string
 	var properties string
-	err2 := gdb.Db.QueryRow("SELECT * FROM v1.thing WHERE id = $1 LIMIT 1", intId).Scan(&thingId, &description, &properties)
+	err2 := gdb.Db.QueryRow("SELECT * FROM v1.thing WHERE id = $1 LIMIT 1", intID).Scan(&thingID, &description, &properties)
 
 	if err2 != nil {
 		return nil, err
 	}
 
 	thing := sensorthings.Thing{}
-	thing.ID = strconv.Itoa(thingId)
+	thing.ID = strconv.Itoa(thingID)
 	thing.Description = description
 
 	var p map[string]string
@@ -94,6 +97,7 @@ func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 	return &thing, nil
 }
 
+// GetThings returns an array of things
 func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
 	rows, err := gdb.Db.Query("SELECT * FROM v1.thing")
 	if err != nil {
@@ -101,7 +105,7 @@ func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
 	}
 
 	defer rows.Close()
-	things := make([]*sensorthings.Thing, 0)
+	var things = []*sensorthings.Thing{}
 
 	for rows.Next() {
 		thing := sensorthings.Thing{}
@@ -130,38 +134,45 @@ func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
 	return things, nil
 }
 
+// PostThing receives a posted thing entity and adds it to the database
+// returns the created Thing including the generated id
 func (gdb *GostDatabase) PostThing(thing sensorthings.Thing) (*sensorthings.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
-	var thingId int
-	err := gdb.Db.QueryRow("INSERT INTO v1.thing (description, properties) VALUES ($1, $2) RETURNING id", thing.Description, jsonProperties).Scan(&thingId)
+	var thingID int
+	err := gdb.Db.QueryRow("INSERT INTO v1.thing (description, properties) VALUES ($1, $2) RETURNING id", thing.Description, jsonProperties).Scan(&thingID)
 	if err != nil {
 		return nil, err
 	}
 
-	thing.ID = strconv.Itoa(thingId)
+	thing.ID = strconv.Itoa(thingID)
 	return &thing, nil
 }
 
+// PostLocation receives a posted location entity and adds it to the database
+// returns the created Location including the generated id
 func (gdb *GostDatabase) PostLocation(location sensorthings.Location) (*sensorthings.Location, error) {
-	var locationId int
-	err := gdb.Db.QueryRow("INSERT INTO v1.location (description, encodingtype, location) VALUES ($1, $2, $3) RETURNING id", location.Description, 1, location.Location).Scan(&locationId)
+	var locationID int
+	err := gdb.Db.QueryRow("INSERT INTO v1.location (description, encodingtype, location) VALUES ($1, $2, $3) RETURNING id", location.Description, 1, location.Location).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
 
-	location.ID = strconv.Itoa(locationId)
+	location.ID = strconv.Itoa(locationID)
 	return &location, nil
 }
 
+// PostHistoricalLocation adds a historical location to the database
+// returns the created historical location including the generated id
+// fails when a thing or location cannot be found for the given id's
 func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID string) error {
 	tid, err := strconv.Atoi(thingID)
 	if !gdb.ThingExists(tid) || err != nil {
-		return errors.New(fmt.Sprintf("Thing(%v) does not exist", thingID))
+		return fmt.Errorf("Thing(%v) does not exist", thingID)
 	}
 
 	lid, err2 := strconv.Atoi(thingID)
 	if !gdb.ThingExists(lid) || err2 != nil {
-		return errors.New(fmt.Sprintf("Location(%v) does not exist", locationID))
+		return fmt.Errorf("Location(%v) does not exist", locationID)
 	}
 
 	//check if thing and location exist
@@ -173,15 +184,17 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 	return nil
 }
 
+// LinkLocation links a thing with a location
+// fails when a thing or location cannot be found for the given id's
 func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	tid, err := strconv.Atoi(thingID)
 	if !gdb.ThingExists(tid) || err != nil {
-		return errors.New(fmt.Sprintf("Thing(%v) does not exist", thingID))
+		return fmt.Errorf("Thing(%v) does not exist", thingID)
 	}
 
 	lid, err2 := strconv.Atoi(thingID)
 	if !gdb.ThingExists(lid) || err2 != nil {
-		return errors.New(fmt.Sprintf("Location(%v) does not exist", locationID))
+		return fmt.Errorf("Location(%v) does not exist", locationID)
 	}
 
 	_, err3 := gdb.Db.Exec("INSERT INTO v1.thing_to_location (thing_id, location_id) VALUES ($1, $2)", tid, lid)
@@ -192,6 +205,7 @@ func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	return nil
 }
 
+// ThingExists checks if a thing is present in the database based on a given id
 func (gdb *GostDatabase) ThingExists(thingID int) bool {
 	var result bool
 	err := gdb.Db.QueryRow("SELECT exists (SELECT 1 FROM v1.thing WHERE id = $1 LIMIT 1)", thingID).Scan(&result)
@@ -202,6 +216,7 @@ func (gdb *GostDatabase) ThingExists(thingID int) bool {
 	return result
 }
 
+// LocationExists checks if a location is present in the database based on a given id
 func (gdb *GostDatabase) LocationExists(locationID int) bool {
 	var result bool
 	err := gdb.Db.QueryRow("SELECT exists (SELECT 1 FROM v1.location WHERE id = $1 LIMIT 1)", locationID).Scan(&result)

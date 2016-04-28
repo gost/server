@@ -10,11 +10,13 @@ import (
 	"github.com/surgemq/surgemq/service"
 )
 
-type MQTTServer interface {
+// Server interface defines the needed MQTT operations
+type Server interface {
 	Start()
 	Stop()
 }
 
+// MQTT is the implementation of the MQTT server
 type MQTT struct {
 	server           service.Server
 	keepAlive        int
@@ -31,7 +33,8 @@ type MQTT struct {
 	wssKeyPath       string // path to HTTPS private key
 }
 
-func NewMQTTServer() MQTTServer {
+// NewMQTTServer creates a new MQTT server
+func NewMQTTServer() Server {
 	return &MQTT{
 		keepAlive:        service.DefaultKeepAlive,
 		connectTimeout:   service.DefaultConnectTimeout,
@@ -48,6 +51,7 @@ func NewMQTTServer() MQTTServer {
 	}
 }
 
+// Start running the MQTT server
 func (m *MQTT) Start() {
 	mqttaddr := "tcp://:1883"
 	var err error
@@ -102,6 +106,7 @@ func (m *MQTT) Start() {
 	}()
 }
 
+// Stop the MQTT server
 func (m *MQTT) Stop() {
 	m.server.Close()
 }

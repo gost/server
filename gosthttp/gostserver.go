@@ -22,7 +22,7 @@ type GostServer struct {
 	api  *sensorthings.SensorThingsAPI // Sensorthings api to interact with from the HttpServer
 }
 
-// NewServer intialises a new GOST HTTPServer based on the given parameters
+// NewServer initialises a new GOST HTTPServer based on the given parameters
 func NewServer(host string, port int, api *sensorthings.SensorThingsAPI) HTTPServer {
 	return &GostServer{
 		host: host,

@@ -1,14 +1,14 @@
 package configuration
 
 import (
-	"os"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
-func readFile(cfgFile string) ([]byte, error){
-	if _, err := os.Stat(cfgFile);
-	os.IsNotExist(err) {
+func readFile(cfgFile string) ([]byte, error) {
+	if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
 		return nil, err
 	}
 
@@ -38,10 +38,10 @@ func GetConfig(cfgFile string) (Config, error) {
 		return Config{}, err
 	}
 
-	conf, err := readConfig(content);
+	conf, err := readConfig(content)
 	if err != nil {
 		return Config{}, err
 	}
 
-	return conf, nil;
+	return conf, nil
 }

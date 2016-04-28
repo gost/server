@@ -16,6 +16,7 @@ package configuration
 
 import (
 	"testing"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,15 +37,15 @@ database:
     ssl: false
 `
 
-func TestReadFile(t *testing.T){
+func TestReadFile(t *testing.T) {
 	f, err := readFile(configLocation)
-	if err != nil{
+	if err != nil {
 		t.Error("Please make sure there is a config.yaml file in the root directory ", err)
 	}
 	assert.NotNil(t, f, "config bytes should not be nil")
 
 	_, err2 := readFile("nonexistingfile.yaml")
-	if err2 == nil{
+	if err2 == nil {
 		t.Error("Reading non existing config file should have given an error")
 	}
 }
@@ -52,7 +53,7 @@ func TestReadFile(t *testing.T){
 func TestReadConfig(t *testing.T) {
 	content := []byte(data)
 	cfg, err := readConfig(content)
-	if err != nil{
+	if err != nil {
 		t.Error("Given static config data could not be parsed into config struct")
 	}
 	assert.NotNil(t, cfg)

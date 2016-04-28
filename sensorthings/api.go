@@ -50,7 +50,7 @@ func NewAPI(database Database, config configuration.Config) SensorThingsAPI {
 	}
 }
 
-func (a *API) GetConfig() *configuration.Config{
+func (a *API) GetConfig() *configuration.Config {
 	return &a.config
 }
 

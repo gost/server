@@ -122,14 +122,14 @@ func CreateEndPoints(externalURL string) []Endpoint {
 	endpoints := []Endpoint{
 		{
 			Name: "Version",
-			URL: fmt.Sprintf("%s/%s", externalURL, "Version"),
+			URL:  fmt.Sprintf("%s/%s", externalURL, "Version"),
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/Version", HandleVersion},
 			},
 		},
 		{
 			Name: "Root",
-			URL: fmt.Sprintf("%s/%s", externalURL, "v1.0"),
+			URL:  fmt.Sprintf("%s/%s", externalURL, "v1.0"),
 			Operations: []EndpointOperation{
 				{HTTPOperationGet, "/v1.0", HandleAPIRoot},
 			},

@@ -7,12 +7,13 @@ import (
 	"github.com/geodan/gost/gostdb"
 	"github.com/geodan/gost/gosthttp"
 	//"github.com/geodan/gost/mqtt"
-	"github.com/geodan/gost/sensorthings"
 	"log"
+
+	"github.com/geodan/gost/sensorthings"
 )
 
 var (
-	api  sensorthings.SensorThingsAPI
+	api sensorthings.SensorThingsAPI
 	//mqttServer mqtt.MQTTServer
 )
 
@@ -28,7 +29,7 @@ func init() {
 	flag.Parse()
 
 	conf, err := configuration.GetConfig(cfgFlag)
-	if err != nil{
+	if err != nil {
 		log.Fatal("config read error: ", err)
 	}
 

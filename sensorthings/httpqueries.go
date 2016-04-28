@@ -116,7 +116,7 @@ type QueryOption interface {
 }
 
 // ParseQueryOption tries to parse the user supplied values into the desired QueryOption
-// if an error occured in the parsing process a new error will be added
+// if an error occurred in the parsing process a new error will be added
 // to the supplied errorlist
 func ParseQueryOption(value string, q QueryOption, errorList *[]error) {
 	e := q.Parse(value)
