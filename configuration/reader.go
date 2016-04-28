@@ -7,20 +7,23 @@ import (
 	"io/ioutil"
 )
 
-func readConfig(cfgFile string) (Config, error) {
-	config := Config{}
-
+func readFile(cfgFile string) ([]byte, error){
 	if _, err := os.Stat(cfgFile);
 	os.IsNotExist(err) {
-		return config, err
+		return nil, err
 	}
 
 	source, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
-		return config, err
+		return nil, err
 	}
 
-	err2 := yaml.Unmarshal(source, &config)
+	return source, nil
+}
+
+func readConfig(fileContent []byte) (Config, error) {
+	config := Config{}
+	err2 := yaml.Unmarshal(fileContent, &config)
 	if err2 != nil {
 		return config, err2
 	}
@@ -31,9 +34,14 @@ func readConfig(cfgFile string) (Config, error) {
 // GetConfig retrieves a new configuration from the given config file
 // Fatal when config does not exist or cannot be read
 func GetConfig(cfgFile string) Config {
-	conf, confError := readConfig(cfgFile);
-	if confError != nil {
-		log.Fatal("config read error: ", confError)
+	content, err := readFile(cfgFile)
+	if err != nil {
+		log.Fatal("config read error: ", err)
+	}
+
+	conf, err2 := readConfig(content);
+	if err2 != nil {
+		log.Fatal("config read error: ", err2)
 	}
 
 	return conf;

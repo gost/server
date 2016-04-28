@@ -13,6 +13,7 @@ GOST is in it's very early stage and cannot be used at the moment, feel free to 
 GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Dependencies
+
 [yaml v2](https://github.com/go-yaml/yaml)
 [pq](https://github.com/lib/pq)  
 [mux](https://github.com/gorilla/mux)  
