@@ -16,14 +16,18 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 1] Install
 Install GoLang https://golang.org/
+
 Install Postgresql http://www.postgresql.org/
 
 2] Clone code
 git clone https://github.com/Geodan/gost.git
 
 3] Get dependencies
+
 go get gopkg.in/yaml.v2
+
 go get github.com/lib/pq 
+
 go get github.com/gorilla/mux
 
 4] Edit config.yaml
