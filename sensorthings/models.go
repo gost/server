@@ -1,15 +1,17 @@
 package sensorthings
 
+import "github.com/geodan/gost/sensorthings/entities"
+
 // Database specifies the operations that the database provider needs to support
 type Database interface {
 	Start()
 	CreateSchema()
 
-	GetThing(string) (*Thing, error)
-	GetThings() ([]*Thing, error)
-	PostThing(thing Thing) (*Thing, error)
+	GetThing(string) (*entities.Thing, error)
+	GetThings() ([]*entities.Thing, error)
+	PostThing(thing entities.Thing) (*entities.Thing, error)
 
-	PostLocation(location Location) (*Location, error)
+	PostLocation(location entities.Location) (*entities.Location, error)
 	LinkLocation(thingID string, locationID string) error
 
 	PostHistoricalLocation(thingID string, locationID string) error

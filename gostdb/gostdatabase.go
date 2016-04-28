@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/geodan/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings/entities"
 	_ "github.com/lib/pq" // needed for PostgreSQL integration
 )
 
@@ -67,7 +68,7 @@ func (gdb *GostDatabase) CreateSchema() {
 }
 
 // GetThing returns a thing entity based on id and query
-func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
+func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -82,7 +83,7 @@ func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 		return nil, err
 	}
 
-	thing := sensorthings.Thing{}
+	thing := entities.Thing{}
 	thing.ID = strconv.Itoa(thingID)
 	thing.Description = description
 
@@ -98,17 +99,17 @@ func (gdb *GostDatabase) GetThing(id string) (*sensorthings.Thing, error) {
 }
 
 // GetThings returns an array of things
-func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
+func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 	rows, err := gdb.Db.Query("SELECT id, description, properties FROM v1.thing")
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
-	var things = []*sensorthings.Thing{}
+	var things = []*entities.Thing{}
 
 	for rows.Next() {
-		thing := sensorthings.Thing{}
+		thing := entities.Thing{}
 
 		var id int
 		var description string
@@ -136,7 +137,7 @@ func (gdb *GostDatabase) GetThings() ([]*sensorthings.Thing, error) {
 
 // PostThing receives a posted thing entity and adds it to the database
 // returns the created Thing including the generated id
-func (gdb *GostDatabase) PostThing(thing sensorthings.Thing) (*sensorthings.Thing, error) {
+func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
 	var thingID int
 	err := gdb.Db.QueryRow("INSERT INTO v1.thing (description, properties) VALUES ($1, $2) RETURNING id", thing.Description, jsonProperties).Scan(&thingID)
@@ -150,7 +151,7 @@ func (gdb *GostDatabase) PostThing(thing sensorthings.Thing) (*sensorthings.Thin
 
 // PostLocation receives a posted location entity and adds it to the database
 // returns the created Location including the generated id
-func (gdb *GostDatabase) PostLocation(location sensorthings.Location) (*sensorthings.Location, error) {
+func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
 	err := gdb.Db.QueryRow("INSERT INTO v1.location (description, encodingtype, location) VALUES ($1, $2, $3) RETURNING id", location.Description, 1, location.Location).Scan(&locationID)
 	if err != nil {

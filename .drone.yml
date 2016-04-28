@@ -1,3 +1,3 @@
 notify:
   gitter:
-    webhook: https://drone.io/hook?id=github.com/Geodan/gost&token=JaCUqJiZn6jrbjDSK33i
+    webhook:

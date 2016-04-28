@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"io"
+	"io/ioutil"
 	"time"
 
+	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/gorilla/mux"
 )
 
@@ -44,47 +45,14 @@ func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *Endpoi
 
 // HandlePostThing tries to insert a new Thing and sends back the created Thing with http.StatusCreated when successful
 func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *Endpoint, api *API) {
-	var t Thing
-	if !tryParseEntity(w, r.Body, &t) {
-		return
-	}
-
 	a := *api
-	nt, err := a.PostThing(t)
-	if err != nil {
-		sendError(w, http.StatusBadRequest, err)
-	} else {
-		sendJSONResponse(w, http.StatusCreated, nt)
+	thing := &entities.Thing{}
+	handle := func() (interface{}, []error) {
+		t := *thing
+		return a.PostThing(t)
 	}
 
-	// test
-	/*a := *api
-	//var t Thing
-	handle := func(test interface{}) (interface{}, []error) {
-		asdf := *test
-		return a.PostThing(asdf.(Thing))
-	}
-
-	handlePostRequest(w, endpoint, r, &handle, Thing{}, http.StatusOK)*/
-}
-
-// handlePostRequest todo
-func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(interface{}) (interface{}, []error), i interface{}, statusCode int) {
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&i)
-	if err != nil {
-		sendError(w, http.StatusBadRequest, []error{err})
-		return
-	}
-
-	handle := *h
-	data, err2 := handle(&i)
-	if err2 != nil {
-		sendError(w, http.StatusBadRequest, []error{err})
-		return
-	}
-
-	sendJSONResponse(w, statusCode, data)
+	handlePostRequest(w, endpoint, r, thing, &handle, http.StatusOK)
 }
 
 // HandleDeleteThing todo
@@ -217,30 +185,17 @@ func getQueryOptions(r *http.Request) (*QueryOptions, []error) {
 	return qo, e
 }
 
-// tryParseEntity tries to parse a request body into the given entity
-// calls SendError to handle the error if the body can't be parsed to the given entity
-func tryParseEntity(w http.ResponseWriter, r io.ReadCloser, t interface{}) bool {
-	decoder := json.NewDecoder(r)
-	err := decoder.Decode(t)
-	if err != nil {
-		sendError(w, http.StatusBadRequest, []error{err})
-		return false
-	}
-
-	return true
-}
-
 // handleGetRequest is the default function to handle incoming GET requests
 func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *func(q *QueryOptions) (interface{}, error), statusCode int) {
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, err)
+		sendError(w, http.StatusMethodNotAllowed, err)
 		return
 	}
 
 	_, errors := e.AreQueryOptionsSupported(queryOptions)
 	if errors != nil {
-		sendError(w, http.StatusBadRequest, errors)
+		sendError(w, http.StatusMethodNotAllowed, errors)
 		return
 	}
 
@@ -248,6 +203,25 @@ func handleGetRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, h *fu
 	data, err2 := handler(queryOptions)
 	if err2 != nil {
 		sendError(w, http.StatusInternalServerError, errors)
+		return
+	}
+
+	sendJSONResponse(w, statusCode, data)
+}
+
+// handlePostRequest todo
+func handlePostRequest(w http.ResponseWriter, e *Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error), statusCode int) {
+	byteData, _ := ioutil.ReadAll(r.Body)
+	err := entity.ParseEntity(byteData)
+	if err != nil {
+		sendError(w, http.StatusBadRequest, []error{err})
+		return
+	}
+
+	handle := *h
+	data, err2 := handle()
+	if err2 != nil {
+		sendError(w, http.StatusBadRequest, []error{err})
 		return
 	}
 

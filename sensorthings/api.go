@@ -2,6 +2,7 @@ package sensorthings
 
 import (
 	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/sensorthings/entities"
 )
 
 const (
@@ -17,15 +18,15 @@ type API interface {
 	GetBasePathInfo() *ArrayResponse
 	GetEndpoints() *[]Endpoint
 
-	GetThing(id string, qo *QueryOptions) (*Thing, error)
+	GetThing(id string, qo *QueryOptions) (*entities.Thing, error)
 	GetThings(qo *QueryOptions) (*ArrayResponse, error)
-	PostThing(thing Thing) (*Thing, []error)
+	PostThing(thing entities.Thing) (*entities.Thing, []error)
 	DeleteThing(id string)
-	PatchThing(thing Thing)
+	PatchThing(thing entities.Thing)
 
-	GetLocation(id string) *Location
+	GetLocation(id string) *entities.Location
 	GetLocations() *ArrayResponse
-	PostLocation(location Location, thingID string) (*Location, []error)
+	PostLocation(location entities.Location, thingID string) (*entities.Location, []error)
 	DeleteLocation(id string)
 	PatchLocation(id string)
 
@@ -68,9 +69,9 @@ func (a *APIv1) GetVersionInfo() *VersionInfo {
 
 // GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
 func (a *APIv1) GetBasePathInfo() *ArrayResponse {
-	var rp interface{} = a.GetEndpoints()
+	var ep interface{} = a.GetEndpoints()
 	basePathInfo := ArrayResponse{
-		Data: &rp,
+		Data: &ep,
 	}
 
 	return &basePathInfo
@@ -87,7 +88,7 @@ func (a *APIv1) GetEndpoints() *[]Endpoint {
 
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
-func (a *APIv1) GetThing(id string, qo *QueryOptions) (*Thing, error) {
+func (a *APIv1) GetThing(id string, qo *QueryOptions) (*entities.Thing, error) {
 	t, err := a.db.GetThing(id)
 	if err != nil {
 		return nil, err
@@ -124,7 +125,7 @@ func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 
 // PostThing checks if a posted thing entity is valid and adds it to the database
 // a posted thing can also contain Locations and DataStreams
-func (a *APIv1) PostThing(thing Thing) (*Thing, []error) {
+func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
 	_, err := thing.ContainsMandatoryPostParams()
 	if err != nil {
 		return nil, err
@@ -171,12 +172,12 @@ func (a *APIv1) DeleteThing(id string) {
 }
 
 // PatchThing todo
-func (a *APIv1) PatchThing(thing Thing) {
+func (a *APIv1) PatchThing(thing entities.Thing) {
 
 }
 
 // GetLocation todo
-func (a *APIv1) GetLocation(id string) *Location {
+func (a *APIv1) GetLocation(id string) *entities.Location {
 	return nil
 }
 
@@ -192,7 +193,7 @@ func (a *APIv1) PatchLocation(id string) {
 
 // PostLocation checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
-func (a *APIv1) PostLocation(location Location, thingID string) (*Location, []error) {
+func (a *APIv1) PostLocation(location entities.Location, thingID string) (*entities.Location, []error) {
 	_, err := location.ContainsMandatoryPostParams()
 	if err != nil {
 		return nil, err
