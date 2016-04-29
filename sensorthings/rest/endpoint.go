@@ -58,59 +58,56 @@ func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (b
 	}
 
 	var errorList []error
-	if queryOptions.QueryTop != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryTop.GetQueryOptionType()) {
-			errorList = append(errorList, errors.New(odata.CreateQueryError(odata.QueryTopInvalid, e.Name)))
-		}
-	}
 
-	if queryOptions.QuerySkip != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QuerySkip.GetQueryOptionType()) {
-			errorList = append(errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)))
-		}
-	}
+	check(e, queryOptions.QueryTop, &errorList, errors.New(odata.CreateQueryError(odata.QueryTopInvalid, e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryTop.GetQueryOptionType())
+	})
 
-	if queryOptions.QuerySelect != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QuerySelect.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	check(e, queryOptions.QuerySkip, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QuerySkip.GetQueryOptionType())
+	})
 
-	if queryOptions.QueryExpand != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryExpand.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	//ToDo: Create error message for queries below
+	check(e, queryOptions.QuerySelect, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QuerySelect.GetQueryOptionType())
+	})
 
-	if queryOptions.QueryOrderBy != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryOrderBy.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	check(e, queryOptions.QueryExpand, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryExpand.GetQueryOptionType())
+	})
 
-	if queryOptions.QueryCount != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryCount.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	check(e, queryOptions.QueryOrderBy, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryOrderBy.GetQueryOptionType())
+	})
 
-	if queryOptions.QueryFilter != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryFilter.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	check(e, queryOptions.QueryCount, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryCount.GetQueryOptionType())
+	})
 
-	if queryOptions.QueryResultFormat != nil {
-		if !e.SupportsQueryOptionType(queryOptions.QueryResultFormat.GetQueryOptionType()) {
-			//ToDo: Create error message
-		}
-	}
+	check(e, queryOptions.QueryFilter, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryFilter.GetQueryOptionType())
+	})
+
+	check(e, queryOptions.QueryResultFormat, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
+		return e.SupportsQueryOptionType(queryOptions.QueryResultFormat.GetQueryOptionType())
+	})
 
 	if errorList != nil {
 		return false, errorList
 	}
 
 	return true, nil
+}
+
+func check(e *Endpoint, i interface{}, errorList *[]error, err error, supported func() bool) {
+	if i == nil {
+		return
+	}
+
+	errors := *errorList
+	if !supported() {
+		*errorList = append(errors, err)
+	}
 }
 
 // SupportsQueryOptionType checks if a given QueryOptionType is configured for the endpoint

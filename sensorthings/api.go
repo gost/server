@@ -34,8 +34,8 @@ func (a *APIv1) GetConfig() *configuration.Config {
 // GetVersionInfo retrieves the version info of the current supported SensorThings API Version and running server version
 func (a *APIv1) GetVersionInfo() *models.VersionInfo {
 	versionInfo := models.VersionInfo{
-		GostServerVersion: models.GostServerVersion{configuration.ServerVersion},
-		APIVersion:        models.APIVersion{configuration.SensorThingsAPIVersion},
+		GostServerVersion: models.GostServerVersion{Version: configuration.ServerVersion},
+		APIVersion:        models.APIVersion{Version: configuration.SensorThingsAPIVersion},
 	}
 
 	return &versionInfo
