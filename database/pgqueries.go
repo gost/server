@@ -1,4 +1,4 @@
-package gostdb
+package database
 
 import "fmt"
 

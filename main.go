@@ -2,13 +2,12 @@ package main
 
 import (
 	"flag"
-
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/gostdb"
-	"github.com/geodan/gost/gosthttp"
-	//"github.com/geodan/gost/mqtt"
 	"log"
 
+	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/database"
+	"github.com/geodan/gost/gosthttp"
+	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings"
 )
 
@@ -33,7 +32,7 @@ func init() {
 		log.Fatal("config read error: ", err)
 	}
 
-	database := gostdb.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
+	database := database.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
 	database.Start()
 
 	//mqttServer = mqtt.NewMQTTServer()
