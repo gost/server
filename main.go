@@ -9,10 +9,11 @@ import (
 	"github.com/geodan/gost/http"
 	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings/models"
 )
 
 var (
-	api sensorthings.API
+	api models.API
 	//mqttServer mqtt.MQTTServer
 )
 
@@ -42,7 +43,7 @@ func init() {
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
-func createAndStartServer(api *sensorthings.API) {
+func createAndStartServer(api *models.API) {
 	a := *api
 	gostServer := http.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
 	gostServer.Start()

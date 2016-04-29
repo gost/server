@@ -1,4 +1,4 @@
-package sensorthings
+package odata
 
 import (
 	"errors"

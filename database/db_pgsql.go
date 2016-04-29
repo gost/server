@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/geodan/gost/sensorthings"
 	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/geodan/gost/sensorthings/models"
 	_ "github.com/lib/pq" // needed for PostgreSQL integration
 )
 
@@ -32,7 +32,7 @@ type GostDatabase struct {
 //	password = database password
 //	database = name of database
 //	ssl = Whether to use secure TCP/IP connections (TLS).
-func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool) sensorthings.Database {
+func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool) models.Database {
 	return &GostDatabase{
 		Host:     host,
 		Port:     port,
