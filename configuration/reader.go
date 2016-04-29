@@ -2,21 +2,15 @@ package configuration
 
 import (
 	"io/ioutil"
-	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
-// readfile checks if the given filepath exist and returns the contenst
-// of the file in a byte array
+// readfile reads the bytes from a given file
 func readFile(cfgFile string) ([]byte, error) {
-	if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
+	source, err := ioutil.ReadFile(cfgFile)
+	if err != nil {
 		return nil, err
-	}
-
-	source, err2 := ioutil.ReadFile(cfgFile)
-	if err2 != nil {
-		return nil, err2
 	}
 
 	return source, nil

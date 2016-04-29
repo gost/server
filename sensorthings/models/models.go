@@ -1,10 +1,11 @@
 package models
 
 import (
+	"net/http"
+
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/odata"
-	"net/http"
 )
 
 const (

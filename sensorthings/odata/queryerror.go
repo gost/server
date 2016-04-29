@@ -14,6 +14,7 @@ const (
 	QueryCountInvalid        QueryErrorMessage = "The value %s for $count is invalid, available options: \"true\" or \"false\" "
 	QueryResultFormatInvalid QueryErrorMessage = "The value %s for $resultFormat is invalid, available options: dataArray"
 	QueryUnknown             QueryErrorMessage = "The query parameter %s is not supported"
+	QueryTopNotAvailable     QueryErrorMessage = "Query %s is not available on endpoint %s"
 	QuerySkipNotAvailable    QueryErrorMessage = "Query %s is not available on endpoint %s"
 )
 

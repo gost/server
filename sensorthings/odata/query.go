@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+// QueryOption contains user requested query information for retrieving objects
+// from the SensorThings API
+type QueryOption interface {
+	Parse(string) error
+	GetQueryOptionType() QueryOptionType
+	IsNil() bool
+}
+
 // QueryOptionType holds a supported query option
 type QueryOptionType int
 
@@ -55,7 +63,7 @@ type QueryOptions struct {
 // CreateQueryOptions parses the requested request parameters into usable Query options
 // and filters out invalid requests
 func CreateQueryOptions(queryParams url.Values) (*QueryOptions, []error) {
-	qo := QueryOptions{}
+	qo := &QueryOptions{}
 
 	var errorList []error
 	err := &errorList
@@ -105,14 +113,7 @@ func CreateQueryOptions(queryParams url.Values) (*QueryOptions, []error) {
 		return nil, errorList
 	}
 
-	return &qo, nil
-}
-
-// QueryOption contains user requested query information for retrieving objects
-// from the SensorThings API
-type QueryOption interface {
-	Parse(string) error
-	GetQueryOptionType() QueryOptionType
+	return qo, nil
 }
 
 // ParseQueryOption tries to parse the user supplied values into the desired QueryOption
@@ -150,6 +151,15 @@ func (q *QueryTop) GetQueryOptionType() QueryOptionType {
 	return QueryOptionTop
 }
 
+// IsNil checks if *QueryTop is nil
+func (q *QueryTop) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
+}
+
 // QuerySkip is used for retrieving records from a specified index of the entire record set.
 // If set the request will return table entries after the provided index value.
 type QuerySkip struct {
@@ -171,6 +181,15 @@ func (q *QuerySkip) Parse(value string) error {
 // GetQueryOptionType returns the QueryOptionType for QuerySkip
 func (q *QuerySkip) GetQueryOptionType() QueryOptionType {
 	return QueryOptionSkip
+}
+
+// IsNil checks if *QuerySkip is nil
+func (q *QuerySkip) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
 }
 
 // QuerySelect is used to return only the entity property values desired, this is used
@@ -199,6 +218,15 @@ func (q *QuerySelect) GetQueryOptionType() QueryOptionType {
 	return QueryOptionSelect
 }
 
+// IsNil checks if *QuerySelect is nil
+func (q *QuerySelect) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
+}
+
 // QueryExpand is used to return a linked entity member’s full details.
 // Expand retrieves the specified named property and represents it inline to the base entity.
 type QueryExpand struct {
@@ -222,6 +250,15 @@ func (q *QueryExpand) IsValid(values []string) (bool, error) {
 // GetQueryOptionType returns the QueryOptionType for QueryExpand
 func (q *QueryExpand) GetQueryOptionType() QueryOptionType {
 	return QueryOptionExpand
+}
+
+// IsNil checks if *QueryExpand is nil
+func (q *QueryExpand) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
 }
 
 // QueryOrderBy is used to define the order of the results set be ascending (asc) or descending (desc) order.
@@ -257,6 +294,15 @@ func (q *QueryOrderBy) GetQueryOptionType() QueryOptionType {
 	return QueryOptionOrderBy
 }
 
+// IsNil checks if *QueryOrderBy is nil
+func (q *QueryOrderBy) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
+}
+
 // QueryCount is used to get a total count for the number of each entity in the system.
 // Count is used to retrieve the total number of items in a collection matching the requested entity.
 type QueryCount struct {
@@ -280,6 +326,15 @@ func (q *QueryCount) GetQueryOptionType() QueryOptionType {
 	return QueryOptionCount
 }
 
+// IsNil checks if *QueryCount is nil
+func (q *QueryCount) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
+}
+
 // QueryFilter is used to perform conditional operations on the parameter values
 // Count is used to retrieve the total number of items in a collection matching the requested entity.
 type QueryFilter struct {
@@ -295,6 +350,15 @@ func (q *QueryFilter) Parse(value string) error {
 // GetQueryOptionType returns the QueryOptionType for QueryFilter
 func (q *QueryFilter) GetQueryOptionType() QueryOptionType {
 	return QueryOptionFilter
+}
+
+// IsNil checks if *QueryFilter is nil
+func (q *QueryFilter) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
 }
 
 // QueryResultFormat is used to return Observations in a data array format, a components section
@@ -318,4 +382,13 @@ func (q *QueryResultFormat) Parse(value string) error {
 // GetQueryOptionType returns the QueryOptionType for QueryResultFormat
 func (q *QueryResultFormat) GetQueryOptionType() QueryOptionType {
 	return QueryOptionResultFormat
+}
+
+// IsNil checks if *QueryResultFormat is nil
+func (q *QueryResultFormat) IsNil() bool {
+	if q == nil {
+		return true
+	}
+
+	return false
 }

@@ -18,9 +18,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"os"
 )
 
 var configLocation = "../config.yaml"
+var configLocationDrone = "../config_drone.yaml"
+var configFake = "nonexistingfile.yaml"
+var configWrongData = "testreadconfig.yaml"
+
 var data = `
 server:
     name: GOST Server
@@ -42,15 +48,24 @@ func TestReadFile(t *testing.T) {
 	if err != nil {
 		t.Error("Please make sure there is a config.yaml file in the root directory ", err)
 	}
+
 	assert.NotNil(t, f, "config bytes should not be nil")
 
-	_, err2 := readFile("nonexistingfile.yaml")
-	if err2 == nil {
+	f, err = readFile(configLocationDrone)
+	if err != nil {
+		t.Error("Error for config_drone.yaml", err)
+	}
+
+	assert.NotNil(t, f, "config bytes should not be nil")
+
+	_, err = readFile(configFake)
+	if err == nil {
 		t.Error("Reading non existing config file should have given an error")
 	}
 }
 
 func TestReadConfig(t *testing.T) {
+	// try parsing data, this should parse if not give error
 	content := []byte(data)
 	cfg, err := readConfig(content)
 	if err != nil {
@@ -63,12 +78,14 @@ func TestReadConfig(t *testing.T) {
 	assert.Equal(t, false, cfg.Database.SSL)
 	assert.Equal(t, "192.168.40.10", cfg.Database.Host)
 
+	// put in some false content this should fail
 	falseContent := []byte("aaabbbccc")
 	cfg, err = readConfig(falseContent)
 	assert.NotNil(t, err, "ReadConfig should have returned an error")
 }
 
 func TestGetConfig(t *testing.T) {
+	// Get the default config, should exist
 	cfg, err := GetConfig(configLocation)
 	if err != nil {
 		t.Error("GetConfig returned an error ", err)
@@ -77,4 +94,19 @@ func TestGetConfig(t *testing.T) {
 	// Check if there is data
 	assert.NotNil(t, cfg.Server.Host)
 	assert.NotNil(t, cfg.Database.Database)
+
+	// Try to get a fake config, should return error
+	_, err = GetConfig(configFake)
+	if err == nil {
+		t.Error("Given fake config did not return an error", err)
+	}
+
+	// write file with some fake data, GetConfig should return error
+	d1 := []byte("aaabbbccc")
+	_ = ioutil.WriteFile(configWrongData, d1, 0644)
+	_, err = GetConfig(configWrongData)
+	_ = os.Remove(configWrongData)
+	if err == nil {
+		t.Error("GetConfig should have returned an error on reading a fake config", err)
+	}
 }

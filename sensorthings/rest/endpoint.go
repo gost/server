@@ -2,7 +2,7 @@ package rest
 
 import (
 	"errors"
-	"fmt"
+
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/odata"
 )
@@ -58,39 +58,17 @@ func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (b
 	}
 
 	var errorList []error
-
-	check(e, queryOptions.QueryTop, &errorList, errors.New(odata.CreateQueryError(odata.QueryTopInvalid, e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryTop.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QuerySkip, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QuerySkip.GetQueryOptionType())
-	})
+	qo := *queryOptions
+	checkQueryOptionSupported(e, qo.QueryTop, &errorList, errors.New(odata.CreateQueryError(odata.QueryTopNotAvailable, qo.QueryTop.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QuerySkip, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QuerySkip.GetQueryOptionType().String(), e.Name)))
 
 	//ToDo: Create error message for queries below
-	check(e, queryOptions.QuerySelect, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QuerySelect.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QueryExpand, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryExpand.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QueryOrderBy, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryOrderBy.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QueryCount, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryCount.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QueryFilter, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryFilter.GetQueryOptionType())
-	})
-
-	check(e, queryOptions.QueryResultFormat, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, queryOptions.QuerySkip.GetQueryOptionType().String(), e.Name)), func() bool {
-		return e.SupportsQueryOptionType(queryOptions.QueryResultFormat.GetQueryOptionType())
-	})
+	checkQueryOptionSupported(e, qo.QuerySelect, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QuerySkip.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryExpand, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryExpand.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryOrderBy, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryOrderBy.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryCount, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryCount.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryFilter, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryFilter.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryResultFormat, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryResultFormat.GetQueryOptionType().String(), e.Name)))
 
 	if errorList != nil {
 		return false, errorList
@@ -99,13 +77,15 @@ func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (b
 	return true, nil
 }
 
-func check(e *Endpoint, i interface{}, errorList *[]error, err error, supported func() bool) {
-	if i == nil {
+// checkQueryOptionSupported checks if an QueryOption is supported on an endpoint, if not
+// an error will be added to the error list
+func checkQueryOptionSupported(e *Endpoint, q odata.QueryOption, errorList *[]error, err error) {
+	if q.IsNil() {
 		return
 	}
 
 	errors := *errorList
-	if !supported() {
+	if !e.SupportsQueryOptionType(q.GetQueryOptionType()) {
 		*errorList = append(errors, err)
 	}
 }
@@ -119,239 +99,4 @@ func (e *Endpoint) SupportsQueryOptionType(queryOptionType odata.QueryOptionType
 	}
 
 	return false
-}
-
-// CreateEndPoints creates the pre-defined endpoint config, the config contains all endpoint info
-// describing the SupportedQueryOptions (if needed) and EndpointOperation for each endpoint
-// parameter externalURL is the URL where the GOST service can be reached, main endpoint urls
-// are generated based upon this URL
-func CreateEndPoints(externalURL string) []models.Endpoint {
-	endpoints := []models.Endpoint{
-		&Endpoint{
-			Name: "Version",
-			URL:  fmt.Sprintf("%s/%s", externalURL, "Version"),
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/Version", HandleVersion},
-			},
-		},
-		&Endpoint{
-			Name: "Root",
-			URL:  fmt.Sprintf("%s/%s", externalURL, "v1.0"),
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0", HandleAPIRoot},
-			},
-		},
-		&Endpoint{
-			Name: "Things",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Things")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Locations",
-				"Datastreams",
-				"HistoricalLocations",
-			},
-			SupportedSelectParams: []string{
-				"properties",
-				"description",
-				"Locations",
-				"Datastreams",
-				"HistoricalLocations",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/Things", HandleGetThings},
-				{models.HTTPOperationGet, "/v1.0/Things{id}", HandleGetThingByID},
-				{models.HTTPOperationPost, "/v1.0/Things", HandlePostThing},
-				{models.HTTPOperationDelete, "/v1.0/Things{id}", HandleDeleteThing},
-				{models.HTTPOperationPatch, "/v1.0/Things{id}", HandlePatchThing},
-			},
-		},
-		&Endpoint{
-			Name: "Datastreams",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Datastreams")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Thing",
-				"Sensor",
-				"Observedproperty",
-				"Observations",
-			},
-			SupportedSelectParams: []string{
-				"description",
-				"unitofmeasurement",
-				"observationtype",
-				"observedarea",
-				"phenomenontime",
-				"resulttime",
-				"Thing",
-				"Sensor",
-				"ObservedProperty",
-				"Observations",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/Datastreams", HandleGetDatastreams},
-				{models.HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastreamByID},
-				{models.HTTPOperationGet, "/v1.0/Things{id}/Datastreams", HandleGetDatastreamsByThing},
-				{models.HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
-				{models.HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostAndLinkDatastream},
-				{models.HTTPOperationDelete, "/v1.0/Datastreams{id}", HandleDeleteDatastream},
-				{models.HTTPOperationPatch, "/v1.0/Things{id}/Datastreams", HandlePatchDatastream},
-			},
-		},
-		&Endpoint{
-			Name: "ObservedProperties",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "ObservedProperties")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Datastreams",
-			},
-			SupportedSelectParams: []string{
-				"name",
-				"definition",
-				"description",
-				"Datastreams",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/ObservedProperties", HandleGetObservedProperties},
-				{models.HTTPOperationGet, "/v1.0/ObservedProperty{id}", HandleGetObservedPropertyByID},
-				{models.HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperty", HandleGetObservedPropertyFromDatastream},
-				{models.HTTPOperationPost, "/v1.0/ObservedProperty", HandlePostObservedProperty},
-				{models.HTTPOperationDelete, "/v1.0/ObservedProperty{id}", HandleDeleteObservedProperty},
-				{models.HTTPOperationPatch, "/v1.0/ObservedProperty{id}", HandlePatchObservedProperty},
-			},
-		},
-		&Endpoint{
-			Name: "Locations",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Locations")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
-			},
-			SupportedExpandParams: []string{
-				"Things",
-				"HistoricalLocations",
-			},
-			SupportedSelectParams: []string{
-				"description",
-				"encodingtype",
-				"location",
-				"Things",
-				"HistoricalLocations",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/Locations", HandleGetLocations},
-				{models.HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocationByID},
-				{models.HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
-				{models.HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostAndLinkLocation},
-				{models.HTTPOperationDelete, "/v1.0/Locations{id}", HandleDeleteLocation},
-				{models.HTTPOperationPatch, "/v1.0/Locations{id}", HandlePatchLocation},
-			},
-		},
-		&Endpoint{
-			Name: "Sensors",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Sensors")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Datastream",
-			},
-			SupportedSelectParams: []string{
-				"description",
-				"encodingtype",
-				"metadata",
-				"Datastreams",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/Sensors", HandleGetSensors},
-				{models.HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensorByID},
-				{models.HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
-				{models.HTTPOperationDelete, "/v1.0/Sensors{id}", HandleDeleteSensor},
-				{models.HTTPOperationPatch, "/v1.0/Sensors{id}", HandlePatchSensor},
-			},
-		},
-		&Endpoint{
-			Name: "Observations",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Observations")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Datastream",
-				"FeatureOfInterest",
-			},
-			SupportedSelectParams: []string{
-				"description",
-				"encodingtype",
-				"feature",
-				"Observations",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/Observations", nil},
-				{models.HTTPOperationGet, "/v1.0/Observations{id}", nil},
-				{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Observations", nil},
-				{models.HTTPOperationPost, "/v1.0/Observations", nil},
-				{models.HTTPOperationPost, "/v1.0/Datastreams{id}/Observations", nil},
-				{models.HTTPOperationDelete, "/v1.0/Observations{id}", nil},
-				{models.HTTPOperationPatch, "/v1.0/Observations{id}", nil},
-			},
-		},
-		&Endpoint{
-			Name: "FeaturesOfInterest",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "FeaturesOfInterest")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"Observation",
-			},
-			SupportedSelectParams: []string{
-				"description",
-				"encodingtype",
-				"feature",
-				"Observations",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest", nil},
-				{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}", nil},
-				{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", nil},
-				{models.HTTPOperationDelete, "/v1.0/FeaturesOfInterest{id}", nil},
-				{models.HTTPOperationPatch, "/v1.0/FeaturesOfInterest{id}", nil},
-			},
-		},
-		&Endpoint{
-			Name: "HistoricalLocations",
-			URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "HistoricalLocations")),
-			SupportedQueryOptions: []odata.QueryOptionType{
-				odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-				odata.QueryOptionExpand, odata.QueryOptionSelect,
-			},
-			SupportedExpandParams: []string{
-				"locations",
-				"thing",
-			},
-			SupportedSelectParams: []string{
-				"time",
-			},
-			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/HistoricalLocations", nil},
-				{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", nil},
-				{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", nil},
-				{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", nil},
-			},
-		},
-	}
-
-	return endpoints
 }
