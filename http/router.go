@@ -1,4 +1,4 @@
-package gosthttp
+package http
 
 import (
 	"fmt"

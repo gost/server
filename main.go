@@ -6,7 +6,7 @@ import (
 
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/database"
-	"github.com/geodan/gost/gosthttp"
+	"github.com/geodan/gost/http"
 	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings"
 )
@@ -44,6 +44,6 @@ func init() {
 // createAndStartServer creates the GOST HTTPServer and starts it
 func createAndStartServer(api *sensorthings.API) {
 	a := *api
-	gostServer := gosthttp.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
+	gostServer := http.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
 	gostServer.Start()
 }
