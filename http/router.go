@@ -15,7 +15,7 @@ func NewRouter(api *models.API) *mux.Router {
 	a := *api
 	endpoints := *a.GetEndpoints()
 	router := mux.NewRouter().StrictSlash(true)
-	router.Path("/").Handler(http.FileServer(http.Dir("./client/")))
+	router.PathPrefix("/dashboard").Handler(http.StripPrefix("/dashboard", http.FileServer(http.Dir("./client/"))))
 
 	for _, endpoint := range endpoints {
 		ep := endpoint
