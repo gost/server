@@ -2,7 +2,6 @@ package entities
 
 import (
 	"encoding/json"
-	"errors"
 )
 
 // Thing in SensorThings represents a physical object in the real world. A Thing is a good starting
@@ -22,6 +21,11 @@ type Thing struct {
 	HistoricalLocations    []*HistoricalLocation `json:"HistoricalLocations,omitempty"`
 }
 
+// GetEntityType returns the EntityType for Thing
+func (t *Thing) GetEntityType() EntityType {
+	return EntityTypeThing
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (t *Thing) ParseEntity(data []byte) error {
 	thing := &t
@@ -33,10 +37,13 @@ func (t *Thing) ParseEntity(data []byte) error {
 	return nil
 }
 
-// ContainsMandatoryPostParams checks if all mandatory params for a Thing are available before posting
-func (t *Thing) ContainsMandatoryPostParams() (bool, []error) {
-	if len(t.Description) == 0 {
-		return false, []error{errors.New("Missing Thing.Description")}
+// ContainsMandatoryParams checks if all mandatory params for Thing are available before posting.
+func (t *Thing) ContainsMandatoryParams() (bool, []error) {
+	err := []error{}
+	CheckMandatoryParam(&err, t.Description, t.GetEntityType(), "description")
+
+	if len(err) != 0 {
+		return false, err
 	}
 
 	return true, nil
@@ -44,19 +51,8 @@ func (t *Thing) ContainsMandatoryPostParams() (bool, []error) {
 
 // SetLinks sets the entity specific navigation links if needed
 func (t *Thing) SetLinks(externalURL string) {
-	t.NavSelf = CreateEntitySefLink(externalURL, "Things", t.ID)
-
-	t.NavLocations = ""
-	t.NavDatastreams = ""
-	t.NavHistoricalLocations = ""
-
-	if t.Locations == nil {
-		t.NavLocations = CreateEntityLink("Things", "Locations", t.ID)
-	}
-	if t.Datastreams == nil {
-		t.NavDatastreams = CreateEntityLink("Things", "Datastreams", t.ID)
-	}
-	if t.HistoricalLocations == nil {
-		t.NavHistoricalLocations = CreateEntityLink("Things", "HistoricalLocations", t.ID)
-	}
+	t.NavSelf = CreateEntitySefLink(externalURL, EntityLinkThings.ToString(), t.ID)
+	t.NavLocations = CreateEntityLink(t.Locations == nil, EntityLinkThings.ToString(), EntityLinkLocations.ToString(), t.ID)
+	t.NavDatastreams = CreateEntityLink(t.Datastreams == nil, EntityLinkThings.ToString(), EntityLinkDatastreams.ToString(), t.ID)
+	t.NavHistoricalLocations = CreateEntityLink(t.HistoricalLocations == nil, EntityLinkThings.ToString(), EntityLinkHistoricalLocations.ToString(), t.ID)
 }

@@ -1,10 +1,9 @@
 package rest
 
 import (
-	"errors"
-
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/odata"
+	"net/http"
 )
 
 // Endpoint contains all information for creating and handling a main SensorThings endpoint.
@@ -59,16 +58,14 @@ func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (b
 
 	var errorList []error
 	qo := *queryOptions
-	checkQueryOptionSupported(e, qo.QueryTop, &errorList, errors.New(odata.CreateQueryError(odata.QueryTopNotAvailable, qo.QueryTop.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QuerySkip, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QuerySkip.GetQueryOptionType().String(), e.Name)))
-
-	//ToDo: Create error message for queries below
-	checkQueryOptionSupported(e, qo.QuerySelect, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QuerySkip.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QueryExpand, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryExpand.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QueryOrderBy, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryOrderBy.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QueryCount, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryCount.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QueryFilter, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryFilter.GetQueryOptionType().String(), e.Name)))
-	checkQueryOptionSupported(e, qo.QueryResultFormat, &errorList, errors.New(odata.CreateQueryError(odata.QuerySkipNotAvailable, qo.QueryResultFormat.GetQueryOptionType().String(), e.Name)))
+	checkQueryOptionSupported(e, qo.QueryTop, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryTop.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QuerySkip, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QuerySkip.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QuerySelect, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QuerySkip.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QueryExpand, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryExpand.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QueryOrderBy, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryOrderBy.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QueryCount, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryCount.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QueryFilter, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryFilter.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QueryResultFormat, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryResultFormat.GetQueryOptionType().String(), e.Name))
 
 	if errorList != nil {
 		return false, errorList

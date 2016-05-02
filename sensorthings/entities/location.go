@@ -2,7 +2,6 @@ package entities
 
 import (
 	"encoding/json"
-	"errors"
 )
 
 // Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
@@ -16,13 +15,18 @@ import (
 type Location struct {
 	ID                     string                `json:"@iot.id"`
 	NavSelf                string                `json:"@iot.selfLink"`
-	Description            string                `json:"descritption"`
+	Description            string                `json:"description"`
 	EncodingType           string                `json:"encodingtype"`
 	Location               string                `json:"location"`
 	NavThings              string                `json:"Things@iot.navigationLink,omitempty"`
 	NavHistoricalLocations string                `json:"HistoricalLocations@iot.navigationLink,omitempty"`
-	Things                 []*Thing              `json:"things"`
+	Things                 []*Thing              `json:"Things,omitempty"`
 	HistoricalLocations    []*HistoricalLocation `json:"HistoricalLocations,omitempty"`
+}
+
+// GetEntityType returns the EntityType for Location
+func (l *Location) GetEntityType() EntityType {
+	return EntityTypeLocation
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -36,24 +40,23 @@ func (l *Location) ParseEntity(data []byte) error {
 	return nil
 }
 
-// ContainsMandatoryPostParams checks if all mandatory params for Location are available before posting.
-func (l *Location) ContainsMandatoryPostParams() (bool, []error) {
+// ContainsMandatoryParams checks if all mandatory params for Location are available before posting.
+func (l *Location) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
-	if len(l.Description) == 0 {
-		err = append(err, errors.New("Missing Location.Description"))
-	}
+	CheckMandatoryParam(&err, l.Description, l.GetEntityType(), "description")
+	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingtype")
+	CheckMandatoryParam(&err, l.Location, l.GetEntityType(), "location")
 
-	if len(l.EncodingType) == 0 {
-		err = append(err, errors.New("Missing Location.EncodingType"))
-	}
-
-	if len(l.Location) == 0 {
-		err = append(err, errors.New("Missing Location.Location"))
-	}
-
-	if len(err) > 0 {
+	if len(err) != 0 {
 		return false, err
 	}
 
 	return true, nil
+}
+
+// SetLinks sets the entity specific navigation links if needed
+func (l *Location) SetLinks(externalURL string) {
+	l.NavSelf = CreateEntitySefLink(externalURL, EntityLinkLocations.ToString(), l.ID)
+	l.NavThings = CreateEntityLink(l.Things == nil, EntityLinkLocations.ToString(), EntityLinkThings.ToString(), l.ID)
+	l.NavHistoricalLocations = CreateEntityLink(l.HistoricalLocations == nil, EntityLinkLocations.ToString(), EntityLinkHistoricalLocations.ToString(), l.ID)
 }

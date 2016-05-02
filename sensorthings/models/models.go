@@ -109,3 +109,15 @@ type ArrayResponse struct {
 	Count *int         `json:"count,omitempty"`
 	Data  *interface{} `json:"value"`
 }
+
+// ErrorResponse is the default response format for sending errors back
+type ErrorResponse struct {
+	Error ErrorContent `json:"error"`
+}
+
+// ErrorContent holds information on the error that occurred
+type ErrorContent struct {
+	StatusText string   `json:"status"`
+	StatusCode int      `json:"code"`
+	Messages   []string `json:"message"`
+}

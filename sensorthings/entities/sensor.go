@@ -7,11 +7,16 @@ import "encoding/json"
 type Sensor struct {
 	ID             string        `json:"@iot.id"`
 	NavSelf        string        `json:"@iot.selfLink"`
-	Description    string        `json:"descritption"`
+	Description    string        `json:"description"`
 	EncodingType   string        `json:"encodingtype"`
 	Metadata       string        `json:"metadata"`
 	NavDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty"`
 	Datastreams    []*Datastream `json:"Datastreams,omitempty"`
+}
+
+// GetEntityType returns the EntityType for Sensor
+func (s *Sensor) GetEntityType() EntityType {
+	return EntityTypeSensor
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -23,4 +28,24 @@ func (s *Sensor) ParseEntity(data []byte) error {
 	}
 
 	return nil
+}
+
+// ContainsMandatoryParams checks if all mandatory params for Sensor are available before posting.
+func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
+	err := []error{}
+	CheckMandatoryParam(&err, s.Description, s.GetEntityType(), "description")
+	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingtype")
+	CheckMandatoryParam(&err, s.Metadata, s.GetEntityType(), "metadata")
+
+	if len(err) != 0 {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// SetLinks sets the entity specific navigation links if needed
+func (s *Sensor) SetLinks(externalURL string) {
+	s.NavSelf = CreateEntitySefLink(externalURL, EntityLinkSensors.ToString(), s.ID)
+	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
 }

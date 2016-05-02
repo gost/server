@@ -11,7 +11,7 @@ import (
 
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/models"
-	_ "github.com/lib/pq" // needed for PostgreSQL integration
+	_ "github.com/lib/pq" // postgres driver
 )
 
 // GostDatabase implementation
@@ -55,7 +55,7 @@ func (gdb *GostDatabase) Start() {
 
 	gdb.Db = db
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
-	//gdb.CreateSchema()
+	gdb.CreateSchema()
 }
 
 // CreateSchema creates the needed schema in the database

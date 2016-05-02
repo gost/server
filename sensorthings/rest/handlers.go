@@ -2,12 +2,11 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"io/ioutil"
-	"time"
 
+	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/odata"
@@ -30,11 +29,9 @@ func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *models.Endp
 
 // HandleGetThings retrieves and sends Things based on the given filter if provided
 func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-	fmt.Println(time.Now())
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThings(q) }
 	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
-	fmt.Println(time.Now())
 }
 
 // HandleGetThingByID retrieves and sends a specific Thing based on the given ID and filter
@@ -45,7 +42,7 @@ func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *models
 	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
 }
 
-// HandlePostThing tries to insert a new Thing and sends back the created Thing with http.StatusCreated when successful
+// HandlePostThing tries to insert a new Thing and sends back the created Thing
 func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	thing := &entities.Thing{}
@@ -54,7 +51,7 @@ func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *models.En
 		return a.PostThing(t)
 	}
 
-	handlePostRequest(w, endpoint, r, thing, &handle, http.StatusOK)
+	handlePostRequest(w, endpoint, r, thing, &handle)
 }
 
 // HandleDeleteThing todo
@@ -189,23 +186,26 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 
 // handleGetRequest is the default function to handle incoming GET requests
 func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions) (interface{}, error), statusCode int) {
+	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
-		sendError(w, http.StatusMethodNotAllowed, err)
+		sendError(w, err)
 		return
 	}
+
+	// Check if the requested enpoints supports the parsed queries
 	endpoint := *e
-
-	_, errors := endpoint.AreQueryOptionsSupported(queryOptions)
-	if errors != nil {
-		sendError(w, http.StatusMethodNotAllowed, errors)
+	_, err = endpoint.AreQueryOptionsSupported(queryOptions)
+	if err != nil {
+		sendError(w, err)
 		return
 	}
 
+	// Run the handler func such as Api.GetThingById
 	handler := *h
 	data, err2 := handler(queryOptions)
 	if err2 != nil {
-		sendError(w, http.StatusInternalServerError, errors)
+		sendError(w, []error{err2})
 		return
 	}
 
@@ -213,22 +213,22 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 }
 
 // handlePostRequest todo
-func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error), statusCode int) {
+func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
 	byteData, _ := ioutil.ReadAll(r.Body)
 	err := entity.ParseEntity(byteData)
 	if err != nil {
-		sendError(w, http.StatusBadRequest, []error{err})
+		sendError(w, []error{err})
 		return
 	}
 
 	handle := *h
 	data, err2 := handle()
 	if err2 != nil {
-		sendError(w, http.StatusBadRequest, []error{err})
+		sendError(w, []error{err})
 		return
 	}
 
-	sendJSONResponse(w, statusCode, data)
+	sendJSONResponse(w, http.StatusCreated, data)
 }
 
 // sendJSONResponse sends the desired message to the user
@@ -246,33 +246,32 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
 
 // sendError creates an ErrorResponse message and sets it to the user
 // using SendJSONResponse
-func sendError(w http.ResponseWriter, status int, error []error) {
+func sendError(w http.ResponseWriter, error []error) {
 	//errors cannot be marshalled, create strings
 	errors := make([]string, len(error))
 	for idx, value := range error {
-		errors[idx] = fmt.Sprintf("%s", value)
+		errors[idx] = value.Error()
 	}
 
-	statusText := http.StatusText(status)
-	errorResponse := ErrorResponse{
-		Error: ErrorContent{
+	// Set te status code, default 500 for error, check if there is an ApiError an get
+	// the status code
+	var statusCode = http.StatusInternalServerError
+	if error != nil && len(error) > 0 {
+		switch e := error[0].(type) {
+		case gostErrors.APIError:
+			statusCode = e.GetHTTPErrorStatusCode()
+			break
+		}
+	}
+
+	statusText := http.StatusText(statusCode)
+	errorResponse := models.ErrorResponse{
+		Error: models.ErrorContent{
 			StatusText: statusText,
-			StatusCode: status,
+			StatusCode: statusCode,
 			Messages:   errors,
 		},
 	}
 
-	sendJSONResponse(w, status, errorResponse)
-}
-
-// ErrorResponse is the default response format for sending errors back
-type ErrorResponse struct {
-	Error ErrorContent `json:"error"`
-}
-
-// ErrorContent holds information on the error that occurred
-type ErrorContent struct {
-	StatusText string   `json:"status"`
-	StatusCode int      `json:"code"`
-	Messages   []string `json:"message"`
+	sendJSONResponse(w, statusCode, errorResponse)
 }

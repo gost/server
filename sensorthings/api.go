@@ -82,7 +82,7 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error)
 	uri := a.config.GetExternalServerURI()
 	for idx, item := range things {
 		i := *item
-		item.SetLinks(uri)
+		i.SetLinks(uri)
 		things[idx] = &i
 	}
 
@@ -100,7 +100,7 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error)
 // PostThing checks if a posted thing entity is valid and adds it to the database
 // a posted thing can also contain Locations and DataStreams
 func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
-	_, err := thing.ContainsMandatoryPostParams()
+	_, err := thing.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (a *APIv1) PatchLocation(id string) {
 // PostLocation checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
 func (a *APIv1) PostLocation(location entities.Location, thingID string) (*entities.Location, []error) {
-	_, err := location.ContainsMandatoryPostParams()
+	_, err := location.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}

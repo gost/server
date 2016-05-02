@@ -14,10 +14,15 @@ type Observation struct {
 	ResultQuality        string             `json:"resultQuality"`
 	ValidTime            string             `json:"validTime"`
 	Parameters           string             `json:"parameters"`
-	NavDatastreams       string             `json:"Datastreams@iot.navigationLink,omitempty"`
+	NavDatastream        string             `json:"Datastream@iot.navigationLink,omitempty"`
 	NavFeatureOfInterest string             `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
-	Datastreams          []*Datastream      `json:"Datastreams,omitempty"`
+	Datastream           *Datastream        `json:"Datastream,omitempty"`
 	FeatureOfInterest    *FeatureOfInterest `json:"FeatureOfInterest,omitempty"`
+}
+
+// GetEntityType returns the EntityType for Observation
+func (o *Observation) GetEntityType() EntityType {
+	return EntityTypeObservation
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -29,4 +34,25 @@ func (o *Observation) ParseEntity(data []byte) error {
 	}
 
 	return nil
+}
+
+// ContainsMandatoryParams checks if all mandatory params for Observation are available before posting.
+func (o *Observation) ContainsMandatoryParams() (bool, []error) {
+	err := []error{}
+	CheckMandatoryParam(&err, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
+	CheckMandatoryParam(&err, o.Result, o.GetEntityType(), "result")
+	CheckMandatoryParam(&err, o.ResultTime, o.GetEntityType(), "resultTime")
+
+	if len(err) != 0 {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// SetLinks sets the entity specific navigation links if needed
+func (o *Observation) SetLinks(externalURL string) {
+	o.NavSelf = CreateEntitySefLink(externalURL, EntityLinkObservations.ToString(), o.ID)
+	o.NavDatastream = CreateEntityLink(o.Datastream == nil, EntityLinkObservations.ToString(), EntityTypeDatastream.ToString(), o.ID)
+	o.NavFeatureOfInterest = CreateEntityLink(o.FeatureOfInterest == nil, EntityLinkObservations.ToString(), EntityTypeFeatureOfInterest.ToString(), o.ID)
 }
