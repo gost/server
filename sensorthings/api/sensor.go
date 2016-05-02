@@ -19,7 +19,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error
 }
 
 // PostSensor todo
-func (a *APIv1) PostSensor(sensor entities.Sensor, x string) (*entities.Sensor, []error) {
+func (a *APIv1) PostSensor(sensor entities.Sensor) (*entities.Sensor, []error) {
 	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
 }
 

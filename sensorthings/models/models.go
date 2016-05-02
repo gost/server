@@ -29,7 +29,8 @@ type API interface {
 
 	GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error)
 	GetLocations(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostLocation(location entities.Location, x string) (*entities.Location, []error)
+	PostLocation(location entities.Location) (*entities.Location, []error)
+	PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error)
 	PatchLocation(id string, location entities.Location) (*entities.Location, error)
 	DeleteLocation(id string) error
 
@@ -40,31 +41,36 @@ type API interface {
 
 	GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error)
 	GetDatastreams(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostDatastream(datastream entities.Datastream, x string) (*entities.Datastream, []error)
+	GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	PostDatastream(datastream entities.Datastream) (*entities.Datastream, []error)
+	PostDatastreamByThing(thingID string, datastream entities.Datastream) (*entities.Datastream, []error)
 	PatchDatastream(id string, datastream entities.Datastream) (*entities.Datastream, error)
 	DeleteDatastream(id string) error
 
 	GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostFeatureOfInterest(foi entities.FeatureOfInterest, x string) (*entities.FeatureOfInterest, []error)
+	PostFeatureOfInterest(foi entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	PatchFeatureOfInterest(id string, foi entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	DeleteFeatureOfInterest(id string) error
 
 	GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error)
 	GetObservations(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostObservation(observation entities.Observation, x string) (*entities.Observation, []error)
+	GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	PostObservation(observation entities.Observation) (*entities.Observation, []error)
+	PostObservationByDatastream(datastreamID string, observation entities.Observation) (*entities.Observation, []error)
 	PatchObservation(id string, observation entities.Observation) (*entities.Observation, error)
 	DeleteObservation(id string) error
 
 	GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
 	GetObservedProperties(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostObservedProperty(op entities.ObservedProperty, x string) (*entities.ObservedProperty, []error)
+	GetObservedPropertiesByDatastream(datastreamID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, []error)
 	PatchObservedProperty(id string, op entities.ObservedProperty) (*entities.ObservedProperty, error)
 	DeleteObservedProperty(id string) error
 
 	GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error)
 	GetSensors(qo *odata.QueryOptions) (*ArrayResponse, error)
-	PostSensor(sensor entities.Sensor, x string) (*entities.Sensor, []error)
+	PostSensor(sensor entities.Sensor) (*entities.Sensor, []error)
 	PatchSensor(id string, sensor entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id string) error
 

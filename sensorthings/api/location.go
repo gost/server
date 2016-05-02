@@ -8,9 +8,14 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 )
 
-// PostLocation checks if the given location entity is valid and adds it to the database
+// PostLocation todo
+func (a *APIv1) PostLocation(location entities.Location) (*entities.Location, []error) {
+	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+}
+
+// PostLocationByThing checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
-func (a *APIv1) PostLocation(location entities.Location, thingID string) (*entities.Location, []error) {
+func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error) {
 	_, err := location.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
