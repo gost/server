@@ -41,6 +41,7 @@ function showThings(data){
         html+="Id: " + val0["@iot.id"] + "<br/>"; 
         html+="Description: " + val0.description + "<br/>";
         html+="Organisation: " + val0.properties.organisation + "<br/>";
+        html+="Owner: " + val0.properties.owner + "<br/>";
         html += "Link: " + "<a href = '" + val0["@iot.selfLink"] + "'>" + val0["@iot.selfLink"] + "</a><br/>";
         html += "<br/>";
     }
