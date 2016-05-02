@@ -18,8 +18,13 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResp
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
+// GetObservedPropertiesByDatastream todo
+func (a *APIv1) GetObservedPropertiesByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
 // PostObservedProperty todo
-func (a *APIv1) PostObservedProperty(op entities.ObservedProperty, x string) (*entities.ObservedProperty, []error) {
+func (a *APIv1) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, []error) {
 	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
 }
 

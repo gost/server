@@ -19,7 +19,7 @@ func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions) (*models.ArrayResp
 }
 
 // PostFeatureOfInterest todo
-func (a *APIv1) PostFeatureOfInterest(foi entities.FeatureOfInterest, x string) (*entities.FeatureOfInterest, []error) {
+func (a *APIv1) PostFeatureOfInterest(foi entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
 	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
 }
 

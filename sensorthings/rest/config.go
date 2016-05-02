@@ -70,7 +70,7 @@ func createThings(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Things", HandleGetThings},
-			{models.HTTPOperationGet, "/v1.0/Things{id}", HandleGetThingByID},
+			{models.HTTPOperationGet, "/v1.0/Things{id}", HandleGetThing},
 			{models.HTTPOperationPost, "/v1.0/Things", HandlePostThing},
 			{models.HTTPOperationDelete, "/v1.0/Things{id}", HandleDeleteThing},
 			{models.HTTPOperationPatch, "/v1.0/Things{id}", HandlePatchThing},
@@ -106,12 +106,12 @@ func createDatastreams(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Datastreams", HandleGetDatastreams},
-			{models.HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastreamByID},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastream},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/Datastreams", HandleGetDatastreamsByThing},
 			{models.HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
-			{models.HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostAndLinkDatastream},
+			{models.HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostDatastreamByThing},
 			{models.HTTPOperationDelete, "/v1.0/Datastreams{id}", HandleDeleteDatastream},
-			{models.HTTPOperationPatch, "/v1.0/Things{id}/Datastreams", HandlePatchDatastream},
+			{models.HTTPOperationPatch, "/v1.0/Datastreams{id}", HandlePatchDatastream},
 		},
 	}
 }
@@ -135,8 +135,8 @@ func createObservedProperties(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties", HandleGetObservedProperties},
-			{models.HTTPOperationGet, "/v1.0/ObservedProperty{id}", HandleGetObservedPropertyByID},
-			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperty", HandleGetObservedPropertyFromDatastream},
+			{models.HTTPOperationGet, "/v1.0/ObservedProperty{id}", HandleGetObservedProperty},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperty", HandleGetObservedPropertyByDatastream},
 			{models.HTTPOperationPost, "/v1.0/ObservedProperty", HandlePostObservedProperty},
 			{models.HTTPOperationDelete, "/v1.0/ObservedProperty{id}", HandleDeleteObservedProperty},
 			{models.HTTPOperationPatch, "/v1.0/ObservedProperty{id}", HandlePatchObservedProperty},
@@ -165,9 +165,9 @@ func createLocations(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Locations", HandleGetLocations},
-			{models.HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocationByID},
+			{models.HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocation},
 			{models.HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
-			{models.HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostAndLinkLocation},
+			{models.HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostLocationByThing},
 			{models.HTTPOperationDelete, "/v1.0/Locations{id}", HandleDeleteLocation},
 			{models.HTTPOperationPatch, "/v1.0/Locations{id}", HandlePatchLocation},
 		},
@@ -193,7 +193,7 @@ func createSensors(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Sensors", HandleGetSensors},
-			{models.HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensorByID},
+			{models.HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensor},
 			{models.HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
 			{models.HTTPOperationDelete, "/v1.0/Sensors{id}", HandleDeleteSensor},
 			{models.HTTPOperationPatch, "/v1.0/Sensors{id}", HandlePatchSensor},
@@ -220,13 +220,13 @@ func createObservations(externalURL string) *Endpoint {
 			"Observations",
 		},
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/v1.0/Observations", nil},
-			{models.HTTPOperationGet, "/v1.0/Observations{id}", nil},
-			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Observations", nil},
-			{models.HTTPOperationPost, "/v1.0/Observations", nil},
-			{models.HTTPOperationPost, "/v1.0/Datastreams{id}/Observations", nil},
-			{models.HTTPOperationDelete, "/v1.0/Observations{id}", nil},
-			{models.HTTPOperationPatch, "/v1.0/Observations{id}", nil},
+			{models.HTTPOperationGet, "/v1.0/Observations", HandleGetObservations},
+			{models.HTTPOperationGet, "/v1.0/Observations{id}", HandleGetObservation},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Observations", HandleGetObservationsByDatastream},
+			{models.HTTPOperationPost, "/v1.0/Observations", HandlePostObservation},
+			{models.HTTPOperationPost, "/v1.0/Datastreams{id}/Observations", HandlePostObservationByDatastream},
+			{models.HTTPOperationDelete, "/v1.0/Observations{id}", HandleDeleteObservation},
+			{models.HTTPOperationPatch, "/v1.0/Observations{id}", HandlePatchObservation},
 		},
 	}
 }
@@ -249,11 +249,11 @@ func createFeaturesOfInterest(externalURL string) *Endpoint {
 			"Observations",
 		},
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest", nil},
-			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}", nil},
-			{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", nil},
-			{models.HTTPOperationDelete, "/v1.0/FeaturesOfInterest{id}", nil},
-			{models.HTTPOperationPatch, "/v1.0/FeaturesOfInterest{id}", nil},
+			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest", HandleGetFeatureOfInterests},
+			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}", HandleGetFeatureOfInterest},
+			{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", HandlePostFeatureOfInterest},
+			{models.HTTPOperationDelete, "/v1.0/FeaturesOfInterest{id}", HandleDeleteFeatureOfInterest},
+			{models.HTTPOperationPatch, "/v1.0/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
 		},
 	}
 }
@@ -274,10 +274,10 @@ func createHistoricalLocations(externalURL string) *Endpoint {
 			"time",
 		},
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/v1.0/HistoricalLocations", nil},
-			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", nil},
-			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", nil},
-			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", nil},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations", HandleGetHistoricalLocations},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", HandleGetHistoricalLocation},
+			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
+			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},
 		},
 	}
 }

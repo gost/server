@@ -26,15 +26,4 @@ const (
 func CreateQueryError(msg QueryErrorMessage, status int, value ...string) error {
 	m := fmt.Sprintf("%s", msg)
 	return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value), status)
-	/*if len(value) == 1 {
-		return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value), status)
-	}
-	if len(value) == 2 {
-		return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value[0], value[1]), status)
-	}
-	if len(value) == 3 {
-		return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value[0], value[1], value[2]), status)
-	}
-
-	return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value), status)*/
 }

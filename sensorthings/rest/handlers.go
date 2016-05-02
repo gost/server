@@ -31,134 +31,338 @@ func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *models.Endp
 func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThings(q) }
-	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
-// HandleGetThingByID retrieves and sends a specific Thing based on the given ID and filter
-func HandleGetThingByID(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandleGetThing retrieves and sends a specific Thing based on the given ID and filter
+func HandleGetThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	id := getEntityID(r)
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThing(id, q) }
-	handleGetRequest(w, endpoint, r, &handle, http.StatusOK)
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThing(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandlePostThing tries to insert a new Thing and sends back the created Thing
 func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	thing := &entities.Thing{}
-	handle := func() (interface{}, []error) {
-		t := *thing
-		return a.PostThing(t)
-	}
-
+	handle := func() (interface{}, []error) { t := *thing; return a.PostThing(t) }
 	handlePostRequest(w, endpoint, r, thing, &handle)
 }
 
 // HandleDeleteThing todo
 func HandleDeleteThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-
+	a := *api
+	handle := func() error { return a.DeleteThing(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
 }
 
 // HandlePatchThing todo
 func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	thing := &entities.Thing{}
+	handle := func() (interface{}, error) { t := *thing; return a.PatchThing(getEntityID(r), t) }
+	handlePatchRequest(w, endpoint, r, thing, &handle)
+}
 
+// HandleGetObservedProperty todo
+func HandleGetObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservedProperty(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetObservedProperties todo
 func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservedProperties(q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
-// HandleGetObservedPropertyByID todo
-func HandleGetObservedPropertyByID(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-}
-
-// HandleGetObservedPropertyFromDatastream todo
-func HandleGetObservedPropertyFromDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandleGetObservedPropertyByDatastream todo
+func HandleGetObservedPropertyByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetObservedPropertiesByDatastream(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandlePostObservedProperty todo
 func HandlePostObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	op := &entities.ObservedProperty{}
+	handle := func() (interface{}, []error) { o := *op; return a.PostObservedProperty(o) }
+	handlePostRequest(w, endpoint, r, op, &handle)
 }
 
 // HandleDeleteObservedProperty todo
 func HandleDeleteObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteObservedProperty(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
 }
 
 // HandlePatchObservedProperty todo
 func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	op := &entities.ObservedProperty{}
+	handle := func() (interface{}, error) { o := *op; return a.PatchObservedProperty(getEntityID(r), o) }
+	handlePatchRequest(w, endpoint, r, op, &handle)
 }
 
 // HandleGetLocations todo
 func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocations(q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
-// HandleGetLocationByID todo
-func HandleGetLocationByID(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandleGetLocation todo
+func HandleGetLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocation(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandlePostLocation todo
 func HandlePostLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	loc := &entities.Location{}
+	handle := func() (interface{}, []error) { l := *loc; return a.PostLocation(l) }
+	handlePostRequest(w, endpoint, r, loc, &handle)
 }
 
-// HandlePostAndLinkLocation todo
-func HandlePostAndLinkLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandlePostLocationByThing todo
+func HandlePostLocationByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	loc := &entities.Location{}
+	handle := func() (interface{}, []error) { l := *loc; return a.PostLocationByThing(getEntityID(r), l) }
+	handlePostRequest(w, endpoint, r, loc, &handle)
 }
 
 // HandleDeleteLocation todo
 func HandleDeleteLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteLocation(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
 }
 
 // HandlePatchLocation todo
 func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	loc := &entities.Location{}
+	handle := func() (interface{}, error) { l := *loc; return a.PatchLocation(getEntityID(r), l) }
+	handlePatchRequest(w, endpoint, r, loc, &handle)
 }
 
 // HandleGetDatastreams todo
 func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreams(q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
-// HandleGetDatastreamByID todo
-func HandleGetDatastreamByID(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandleGetDatastream todo
+func HandleGetDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastream(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetDatastreamsByThing todo
 func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreamsByThing(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandlePostDatastream todo
 func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ds := &entities.Datastream{}
+	handle := func() (interface{}, []error) { d := *ds; return a.PostDatastream(d) }
+	handlePostRequest(w, endpoint, r, ds, &handle)
 }
 
-// HandlePostAndLinkDatastream todo
-func HandlePostAndLinkDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+// HandlePostDatastreamByThing todo
+func HandlePostDatastreamByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ds := &entities.Datastream{}
+	handle := func() (interface{}, []error) { d := *ds; return a.PostDatastreamByThing(getEntityID(r), d) }
+	handlePostRequest(w, endpoint, r, ds, &handle)
 }
 
 // HandleDeleteDatastream todo
 func HandleDeleteDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteDatastream(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
 }
 
 // HandlePatchDatastream todo
 func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ds := &entities.Datastream{}
+	handle := func() (interface{}, error) { d := *ds; return a.PatchDatastream(getEntityID(r), d) }
+	handlePatchRequest(w, endpoint, r, ds, &handle)
+}
+
+// HandleGetSensor todo
+func HandleGetSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensor(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetSensors todo
 func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-}
-
-// HandleGetSensorByID todo
-func HandleGetSensorByID(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensors(q) }
+	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandlePostSensors todo
 func HandlePostSensors(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	sensor := &entities.Sensor{}
+	handle := func() (interface{}, []error) { s := *sensor; return a.PostSensor(s) }
+	handlePostRequest(w, endpoint, r, sensor, &handle)
 }
 
 // HandleDeleteSensor todo
 func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteSensor(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
 }
 
 // HandlePatchSensor todo
 func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	sensor := &entities.Sensor{}
+	handle := func() (interface{}, error) { s := *sensor; return a.PatchSensor(getEntityID(r), s) }
+	handlePatchRequest(w, endpoint, r, sensor, &handle)
+}
+
+// HandleGetObservations todo
+func HandleGetObservations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservations(q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetObservation todo
+func HandleGetObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservation(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetObservationsByDatastream todo
+func HandleGetObservationsByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetObservationsByDatastream(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandlePostObservation todo
+func HandlePostObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ob := &entities.Observation{}
+	handle := func() (interface{}, []error) { o := *ob; return a.PostObservation(o) }
+	handlePostRequest(w, endpoint, r, ob, &handle)
+}
+
+// HandlePostObservationByDatastream todo
+func HandlePostObservationByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ob := &entities.Observation{}
+	handle := func() (interface{}, []error) { o := *ob; return a.PostObservationByDatastream(getEntityID(r), o) }
+	handlePostRequest(w, endpoint, r, ob, &handle)
+}
+
+// HandleDeleteObservation todo
+func HandleDeleteObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteObservation(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
+}
+
+// HandlePatchObservation todo
+func HandlePatchObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ob := &entities.Observation{}
+	handle := func() (interface{}, error) { o := *ob; return a.PatchObservation(getEntityID(r), o) }
+	handlePatchRequest(w, endpoint, r, ob, &handle)
+}
+
+// HandleGetFeatureOfInterests todo
+func HandleGetFeatureOfInterests(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetFeatureOfInterests(q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetFeatureOfInterest todo
+func HandleGetFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetFeatureOfInterest(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandlePostFeatureOfInterest todo
+func HandlePostFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	foi := &entities.FeatureOfInterest{}
+	handle := func() (interface{}, []error) { f := *foi; return a.PostFeatureOfInterest(f) }
+	handlePostRequest(w, endpoint, r, foi, &handle)
+}
+
+// HandleDeleteFeatureOfInterest todo
+func HandleDeleteFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteFeatureOfInterest(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
+}
+
+// HandlePatchFeatureOfInterest todo
+func HandlePatchFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	foi := &entities.FeatureOfInterest{}
+	handle := func() (interface{}, error) { f := *foi; return a.PatchFeatureOfInterest(getEntityID(r), f) }
+	handlePatchRequest(w, endpoint, r, foi, &handle)
+}
+
+// HandleGetHistoricalLocations todo
+func HandleGetHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetHistoricalLocations(q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetHistoricalLocation todo
+func HandleGetHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	id := getEntityID(r)
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetHistoricalLocation(id, q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleDeleteHistoricalLocations todo
+func HandleDeleteHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func() error { return a.DeleteHistoricalLocation(getEntityID(r)) }
+	handleDeleteRequest(w, endpoint, r, &handle)
+}
+
+// HandlePatchHistoricalLocations todo
+func HandlePatchHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	hl := &entities.HistoricalLocation{}
+	handle := func() (interface{}, error) { h := *hl; return a.PatchHistoricalLocation(getEntityID(r), h) }
+	handlePatchRequest(w, endpoint, r, hl, &handle)
 }
 
 // getEntityID retrieves the id from the request, for example
@@ -185,7 +389,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 }
 
 // handleGetRequest is the default function to handle incoming GET requests
-func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions) (interface{}, error), statusCode int) {
+func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions) (interface{}, error)) {
 	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
@@ -209,7 +413,38 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		return
 	}
 
-	sendJSONResponse(w, statusCode, data)
+	sendJSONResponse(w, http.StatusOK, data)
+}
+
+// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
+func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
+	byteData, _ := ioutil.ReadAll(r.Body)
+	err := entity.ParseEntity(byteData)
+	if err != nil {
+		sendError(w, []error{err})
+		return
+	}
+
+	handle := *h
+	data, err2 := handle()
+	if err2 != nil {
+		sendError(w, []error{err2})
+		return
+	}
+
+	sendJSONResponse(w, http.StatusOK, data)
+}
+
+// handlePostRequest todo
+func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func() error) {
+	handle := *h
+	err := handle()
+	if err != nil {
+		sendError(w, []error{err})
+		return
+	}
+
+	sendJSONResponse(w, http.StatusOK, "null")
 }
 
 // handlePostRequest todo
@@ -224,7 +459,7 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 	handle := *h
 	data, err2 := handle()
 	if err2 != nil {
-		sendError(w, []error{err})
+		sendError(w, err2)
 		return
 	}
 

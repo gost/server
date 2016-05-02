@@ -64,7 +64,7 @@ func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
 			location := *l
 			// New location posted
 			if len(l.ID) == 0 { //Id is null so a new location is posted
-				_, err3 := a.PostLocation(location, nt.ID)
+				_, err3 := a.PostLocationByThing(nt.ID, location)
 				if err3 != nil {
 					return nil, err3
 				}

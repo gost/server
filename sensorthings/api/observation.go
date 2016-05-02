@@ -18,8 +18,18 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, 
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
+// GetObservationsByDatastream todo
+func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
 // PostObservation todo
-func (a *APIv1) PostObservation(observation entities.Observation, x string) (*entities.Observation, []error) {
+func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Observation, []error) {
+	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+}
+
+// PostObservationByDatastream todo
+func (a *APIv1) PostObservationByDatastream(datastreamID string, observation entities.Observation) (*entities.Observation, []error) {
 	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
 }
 
