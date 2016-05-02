@@ -2,7 +2,7 @@ server:
     name: GOST Server
     host: localhost
     port: 8080
-    externalUri: localhost:8080/
+    externalUri: http://localhost:8080/
 database:
     host: 192.168.40.10
     port: 5432
