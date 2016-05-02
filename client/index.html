@@ -7,13 +7,13 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="resources/css/normalize.css">
-    <link rel="stylesheet" href="resources/css/bootstrap-3.3.6.min.css">
-    <link rel="stylesheet" href="resources/css/main.css">
-    <link rel="stylesheet" href="resources/css/font-awesome.min.css">
-    <script src="resources/js/vendor/modernizr-2.8.3.min.js"></script>
-    <script src="resources/js/vendor/jquery-2.2.0.min.js"></script>
-    <script src="resources/js/vendor/bootstrap-3.3.6.min.js"></script>
+    <link rel="stylesheet" href="./resources/css/normalize.css">
+    <link rel="stylesheet" href="./resources/css/bootstrap-3.3.6.min.css">
+    <link rel="stylesheet" href="./resources/css/main.css">
+    <link rel="stylesheet" href="./resources/css/font-awesome.min.css">
+    <script src="./resources/js/vendor/modernizr-2.8.3.min.js"></script>
+    <script src="./resources/js/vendor/jquery-2.2.0.min.js"></script>
+    <script src="./resources/js/vendor/bootstrap-3.3.6.min.js"></script>
 </head>
 <body>
 <!--[if lt IE 8]>
@@ -37,8 +37,33 @@
         <div class="col-sm-3 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
                 <div class="sidebar-control">
-                    <button type="button" class="btn btn-primary" onclick="getVersion()">Version</button>
-                    <button type="button" class="btn btn-primary" onclick="getVersion()">Test</button>
+                    Version<br/>
+                    <button type="button" class="btn btn-primary" onclick="getVersion()">Get</button>
+                    <br/>
+                    Things<br/>
+                    <button type="button" class="btn btn-primary" onclick="getThings()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postThing()">Post</button>
+                    <br/>
+                    Sensors<br/>
+                    <button type="button" class="btn btn-primary" onclick="getSensors()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postSensor()">Post</button>
+                    <br/>
+                    Observations<br/>
+                    <button type="button" class="btn btn-primary" onclick="getObservations()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postObservation()">Post</button>
+                    <br/>
+                    Locations<br/>
+                    <button type="button" class="btn btn-primary" onclick="getLocations()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postLocation()">Post</button>
+                    <br/>
+                    Features of interest<br/>
+                    <button type="button" class="btn btn-primary" onclick="getFeaturesOfInterest()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postFeatureOfInterest()">Post</button>
+                    <br/>
+                    Datastream<br/>
+                    <button type="button" class="btn btn-primary" onclick="getDatastreams()">Get</button>
+                    <button type="button" class="btn btn-primary" onclick="postDatastream()">Post</button>
+                    <br/>
                 </div>
                 <div class="sidebar-control">
                     <li class="active">
