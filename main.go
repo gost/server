@@ -8,17 +8,17 @@ import (
 	"github.com/geodan/gost/database"
 	"github.com/geodan/gost/http"
 	//"github.com/geodan/gost/mqtt"
-	"github.com/geodan/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/models"
 )
 
 var (
-	api models.API
+	stAPI models.API
 	//mqttServer mqtt.MQTTServer
 )
 
 func main() {
-	createAndStartServer(&api)
+	createAndStartServer(&stAPI)
 }
 
 // Initialises GOST
@@ -39,7 +39,7 @@ func init() {
 	//mqttServer = mqtt.NewMQTTServer()
 	//mqttServer.Start()
 
-	api = sensorthings.NewAPI(database, conf)
+	stAPI = api.NewAPI(database, conf)
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
