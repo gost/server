@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
@@ -149,6 +150,18 @@ func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error
 	return &thing, nil
 }
 
+// GetLocation retrieves the location for the given id from the database
+func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
+	//example error @bertt when location cannot be found
+	err := gostErrors.NewRequestNotFound(fmt.Errorf("Location(%s) does not exist", id))
+	return nil, err
+}
+
+// GetLocations todo
+func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
+	return nil, nil
+}
+
 // PostLocation receives a posted location entity and adds it to the database
 // returns the created Location including the generated id
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
@@ -204,6 +217,81 @@ func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	}
 
 	return nil
+}
+
+// GetObservedProperty todo
+func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedProperty, error) {
+	return nil, nil
+}
+
+// GetObservedProperties todo
+func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, error) {
+	return nil, nil
+}
+
+// PostObservedProperty todo
+func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, error) {
+	return nil, nil
+}
+
+// GetSensor todo
+func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
+	return nil, nil
+}
+
+// GetSensors todo
+func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
+	return nil, nil
+}
+
+// PostSensor todo
+func (gdb *GostDatabase) PostSensor(s entities.Sensor) (*entities.Sensor, error) {
+	return nil, nil
+}
+
+// GetDatastream todo
+func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) {
+	return nil, nil
+}
+
+// GetDatastreams todo
+func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
+	return nil, nil
+}
+
+// PostDatastream todo
+func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datastream, error) {
+	return nil, nil
+}
+
+// GetFeatureOfInterest todo
+func (gdb *GostDatabase) GetFeatureOfInterest(id string) (*entities.FeatureOfInterest, error) {
+	return nil, nil
+}
+
+// GetFeatureOfInterests todo
+func (gdb *GostDatabase) GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error) {
+	return nil, nil
+}
+
+// PostFeatureOfInterest todo
+func (gdb *GostDatabase) PostFeatureOfInterest(f entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	return nil, nil
+}
+
+// GetObservation todo
+func (gdb *GostDatabase) GetObservation(id string) (*entities.Observation, error) {
+	return nil, nil
+}
+
+// GetObservations todo
+func (gdb *GostDatabase) GetObservations() ([]*entities.Observation, error) {
+	return nil, nil
+}
+
+// PostObservation todo
+func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Observation, error) {
+	return nil, nil
 }
 
 // ThingExists checks if a thing is present in the database based on a given id

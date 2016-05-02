@@ -17,6 +17,7 @@ const (
 	QueryResultFormatInvalid QueryErrorMessage = "The value %s for $resultFormat is invalid, available options: dataArray"
 	QueryUnknown             QueryErrorMessage = "The query parameter %s is not supported"
 	QueryNotAvailable        QueryErrorMessage = "Query %s is not available on endpoint %s"
+	QueryExpandAvailable     QueryErrorMessage = "Expand %s is not available on endpoint %s"
 )
 
 // CreateQueryError formats a query error, adding a value into the defined message
