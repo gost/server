@@ -2,48 +2,23 @@ package sensorthings
 
 import (
 	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/geodan/gost/sensorthings/models"
+	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/geodan/gost/sensorthings/rest"
 )
-
-const (
-	// APIPrefix for V1.0 endpoint
-	APIPrefix string = "v1.0"
-)
-
-// API describes all request and responses to fulfill the SensorThings API standard
-type API interface {
-	GetConfig() *configuration.Config
-
-	GetVersionInfo() *VersionInfo
-	GetBasePathInfo() *ArrayResponse
-	GetEndpoints() *[]Endpoint
-
-	GetThing(id string, qo *QueryOptions) (*Thing, error)
-	GetThings(qo *QueryOptions) (*ArrayResponse, error)
-	PostThing(thing Thing) (*Thing, []error)
-	DeleteThing(id string)
-	PatchThing(thing Thing)
-
-	GetLocation(id string) *Location
-	GetLocations() *ArrayResponse
-	PostLocation(location Location, thingID string) (*Location, []error)
-	DeleteLocation(id string)
-	PatchLocation(id string)
-
-	PostHistoricalLocation(thingID string, locationID string) error
-	LinkLocation(thingID string, locationID string) error
-}
 
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
 // provider, config, endpoint information to setup te needed services
 type APIv1 struct {
-	db        Database
+	db        models.Database
 	config    configuration.Config
-	endPoints []Endpoint
+	endPoints []models.Endpoint
 	//mqtt      mqtt.MQTTServer
 }
 
 // NewAPI Initialise a new SensorThings API
-func NewAPI(database Database, config configuration.Config) API {
+func NewAPI(database models.Database, config configuration.Config) models.API {
 	return &APIv1{
 		db: database,
 		//mqtt:   mqtt,
@@ -57,29 +32,29 @@ func (a *APIv1) GetConfig() *configuration.Config {
 }
 
 // GetVersionInfo retrieves the version info of the current supported SensorThings API Version and running server version
-func (a *APIv1) GetVersionInfo() *VersionInfo {
-	versionInfo := VersionInfo{
-		GostServerVersion: GostServerVersion{configuration.ServerVersion},
-		APIVersion:        APIVersion{configuration.SensorThingsAPIVersion},
+func (a *APIv1) GetVersionInfo() *models.VersionInfo {
+	versionInfo := models.VersionInfo{
+		GostServerVersion: models.GostServerVersion{Version: configuration.ServerVersion},
+		APIVersion:        models.APIVersion{Version: configuration.SensorThingsAPIVersion},
 	}
 
 	return &versionInfo
 }
 
 // GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
-func (a *APIv1) GetBasePathInfo() *ArrayResponse {
-	var rp interface{} = a.GetEndpoints()
-	basePathInfo := ArrayResponse{
-		Data: &rp,
+func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
+	var ep interface{} = a.GetEndpoints()
+	basePathInfo := models.ArrayResponse{
+		Data: &ep,
 	}
 
 	return &basePathInfo
 }
 
 // GetEndpoints returns all configured endpoints for the HTTP server
-func (a *APIv1) GetEndpoints() *[]Endpoint {
+func (a *APIv1) GetEndpoints() *[]models.Endpoint {
 	if a.endPoints == nil {
-		a.endPoints = CreateEndPoints(a.config.GetExternalServerURI())
+		a.endPoints = rest.CreateEndPoints(a.config.GetExternalServerURI())
 	}
 
 	return &a.endPoints
@@ -87,7 +62,7 @@ func (a *APIv1) GetEndpoints() *[]Endpoint {
 
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
-func (a *APIv1) GetThing(id string, qo *QueryOptions) (*Thing, error) {
+func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
 	t, err := a.db.GetThing(id)
 	if err != nil {
 		return nil, err
@@ -98,7 +73,7 @@ func (a *APIv1) GetThing(id string, qo *QueryOptions) (*Thing, error) {
 }
 
 // GetThings returns an array of thing entities based on the QueryOptions
-func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
+func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	things, err := a.db.GetThings()
 	if err != nil {
 		return nil, err
@@ -107,14 +82,14 @@ func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 	uri := a.config.GetExternalServerURI()
 	for idx, item := range things {
 		i := *item
-		item.SetLinks(uri)
+		i.SetLinks(uri)
 		things[idx] = &i
 	}
 
 	var data interface{} = things
 
 	var count = len(things)
-	response := ArrayResponse{
+	response := models.ArrayResponse{
 		Count: &count,
 		Data:  &data,
 	}
@@ -124,8 +99,8 @@ func (a *APIv1) GetThings(qo *QueryOptions) (*ArrayResponse, error) {
 
 // PostThing checks if a posted thing entity is valid and adds it to the database
 // a posted thing can also contain Locations and DataStreams
-func (a *APIv1) PostThing(thing Thing) (*Thing, []error) {
-	_, err := thing.ContainsMandatoryPostParams()
+func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
+	_, err := thing.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
@@ -171,17 +146,17 @@ func (a *APIv1) DeleteThing(id string) {
 }
 
 // PatchThing todo
-func (a *APIv1) PatchThing(thing Thing) {
+func (a *APIv1) PatchThing(thing entities.Thing) {
 
 }
 
 // GetLocation todo
-func (a *APIv1) GetLocation(id string) *Location {
+func (a *APIv1) GetLocation(id string) *entities.Location {
 	return nil
 }
 
 // GetLocations todo
-func (a *APIv1) GetLocations() *ArrayResponse {
+func (a *APIv1) GetLocations() *models.ArrayResponse {
 	return nil
 }
 
@@ -192,8 +167,8 @@ func (a *APIv1) PatchLocation(id string) {
 
 // PostLocation checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
-func (a *APIv1) PostLocation(location Location, thingID string) (*Location, []error) {
-	_, err := location.ContainsMandatoryPostParams()
+func (a *APIv1) PostLocation(location entities.Location, thingID string) (*entities.Location, []error) {
+	_, err := location.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}

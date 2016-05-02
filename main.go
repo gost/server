@@ -2,18 +2,18 @@ package main
 
 import (
 	"flag"
-
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/gostdb"
-	"github.com/geodan/gost/gosthttp"
-	//"github.com/geodan/gost/mqtt"
 	"log"
 
+	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/database"
+	"github.com/geodan/gost/http"
+	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings"
+	"github.com/geodan/gost/sensorthings/models"
 )
 
 var (
-	api sensorthings.API
+	api models.API
 	//mqttServer mqtt.MQTTServer
 )
 
@@ -33,7 +33,7 @@ func init() {
 		log.Fatal("config read error: ", err)
 	}
 
-	database := gostdb.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
+	database := database.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
 	database.Start()
 
 	//mqttServer = mqtt.NewMQTTServer()
@@ -43,8 +43,8 @@ func init() {
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
-func createAndStartServer(api *sensorthings.API) {
+func createAndStartServer(api *models.API) {
 	a := *api
-	gostServer := gosthttp.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
+	gostServer := http.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
 	gostServer.Start()
 }
