@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS featureofinterest
   id serial NOT NULL,
   description character varying(255),
   encodingtype integer,
-  feature jsonb,
+  feature public.geometry,
   CONSTRAINT featureofinterest_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS location
   id serial NOT NULL,
   description character varying(255),
   encodingtype integer,
-  location character varying(255),
+  location public.geometry,
   CONSTRAINT location_pkey PRIMARY KEY (id)
 )
 WITH (
