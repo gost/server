@@ -42,7 +42,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 -config : specify the config file (default config.yaml)
 
--install : creates the database schema
+-install database_script_file: creates the database schema
 
 ## Dependencies
 
