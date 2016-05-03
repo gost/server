@@ -25,12 +25,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
  1. git clone https://github.com/Geodan/gost.git
 
 3. Get dependencies
- 1. go get gopkg.in/yaml.v2
- 2. go get github.com/lib/pq
- 3. go get github.com/gorilla/mux
- 4. go get github.com/surge/glog
- 5. go get github.com/surgemq/surgemq
- 6. go get github.com/surgemq/message
+ 1. go get -t
 
 4. Edit config.yaml
  1. Change connection to database
