@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/geodan/gost/sensorthings/entities"
 	"strconv"
+
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // GetObservedProperty todo
@@ -14,21 +16,20 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 	}
 
 	var opID int
-	var name string
-	var definition string
-	var description string
+	var name, definition, description string
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty where id = $1", gdb.Schema)
-	err2 := gdb.Db.QueryRow(sql, intID).Scan(&opID, &name, &definition, &description)
+	err = gdb.Db.QueryRow(sql, intID).Scan(&opID, &name, &definition, &description)
 
-	if err2 != nil {
-		return nil, err
+	if err != nil {
+		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("ObservedProperties(%s) does not exist", id))
 	}
 
-	op := entities.ObservedProperty{}
-	op.ID = strconv.Itoa(opID)
-	op.Name = name
-	op.Definition = definition
-	op.Description = description
+	op := entities.ObservedProperty{
+		ID:          strconv.Itoa(opID),
+		Name:        name,
+		Definition:  definition,
+		Description: description,
+	}
 
 	return &op, nil
 }
@@ -42,29 +43,29 @@ func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, 
 	}
 
 	defer rows.Close()
-	var observedproperties = []*entities.ObservedProperty{}
+	var observedProperties = []*entities.ObservedProperty{}
 
 	for rows.Next() {
-		op := entities.ObservedProperty{}
-
-		var id int
+		var opID int
 		var name string
 		var definition string
 		var description string
-		err2 := rows.Scan(&id, &name, &definition, &description)
+		err2 := rows.Scan(&opID, &name, &definition, &description)
 		if err2 != nil {
 			return nil, err2
 		}
 
-		op.ID = strconv.Itoa(id)
-		op.Name = name
-		op.Definition = definition
-		op.Description = description
+		op := entities.ObservedProperty{
+			ID:          strconv.Itoa(opID),
+			Name:        name,
+			Definition:  definition,
+			Description: description,
+		}
 
-		observedproperties = append(observedproperties, &op)
+		observedProperties = append(observedProperties, &op)
 	}
 
-	return observedproperties, nil
+	return observedProperties, nil
 }
 
 // PostObservedProperty todo
@@ -78,4 +79,16 @@ func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*en
 
 	op.ID = strconv.Itoa(opID)
 	return &op, nil
+}
+
+// ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
+func (gdb *GostDatabase) ObservedPropertyExists(thingID int) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observedproperty WHERE id = $1 LIMIT 1)", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
 }

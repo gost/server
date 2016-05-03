@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
+	"encoding/json"
 	"github.com/geodan/gost/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
 )
@@ -86,4 +87,15 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 	content := string(bytes[:])
 	formatted := fmt.Sprintf(content, schema, schema)
 	return &formatted, nil
+}
+
+// JSONToMap converts a string of json into a map
+func JSONToMap(data string) (map[string]interface{}, error) {
+	var p map[string]interface{}
+	err := json.Unmarshal([]byte(data), &p)
+	if err != nil {
+		return nil, err
+	}
+
+	return p, nil
 }

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/geodan/gost/sensorthings/entities"
 	"strconv"
+
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // GetSensor todo
@@ -14,19 +16,19 @@ func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
 	}
 
 	var sensorID int
-	var description string
-	var metadata string
+	var description, metadata string
 	sql := fmt.Sprintf("select id, description, metadata from %s.sensor where id = $1", gdb.Schema)
-	err2 := gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &metadata)
+	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &metadata)
 
-	if err2 != nil {
-		return nil, err
+	if err != nil {
+		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Sensors(%s) does not exist", id))
 	}
 
-	sensor := entities.Sensor{}
-	sensor.ID = strconv.Itoa(sensorID)
-	sensor.Description = description
-	sensor.Metadata = metadata
+	sensor := entities.Sensor{
+		ID:          strconv.Itoa(sensorID),
+		Description: description,
+		Metadata:    metadata,
+	}
 
 	return &sensor, nil
 }
@@ -43,20 +45,18 @@ func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
 	var sensors = []*entities.Sensor{}
 
 	for rows.Next() {
-		sensor := entities.Sensor{}
-
 		var id int
-		var description string
-		var metadata string
-		err2 := rows.Scan(&id, &description, &metadata)
-		if err2 != nil {
-			return nil, err2
+		var description, metadata string
+		err = rows.Scan(&id, &description, &metadata)
+		if err != nil {
+			return nil, err
 		}
 
-		sensor.ID = strconv.Itoa(id)
-		sensor.Description = description
-		sensor.Metadata = metadata
-
+		sensor := entities.Sensor{
+			ID:          strconv.Itoa(id),
+			Description: description,
+			Metadata:    metadata,
+		}
 		sensors = append(sensors, &sensor)
 	}
 
@@ -74,4 +74,16 @@ func (gdb *GostDatabase) PostSensor(sensor entities.Sensor) (*entities.Sensor, e
 
 	sensor.ID = strconv.Itoa(sensorID)
 	return &sensor, nil
+}
+
+// SensorExists checks if a sensor is present in the database based on a given id
+func (gdb *GostDatabase) SensorExists(thingID int) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.sensor WHERE id = $1 LIMIT 1)", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
 }

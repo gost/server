@@ -5,11 +5,11 @@ import "encoding/json"
 // ObservedProperty in SensorThings represents the physical phenomenon being observed by the Sensor. An ObserveProperty is
 // linked to a Datatream which can only have one ObserveProperty
 type ObservedProperty struct {
-	ID             string        `json:"@iot.id"`
-	NavSelf        string        `json:"@iot.selfLink"`
-	Description    string        `json:"description"`
-	Name           string        `json:"name"`
-	Definition     string        `json:"definition"`
+	ID             string        `json:"@iot.id,omitempty"`
+	NavSelf        string        `json:"@iot.selfLink,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	Name           string        `json:"name,omitempty"`
+	Definition     string        `json:"definition,omitempty"`
 	NavDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty"`
 	Datastreams    []*Datastream `json:"Datastreams,omitempty"`
 }

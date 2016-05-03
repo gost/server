@@ -5,11 +5,11 @@ import "encoding/json"
 // Sensor in SensorThings represents the physical device capable of observing a physical property and converting
 // it to an electrical impulse and be converted to a empirical value to represent a measurement value of the physical property
 type Sensor struct {
-	ID             string        `json:"@iot.id"`
-	NavSelf        string        `json:"@iot.selfLink"`
-	Description    string        `json:"description"`
-	EncodingType   string        `json:"encodingtype"`
-	Metadata       string        `json:"metadata"`
+	ID             string        `json:"@iot.id,omitempty"`
+	NavSelf        string        `json:"@iot.selfLink,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	EncodingType   string        `json:"encodingtype,omitempty"`
+	Metadata       string        `json:"metadata,omitempty"`
 	NavDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty"`
 	Datastreams    []*Datastream `json:"Datastreams,omitempty"`
 }

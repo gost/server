@@ -10,12 +10,6 @@ import (
 
 // PostLocation todo
 func (a *APIv1) PostLocation(location entities.Location) (*entities.Location, []error) {
-	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
-}
-
-// PostLocationByThing checks if the given location entity is valid and adds it to the database
-// the new location will be linked to a thing if needed
-func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error) {
 	_, err := location.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
@@ -26,15 +20,26 @@ func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) 
 		return nil, []error{err2}
 	}
 
+	return l, nil
+}
+
+// PostLocationByThing checks if the given location entity is valid and adds it to the database
+// the new location will be linked to a thing if needed
+func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error) {
+	l, err := a.PostLocation(location)
+	if err != nil {
+		return nil, err
+	}
+
 	if len(thingID) != 0 {
-		err3 := a.LinkLocation(thingID, l.ID)
-		if err3 != nil {
-			return nil, []error{err3}
+		err2 := a.LinkLocation(thingID, l.ID)
+		if err2 != nil {
+			return nil, []error{err2}
 		}
 
-		err4 := a.PostHistoricalLocation(thingID, l.ID)
-		if err4 != nil {
-			return nil, err4
+		err3 := a.PostHistoricalLocation(thingID, l.ID)
+		if err3 != nil {
+			return nil, err3
 		}
 	}
 

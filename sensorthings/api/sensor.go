@@ -8,7 +8,7 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 )
 
-// GetSensor todo
+// GetSensor retrieves a sensor by id and given query
 func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	s, err := a.db.GetSensor(id)
 	if err != nil {
@@ -19,7 +19,7 @@ func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, 
 	return s, nil
 }
 
-// GetSensors todo
+// GetSensors retrieves an array of sensors based on the given query
 func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	sensors, err := a.db.GetSensors()
 	if err != nil {
@@ -40,7 +40,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error
 	}, nil
 }
 
-// PostSensor todo
+// PostSensor adds a new sensor to the database
 func (a *APIv1) PostSensor(sensor entities.Sensor) (*entities.Sensor, []error) {
 	_, err := sensor.ContainsMandatoryParams()
 	if err != nil {
@@ -55,12 +55,12 @@ func (a *APIv1) PostSensor(sensor entities.Sensor) (*entities.Sensor, []error) {
 	return ns, nil
 }
 
-// PatchSensor todo
+// PatchSensor updates a sensor in the database
 func (a *APIv1) PatchSensor(id string, sensor entities.Sensor) (*entities.Sensor, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteSensor todo
+// DeleteSensor deletes a sensor from the database by given sensor id
 func (a *APIv1) DeleteSensor(id string) error {
 	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }

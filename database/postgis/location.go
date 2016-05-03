@@ -5,14 +5,38 @@ import (
 	"github.com/geodan/gost/sensorthings/entities"
 	"strconv"
 
+	"encoding/json"
 	gostErrors "github.com/geodan/gost/errors"
 )
 
 // GetLocation retrieves the location for the given id from the database
 func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
-	//example error @bertt when location cannot be found
-	err := gostErrors.NewRequestNotFound(fmt.Errorf("Location(%s) does not exist", id))
-	return nil, err
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var sensorID, encodingtype int
+	var description, location string
+	sql := fmt.Sprintf("select id, description, encodingtype, ST_AsGeoJSON(location) AS location from %s.location where id = $1", gdb.Schema)
+	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &encodingtype, &location)
+
+	if err != nil {
+		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Locations(%s) does not exist", id))
+	}
+
+	locationMap, err := JSONToMap(location)
+	if err != nil {
+		return nil, err
+	}
+
+	l := entities.Location{
+		ID:          strconv.Itoa(sensorID),
+		Description: description,
+		Location:    locationMap,
+	}
+
+	return &l, nil
 }
 
 // GetLocations todo
@@ -22,10 +46,14 @@ func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
 
 // PostLocation receives a posted location entity and adds it to the database
 // returns the created Location including the generated id
+//TODO: ENCODINGTYPE
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
-	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, location.Description, 1, location.Location).Scan(&locationID)
+	locationBytes, _ := json.Marshal(location.Location)
+	json := string(locationBytes[:])
+	jsonToGeom := fmt.Sprintf("ST_GeomFromGeoJSON('%s')", string(locationBytes[:]))
+	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, %s) RETURNING id", gdb.Schema, jsonToGeom)
+	err := gdb.Db.QueryRow(sql, location.Description, 1, json).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}

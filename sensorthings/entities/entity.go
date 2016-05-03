@@ -5,10 +5,10 @@ import (
 	gostErrors "github.com/geodan/gost/errors"
 )
 
-// EntityType holds the name and type of a SensorThings entity
+// EntityType holds the name and type of a SensorThings entity.
 type EntityType string
 
-// List of all EntityTypes
+// List of all EntityTypes.
 const (
 	EntityTypeThing              EntityType = "Thing"
 	EntityTypeLocation           EntityType = "Location"
@@ -20,15 +20,15 @@ const (
 	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
 )
 
-// ToString return the string representation of the EntityType
+// ToString return the string representation of the EntityType.
 func (e EntityType) ToString() string {
 	return fmt.Sprintf("%s", e)
 }
 
-// EntityLink holds the name and type of a SensorThings entity link
+// EntityLink holds the name and type of a SensorThings entity link.
 type EntityLink string
 
-// List of all EntityLinks
+// List of all EntityLinks.
 const (
 	EntityLinkThings              EntityLink = "Things"
 	EntityLinkLocations           EntityLink = "Locations"
@@ -40,12 +40,12 @@ const (
 	EntityLinkFeatureOfInterests  EntityLink = "FeatureOfInterests"
 )
 
-// ToString return the string representation of the EntityLink
+// ToString return the string representation of the EntityLink.
 func (e EntityLink) ToString() string {
 	return fmt.Sprintf("%s", e)
 }
 
-// Entity is the base interface for all SensorThings entities
+// Entity is the base interface for all SensorThings entities.
 type Entity interface {
 	ParseEntity(data []byte) error
 	ContainsMandatoryParams() (bool, []error)
@@ -54,8 +54,7 @@ type Entity interface {
 }
 
 // CheckMandatoryParam checks if the given parameter is nil, if true then an ApiError will be added to the
-// given list of errors. CheckMandatoryParam only checks when type is string or map[string]string no other
-// types are available for mandatory SensorThings entity params
+// given list of errors.
 func CheckMandatoryParam(errorList *[]error, param interface{}, entityType EntityType, paramName string) {
 	isNil := false
 	switch t := param.(type) {
@@ -70,7 +69,17 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 		}
 		break
 	case *Thing:
-		if t == nil {
+		if t == nil || len(t.ID) == 0 {
+			isNil = true
+		}
+		break
+	case *Sensor:
+		if t == nil || len(t.ID) == 0 {
+			isNil = true
+		}
+		break
+	case *ObservedProperty:
+		if t == nil || len(t.ID) == 0 {
 			isNil = true
 		}
 		break

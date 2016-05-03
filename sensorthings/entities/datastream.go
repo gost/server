@@ -9,20 +9,20 @@ import (
 // data (Observations) to a single Datastream. A Datastream can have only one Sensor and that Sensor can only
 // sense one ObservedProperty.
 type Datastream struct {
-	ID                  string            `json:"@iot.id"`
-	NavSelf             string            `json:"@iot.selfLink"`
-	Description         string            `json:"description"`
-	UnitOfMeasurement   map[string]string `json:"unitOfMeasurement"`
-	ObservationType     string            `json:"observationType"`
-	ObservedArea        map[string]string `json:"observedArea"`
-	NavThing            string            `json:"Thing@iot.navigationLink,omitempty"`
-	NavSensor           string            `json:"Sensor@iot.navigationLink,omitempty"`
-	NavObservations     string            `json:"Observations@iot.navigationLink,omitempty"`
-	NavObservedProperty string            `json:"ObservedProperty@iot.navigationLink,omitempty"`
-	Thing               *Thing            `json:"Thing,omitempty"`
-	Sensor              *Sensor           `json:"Sensor,omitempty"`
-	Observations        *[]Observation    `json:"Observations,omitempty"`
-	ObservedProperty    *ObservedProperty `json:"ObservedProperty,omitempty"`
+	ID                  string                 `json:"@iot.id,omitempty"`
+	NavSelf             string                 `json:"@iot.selfLink,omitempty"`
+	Description         string                 `json:"description,omitempty"`
+	UnitOfMeasurement   map[string]interface{} `json:"unitOfMeasurement,omitempty"`
+	ObservationType     string                 `json:"observationType,omitempty"`
+	ObservedArea        map[string]interface{} `json:"observedArea,omitempty"`
+	NavThing            string                 `json:"Thing@iot.navigationLink,omitempty"`
+	NavSensor           string                 `json:"Sensor@iot.navigationLink,omitempty"`
+	NavObservations     string                 `json:"Observations@iot.navigationLink,omitempty"`
+	NavObservedProperty string                 `json:"ObservedProperty@iot.navigationLink,omitempty"`
+	Thing               *Thing                 `json:"Thing,omitempty"`
+	Sensor              *Sensor                `json:"Sensor,omitempty"`
+	Observations        *[]Observation         `json:"Observations,omitempty"`
+	ObservedProperty    *ObservedProperty      `json:"ObservedProperty,omitempty"`
 }
 
 // GetEntityType returns the EntityType for Datastream
@@ -47,6 +47,9 @@ func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
 	CheckMandatoryParam(&err, d.Description, d.GetEntityType(), "description")
 	CheckMandatoryParam(&err, d.UnitOfMeasurement, d.GetEntityType(), "unitOfMeasurement")
 	CheckMandatoryParam(&err, d.ObservationType, d.GetEntityType(), "observationType")
+	CheckMandatoryParam(&err, d.Thing, d.GetEntityType(), "Thing")
+	CheckMandatoryParam(&err, d.Sensor, d.GetEntityType(), "Sensor")
+	CheckMandatoryParam(&err, d.ObservedProperty, d.GetEntityType(), "ObservedProperty")
 
 	if len(err) != 0 {
 		return false, err

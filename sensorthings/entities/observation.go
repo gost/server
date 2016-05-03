@@ -6,14 +6,14 @@ import "encoding/json"
 // Observations to a specified Datastream. An Observation requires a FeaturOfInterest entity, if none is provided in the request,
 // the Location of the Thing associated with the Datastream, will be assigned to the new Observation as the FeaturOfInterest.
 type Observation struct {
-	ID                   string             `json:"@iot.id"`
-	NavSelf              string             `json:"@iot.selfLink"`
-	PhenomenonTime       string             `json:"phenomenonTime"`
-	Result               string             `json:"result"`
-	ResultTime           string             `json:"resultTime"`
-	ResultQuality        string             `json:"resultQuality"`
-	ValidTime            string             `json:"validTime"`
-	Parameters           string             `json:"parameters"`
+	ID                   string             `json:"@iot.id,omitempty"`
+	NavSelf              string             `json:"@iot.selfLink,omitempty"`
+	PhenomenonTime       string             `json:"phenomenonTime,omitempty"`
+	Result               string             `json:"result,omitempty"`
+	ResultTime           string             `json:"resultTime,omitempty"`
+	ResultQuality        string             `json:"resultQuality,omitempty"`
+	ValidTime            string             `json:"validTime,omitempty"`
+	Parameters           string             `json:"parameters,omitempty"`
 	NavDatastream        string             `json:"Datastream@iot.navigationLink,omitempty"`
 	NavFeatureOfInterest string             `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
 	Datastream           *Datastream        `json:"Datastream,omitempty"`

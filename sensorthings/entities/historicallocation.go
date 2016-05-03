@@ -4,9 +4,9 @@ import "encoding/json"
 
 // HistoricalLocation in sensorthings represents the current and previous locations of a thing including time
 type HistoricalLocation struct {
-	ID           string      `json:"@iot.id"`
-	NavSelf      string      `json:"@iot.selfLink"`
-	Time         string      `json:"time"`
+	ID           string      `json:"@iot.id,omitempty"`
+	NavSelf      string      `json:"@iot.selfLink,omitempty"`
+	Time         string      `json:"time,omitempty"`
 	NavThing     string      `json:"Thing@iot.navigationLink,omitempty"`
 	NavLocations string      `json:"Locations@iot.navigationLink,omitempty"`
 	Thing        *Thing      `json:"Thing,omitempty"`

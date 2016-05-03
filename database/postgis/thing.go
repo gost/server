@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/geodan/gost/sensorthings/entities"
 	"strconv"
+
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // GetThing returns a thing entity based on id and query
@@ -15,26 +17,23 @@ func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 	}
 
 	var thingID int
-	var description string
-	var properties string
+	var description, properties string
 	sql := fmt.Sprintf("select id, description, properties from %s.thing where id = $1", gdb.Schema)
-	err2 := gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
+	err = gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
+	if err != nil {
+		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Things(%s) does not exist", id))
+	}
 
-	if err2 != nil {
+	propMap, err := JSONToMap(properties)
+	if err != nil {
 		return nil, err
 	}
 
-	thing := entities.Thing{}
-	thing.ID = strconv.Itoa(thingID)
-	thing.Description = description
-
-	var p map[string]string
-	err3 := json.Unmarshal([]byte(properties), &p)
-	if err3 != nil {
-		return nil, err3
+	thing := entities.Thing{
+		ID:          strconv.Itoa(thingID),
+		Description: description,
+		Properties:  propMap,
 	}
-
-	thing.Properties = p
 
 	return &thing, nil
 }
@@ -51,26 +50,24 @@ func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 	var things = []*entities.Thing{}
 
 	for rows.Next() {
-		thing := entities.Thing{}
-
-		var id int
-		var description string
-		var properties string
-		err2 := rows.Scan(&id, &description, &properties)
-		if err2 != nil {
-			return nil, err2
+		var thingID int
+		var description, properties string
+		err = rows.Scan(&thingID, &description, &properties)
+		if err != nil {
+			return nil, err
 		}
 
-		thing.ID = strconv.Itoa(id)
-		thing.Description = description
-
-		var p map[string]string
-		err3 := json.Unmarshal([]byte(properties), &p)
-		if err3 != nil {
-			return nil, err3
+		propMap, err := JSONToMap(properties)
+		if err != nil {
+			return nil, err
 		}
 
-		thing.Properties = p
+		thing := entities.Thing{
+			ID:          strconv.Itoa(thingID),
+			Description: description,
+			Properties:  propMap,
+		}
+
 		things = append(things, &thing)
 	}
 

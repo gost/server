@@ -1,17 +1,3 @@
-// Copyright (c) 2016 The GOST Authors. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package api
 
 import (
@@ -22,14 +8,36 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 )
 
-// GetDatastream todo
+// GetDatastream retrieves a sensor by id and given query
 func (a *APIv1) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	ds, err := a.db.GetDatastream(id)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.SetLinks(a.config.GetExternalServerURI())
+	return ds, nil
 }
 
-// GetDatastreams todo
+// GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	datastreams, err := a.db.GetDatastreams()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := a.config.GetExternalServerURI()
+	for idx, item := range datastreams {
+		i := *item
+		i.SetLinks(uri)
+		datastreams[idx] = &i
+	}
+
+	var data interface{} = datastreams
+	return &models.ArrayResponse{
+		Count: len(datastreams),
+		Data:  &data,
+	}, nil
 }
 
 // GetDatastreamsByThing todo
@@ -44,12 +52,23 @@ func (a *APIv1) GetDatastreamsBySensor(thingID string, qo *odata.QueryOptions) (
 
 // PostDatastream todo
 func (a *APIv1) PostDatastream(datastream entities.Datastream) (*entities.Datastream, []error) {
-	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+	_, err := datastream.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	ns, err2 := a.db.PostDatastream(datastream)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	return ns, nil
 }
 
 // PostDatastreamByThing todo
 func (a *APIv1) PostDatastreamByThing(thingID string, datastream entities.Datastream) (*entities.Datastream, []error) {
-	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+	datastream.Thing = &entities.Thing{ID: thingID}
+	return a.PostDatastream(datastream)
 }
 
 // PatchDatastream todo

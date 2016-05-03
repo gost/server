@@ -13,15 +13,15 @@ import (
 // thermostat (e.g., room temperature readings) should also be the building or the room. In this case, the content
 // of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type Location struct {
-	ID                     string                `json:"@iot.id"`
-	NavSelf                string                `json:"@iot.selfLink"`
-	Description            string                `json:"description"`
-	EncodingType           string                `json:"encodingtype"`
-	Location               string                `json:"location"`
-	NavThings              string                `json:"Things@iot.navigationLink,omitempty"`
-	NavHistoricalLocations string                `json:"HistoricalLocations@iot.navigationLink,omitempty"`
-	Things                 []*Thing              `json:"Things,omitempty"`
-	HistoricalLocations    []*HistoricalLocation `json:"HistoricalLocations,omitempty"`
+	ID                     string                 `json:"@iot.id,omitempty"`
+	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
+	Description            string                 `json:"description,omitempty"`
+	EncodingType           string                 `json:"encodingtype,omitempty"`
+	Location               map[string]interface{} `json:"location,omitempty"`
+	NavThings              string                 `json:"Things@iot.navigationLink,omitempty"`
+	NavHistoricalLocations string                 `json:"HistoricalLocations@iot.navigationLink,omitempty"`
+	Things                 []*Thing               `json:"Things,omitempty"`
+	HistoricalLocations    []*HistoricalLocation  `json:"HistoricalLocations,omitempty"`
 }
 
 // GetEntityType returns the EntityType for Location
