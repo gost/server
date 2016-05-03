@@ -48,7 +48,7 @@ func NewDatabase(host string, port int, user string, password string, database s
 // Start the database
 func (gdb *GostDatabase) Start() {
 	//ToDo: implement SSL
-	log.Println("Setting up database connection...")
+	log.Println("Creating database connection...")
 
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", gdb.Host, gdb.User, gdb.Password, gdb.Database)
 	db, err := sql.Open("postgres", dbInfo)
@@ -59,7 +59,7 @@ func (gdb *GostDatabase) Start() {
 	gdb.Db = db
 	err2 := gdb.Db.Ping()
 	if err2 != nil {
-		log.Fatal("Unable to connect to database, make sure your config is correct and run -install \"script.sql\"")
+		log.Fatal("Unable to connect to database, check your network connection.")
 	}
 
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
