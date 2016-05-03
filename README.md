@@ -30,8 +30,11 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 4. Edit config.yaml
  1. Change connection to database
 
+5. Create database
+ 1. go run main.go -install ./scripts/createdb.sql
+
 5. Start
- 1. go run main.go
+  1. go run main.go
 
 6. Go in browser to http://localhost:8080
 
@@ -39,7 +42,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 -config : specify the config file (default config.yaml)
 
--install : creates the database schema
+-install database_script_file: creates the database schema
 
 ## Dependencies
 
