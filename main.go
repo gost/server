@@ -17,8 +17,8 @@ var (
 )
 
 func main() {
-	cfgFlag := flag.String("config", "config.yaml", "path of the config file, default = config.yaml")
-	installFlag := flag.String("install", "", "path to the database createion file")
+	cfgFlag := flag.String("config", "config.yaml", "path of the config file")
+	installFlag := flag.String("install", "", "path to the database creation file")
 	flag.Parse()
 
 	cfg := *cfgFlag
