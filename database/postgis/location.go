@@ -50,10 +50,9 @@ func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
-	json := string(locationBytes[:])
 	jsonToGeom := fmt.Sprintf("ST_GeomFromGeoJSON('%s')", string(locationBytes[:]))
 	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, %s) RETURNING id", gdb.Schema, jsonToGeom)
-	err := gdb.Db.QueryRow(sql, location.Description, 1, json).Scan(&locationID)
+	err := gdb.Db.QueryRow(sql, location.Description, 1).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
