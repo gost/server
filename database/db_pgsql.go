@@ -61,7 +61,10 @@ func (gdb *GostDatabase) Start() {
 
 // CreateSchema creates the needed schema in the database
 func (gdb *GostDatabase) CreateSchema() {
-	create := GetCreateDatabaseQuery(gdb.Schema)
+	create, error := GetCreateDatabaseQuery(gdb.Schema)
+	if error!=nil {
+		log.Fatal(error)
+	}
 	_, err := gdb.Db.Exec(create)
 	if err != nil {
 		log.Fatal(err)
