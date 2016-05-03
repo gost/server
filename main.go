@@ -6,6 +6,8 @@ import (
 	"github.com/geodan/gost/database"
 	"github.com/geodan/gost/http"
 	"log"
+	"os"
+	"strconv"
 	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/models"
@@ -27,6 +29,26 @@ func main() {
 		log.Fatal("config read error: ", err)
 		return
 	}
+	
+	gostDbHost := os.Getenv("gost_db_host")
+	if(gostDbHost != ""){
+		conf.Database.Host = gostDbHost;
+	}
+	gostDbPort := os.Getenv("gost_db_port")
+	if(gostDbPort != ""){
+		port, err := strconv.Atoi(gostDbPort)
+		if(err==nil){
+			conf.Database.Port = int(port);
+		}
+	}
+	gostDbUser := os.Getenv("gost_db_user")
+	if(gostDbUser != ""){
+		conf.Database.User = gostDbUser;
+	}
+	gostDbPassword := os.Getenv("gost_db_password")
+	if(gostDbPassword != ""){
+		conf.Database.Password = gostDbPassword;
+	}	
 
 	database := database.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
 	database.Start()
