@@ -117,6 +117,13 @@ func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *models
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
+// HandleGetLocationsByThing todo
+func HandleGetLocationsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocationsByThing(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandleGetLocation todo
 func HandleGetLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
@@ -173,6 +180,13 @@ func HandleGetDatastream(w http.ResponseWriter, r *http.Request, endpoint *model
 func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreamsByThing(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetDatastreamsBySensor todo
+func HandleGetDatastreamsBySensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreamsBySensor(getEntityID(r), q) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -339,6 +353,15 @@ func HandlePatchFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoi
 func HandleGetHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetHistoricalLocations(q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetHistoricalLocationsByThing todo
+func HandleGetHistoricalLocationsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetHistoricalLocationsByThing(getEntityID(r), q)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 

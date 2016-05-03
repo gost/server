@@ -29,6 +29,7 @@ type API interface {
 
 	GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error)
 	GetLocations(qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostLocation(location entities.Location) (*entities.Location, []error)
 	PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error)
 	PatchLocation(id string, location entities.Location) (*entities.Location, error)
@@ -36,12 +37,14 @@ type API interface {
 
 	GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error)
 	GetHistoricalLocations(qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PatchHistoricalLocation(id string, hl entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id string) error
 
 	GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error)
 	GetDatastreams(qo *odata.QueryOptions) (*ArrayResponse, error)
 	GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostDatastream(datastream entities.Datastream) (*entities.Datastream, []error)
 	PostDatastreamByThing(thingID string, datastream entities.Datastream) (*entities.Datastream, []error)
 	PatchDatastream(id string, datastream entities.Datastream) (*entities.Datastream, error)
@@ -169,7 +172,7 @@ type APIVersion struct {
 
 // ArrayResponse is the default response format for sending content back
 type ArrayResponse struct {
-	Count *int         `json:"count,omitempty"`
+	Count int          `json:"count,omitempty"`
 	Data  *interface{} `json:"value"`
 }
 

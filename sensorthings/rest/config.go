@@ -108,6 +108,7 @@ func createDatastreams(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Datastreams", HandleGetDatastreams},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastream},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/Datastreams", HandleGetDatastreamsByThing},
+			{models.HTTPOperationGet, "/v1.0/Sensors{id}/Datastreams", HandleGetDatastreamsBySensor},
 			{models.HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
 			{models.HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostDatastreamByThing},
 			{models.HTTPOperationDelete, "/v1.0/Datastreams{id}", HandleDeleteDatastream},
@@ -166,6 +167,7 @@ func createLocations(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Locations", HandleGetLocations},
 			{models.HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocation},
+			{models.HTTPOperationGet, "/v1.0/Things{id}/Locations", HandleGetLocationsByThing},
 			{models.HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
 			{models.HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostLocationByThing},
 			{models.HTTPOperationDelete, "/v1.0/Locations{id}", HandleDeleteLocation},
@@ -275,6 +277,7 @@ func createHistoricalLocations(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations", HandleGetHistoricalLocations},
+			{models.HTTPOperationGet, "/v1.0/Things{id}/HistoricalLocations", HandleGetHistoricalLocationsByThing},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", HandleGetHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},

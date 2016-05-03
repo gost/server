@@ -35,10 +35,8 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error)
 	}
 
 	var data interface{} = things
-
-	var count = len(things)
 	response := models.ArrayResponse{
-		Count: &count,
+		Count: len(things),
 		Data:  &data,
 	}
 

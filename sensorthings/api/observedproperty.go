@@ -10,12 +10,36 @@ import (
 
 // GetObservedProperty todo
 func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	op, err := a.db.GetObservedProperty(id)
+	if err != nil {
+		return nil, err
+	}
+
+	op.SetLinks(a.config.GetExternalServerURI())
+	return op, nil
 }
 
 // GetObservedProperties todo
 func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	ops, err := a.db.GetObservedProperties()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := a.config.GetExternalServerURI()
+	for idx, item := range ops {
+		i := *item
+		i.SetLinks(uri)
+		ops[idx] = &i
+	}
+
+	var data interface{} = ops
+	response := models.ArrayResponse{
+		Count: len(ops),
+		Data:  &data,
+	}
+
+	return &response, nil
 }
 
 // GetObservedPropertiesByDatastream todo

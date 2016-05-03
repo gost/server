@@ -18,6 +18,11 @@ func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions) (*models.ArrayRes
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
+// GetHistoricalLocationsByThing todo
+func (a *APIv1) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
 // PostHistoricalLocation is triggered by code and cannot be used from any endpoint PostHistoricalLocation
 // adds a HistoricalLocation into the database
 func (a *APIv1) PostHistoricalLocation(thingID string, locationID string) []error {

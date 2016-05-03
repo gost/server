@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS sensor
   id serial NOT NULL,
   description character varying(255),
   encodingtype integer,
-  metadata jsonb,
+  metadata character varying(255),
   CONSTRAINT sensor_pkey PRIMARY KEY (id)
 )
 WITH (

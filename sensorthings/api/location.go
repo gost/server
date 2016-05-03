@@ -51,6 +51,11 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, err
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
+// GetLocationsByThing todo
+func (a *APIv1) GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
 // PatchLocation todo
 func (a *APIv1) PatchLocation(id string, location entities.Location) (*entities.Location, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
