@@ -35,6 +35,10 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 6. Go in browser to http://localhost:8080
 
+## Startup flags
+
+-config : specify the config file (default config.yaml)
+
 ## Dependencies
 
 [yaml v2](https://github.com/go-yaml/yaml)<br />
