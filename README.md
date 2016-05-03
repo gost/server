@@ -56,6 +56,11 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 - database.schema: database schema
 - database.ssl: use ssl flag
 
+The following confiuration parameters can be overruled 
+from environment variables:
+gost_database_host, gost_database_port, gost_database_user, gost_database_password
+
+
 ## Dependencies
 
 [yaml v2](https://github.com/go-yaml/yaml)<br />
