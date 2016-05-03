@@ -44,6 +44,18 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 -install database_script_file: creates the database schema
 
+## Configuration
+
+- port: port of webserver
+- externalUri: External uri for links in responses
+- database.host: name or ip of database server
+- database.port: port of database server
+- database.user: username of database login
+- database.password: password of database login
+- database.database: database name
+- database.schema: database schema
+- database.ssl: use ssl flag
+
 ## Dependencies
 
 [yaml v2](https://github.com/go-yaml/yaml)<br />
