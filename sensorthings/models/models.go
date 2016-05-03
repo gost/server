@@ -84,7 +84,7 @@ type API interface {
 // Database specifies the operations that the database provider needs to support
 type Database interface {
 	Start()
-	CreateSchema()
+	CreateSchema(location string) error
 
 	GetThing(string) (*entities.Thing, error)
 	GetThings() ([]*entities.Thing, error)

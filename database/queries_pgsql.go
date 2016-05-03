@@ -6,11 +6,13 @@ import (
 )
 
 // GetCreateDatabaseQuery returns the database creation script for PostgreSQL
-func GetCreateDatabaseQuery(schema string) (string, error) {
-	content, err := ioutil.ReadFile("./scripts/createdb.sql")
+func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
+	bytes, err := ioutil.ReadFile(location)
 	if err != nil {
-    return "", err
+		return nil, err
 	}
 
-	return fmt.Sprintf(string(content), schema, schema), nil
+	content := string(bytes[:])
+	formatted := fmt.Sprintf(content, schema, schema)
+	return &formatted, nil
 }

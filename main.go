@@ -17,17 +17,12 @@ var (
 )
 
 func main() {
-	createAndStartServer(&stAPI)
-}
-
-// Initialises GOST
-// Parse flags, read config, setup database and api
-func init() {
-	var cfgFlag = "config.yaml"
-	flag.StringVar(&cfgFlag, "config", "config.yaml", "path of the config file, default = config.yaml")
+	cfgFlag := flag.String("config", "config.yaml", "path of the config file, default = config.yaml")
+	installFlag := flag.String("install", "", "path to the database createion file")
 	flag.Parse()
 
-	conf, err := configuration.GetConfig(cfgFlag)
+	cfg := *cfgFlag
+	conf, err := configuration.GetConfig(cfg)
 	if err != nil {
 		log.Fatal("config read error: ", err)
 		return
@@ -36,10 +31,27 @@ func init() {
 	database := database.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
 	database.Start()
 
-	//mqttServer = mqtt.NewMQTTServer()
-	//mqttServer.Start()
+	// if install is supplied create database and close, if not start server
+	sqlFile := *installFlag
+	if len(sqlFile) != 0 {
+		createDatabase(database, sqlFile)
+	} else {
+		//mqttServer = mqtt.NewMQTTServer()
+		//mqttServer.Start()
+		stAPI = api.NewAPI(database, conf)
+		createAndStartServer(&stAPI)
+	}
+}
 
-	stAPI = api.NewAPI(database, conf)
+func createDatabase(db models.Database, sqlFile string) {
+	log.Println("--CREATING DATABASE--")
+
+	err := db.CreateSchema(sqlFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Database created successfully, you can start your server now")
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
