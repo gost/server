@@ -2,11 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
-
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/database"
 	"github.com/geodan/gost/http"
+	"log"
 	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/models"
@@ -31,6 +30,7 @@ func init() {
 	conf, err := configuration.GetConfig(cfgFlag)
 	if err != nil {
 		log.Fatal("config read error: ", err)
+		return
 	}
 
 	database := database.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
