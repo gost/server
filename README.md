@@ -46,6 +46,8 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Configuration
 
+Default file: config.yaml
+
 - port: port of webserver
 - externalUri: External uri for links in responses
 - database.host: name or ip of database server
