@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS datastream
   description character varying(255),
   unitofmeasurement jsonb,
   observationtype integer,
-  observedarea jsonb,
+  observedarea public.geometry,
   phenomenontime tstzrange,
   resulttime tstzrange,
   thing_id integer,
