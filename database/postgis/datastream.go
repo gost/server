@@ -18,15 +18,16 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 	}
 
 	var dsID int
-	var description, unitofmeasurement, observedarea string
-	sql := fmt.Sprintf("select id, description, unitofmeasurement, observedarea FROM %s.datastream where id = $1", gdb.Schema)
+	var description, unitofmeasurement string
+	var observedarea *string
+	sql := fmt.Sprintf("select id, description, unitofmeasurement, ST_AsGeoJSON(observedarea) FROM %s.datastream where id = $1", gdb.Schema)
 	err = gdb.Db.QueryRow(sql, intID).Scan(&dsID, &description, &unitofmeasurement, &observedarea)
 
 	if err != nil {
 		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Datastream(%s) does not exist", id))
 	}
 
-	unitOfMeasurementMap, err := JSONToMap(unitofmeasurement)
+	unitOfMeasurementMap, err := JSONToMap(&unitofmeasurement)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 
 // GetDatastreams todo
 func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
-	sql := fmt.Sprintf("select id, description, unitofmeasurement, observedarea FROM %s.datastream", gdb.Schema)
+	sql := fmt.Sprintf("select id, description, unitofmeasurement, ST_AsGeoJSON(observedarea) FROM %s.datastream", gdb.Schema)
 	rows, err := gdb.Db.Query(sql)
 	if err != nil {
 		return nil, err
@@ -59,13 +60,15 @@ func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
 
 	for rows.Next() {
 		var id int
-		var description, unitofmeasurement, observedarea string
+		var description, unitofmeasurement string
+		var observedarea *string
+
 		err = rows.Scan(&id, &description, &unitofmeasurement, &observedarea)
 		if err != nil {
 			return nil, err
 		}
 
-		unitOfMeasurementMap, err := JSONToMap(unitofmeasurement)
+		unitOfMeasurementMap, err := JSONToMap(&unitofmeasurement)
 		if err != nil {
 			return nil, err
 		}
@@ -111,10 +114,15 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 	}
 
 	unitOfMeasurement, _ := json.Marshal(d.UnitOfMeasurement)
-	observedArea, _ := json.Marshal(d.ObservedArea)
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observerproperty_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", gdb.Schema)
-	err = gdb.Db.QueryRow(sql, d.Description, unitOfMeasurement, observedArea, tID, sID, oID).Scan(&dsID)
+	geom := "NULL"
+	if len(d.ObservedArea) != 0 {
+		observedAreaBytes, _ := json.Marshal(d.ObservedArea)
+		geom = fmt.Sprintf("ST_GeomFromGeoJSON('%s')", string(observedAreaBytes[:]))
+	}
+
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observerproperty_id) VALUES ($1, $2, %s, $3, $4, $5) RETURNING id", gdb.Schema, geom)
+	err = gdb.Db.QueryRow(sql, d.Description, unitOfMeasurement, tID, sID, oID).Scan(&dsID)
 	if err != nil {
 		return nil, err
 	}

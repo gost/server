@@ -25,7 +25,7 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Locations(%s) does not exist", id))
 	}
 
-	locationMap, err := JSONToMap(location)
+	locationMap, err := JSONToMap(&location)
 	if err != nil {
 		return nil, err
 	}

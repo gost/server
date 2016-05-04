@@ -17,7 +17,9 @@ func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 	}
 
 	var thingID int
-	var description, properties string
+	var description string
+	var properties *string
+
 	sql := fmt.Sprintf("select id, description, properties from %s.thing where id = $1", gdb.Schema)
 	err = gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
 	if err != nil {
@@ -51,7 +53,9 @@ func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 
 	for rows.Next() {
 		var thingID int
-		var description, properties string
+		var description string
+		var properties *string
+
 		err = rows.Scan(&thingID, &description, &properties)
 		if err != nil {
 			return nil, err

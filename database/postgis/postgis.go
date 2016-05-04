@@ -90,9 +90,13 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 }
 
 // JSONToMap converts a string of json into a map
-func JSONToMap(data string) (map[string]interface{}, error) {
+func JSONToMap(data *string) (map[string]interface{}, error) {
 	var p map[string]interface{}
-	err := json.Unmarshal([]byte(data), &p)
+	if data == nil || len(*data) == 0 {
+		return p, nil
+	}
+
+	err := json.Unmarshal([]byte(*data), &p)
 	if err != nil {
 		return nil, err
 	}
