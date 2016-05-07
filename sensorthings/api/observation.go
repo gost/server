@@ -25,12 +25,25 @@ func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.Query
 
 // PostObservation todo
 func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Observation, []error) {
-	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+	_, err := observation.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	//ToDo check for linked featureofinterest
+	no, err2 := a.db.PostObservation(observation)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	no.SetLinks(a.config.GetExternalServerURI())
+	return no, nil
 }
 
-// PostObservationByDatastream todo
+// PostObservationByDatastream creates a Datastream with given id for the Observation and calls PostObservation
 func (a *APIv1) PostObservationByDatastream(datastreamID string, observation entities.Observation) (*entities.Observation, []error) {
-	return nil, []error{gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))}
+	observation.Datastream = &entities.Datastream{ID: datastreamID}
+	return a.PostObservation(observation)
 }
 
 // PatchObservation todo

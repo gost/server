@@ -1,6 +1,10 @@
 package entities
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+)
 
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends
 // Observations to a specified Datastream. An Observation requires a FeaturOfInterest entity, if none is provided in the request,
@@ -9,7 +13,7 @@ type Observation struct {
 	ID                   string             `json:"@iot.id,omitempty"`
 	NavSelf              string             `json:"@iot.selfLink,omitempty"`
 	PhenomenonTime       string             `json:"phenomenonTime,omitempty"`
-	Result               string             `json:"result,omitempty"`
+	Result               float64            `json:"result,omitempty"`
 	ResultTime           string             `json:"resultTime,omitempty"`
 	ResultQuality        string             `json:"resultQuality,omitempty"`
 	ValidTime            string             `json:"validTime,omitempty"`
@@ -38,10 +42,25 @@ func (o *Observation) ParseEntity(data []byte) error {
 
 // ContainsMandatoryParams checks if all mandatory params for Observation are available before posting.
 func (o *Observation) ContainsMandatoryParams() (bool, []error) {
+	// When a SensorThings service receives a POST Observations without phenonmenonTime, the service SHALL
+	// assign the current server time to the value of the phenomenonTime.
+	if len(o.PhenomenonTime) == 0 {
+		now := time.Now().UTC()
+		nowIso8601 := now.Format(time.RFC3339Nano)
+		o.PhenomenonTime = fmt.Sprintf("%s", nowIso8601)
+	}
+
+	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
+	// null value to the resultTime.
+	if len(o.ResultTime) == 0 {
+		o.ResultTime = "NULL"
+	}
+
 	err := []error{}
 	CheckMandatoryParam(&err, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
 	CheckMandatoryParam(&err, o.Result, o.GetEntityType(), "result")
 	CheckMandatoryParam(&err, o.ResultTime, o.GetEntityType(), "resultTime")
+	CheckMandatoryParam(&err, o.Datastream, o.GetEntityType(), "Datastream")
 
 	if len(err) != 0 {
 		return false, err

@@ -48,12 +48,34 @@ func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) 
 
 // GetLocation todo
 func (a *APIv1) GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	l, err := a.db.GetLocation(id)
+	if err != nil {
+		return nil, err
+	}
+
+	l.SetLinks(a.config.GetExternalServerURI())
+	return l, nil
 }
 
 // GetLocations todo
 func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	locations, err := a.db.GetLocations()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := a.config.GetExternalServerURI()
+	for idx, item := range locations {
+		i := *item
+		i.SetLinks(uri)
+		locations[idx] = &i
+	}
+
+	var data interface{} = locations
+	return &models.ArrayResponse{
+		Count: len(locations),
+		Data:  &data,
+	}, nil
 }
 
 // GetLocationsByThing todo

@@ -22,6 +22,7 @@ type API interface {
 	GetEndpoints() *[]Endpoint
 
 	GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error)
+	GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThings(qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostThing(thing entities.Thing) (*entities.Thing, []error)
 	PatchThing(id string, thing entities.Thing) (*entities.Thing, error)
@@ -87,6 +88,7 @@ type Database interface {
 	CreateSchema(location string) error
 
 	GetThing(string) (*entities.Thing, error)
+	GetThingByDatastream(string) (*entities.Thing, error)
 	GetThings() ([]*entities.Thing, error)
 	PostThing(entities.Thing) (*entities.Thing, error)
 

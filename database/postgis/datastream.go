@@ -96,7 +96,6 @@ func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
 // TODO: !!!!ADD observationtype SUPPORT!!!!
 func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datastream, error) {
 	var dsID int
-
 	tID, err := strconv.Atoi(d.Thing.ID)
 	sID, err2 := strconv.Atoi(d.Sensor.ID)
 	oID, err3 := strconv.Atoi(d.ObservedProperty.ID)
@@ -114,7 +113,6 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 	}
 
 	unitOfMeasurement, _ := json.Marshal(d.UnitOfMeasurement)
-
 	geom := "NULL"
 	if len(d.ObservedArea) != 0 {
 		observedAreaBytes, _ := json.Marshal(d.ObservedArea)
@@ -135,4 +133,16 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 	d.ObservedProperty = nil
 
 	return &d, nil
+}
+
+// DatastreamExists checks if a Datastream is present in the database based on a given id
+func (gdb *GostDatabase) DatastreamExists(databaseID int) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.datastream WHERE id = $1 LIMIT 1)", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, databaseID).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
 }

@@ -41,6 +41,13 @@ func HandleGetThing(w http.ResponseWriter, r *http.Request, endpoint *models.End
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
+// HandleGetThingByDatastream retrieves and sends a specific Thing based on the given datastream ID and filter
+func HandleGetThingByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThingByDatastream(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandlePostThing tries to insert a new Thing and sends back the created Thing
 func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api

@@ -8,7 +8,7 @@ import (
 	gostErrors "github.com/geodan/gost/errors"
 )
 
-// GetObservedProperty todo
+// GetObservedProperty returns an ObservedProperty by id
 func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedProperty, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -34,7 +34,7 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 	return &op, nil
 }
 
-// GetObservedProperties todo
+// GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, error) {
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty", gdb.Schema)
 	rows, err := gdb.Db.Query(sql)
@@ -68,7 +68,7 @@ func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, 
 	return observedProperties, nil
 }
 
-// PostObservedProperty todo
+// PostObservedProperty adds an ObservedProperty to the database
 func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var opID int
 	sql := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)

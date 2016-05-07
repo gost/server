@@ -20,6 +20,17 @@ func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, er
 	return t, nil
 }
 
+// GetThingByDatastream returns a thing entity based on the given datastream id and QueryOptions
+func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+	t, err := a.db.GetThingByDatastream(id)
+	if err != nil {
+		return nil, err
+	}
+
+	t.SetLinks(a.config.GetExternalServerURI())
+	return t, nil
+}
+
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	things, err := a.db.GetThings()

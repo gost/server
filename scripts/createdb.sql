@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS observation
 (
   id integer NOT NULL DEFAULT nextval('observations_id_seq'::regclass),
   phenomenontime tstzrange,
-  result jsonb,
+  result double precision,
   resulttime timestamp with time zone,
   resultquality character varying(25),
   validtime tstzrange,

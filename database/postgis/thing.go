@@ -40,6 +40,37 @@ func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 	return &thing, nil
 }
 
+//GetThingByDatastream retrieves the thing linked to a datastream
+func (gdb *GostDatabase) GetThingByDatastream(id string) (*entities.Thing, error) {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var thingID int
+	var description string
+	var properties *string
+
+	sql := fmt.Sprintf("select %s.thing.id, %s.thing.description, %s.thing.properties from %s.thing INNER JOIN %s.datastream ON %s.datastream.thing_id = %s.thing.id WHERE %s.datastream.id = $1;", gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema)
+	err = gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
+	if err != nil {
+		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Datastreams(%s)/Thing does not exist", id))
+	}
+
+	propMap, err := JSONToMap(properties)
+	if err != nil {
+		return nil, err
+	}
+
+	thing := entities.Thing{
+		ID:          strconv.Itoa(thingID),
+		Description: description,
+		Properties:  propMap,
+	}
+
+	return &thing, nil
+}
+
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 	sql := fmt.Sprintf("select id, description, properties FROM %s.thing", gdb.Schema)

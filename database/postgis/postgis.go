@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"github.com/geodan/gost/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
+	"strings"
 )
 
 // GostDatabase implementation
@@ -102,4 +103,25 @@ func JSONToMap(data *string) (map[string]interface{}, error) {
 	}
 
 	return p, nil
+}
+
+// PrepareTimeRangeForPostgres splits an incoming timerange by the / delimiter and returns the start
+// and end value, if it can't be splitted the function will return the start value also as end
+func PrepareTimeRangeForPostgres(timeRange string) string {
+	if len(timeRange) == 0 {
+		return "NULL"
+	}
+
+	var start string
+	var end string
+	s := strings.Split(timeRange, "/")
+	if len(s) == 1 {
+		start = s[0]
+		end = s[0]
+	}
+	if len(s) == 2 {
+		end = s[1]
+	}
+
+	return fmt.Sprintf("tstzrange('%s','%s')", start, end)
 }
