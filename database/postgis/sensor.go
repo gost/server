@@ -17,7 +17,7 @@ func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
 
 	var sensorID int
 	var description, metadata string
-	sql := fmt.Sprintf("select id, description, metadata from %s.sensor where id = $1", gdb.Schema)
+	sql := "select id, description, metadata from sensor where id = $1"
 	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &metadata)
 
 	if err != nil {
@@ -35,7 +35,7 @@ func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
 
 // GetSensors todo
 func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
-	sql := fmt.Sprintf("select id, description, metadata FROM %s.sensor", gdb.Schema)
+	sql := "select id, description, metadata FROM sensor"
 	rows, err := gdb.Db.Query(sql)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
 // PostSensor todo
 func (gdb *GostDatabase) PostSensor(sensor entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
-	sql := fmt.Sprintf("INSERT INTO %s.sensor (description, encodingtype, metadata) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+	sql := "INSERT INTO sensor (description, encodingtype, metadata) VALUES ($1, $2, $3) RETURNING id"
 	err := gdb.Db.QueryRow(sql, sensor.Description, 1, sensor.Metadata).Scan(&sensorID)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func (gdb *GostDatabase) PostSensor(sensor entities.Sensor) (*entities.Sensor, e
 // SensorExists checks if a sensor is present in the database based on a given id
 func (gdb *GostDatabase) SensorExists(thingID int) bool {
 	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.sensor WHERE id = $1 LIMIT 1)", gdb.Schema)
+	sql := "SELECT exists (SELECT 1 FROM sensor WHERE id = $1 LIMIT 1)"
 	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
 	if err != nil {
 		return false

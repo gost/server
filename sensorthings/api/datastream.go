@@ -22,6 +22,22 @@ func (a *APIv1) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Data
 // GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	datastreams, err := a.db.GetDatastreams()
+	return processDatastreams(a, datastreams, err)
+
+}
+
+// GetDatastreamsByThing returns all datastreams linked to the given thing
+func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	datastreams, err := a.db.GetDatastreamsByThing(thingID)
+	return processDatastreams(a, datastreams, err)
+}
+
+// GetDatastreamsBySensor todo
+func (a *APIv1) GetDatastreamsBySensor(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -38,16 +54,6 @@ func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, e
 		Count: len(datastreams),
 		Data:  &data,
 	}, nil
-}
-
-// GetDatastreamsByThing todo
-func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
-}
-
-// GetDatastreamsBySensor todo
-func (a *APIv1) GetDatastreamsBySensor(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // PostDatastream todo

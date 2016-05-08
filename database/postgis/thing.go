@@ -20,7 +20,7 @@ func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 	var description string
 	var properties *string
 
-	sql := fmt.Sprintf("select id, description, properties from %s.thing where id = $1", gdb.Schema)
+	sql := "select id, description, properties from thing where id = $1"
 	err = gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
 	if err != nil {
 		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Things(%s) does not exist", id))
@@ -51,7 +51,7 @@ func (gdb *GostDatabase) GetThingByDatastream(id string) (*entities.Thing, error
 	var description string
 	var properties *string
 
-	sql := fmt.Sprintf("select %s.thing.id, %s.thing.description, %s.thing.properties from %s.thing INNER JOIN %s.datastream ON %s.datastream.thing_id = %s.thing.id WHERE %s.datastream.id = $1;", gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema, gdb.Schema)
+	sql := "select thing.id, thing.description, thing.properties from thing INNER JOIN datastream ON datastream.thing_id = thing.id WHERE datastream.id = $1;"
 	err = gdb.Db.QueryRow(sql, intID).Scan(&thingID, &description, &properties)
 	if err != nil {
 		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Datastreams(%s)/Thing does not exist", id))
@@ -73,7 +73,7 @@ func (gdb *GostDatabase) GetThingByDatastream(id string) (*entities.Thing, error
 
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
-	sql := fmt.Sprintf("select id, description, properties FROM %s.thing", gdb.Schema)
+	sql := fmt.Sprintf("select id, description, properties FROM thing")
 	rows, err := gdb.Db.Query(sql)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
 	var thingID int
-	sql := fmt.Sprintf("INSERT INTO %s.thing (description, properties) VALUES ($1, $2) RETURNING id", gdb.Schema)
+	sql := "INSERT INTO thing (description, properties) VALUES ($1, $2) RETURNING id"
 	err := gdb.Db.QueryRow(sql, thing.Description, jsonProperties).Scan(&thingID)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error
 // ThingExists checks if a thing is present in the database based on a given id
 func (gdb *GostDatabase) ThingExists(thingID int) bool {
 	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.thing WHERE id = $1 LIMIT 1)", gdb.Schema)
+	sql := "SELECT exists (SELECT 1 FROM thing WHERE id = $1 LIMIT 1)"
 	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
 	if err != nil {
 		return false

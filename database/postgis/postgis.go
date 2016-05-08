@@ -59,6 +59,7 @@ func (gdb *GostDatabase) Start() {
 		log.Fatal("Unable to connect to database, check your network connection.")
 	}
 
+	gdb.Db.Exec(fmt.Sprintf("SET search_path = %s", gdb.Schema))
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
 }
 

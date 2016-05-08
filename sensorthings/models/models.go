@@ -107,6 +107,7 @@ type Database interface {
 
 	GetDatastream(string) (*entities.Datastream, error)
 	GetDatastreams() ([]*entities.Datastream, error)
+	GetDatastreamsByThing(string) ([]*entities.Datastream, error)
 	PostDatastream(entities.Datastream) (*entities.Datastream, error)
 
 	GetFeatureOfInterest(string) (*entities.FeatureOfInterest, error)

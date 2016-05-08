@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 
 	var sensorID, encodingtype int
 	var description, location string
-	sql := fmt.Sprintf("select id, description, encodingtype, ST_AsGeoJSON(location) AS location from %s.location where id = $1", gdb.Schema)
+	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location where id = $1"
 	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &encodingtype, &location)
 
 	if err != nil {
@@ -41,7 +41,7 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 
 // GetLocations todo
 func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
-	sql := fmt.Sprintf("select id, description, encodingtype, ST_AsGeoJSON(location) AS location from %s.location", gdb.Schema)
+	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location"
 	rows, err := gdb.Db.Query(sql)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,8 @@ func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
-	jsonToGeom := fmt.Sprintf("ST_GeomFromGeoJSON('%s')", string(locationBytes[:]))
-	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, %s) RETURNING id", gdb.Schema, jsonToGeom)
+	sql := fmt.Sprintf("INSERT INTO location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", string(locationBytes[:]))
+	fmt.Println(sql)
 	err := gdb.Db.QueryRow(sql, location.Description, 1).Scan(&locationID)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Loc
 // LocationExists checks if a location is present in the database based on a given id
 func (gdb *GostDatabase) LocationExists(locationID int) bool {
 	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.location WHERE id = $1 LIMIT 1)", gdb.Schema)
+	sql := "SELECT exists (SELECT 1 FROM  location WHERE id = $1 LIMIT 1)"
 	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
 	if err != nil {
 		return false
@@ -109,15 +109,15 @@ func (gdb *GostDatabase) LocationExists(locationID int) bool {
 func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 	tid, err := strconv.Atoi(thingID)
 	if !gdb.ThingExists(tid) || err != nil {
-		return fmt.Errorf("Thing(%v) does not exist", thingID)
+		return fmt.Errorf("Thing(%s) does not exist", thingID)
 	}
 
 	lid, err2 := strconv.Atoi(thingID)
 	if !gdb.ThingExists(lid) || err2 != nil {
-		return fmt.Errorf("Location(%v) does not exist", locationID)
+		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
+	sql := "INSERT INTO thing_to_location (thing_id, location_id) VALUES ($1, $2)"
 	_, err3 := gdb.Db.Exec(sql, tid, lid)
 	if err3 != nil {
 		return err3

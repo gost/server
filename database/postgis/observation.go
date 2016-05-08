@@ -76,8 +76,8 @@ func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Obse
 		}
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.observation (phenomenontime, parameters, validtime, resulttime, result, resultquality, stream_id, featureofinterest_id) VALUES (%s, %s, %s, %s, %v, %s, %v, %v) RETURNING id",
-		gdb.Schema, pTime, parameters, vTime, resultTime, o.Result, resultQuality, dID, fID)
+	sql := fmt.Sprintf("INSERT INTO observation (phenomenontime, parameters, validtime, resulttime, result, resultquality, stream_id, featureofinterest_id) VALUES (%s, %s, %s, %s, %v, %s, %v, %v) RETURNING id",
+		pTime, parameters, vTime, resultTime, o.Result, resultQuality, dID, fID)
 	err = gdb.Db.QueryRow(sql).Scan(&oID)
 	if err != nil {
 		return nil, err
