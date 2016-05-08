@@ -8,19 +8,42 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 )
 
-// GetHistoricalLocation todo
+// GetHistoricalLocation retrieves a single HistoricalLocation by id
 func (a *APIv1) GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	hl, err := a.db.GetHistoricalLocation(id)
+	if err != nil {
+		return nil, err
+	}
+
+	hl.SetLinks(a.config.GetExternalServerURI())
+	return hl, nil
 }
 
-// GetHistoricalLocations todo
+// GetHistoricalLocations retrieves all HistoricalLocations
 func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	hl, err := a.db.GetHistoricalLocations()
+	return processHistoricalLocations(a, hl, err)
 }
 
-// GetHistoricalLocationsByThing todo
+// GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
 func (a *APIv1) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	hl, err := a.db.GetHistoricalLocationsByThing(thingID)
+	return processHistoricalLocations(a, hl, err)
+}
+
+func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, err error) (*models.ArrayResponse, error) {
+	uri := a.config.GetExternalServerURI()
+	for idx, item := range historicalLocations {
+		i := *item
+		i.SetLinks(uri)
+		historicalLocations[idx] = &i
+	}
+
+	var data interface{} = historicalLocations
+	return &models.ArrayResponse{
+		Count: len(historicalLocations),
+		Data:  &data,
+	}, nil
 }
 
 // PostHistoricalLocation is triggered by code and cannot be used from any endpoint PostHistoricalLocation

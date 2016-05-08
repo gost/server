@@ -5,7 +5,9 @@ import (
 	"github.com/geodan/gost/sensorthings/entities"
 	"strconv"
 
+	"database/sql"
 	"encoding/json"
+	"errors"
 	gostErrors "github.com/geodan/gost/errors"
 )
 
@@ -16,40 +18,51 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 		return nil, err
 	}
 
-	var sensorID, encodingtype int
-	var description, location string
 	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location where id = $1"
-	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &encodingtype, &location)
-
-	if err != nil {
-		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Locations(%s) does not exist", id))
-	}
-
-	locationMap, err := JSONToMap(&location)
-	if err != nil {
-		return nil, err
-	}
-
-	l := entities.Location{
-		ID:          strconv.Itoa(sensorID),
-		Description: description,
-		Location:    locationMap,
-	}
-
-	return &l, nil
+	return processLocation(gdb.Db, sql, intID)
 }
 
-// GetLocations todo
+// GetLocations retrieves all locations
 func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
 	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location"
-	rows, err := gdb.Db.Query(sql)
+	return processLocations(gdb.Db, sql)
+
+}
+
+// GetLocationsByThing retrieves all locations linked to the given thing
+func (gdb *GostDatabase) GetLocationsByThing(thingID string) ([]*entities.Location, error) {
+	intID, err := strconv.Atoi(thingID)
 	if err != nil {
 		return nil, err
 	}
 
-	defer rows.Close()
-	var locations = []*entities.Location{}
+	sql := "select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from location inner join thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1"
+	return processLocations(gdb.Db, sql, intID)
 
+}
+
+func processLocation(db *sql.DB, sql string, args ...interface{}) (*entities.Location, error) {
+	locations, err := processLocations(db, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(locations) == 0 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location not found"))
+	}
+
+	return locations[0], nil
+}
+
+func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.Location, error) {
+	rows, err := db.Query(sql, args...)
+	defer rows.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var locations = []*entities.Location{}
 	for rows.Next() {
 		var sensorID, encodingtype int
 		var description, location string

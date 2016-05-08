@@ -2,11 +2,11 @@ package postgis
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 
 	"database/sql"
-	"errors"
 	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/entities"
 )
@@ -18,32 +18,6 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 		return nil, err
 	}
 
-	/*var dsID int
-	var description, unitofmeasurement string
-	var observedarea *string
-	sql := "select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream where id = $1"
-	err = gdb.Db.QueryRow(sql, intID).Scan(&dsID, &description, &unitofmeasurement, &observedarea)
-
-	if err != nil {
-		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Datastream(%s) does not exist", id))
-	}
-
-	unitOfMeasurementMap, err := JSONToMap(&unitofmeasurement)
-	if err != nil {
-		return nil, err
-	}
-
-	observedAreaMap, err := JSONToMap(observedarea)
-	if err != nil {
-		return nil, err
-	}
-
-	datastream := entities.Datastream{
-		ID:                strconv.Itoa(dsID),
-		Description:       description,
-		UnitOfMeasurement: unitOfMeasurementMap,
-		ObservedArea:      observedAreaMap,
-	}*/
 	sql := "select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream where id = $1"
 	datastream, err := processDatastream(gdb.Db, sql, intID)
 	if err != nil {
@@ -53,15 +27,10 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 	return datastream, nil
 }
 
-// GetDatastreams todo
+// GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
 	sql := "select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream"
-	datastreams, err := processDatastreams(gdb.Db, sql)
-	if err != nil {
-		return nil, err
-	}
-
-	return datastreams, nil
+	return processDatastreams(gdb.Db, sql)
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
@@ -71,13 +40,8 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Data
 		return nil, err
 	}
 
-	sql := "select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) FROM datastream inner join thing on thing.id = datastream.id where thing.id = $1"
-	datastreams, err := processDatastreams(gdb.Db, sql, tID)
-	if err != nil {
-		return nil, err
-	}
-
-	return datastreams, nil
+	sql := "select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) FROM datastream inner join thing on thing.id = datastream.thing_id where thing.id = $1"
+	return processDatastreams(gdb.Db, sql, tID)
 }
 
 func processDatastream(db *sql.DB, sql string, args ...interface{}) (*entities.Datastream, error) {

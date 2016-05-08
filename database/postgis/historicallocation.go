@@ -1,10 +1,89 @@
 package postgis
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
+
+	gostErrors "github.com/geodan/gost/errors"
+	"github.com/geodan/gost/sensorthings/entities"
 )
+
+// GetHistoricalLocation retireves a HistoricalLocation by id
+func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalLocation, error) {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := "select id, time FROM historicallocation where id = $1"
+	historicallocation, err := processHistoricalLocation(gdb.Db, sql, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	return historicallocation, nil
+}
+
+// GetHistoricalLocations retrieves all historicallocations
+func (gdb *GostDatabase) GetHistoricalLocations() ([]*entities.HistoricalLocation, error) {
+	sql := "select id, time FROM historicallocation"
+	return processHistoricalLocations(gdb.Db, sql)
+}
+
+// GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
+func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string) ([]*entities.HistoricalLocation, error) {
+	tID, err := strconv.Atoi(thingID)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := "select historicallocation.id, historicallocation.time FROM historicallocation where historicallocation.thing_id = $1"
+	return processHistoricalLocations(gdb.Db, sql, tID)
+}
+
+func processHistoricalLocation(db *sql.DB, sql string, args ...interface{}) (*entities.HistoricalLocation, error) {
+	hls, err := processHistoricalLocations(db, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(hls) == 0 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation not found"))
+	}
+
+	return hls[0], nil
+}
+
+func processHistoricalLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.HistoricalLocation, error) {
+	rows, err := db.Query(sql, args...)
+	defer rows.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var hls = []*entities.HistoricalLocation{}
+	for rows.Next() {
+		var id int
+		var time string
+
+		err := rows.Scan(&id, &time)
+		if err != nil {
+			return nil, err
+		}
+
+		datastream := entities.HistoricalLocation{
+			ID:   strconv.Itoa(id),
+			Time: time,
+		}
+		hls = append(hls, &datastream)
+	}
+
+	return hls, nil
+}
 
 // PostHistoricalLocation adds a historical location to the database
 // returns the created historical location including the generated id
@@ -20,7 +99,6 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 
-	//check if thing and location exist
 	sql := "INSERT INTO historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3)"
 	_, err3 := gdb.Db.Exec(sql, time.Now(), tid, lid)
 	if err3 != nil {

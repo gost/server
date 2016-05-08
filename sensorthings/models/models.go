@@ -79,6 +79,7 @@ type API interface {
 	DeleteSensor(id string) error
 
 	PostHistoricalLocation(thingID string, locationID string) []error
+
 	LinkLocation(thingID string, locationID string) error
 }
 
@@ -94,6 +95,7 @@ type Database interface {
 
 	GetLocation(string) (*entities.Location, error)
 	GetLocations() ([]*entities.Location, error)
+	GetLocationsByThing(string) ([]*entities.Location, error)
 	PostLocation(entities.Location) (*entities.Location, error)
 	LinkLocation(string, locationID string) error
 
@@ -118,6 +120,9 @@ type Database interface {
 	GetObservations() ([]*entities.Observation, error)
 	PostObservation(entities.Observation) (*entities.Observation, error)
 
+	GetHistoricalLocation(string) (*entities.HistoricalLocation, error)
+	GetHistoricalLocations() ([]*entities.HistoricalLocation, error)
+	GetHistoricalLocationsByThing(string) ([]*entities.HistoricalLocation, error)
 	PostHistoricalLocation(thingID string, locationID string) error
 
 	ThingExists(thingID int) bool

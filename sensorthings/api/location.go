@@ -46,7 +46,7 @@ func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) 
 	return l, nil
 }
 
-// GetLocation todo
+// GetLocation retrieves a single location by id
 func (a *APIv1) GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error) {
 	l, err := a.db.GetLocation(id)
 	if err != nil {
@@ -57,13 +57,19 @@ func (a *APIv1) GetLocation(id string, qo *odata.QueryOptions) (*entities.Locati
 	return l, nil
 }
 
-// GetLocations todo
+// GetLocations retrieves all locations from the database and returns it as and ArrayResponse
 func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	locations, err := a.db.GetLocations()
-	if err != nil {
-		return nil, err
-	}
+	return processLocations(a, locations, err)
+}
 
+// GetLocationsByThing retrieves the latest locations linked to a thing
+func (a *APIv1) GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	locations, err := a.db.GetLocationsByThing(thingID)
+	return processLocations(a, locations, err)
+}
+
+func processLocations(a *APIv1, locations []*entities.Location, err error) (*models.ArrayResponse, error) {
 	uri := a.config.GetExternalServerURI()
 	for idx, item := range locations {
 		i := *item
@@ -76,11 +82,6 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, err
 		Count: len(locations),
 		Data:  &data,
 	}, nil
-}
-
-// GetLocationsByThing todo
-func (a *APIv1) GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // PatchLocation todo
