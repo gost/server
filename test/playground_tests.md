@@ -4,6 +4,8 @@ Here a collection of sample requests to start working with the GOST API. It cont
 
 ## 1] Create a Thing
 
+A thing is an object in either the physical or virtual world.
+
 Request:
 
 ```sh
@@ -25,6 +27,8 @@ Response:
 ```
 
 ## 2] Create a Location
+
+Where is the physical or virtual object located?
 
 Request: 
 
@@ -58,6 +62,8 @@ Response:
 
 ## 3] Create an ObservedProperty
 
+What property is the sensor observing?
+
 Request: 
 
 ```sh
@@ -79,6 +85,8 @@ Response:
 
 ## 4] Create a Sensor
 
+The sensor is what actually makes the observations. 
+
 Request:
 
 ```sh
@@ -99,6 +107,8 @@ Response:
 ```
 
 ## 5] Create a Datastream
+
+The Datastream represents a series of observations.
 
 Request:
 
