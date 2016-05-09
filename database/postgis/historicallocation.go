@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalL
 		return nil, err
 	}
 
-	sql := "select id, time FROM historicallocation where id = $1"
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation where id = $1", TimeFormat)
 	historicallocation, err := processHistoricalLocation(gdb.Db, sql, intID)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalL
 
 // GetHistoricalLocations retrieves all historicallocations
 func (gdb *GostDatabase) GetHistoricalLocations() ([]*entities.HistoricalLocation, error) {
-	sql := "select id, time FROM historicallocation"
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation", TimeFormat)
 	return processHistoricalLocations(gdb.Db, sql)
 }
 
@@ -39,8 +39,7 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string) ([]*entit
 	if err != nil {
 		return nil, err
 	}
-
-	sql := "select historicallocation.id, historicallocation.time FROM historicallocation where historicallocation.thing_id = $1"
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation where thing_id = $1", TimeFormat)
 	return processHistoricalLocations(gdb.Db, sql, tID)
 }
 

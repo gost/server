@@ -12,6 +12,10 @@ import (
 	"strings"
 )
 
+const (
+	TimeFormat = "YYYY-MM-DD\"T\"HH24:MI:SS.MSZ"
+)
+
 // GostDatabase implementation
 type GostDatabase struct {
 	Host     string
