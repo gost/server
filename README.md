@@ -41,7 +41,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Sample requests
 
-For sample request see the test in the [playground](test/playground_tests.md)
+For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 
 
 ## Startup flags
 
