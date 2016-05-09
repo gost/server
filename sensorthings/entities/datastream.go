@@ -2,7 +2,8 @@ package entities
 
 import (
 	"encoding/json"
-	"github.com/geodan/gost/errors"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // Datastream in SensorThings represents a collection of Observations from a Sensor. A physical Sensor will send its
@@ -35,7 +36,7 @@ func (d *Datastream) ParseEntity(data []byte) error {
 	datastream := &d
 	err := json.Unmarshal(data, datastream)
 	if err != nil {
-		return errors.NewBadRequestError(err)
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse Datastream"))
 	}
 
 	return nil

@@ -1,6 +1,10 @@
 package entities
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
+)
 
 // HistoricalLocation in sensorthings represents the current and previous locations of a thing including time
 type HistoricalLocation struct {
@@ -23,7 +27,7 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 	hl := &h
 	err := json.Unmarshal(data, hl)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse HistoricalLocation"))
 	}
 
 	return nil

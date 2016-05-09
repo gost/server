@@ -41,6 +41,19 @@ database:
     database: gost
     schema: v1
     ssl: false
+mqtt:
+    enabled: true
+    webSocketEnabled: true
+    secureWebSocketEnabled: false
+    port: 1883
+    webSocketPort:  8081
+    secureWebSocketPort: 8082
+    keepAlive: 300
+    connectTimeout: 2
+    ackTimeout: 20
+    timeoutRetries: 3
+    secureWebSocketCertPath:
+    secureWebSocketKeyPath:
 `
 
 func TestReadFile(t *testing.T) {

@@ -2,6 +2,8 @@ package entities
 
 import (
 	"encoding/json"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // Thing in SensorThings represents a physical object in the real world. A Thing is a good starting
@@ -31,7 +33,7 @@ func (t *Thing) ParseEntity(data []byte) error {
 	thing := &t
 	err := json.Unmarshal(data, thing)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse Thing"))
 	}
 
 	return nil

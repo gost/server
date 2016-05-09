@@ -57,7 +57,7 @@ func main() {
 	if len(sqlFile) != 0 {
 		createDatabase(database, sqlFile)
 	} else {
-		mqttServer := mqtt.NewMQTTServer()
+		mqttServer := mqtt.NewMQTTServer(configuration.MQTTConfig{})
 		mqttServer.Start()
 		stAPI = api.NewAPI(database, conf, mqttServer)
 		createAndStartServer(&stAPI)

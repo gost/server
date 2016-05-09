@@ -2,6 +2,8 @@ package entities
 
 import (
 	"encoding/json"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // Location entity locates the Thing or the Things it associated with. A Thing’s Location entity is
@@ -34,7 +36,7 @@ func (l *Location) ParseEntity(data []byte) error {
 	location := &l
 	err := json.Unmarshal(data, location)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse Location"))
 	}
 
 	return nil

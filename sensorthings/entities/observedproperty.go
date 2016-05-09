@@ -1,6 +1,10 @@
 package entities
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
+)
 
 // ObservedProperty in SensorThings represents the physical phenomenon being observed by the Sensor. An ObserveProperty is
 // linked to a Datatream which can only have one ObserveProperty
@@ -24,7 +28,7 @@ func (o *ObservedProperty) ParseEntity(data []byte) error {
 	op := &o
 	err := json.Unmarshal(data, op)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse ObservedProperty"))
 	}
 
 	return nil

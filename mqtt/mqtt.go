@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/surge/glog"
 	"github.com/surgemq/surgemq/service"
@@ -27,12 +28,12 @@ type MQTT struct {
 }
 
 // NewMQTTServer creates a new MQTT server
-func NewMQTTServer() models.MQTTServer {
+func NewMQTTServer(config configuration.MQTTConfig) models.MQTTServer {
 	return &MQTT{
-		keepAlive:        service.DefaultKeepAlive,
-		connectTimeout:   service.DefaultConnectTimeout,
-		ackTimeout:       service.DefaultAckTimeout,
-		timeoutRetries:   service.DefaultTimeoutRetries,
+		keepAlive:        config.KeepAlive,
+		connectTimeout:   config.ConnectTimeout,
+		ackTimeout:       config.AckTimeout,
+		timeoutRetries:   config.TimeoutRetries,
 		authenticator:    service.DefaultAuthenticator,
 		sessionsProvider: service.DefaultSessionsProvider,
 		topicsProvider:   service.DefaultTopicsProvider,

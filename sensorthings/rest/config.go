@@ -139,7 +139,7 @@ func createObservedProperties(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties", HandleGetObservedProperties},
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperty", HandleGetObservedPropertyByDatastream},
-			{models.HTTPOperationPost, "/v1.0/ObservedProperty", HandlePostObservedProperty},
+			{models.HTTPOperationPost, "/v1.0/ObservedProperties", HandlePostObservedProperty},
 			{models.HTTPOperationDelete, "/v1.0/ObservedProperty{id}", HandleDeleteObservedProperty},
 			{models.HTTPOperationPatch, "/v1.0/ObservedProperty{id}", HandlePatchObservedProperty},
 		},

@@ -1,6 +1,10 @@
 package entities
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
+)
 
 // Sensor in SensorThings represents the physical device capable of observing a physical property and converting
 // it to an electrical impulse and be converted to a empirical value to represent a measurement value of the physical property
@@ -24,7 +28,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 	sensor := &s
 	err := json.Unmarshal(data, sensor)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse Sensor"))
 	}
 
 	return nil

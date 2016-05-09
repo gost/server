@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"errors"
+	gostErrors "github.com/geodan/gost/errors"
 )
 
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends
@@ -34,7 +37,7 @@ func (o *Observation) ParseEntity(data []byte) error {
 	observation := &o
 	err := json.Unmarshal(data, observation)
 	if err != nil {
-		return err
+		return gostErrors.NewBadRequestError(errors.New("Unable to parse Observation"))
 	}
 
 	return nil
