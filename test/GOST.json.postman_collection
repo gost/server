@@ -50,9 +50,13 @@
 			"description": "",
 			"order": [
 				"58a2d768-904e-cb6b-31cf-6ea765e2c4d3",
-				"40c14ebd-a7e1-78de-89da-95b9cfd9f650"
+				"dba441a1-d4c4-038d-02de-ef6725b4007f",
+				"40c14ebd-a7e1-78de-89da-95b9cfd9f650",
+				"5bec0b83-0594-c626-85b4-4351e16823d0",
+				"8e363ead-f670-8edb-ecbd-041408fbbfa4"
 			],
-			"owner": 0
+			"owner": 0,
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc"
 		},
 		{
 			"id": "608fc284-8d4a-1683-e339-90c5a134b8e8",
@@ -334,12 +338,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1462631580597,
-			"name": "V POST Observation copy",
+			"time": 1462793225856,
+			"name": "V POST Observation (result)",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n  \"result\" : 38\r\n}"
+			"rawModeData": "{\r\n  \"result\" : 12\r\n}"
 		},
 		{
 			"id": "41c91041-6e6d-ac50-1010-2409efcaafd1",
@@ -445,6 +449,26 @@
 			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"1\"}\r\n}"
 		},
 		{
+			"id": "5bec0b83-0594-c626-85b4-4351e16823d0",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1462787805566,
+			"name": "V GET Observations",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
 			"id": "62aa279b-bf45-875c-6a64-39974b5f9181",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
 			"url": "localhost:8080/v1.0/ObservedProperties",
@@ -527,6 +551,26 @@
 			"responses": [],
 			"folder": "ecaaf26d-a374-996d-cacf-7eb60d4fdd24",
 			"rawModeData": "{        \r\n    \"description\": \"SensorUp Tempomatic 2000\",\r\n    \"encodingType\": \"http://schema.org/description\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2014\"\r\n}"
+		},
+		{
+			"id": "8e363ead-f670-8edb-ecbd-041408fbbfa4",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1462793232786,
+			"name": "V GET Observation",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
 			"id": "a24fba63-a07f-3f24-f46c-fd12b35130fb",
@@ -631,6 +675,26 @@
 			"helperAttributes": {},
 			"folder": "4c14dc23-c5b4-6ef4-4f32-11b785931bf0",
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "dba441a1-d4c4-038d-02de-ef6725b4007f",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1462793767181,
+			"name": "V POST Observation full params",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"resultTime\": \"2015-04-13T00:00:05Z\",\r\n  \"result\": 38,\r\n  \"resultQuality\": \"heul goei\",\r\n  \"validTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"parameters\": {\"wie\": \"Barry\", \"waarom\": \"Zomaar\"},\r\n  \"Datastream\": {\"@iot.id\":\"1\"}\r\n}"
 		}
 	]
 }
