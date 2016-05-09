@@ -2,20 +2,19 @@ package main
 
 import (
 	"flag"
-	"log"
-	"os"
-	"strconv"
-	//"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/database/postgis"
 	"github.com/geodan/gost/http"
+	"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/models"
+	"log"
+	"os"
+	"strconv"
 )
 
 var (
 	stAPI models.API
-	//mqttServer mqtt.MQTTServer
 )
 
 func main() {
@@ -58,9 +57,9 @@ func main() {
 	if len(sqlFile) != 0 {
 		createDatabase(database, sqlFile)
 	} else {
-		//mqttServer = mqtt.NewMQTTServer()
-		//mqttServer.Start()
-		stAPI = api.NewAPI(database, conf)
+		mqttServer := mqtt.NewMQTTServer()
+		mqttServer.Start()
+		stAPI = api.NewAPI(database, conf, mqttServer)
 		createAndStartServer(&stAPI)
 	}
 }

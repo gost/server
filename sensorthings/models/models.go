@@ -129,6 +129,12 @@ type Database interface {
 	LocationExists(thingID int) bool
 }
 
+// MQTTServer interface defines the needed MQTT operations
+type MQTTServer interface {
+	Start()
+	Stop()
+}
+
 // Endpoint defines the rest endpoint options
 type Endpoint interface {
 	GetName() string

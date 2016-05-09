@@ -1,20 +1,13 @@
 package mqtt
 
 import (
-	"log"
 	"os"
 	"os/signal"
-	"runtime/pprof"
 
+	"github.com/geodan/gost/sensorthings/models"
 	"github.com/surge/glog"
 	"github.com/surgemq/surgemq/service"
 )
-
-// Server interface defines the needed MQTT operations
-type Server interface {
-	Start()
-	Stop()
-}
 
 // MQTT is the implementation of the MQTT server
 type MQTT struct {
@@ -34,7 +27,7 @@ type MQTT struct {
 }
 
 // NewMQTTServer creates a new MQTT server
-func NewMQTTServer() Server {
+func NewMQTTServer() models.MQTTServer {
 	return &MQTT{
 		keepAlive:        service.DefaultKeepAlive,
 		connectTimeout:   service.DefaultConnectTimeout,
@@ -66,31 +59,12 @@ func (m *MQTT) Start() {
 		TopicsProvider:   m.topicsProvider,
 	}
 
-	var f *os.File
-
-	if m.cpuprofile != "" {
-		f, err = os.Create(m.cpuprofile)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		pprof.StartCPUProfile(f)
-	}
-
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, os.Interrupt, os.Kill)
 	go func() {
 		sig := <-sigchan
 		glog.Errorf("Existing due to trapped signal; %v", sig)
-
-		if f != nil {
-			glog.Errorf("Stopping profile")
-			pprof.StopCPUProfile()
-			f.Close()
-		}
-
 		m.server.Close()
-
 		os.Exit(0)
 	}()
 

@@ -115,9 +115,9 @@ func JSONToMap(data *string) (map[string]interface{}, error) {
 func ConvertNullString(value *string) string {
 	if value == nil {
 		return ""
-	} else {
-		return fmt.Sprintf("%s", *value)
 	}
+
+	return fmt.Sprintf("%s", *value)
 }
 
 // PrepareTimeRangeForPostgres splits an incoming timerange by the / delimiter and returns the start
