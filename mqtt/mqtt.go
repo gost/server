@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 
+	"fmt"
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/surge/glog"
@@ -21,6 +22,7 @@ type MQTT struct {
 	sessionsProvider string
 	topicsProvider   string
 	cpuprofile       string
+	mqttaddr         string
 	wsAddr           string // HTTPS websocket address eg. :8080
 	wssAddr          string // HTTPS websocket address, eg. :8081
 	wssCertPath      string // path to HTTPS public key
@@ -37,6 +39,7 @@ func NewMQTTServer(config configuration.MQTTConfig) models.MQTTServer {
 		authenticator:    service.DefaultAuthenticator,
 		sessionsProvider: service.DefaultSessionsProvider,
 		topicsProvider:   service.DefaultTopicsProvider,
+		mqttaddr:         fmt.Sprintf("tcp://:%v", config.Port),
 		cpuprofile:       "",
 		wsAddr:           "", // HTTPS websocket address eg. :8080
 		wssAddr:          "", // HTTPS websocket address, eg. :8081
@@ -47,10 +50,8 @@ func NewMQTTServer(config configuration.MQTTConfig) models.MQTTServer {
 
 // Start running the MQTT server
 func (m *MQTT) Start() {
-	mqttaddr := "tcp://:1883"
 	var err error
 
-	//	if m.server == nil {
 	m.server = service.Server{
 		KeepAlive:        m.keepAlive,
 		ConnectTimeout:   m.connectTimeout,
@@ -60,21 +61,30 @@ func (m *MQTT) Start() {
 		TopicsProvider:   m.topicsProvider,
 	}
 
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, os.Interrupt, os.Kill)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, os.Kill)
 	go func() {
-		sig := <-sigchan
+		sig := <-sigChan
 		glog.Errorf("Existing due to trapped signal; %v", sig)
 		m.server.Close()
 		os.Exit(0)
 	}()
 
 	if len(m.wsAddr) > 0 || len(m.wssAddr) > 0 {
+		/*addr := "tcp://127.0.0.1:1883"
+		AddWebsocketHandler("/mqtt", addr)
 
+		if len(wsAddr) > 0 {
+			go ListenAndServeWebsocket(wsAddr)
+		}
+
+		if len(wssAddr) > 0 && len(wssCertPath) > 0 && len(wssKeyPath) > 0 {
+			go ListenAndServeWebsocketSecure(wssAddr, wssCertPath, wssKeyPath)
+		}*/
 	}
 
 	go func() {
-		err = m.server.ListenAndServe(mqttaddr)
+		err = m.server.ListenAndServe(m.mqttaddr)
 		if err != nil {
 			glog.Errorf("surgemq/main: %v", err)
 		}

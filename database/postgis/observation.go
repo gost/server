@@ -160,6 +160,10 @@ func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Obse
 
 	o.ID = strconv.Itoa(oID)
 
+	if o.ResultTime == "NULL" {
+		o.ResultTime = ""
+	}
+
 	// clear inner entities to serves links upon response
 	o.Datastream = nil
 	o.FeatureOfInterest = nil
