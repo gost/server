@@ -1,8 +1,8 @@
 ## Playground tests
 
-Here a collection of sample requests to start working with the GOST API
+Here a collection of sample requests to start working with the GOST API. It contains 6 steps: create a Thing, create a Location, create an ObservedProperty, create a Sensor, create a Datastream and create an Observation.
 
-## Create a Thing
+## 1] Create a Thing
 
 Request:
 
@@ -22,7 +22,7 @@ Response:
 }
 ```
 
-## Create a Location
+## 2] Create a Location
 
 Request: 
 
@@ -52,7 +52,7 @@ Response:
 }
 ```
 
-## Create a ObservedProperty
+## 3] Create an ObservedProperty
 
 Request: 
 
@@ -71,7 +71,7 @@ Response:
 }
 ```
 
-## Create a Sensor
+## 4] Create a Sensor
 
 Request:
 
@@ -90,7 +90,7 @@ Response:
 }
 ```
 
-## Create a Datastream
+## 5] Create a Datastream
 
 Request:
 
@@ -113,7 +113,7 @@ Response:
 }
 ```
 
-## Add an Observation
+## 6] Add an Observation
 
 Request: 
 
