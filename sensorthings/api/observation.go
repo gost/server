@@ -8,19 +8,45 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 )
 
-// GetObservation todo
+// GetObservation returns an observation by id
 func (a *APIv1) GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	o, err := a.db.GetObservation(id)
+	if err != nil {
+		return nil, err
+	}
+
+	o.SetLinks(a.config.GetExternalServerURI())
+	return o, nil
 }
 
-// GetObservations todo
+// GetObservations return all observations
 func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	observations, err := a.db.GetObservations()
+	return processObservations(a, observations, err)
 }
 
 // GetObservationsByDatastream todo
 func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+}
+
+func processObservations(a *APIv1, datastreams []*entities.Observation, err error) (*models.ArrayResponse, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	uri := a.config.GetExternalServerURI()
+	for idx, item := range datastreams {
+		i := *item
+		i.SetLinks(uri)
+		datastreams[idx] = &i
+	}
+
+	var data interface{} = datastreams
+	return &models.ArrayResponse{
+		Count: len(datastreams),
+		Data:  &data,
+	}, nil
 }
 
 // PostObservation todo

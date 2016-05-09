@@ -95,7 +95,6 @@ func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Loc
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
 	sql := fmt.Sprintf("INSERT INTO location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", string(locationBytes[:]))
-	fmt.Println(sql)
 	err := gdb.Db.QueryRow(sql, location.Description, 1).Scan(&locationID)
 	if err != nil {
 		return nil, err

@@ -10,18 +10,18 @@ import (
 // Observations to a specified Datastream. An Observation requires a FeaturOfInterest entity, if none is provided in the request,
 // the Location of the Thing associated with the Datastream, will be assigned to the new Observation as the FeaturOfInterest.
 type Observation struct {
-	ID                   string             `json:"@iot.id,omitempty"`
-	NavSelf              string             `json:"@iot.selfLink,omitempty"`
-	PhenomenonTime       string             `json:"phenomenonTime,omitempty"`
-	Result               float64            `json:"result,omitempty"`
-	ResultTime           string             `json:"resultTime,omitempty"`
-	ResultQuality        string             `json:"resultQuality,omitempty"`
-	ValidTime            string             `json:"validTime,omitempty"`
-	Parameters           string             `json:"parameters,omitempty"`
-	NavDatastream        string             `json:"Datastream@iot.navigationLink,omitempty"`
-	NavFeatureOfInterest string             `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
-	Datastream           *Datastream        `json:"Datastream,omitempty"`
-	FeatureOfInterest    *FeatureOfInterest `json:"FeatureOfInterest,omitempty"`
+	ID                   string                 `json:"@iot.id,omitempty"`
+	NavSelf              string                 `json:"@iot.selfLink,omitempty"`
+	PhenomenonTime       string                 `json:"phenomenonTime,omitempty"`
+	Result               float64                `json:"result,omitempty"`
+	ResultTime           string                 `json:"resultTime,omitempty"`
+	ResultQuality        string                 `json:"resultQuality,omitempty"`
+	ValidTime            string                 `json:"validTime,omitempty"`
+	Parameters           map[string]interface{} `json:"parameters,omitempty"`
+	NavDatastream        string                 `json:"Datastream@iot.navigationLink,omitempty"`
+	NavFeatureOfInterest string                 `json:"FeatureOfInterest@iot.navigationLink,omitempty"`
+	Datastream           *Datastream            `json:"Datastream,omitempty"`
+	FeatureOfInterest    *FeatureOfInterest     `json:"FeatureOfInterest,omitempty"`
 }
 
 // GetEntityType returns the EntityType for Observation
