@@ -38,6 +38,11 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 6. Go in browser to http://localhost:8080
 
+
+## Sample requests
+
+For sample request see the test in the [playground](test/playground_tests.md)
+
 ## Startup flags
 
 -config : specify the config file (default config.yaml)
