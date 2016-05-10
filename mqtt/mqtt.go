@@ -2,20 +2,21 @@ package mqtt
 
 import (
 	"fmt"
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/sensorthings/models"
+	"log"
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"log"
+	"github.com/geodan/gost/configuration"
+	"github.com/geodan/gost/sensorthings/models"
 )
 
 // MQTT is the implementation of the MQTT server
 type MQTT struct {
 	host       string
 	port       int
-	client     paho.Client
 	connecting bool
+	client     paho.Client
+	api        *models.API
 }
 
 // CreateMQTTClient creates a new MQTT client
@@ -37,12 +38,25 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 }
 
 // Start running the MQTT client
-func (m *MQTT) Start() {
+func (m *MQTT) Start(api *models.API) {
+	m.api = api
 	log.Printf("Starting MQTT client on %s", fmt.Sprintf("tcp://%s:%v", m.host, m.port))
 	m.connect()
-	if token := m.client.Subscribe("/gost/#", 0, brokerLoadHandler); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
+
+	a := *m.api
+	topics := *a.GetTopics()
+	for _, t := range topics {
+		topic := t
+		if token := m.client.Subscribe("Datastreams(1)/Observations", 0, func(client paho.Client, msg paho.Message) { topic.Handler(m.api, "", msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
+			fmt.Println(token.Error())
+		}
 	}
+
+	/*
+		if token := m.client.Subscribe("Datastreams(1)/Observations", 0, observationHandler); token.Wait() && token.Error() != nil {
+			fmt.Println(token.Error())
+		}
+	*/
 }
 
 // Stop the MQTT client
@@ -82,11 +96,12 @@ func connectHandler(c paho.Client) {
 	log.Printf("MQTT client connected")
 }
 
+//ToDo: bubble up and call retryConnect?
 func connectionLostHandler(c paho.Client, err error) {
 	log.Printf("MQTT client lost connection: %v", err)
 }
 
-func brokerLoadHandler(client paho.Client, msg paho.Message) {
+func observationHandler(client paho.Client, msg paho.Message) {
 	fmt.Printf("TOPIC: %s\n", msg.Topic())
 	fmt.Printf("MSG: %s\n", msg.Payload())
 }

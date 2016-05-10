@@ -19,9 +19,9 @@ func readFile(cfgFile string) ([]byte, error) {
 // readConfig tries to parse the byte data into a config file
 func readConfig(fileContent []byte) (Config, error) {
 	config := Config{}
-	err2 := yaml.Unmarshal(fileContent, &config)
-	if err2 != nil {
-		return config, err2
+	err := yaml.Unmarshal(fileContent, &config)
+	if err != nil {
+		return config, err
 	}
 
 	return config, nil

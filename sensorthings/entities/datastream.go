@@ -61,7 +61,7 @@ func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
 
 // SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
 func (d *Datastream) SetLinks(externalURL string) {
-	d.NavSelf = CreateEntitySefLink(externalURL, EntityLinkDatastreams.ToString(), d.ID)
+	d.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkDatastreams.ToString(), d.ID)
 	d.NavThing = CreateEntityLink(d.Thing == nil, EntityLinkDatastreams.ToString(), EntityTypeThing.ToString(), d.ID)
 	d.NavSensor = CreateEntityLink(d.Sensor == nil, EntityLinkDatastreams.ToString(), EntityTypeSensor.ToString(), d.ID)
 	d.NavObservations = CreateEntityLink(d.Observations == nil, EntityLinkDatastreams.ToString(), EntityLinkObservations.ToString(), d.ID)

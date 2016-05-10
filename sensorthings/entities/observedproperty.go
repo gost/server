@@ -50,6 +50,6 @@ func (o *ObservedProperty) ContainsMandatoryParams() (bool, []error) {
 
 // SetLinks sets the entity specific navigation links if needed
 func (o *ObservedProperty) SetLinks(externalURL string) {
-	o.NavSelf = CreateEntitySefLink(externalURL, EntityLinkObservedPropertys.ToString(), o.ID)
+	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservedPropertys.ToString(), o.ID)
 	o.NavDatastreams = CreateEntityLink(o.Datastreams == nil, EntityLinkObservedPropertys.ToString(), EntityLinkDatastreams.ToString(), o.ID)
 }

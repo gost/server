@@ -93,7 +93,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 
 // CreateEntitySefLink formats the given parameters into an external navigationlink to the entity
 // for example: http://example.org/OGCSensorThings/v1.0/Things(27815)
-func CreateEntitySefLink(externalURI string, entityLink string, id string) string {
+func CreateEntitySelfLink(externalURI string, entityLink string, id string) string {
 	if len(id) != 0 {
 		entityLink = fmt.Sprintf("%s(%s)", entityLink, id)
 	}

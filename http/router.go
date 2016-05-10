@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// NewRouter creates a new mux.Router and sets up all endpoints defind in the sensothings api
-func NewRouter(api *models.API) *mux.Router {
+// CreateRouter creates a new mux.Router and sets up all endpoints defind in the sensothings api
+func CreateRouter(api *models.API) *mux.Router {
 	// Note: tried julienschmidt/httprouter instead of gorilla/mux but had some
 	// problems with interfering endpoints cause of the wildcard used for the (id) in requests
 	a := *api

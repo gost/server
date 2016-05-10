@@ -74,7 +74,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 
 // SetLinks sets the entity specific navigation links if needed
 func (o *Observation) SetLinks(externalURL string) {
-	o.NavSelf = CreateEntitySefLink(externalURL, EntityLinkObservations.ToString(), o.ID)
+	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservations.ToString(), o.ID)
 	o.NavDatastream = CreateEntityLink(o.Datastream == nil, EntityLinkObservations.ToString(), EntityTypeDatastream.ToString(), o.ID)
 	o.NavFeatureOfInterest = CreateEntityLink(o.FeatureOfInterest == nil, EntityLinkObservations.ToString(), EntityTypeFeatureOfInterest.ToString(), o.ID)
 }

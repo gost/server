@@ -105,18 +105,17 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datastream, error) {
 	var dsID int
 	tID, err := strconv.Atoi(d.Thing.ID)
-	sID, err2 := strconv.Atoi(d.Sensor.ID)
-	oID, err3 := strconv.Atoi(d.ObservedProperty.ID)
-
 	if err != nil || !gdb.ThingExists(tID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("Thing does not exist"))
 	}
 
-	if err2 != nil || !gdb.SensorExists(sID) {
+	sID, err := strconv.Atoi(d.Sensor.ID)
+	if err != nil || !gdb.SensorExists(sID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("Sensor does not exist"))
 	}
 
-	if err3 != nil || !gdb.ObservedPropertyExists(oID) {
+	oID, err := strconv.Atoi(d.ObservedProperty.ID)
+	if err != nil || !gdb.ObservedPropertyExists(oID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservedProperty does not exist"))
 	}
 

@@ -20,6 +20,7 @@ type API interface {
 	GetVersionInfo() *VersionInfo
 	GetBasePathInfo() *ArrayResponse
 	GetEndpoints() *[]Endpoint
+	GetTopics() *[]Topic
 
 	GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error)
@@ -131,7 +132,7 @@ type Database interface {
 
 // MQTTClient interface defines the needed MQTT client operations
 type MQTTClient interface {
-	Start()
+	Start(*API)
 	Stop()
 }
 
@@ -167,6 +168,15 @@ const (
 	HTTPOperationPatch  HTTPOperation = "PATCH"
 	HTTPOperationDelete HTTPOperation = "DELETE"
 )
+
+// Topic defines the MQTT PUBLISH topics
+type Topic struct {
+	Path    string
+	Handler MQTTHandler
+}
+
+// MQTTHandler func defines the format of the handler to process the incoming MQTT publish message
+type MQTTHandler func(a *API, clientID string, topic string, message []byte)
 
 // VersionInfo describes the version info for the GOST server version and supported SensorThings API version
 type VersionInfo struct {

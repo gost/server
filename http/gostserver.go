@@ -23,7 +23,7 @@ type GostServer struct {
 }
 
 // NewServer initialises a new GOST HTTPServer based on the given parameters
-func NewServer(host string, port int, api *models.API) Server {
+func CreateServer(host string, port int, api *models.API) Server {
 	return &GostServer{
 		host: host,
 		port: port,
@@ -34,7 +34,7 @@ func NewServer(host string, port int, api *models.API) Server {
 // Start command to start the GOST HTTPServer
 func (s *GostServer) Start() {
 	log.Printf("Started GOST HTTP Server on %v:%v", s.host, s.port)
-	router := NewRouter(s.api)
+	router := CreateRouter(s.api)
 	httpError := http.ListenAndServe(s.host+":"+strconv.Itoa(s.port), router)
 
 	if httpError != nil {

@@ -4,6 +4,7 @@ import (
 	"github.com/geodan/gost/configuration"
 
 	"github.com/geodan/gost/sensorthings/models"
+	"github.com/geodan/gost/sensorthings/mqtt"
 	"github.com/geodan/gost/sensorthings/rest"
 )
 
@@ -13,6 +14,7 @@ type APIv1 struct {
 	db        models.Database
 	config    configuration.Config
 	endPoints []models.Endpoint
+	topics    []models.Topic
 	mqtt      models.MQTTClient
 }
 
@@ -57,4 +59,13 @@ func (a *APIv1) GetEndpoints() *[]models.Endpoint {
 	}
 
 	return &a.endPoints
+}
+
+// GetTopics returns all configured topics for the MQTT client
+func (a *APIv1) GetTopics() *[]models.Topic {
+	if a.topics == nil {
+		a.topics = mqtt.CreateTopics()
+	}
+
+	return &a.topics
 }

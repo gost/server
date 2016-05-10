@@ -57,9 +57,9 @@ func main() {
 	if len(sqlFile) != 0 {
 		createDatabase(database, sqlFile)
 	} else {
-		mqttServer := mqtt.CreateMQTTClient(conf.MQTT)
-		mqttServer.Start()
-		stAPI = api.NewAPI(database, conf, mqttServer)
+		mqttClient := mqtt.CreateMQTTClient(conf.MQTT)
+		stAPI := api.NewAPI(database, conf, mqttClient)
+		mqttClient.Start(&stAPI)
 		createAndStartServer(&stAPI)
 	}
 }
@@ -78,6 +78,6 @@ func createDatabase(db models.Database, sqlFile string) {
 // createAndStartServer creates the GOST HTTPServer and starts it
 func createAndStartServer(api *models.API) {
 	a := *api
-	gostServer := http.NewServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
+	gostServer := http.CreateServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
 	gostServer.Start()
 }
