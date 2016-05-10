@@ -37,7 +37,7 @@ go get -t
 5. Create database
  '''sh
  go run main.go -install ./scripts/createdb.sql
-'''
+''''
 
 5. Start
 '''sh
