@@ -17,35 +17,39 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Getting started
 
-1. Install
- 1. Install GoLang https://golang.org/
- 2. Install Postgresql http://www.postgresql.org/
+1. Install GoLang (https://golang.org/)
 
-2. Clone code
+2. Install Postgresql (http://www.postgresql.org/)
+
+3. Clone code
+
  ```sh
  git clone https://github.com/Geodan/gost.git
 ```
 
-3. Get dependencies
+4. Get dependencies
+
 ```sh
 go get -t
 ```
 
-4. Edit config.yaml
- Change connection to database
+5. Edit config.yaml
 
-5. Create database
+Change connection to database
+
+6. Create database
+
 ```sh
  go run main.go -install ./scripts/createdb.sql
 ```
 
-5. Start
+7. Start
+
 '''sh
 go run main.go
 '''
 
-6. Go in browser to http://localhost:8080
-
+8. Go in browser to http://localhost:8080
 
 ## Sample requests
 
