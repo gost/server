@@ -17,35 +17,37 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Getting started
 
-1. Install
- 1. Install GoLang https://golang.org/
- 2. Install Postgresql http://www.postgresql.org/
+1] Install GoLang (https://golang.org/)
 
-2. Clone code
- '''sh
- git clone https://github.com/Geodan/gost.git
-'''
+2] Install Postgresql (http://www.postgresql.org/)
 
-3. Get dependencies
-'''sh
+3] Clone code
+
+```sh
+git clone https://github.com/Geodan/gost.git
+```
+4] Get dependencies
+
+```sh
 go get -t
-'''
+```
+5] Change connection to database
 
-4. Edit config.yaml
- Change connection to database
+Edit config.yaml or set environment settings
 
-5. Create database
- '''sh
- go run main.go -install ./scripts/createdb.sql
-'''
+6] Create database
 
-5. Start
-'''sh
+```sh
+go run main.go -install ./scripts/createdb.sql
+```
+
+7] Start
+
+```sh
 go run main.go
-'''
+```
 
-6. Go in browser to http://localhost:8080
-
+8] Go in browser to http://localhost:8080
 
 ## Sample requests
 
@@ -76,13 +78,17 @@ The following configuration parameters can be overruled
 from the following environment variables:
 gost_db_host, gost_db_port, gost_db_user, gost_db_password
 
-Example setting Gost enviroment variable on Windows:
+Example setting Gost environment variable on Windows:
 
+```sh
 set gost_db_host=192.168.10.40
+```
 
-Example setting Gost enviroment variable on Mac/Linux:
+Example setting Gost environment variable on Mac/Linux:
 
+```sh
 export gost_db_host=192.168.10.40
+```
 
 ## Dependencies
 
