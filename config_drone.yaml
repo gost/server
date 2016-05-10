@@ -13,5 +13,5 @@ database:
     ssl: false
 mqtt:
     enabled: true
-    host: test.mosquitto.org
+    host: iot.eclipse.org
     port: 1883

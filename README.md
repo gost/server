@@ -89,7 +89,7 @@ export gost_db_host=192.168.10.40
 [yaml v2](https://github.com/go-yaml/yaml)<br />
 [pq](https://github.com/lib/pq)<br />
 [mux](https://github.com/gorilla/mux)<br />
-[SurgeMQ](github.com/surgemq/surgemq)<br />
+[Paho](https://github.com/eclipse/paho.mqtt.golang)<br />
 
 ## Roadmap
 

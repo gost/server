@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
-// Config holds the settings for the Http server, databases and mqtt
+// Config contains the settings for the Http server, databases and mqtt
 type Config struct {
 	Server   ServerConfig   `yaml:"server"`
 	Database DatabaseConfig `yaml:"database"`
 	MQTT     MQTTConfig     `yaml:"mqtt"`
 }
 
+// ServerConfig contains the general server information
 type ServerConfig struct {
 	Name        string `yaml:"name"`
 	Host        string `yaml:"host"`
@@ -19,6 +20,7 @@ type ServerConfig struct {
 	ExternalURI string `yaml:"externalUri"`
 }
 
+// DatabaseConfig contains the database server information, can be overruled by environment variables
 type DatabaseConfig struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
@@ -29,10 +31,11 @@ type DatabaseConfig struct {
 	SSL      bool   `yaml:"ssl"`
 }
 
+// MQTTConfig contains the MQTT client information
 type MQTTConfig struct {
-	Enabled bool `yaml:"enabled"`
-	host    bool `yaml:"host"`
-	Port    int  `yaml:"port"`
+	Enabled bool   `yaml:"enabled"`
+	Host    string `yaml:"host"`
+	Port    int    `yaml:"port"`
 }
 
 // GetInternalServerURI gets the internal Http server address
