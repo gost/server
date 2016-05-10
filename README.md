@@ -65,9 +65,16 @@ Default file: config.yaml
 - database.ssl: use ssl flag
 
 The following configuration parameters can be overruled 
-from environment variables:
-gost_database_host, gost_database_port, gost_database_user, gost_database_password
+from the following environment variables:
+gost_db_host, gost_db_port, gost_db_user, gost_db_password
 
+Example setting Gost enviroment variable on Windows:
+
+set gost_db_host=192.168.10.40
+
+Example setting Gost enviroment variable on Mac/Linux:
+
+export gost_db_host=192.168.10.40
 
 ## Dependencies
 
