@@ -13,5 +13,5 @@ func TestMain(t *testing.T) {
     // act
     var res = a+b
     // assert
-	assert.Equal(t,3, res, "computer error again")
+	assert.Equal(t,3, res, "computer error again.")
 }
