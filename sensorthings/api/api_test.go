@@ -1,17 +1,24 @@
 package api
 
 import (
+    "github.com/geodan/gost/configuration"
+    "github.com/geodan/gost/mqtt"
+    "github.com/geodan/gost/database/postgis"
+    
 	"testing"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestApi(t *testing.T) {
-    // todo add api tests...
+func TestCreateApi(t *testing.T) {
     // arrange
-    var a=1
-    var b=2
+	cfg := configuration.Config{}
+    mqttServer := mqtt.NewMQTTServer(configuration.MQTTConfig{})
+    database := postgis.NewDatabase("",123,"", "", "", "",false)
+    stAPI := NewAPI(database, cfg, mqttServer)
+    
     // act
-    var res = a+b
+    ep := stAPI.GetEndpoints()
+    
     // assert
-	assert.Equal(t,3, res, "computer error again")
+	assert.NotNil(t,ep)
 }
