@@ -5,7 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConfigt *testing.T) {
+func TestConfig(t *testing.T) {
     // todo add config tests...
     // arrange
     var a=1
