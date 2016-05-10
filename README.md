@@ -33,7 +33,7 @@ go get -t
 ```
 5] Change connection to database
 
-Edit config.yaml or set enviroment settings
+Edit config.yaml or set environment settings
 
 6] Create database
 
