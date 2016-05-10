@@ -26,16 +26,14 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
  ```sh
  git clone https://github.com/Geodan/gost.git
 ```
-
 4. Get dependencies
 
 ```sh
 go get -t
 ```
+5. Change connection to database
 
-5. Edit config.yaml
-
-Change connection to database
+Edit config.yaml or set enviroment settings
 
 6. Create database
 
