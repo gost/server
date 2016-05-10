@@ -23,8 +23,8 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 3. Clone code
 
- ```sh
- git clone https://github.com/Geodan/gost.git
+```sh
+git clone https://github.com/Geodan/gost.git
 ```
 4. Get dependencies
 
@@ -38,14 +38,14 @@ Edit config.yaml or set enviroment settings
 6. Create database
 
 ```sh
- go run main.go -install ./scripts/createdb.sql
+go run main.go -install ./scripts/createdb.sql
 ```
 
 7. Start
 
-'''sh
+```sh
 go run main.go
-'''
+```
 
 8. Go in browser to http://localhost:8080
 
