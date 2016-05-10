@@ -1,12 +1,12 @@
-package sensorthings
+package odata
 
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUtils(t *testing.T) {
-    // todo add utils tests...
+func TestCount(t *testing.T) {
+    // todo add count tests...
     // arrange
     var a=1
     var b=2

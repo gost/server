@@ -1,12 +1,12 @@
-package sensorthings
+package api
 
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUtils(t *testing.T) {
-    // todo add utils tests...
+func TestApi(t *testing.T) {
+    // todo add api tests...
     // arrange
     var a=1
     var b=2
