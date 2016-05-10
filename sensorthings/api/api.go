@@ -13,11 +13,11 @@ type APIv1 struct {
 	db        models.Database
 	config    configuration.Config
 	endPoints []models.Endpoint
-	mqtt      models.MQTTServer
+	mqtt      models.MQTTClient
 }
 
 // NewAPI Initialise a new SensorThings API
-func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTServer) models.API {
+func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTClient) models.API {
 	return &APIv1{
 		db:     database,
 		mqtt:   mqtt,

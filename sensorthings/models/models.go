@@ -129,8 +129,8 @@ type Database interface {
 	LocationExists(thingID int) bool
 }
 
-// MQTTServer interface defines the needed MQTT operations
-type MQTTServer interface {
+// MQTTClient interface defines the needed MQTT client operations
+type MQTTClient interface {
 	Start()
 	Stop()
 }

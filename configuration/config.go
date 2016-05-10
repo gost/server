@@ -7,9 +7,9 @@ import (
 
 // Config holds the settings for the Http server, databases and mqtt
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
-	MQTT     MQTTConfig
+	Server   ServerConfig   `yaml:"server"`
+	Database DatabaseConfig `yaml:"database"`
+	MQTT     MQTTConfig     `yaml:"mqtt"`
 }
 
 type ServerConfig struct {
@@ -30,18 +30,9 @@ type DatabaseConfig struct {
 }
 
 type MQTTConfig struct {
-	Enabled                 bool   `yaml:"enabled"`
-	WebSocketEnabled        bool   `yaml:"webSocketEnabled"`
-	SecureWebSocketEnabled  bool   `yaml:"secureWebSocketEnabled"`
-	Port                    int    `yaml:"port"`
-	WebSocketPort           int    `yaml:"webSocketPort"`
-	SecureWebSocketPort     int    `yaml:"secureWebSocketPort"`
-	KeepAlive               int    `yaml:"keepAlive"`
-	ConnectTimeout          int    `yaml:"connectTimeout"`
-	AckTimeout              int    `yaml:"ackTimeout"`
-	TimeoutRetries          int    `yaml:"timeoutRetries"`
-	SecureWebSocketCertPath string `yaml:"secureWebSocketCertPath"`
-	SecureWebSocketKeyPath  string `yaml:"secureWebSocketKeyPath"`
+	Enabled bool `yaml:"enabled"`
+	host    bool `yaml:"host"`
+	Port    int  `yaml:"port"`
 }
 
 // GetInternalServerURI gets the internal Http server address
