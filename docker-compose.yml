@@ -1,0 +1,41 @@
+store:
+    # data-only container
+    image: mdillon/postgis # reuse postgres container
+    volumes:
+        - /var/lib/postgresql/data
+    command: "true"
+
+postgres:
+    image: mdillon/postgis
+    ports:
+        - "5432" # random available host port will be chosen, same as -P
+    volumes_from:
+        - store # connect postgres and the data-only container
+    environment:
+        - POSTGRES_PASSWORD=mypass
+        # you can also set the postgres username and database name
+
+go:
+    build: .
+    links:
+        - postgres:db # [other container]:[alias in this container]
+        # this will create environment variables in the go container
+        # with ip and port info for the postgres container
+        # also creates entries in /etc/hosts with ip info
+    ports:
+        - "8080" # this is port i'm exposing in the container
+
+proxy:
+    image: nginx:latest
+    ports:
+        - "80:80" # host:container
+        - "443:443"
+    volumes:
+        - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        # connect host's ./nginx.conf with container's nginx.conf
+        # :ro == read only perms in container
+    links:
+        - go:app # [other container]:[alias in this container]
+          # creates environment variables in proxy container
+          # with ip and port info for go container
+          # also creates entries in /etc/hosts with ip info
