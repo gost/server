@@ -134,6 +134,7 @@ type Database interface {
 type MQTTClient interface {
 	Start(*API)
 	Stop()
+	Publish(string, string, byte) //topic, message, qos
 }
 
 // Endpoint defines the rest endpoint options
@@ -176,7 +177,10 @@ type Topic struct {
 }
 
 // MQTTHandler func defines the format of the handler to process the incoming MQTT publish message
-type MQTTHandler func(a *API, clientID string, topic string, message []byte)
+type MQTTHandler func(a *API, topic string, message []byte)
+
+// MQTTInternalHandler func defines the format of the handler to process the incoming MQTT publish message
+type MQTTInternalHandler func(a *API, message []byte, id string)
 
 // VersionInfo describes the version info for the GOST server version and supported SensorThings API version
 type VersionInfo struct {

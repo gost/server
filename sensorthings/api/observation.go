@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/entities"
@@ -63,6 +64,14 @@ func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Obs
 	}
 
 	no.SetLinks(a.config.GetExternalServerURI())
+
+	json, _ := json.Marshal(no)
+	s := string(json)
+
+	//ToDo: TEST
+	a.mqtt.Publish("Datastreams(1)/Observations", s, 0)
+	a.mqtt.Publish("Observations", s, 0)
+
 	return no, nil
 }
 

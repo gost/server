@@ -47,7 +47,7 @@ func (m *MQTT) Start(api *models.API) {
 	topics := *a.GetTopics()
 	for _, t := range topics {
 		topic := t
-		if token := m.client.Subscribe("Datastreams(1)/Observations", 0, func(client paho.Client, msg paho.Message) { topic.Handler(m.api, "", msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
+		if token := m.client.Subscribe(topic.Path, 0, func(client paho.Client, msg paho.Message) { topic.Handler(m.api, msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
 			fmt.Println(token.Error())
 		}
 	}
@@ -62,6 +62,12 @@ func (m *MQTT) Start(api *models.API) {
 // Stop the MQTT client
 func (m *MQTT) Stop() {
 	m.client.Disconnect(500)
+}
+
+// Publish a message on a topic
+func (m *MQTT) Publish(topic string, message string, qos byte) {
+	token := m.client.Publish(topic, qos, false, message)
+	token.Wait()
 }
 
 func (m *MQTT) connect() {
@@ -99,9 +105,4 @@ func connectHandler(c paho.Client) {
 //ToDo: bubble up and call retryConnect?
 func connectionLostHandler(c paho.Client, err error) {
 	log.Printf("MQTT client lost connection: %v", err)
-}
-
-func observationHandler(client paho.Client, msg paho.Message) {
-	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG: %s\n", msg.Payload())
 }
