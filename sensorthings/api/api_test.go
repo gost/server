@@ -18,7 +18,9 @@ func TestCreateApi(t *testing.T) {
 
 	// act
 	ep := stAPI.GetEndpoints()
+	endpoints := *ep
 
 	// assert
 	assert.NotNil(t, ep)
+	assert.NotEqual(t, len(endpoints), 0, "Endpoints empty")
 }
