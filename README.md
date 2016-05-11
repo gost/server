@@ -17,10 +17,7 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Binaries
 
-Release 0.1: 2016-05-11
-
-Windows X64: 
-
+Release 0.1: 2016-05-11 [https://github.com/Geodan/gost/releases/tag/0.1](https://github.com/Geodan/gost/releases/tag/0.1)
 
 ## Getting started for developers
 
