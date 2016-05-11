@@ -15,7 +15,14 @@ GOST is alpha software and is not considered appropriate for customer use. Feel 
 
 GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
-## Getting started
+## Binaries
+
+Release 0.1: 2016-05-11
+
+Windows X64: 
+
+
+## Getting started for developers
 
 1] Install GoLang (https://golang.org/)
 
