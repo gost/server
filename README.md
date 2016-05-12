@@ -23,6 +23,8 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## Getting started for developers
 
+See also [scripts/ubuntu_install.txt](scripts/ubuntu_install.txt) for installation commands on Ubuntu.
+
 1] Install GoLang (https://golang.org/)
 
 2] Install Postgresql (http://www.postgresql.org/)
