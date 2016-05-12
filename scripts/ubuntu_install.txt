@@ -1,0 +1,48 @@
+#-------------------------
+# update system and tools
+#-------------------------
+$ sudo apt-get update
+$ sudo apt-get install git
+$ sudo apt-get install mosquitto
+
+#-------------------------
+# create dirs
+#-------------------------
+$ cd ~
+$ mkdir -p dev/go/src/github.com/geodan
+
+#-------------------------
+# install golang
+#-------------------------
+$ sudo add-apt-repository ppa:ubuntu-lxc/lxd-stable
+$ sudo apt-get update
+$ sudo apt-get install golang
+$ echo "GOPATH=$HOME/dev/go" >> ~/.bashrc
+$ echo "export GOPATH" >> ~/.bashrc
+$ echo "PATH=\$PATH:\$GOPATH/bin # Add GOPATH/bin to PATH for scripting" >> ~/.bashrc
+$ source ~/.bashrc
+
+check: 
+$ go version should return:
+go version go1.6 linux/amd64
+
+#-------------------------
+# install postgresql + postgis
+#-------------------------
+$ sudo apt-get install postgresql postgresql-contrib postgis
+$ sudo su postgres -c psql
+$ alter user postgres with password 'postgres'
+$ \q
+$ sudo su - postgres
+$ createdb gost
+$ \q
+
+#-------------------------
+# install gost
+#-------------------------
+$ cd ~/dev/go/src/github.com/geodan
+$ git clone https://github.com/Geodan/gost.git
+$ cd gost
+$ go get .
+$ go run main.go -install ./scripts/createdb.sql
+$ go run main.go
