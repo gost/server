@@ -1,4 +1,4 @@
-<img src="client/resources/img/icon.png" width="353"><br />
+<img src="src/client/resources/img/icon.png" width="353"><br />
 [![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/Geodan/gost)
 [![Build Status](http://beta.drone.io/api/badges/drone/drone/status.svg)](https://drone.io/github.com/Geodan/gost/latest)
 [![Go Report Card](https://goreportcard.com/badge/geodan/gost)](https://goreportcard.com/report/geodan/gost)
