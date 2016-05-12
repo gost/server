@@ -148,6 +148,7 @@ func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Obse
 			return nil, gostErrors.NewBadRequestError(errors.New("FeatureOfInterest does not exist"))
 		}
 	}
+	//REMOVE EXIST and insert return error based on database error
 
 	sql := fmt.Sprintf("INSERT INTO observation (phenomenontime, parameters, validtime, resulttime, result, resultquality, stream_id, featureofinterest_id) VALUES (%s, %v, %s, %s, %v, %s, %v, %v) RETURNING id",
 		pTime, parameters, vTime, resultTime, o.Result, resultQuality, dID, fID)
