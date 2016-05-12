@@ -19,6 +19,8 @@ GOST licensed under [MIT](https://opensource.org/licenses/MIT).
 
 Release 0.1: 2016-05-11 [https://github.com/Geodan/gost/releases/tag/0.1](https://github.com/Geodan/gost/releases/tag/0.1)
 
+Binaries are build for Windows, Ubuntu and OSX.
+
 ## Getting started for developers
 
 1] Install GoLang (https://golang.org/)
@@ -33,7 +35,7 @@ git clone https://github.com/Geodan/gost.git
 4] Get dependencies
 
 ```sh
-go get -t
+go get .
 ```
 5] Change connection to database
 
