@@ -43,6 +43,9 @@ $ \q
 $ cd ~/dev/go/src/github.com/geodan
 $ git clone https://github.com/Geodan/gost.git
 $ cd gost
-$ go get .
+$ go get github.com/gorilla/mux
+$ go get gopkg.in/yaml.v2
+$ go get github.com/lib/pq
+$ go get github.com/eclipse/paho.mqtt.golang
 $ go run main.go -install ./scripts/createdb.sql
 $ go run main.go
