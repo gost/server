@@ -13,74 +13,75 @@ GOST is alpha software and is not considered appropriate for customer use. Feel 
 
 ## License
 
-GOST licensed under [MIT](https://opensource.org/licenses/MIT).
+GOST is licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Binaries
 
 Release 0.1: 2016-05-11 [https://github.com/Geodan/gost/releases/tag/0.1](https://github.com/Geodan/gost/releases/tag/0.1)
-
 Binaries are build for Windows, Ubuntu and OSX.
+A cross-compilation file can be found here [scripts/xcompile.bat](https://github.com/Geodan/gost/blob/master/scripts/xcompile.bat)
 
 ## Getting started for developers
 
 See also [scripts/ubuntu_install.txt](scripts/ubuntu_install.txt) for installation commands on Ubuntu.
 
-1] Install GoLang (https://golang.org/)
-
-2] Install Postgresql (http://www.postgresql.org/)
-
-3] Clone code
-
+1) Install GoLang (https://golang.org/)<br />
+2) Install Postgresql (http://www.postgresql.org/) and PostGIS <br />
+3) Clone code
 ```sh
 git clone https://github.com/Geodan/gost.git
 ```
-4] Get dependencies
-
+4) Get dependencies
 ```sh
-go get .
+go get github.com/gorilla/mux
+go get gopkg.in/yaml.v2
+go get github.com/lib/pq
+go get github.com/eclipse/paho.mqtt.golang
 ```
-5] Change connection to database
-
+5) Change connection to database<br />
 Edit config.yaml or set environment settings
-
-6] Create database
-
+6) Create database
 ```sh
 go run main.go -install ./scripts/createdb.sql
 ```
-
-7] Start
-
+7) Start
 ```sh
 go run main.go
 ```
 
-8] Go in browser to http://localhost:8080
+8) Go in browser to http://localhost:8080/dashboard to test if the server is running
 
 ## Sample requests
 
 For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 
 For a complete collection of working requests install Postman and import the [Postman file](test/GOST.json.postman_collection) 
 
-## Startup flags
+## GOST Startup flags
 
--config : specify the config file (default config.yaml)
-
--install database_script_file: creates the database schema
+-config "path to config file": specify the config file (default config.yaml)<br />
+-install "path to database creation file": creates the database schema
 
 ## Configuration
 
 Default file: config.yaml
 
-- port: port of webserver
-- externalUri: External uri for links in responses
-- database.host: name or ip of database server
-- database.port: port of database server
-- database.user: username of database login
-- database.password: password of database login
-- database.database: database name
-- database.schema: database schema
-- database.ssl: use ssl flag
+server: <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: GOST Server (name of the webserver)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: localhost (host of webserver, set to 0.0.0.0 if hosting on external machine)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 8080 (port of webserver)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;externalUri: http://localhost:8080/ (change to the uri where users can reach the service)<br />
+database:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: localhost (location of PostGIS server)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 5432 (port of PostGIS database)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user: postgres (PostGIS user)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;password: postgres (PostGIS password)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;database: gost (PostGIS database to use)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;schema: v1 (schema to use)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ssl: false (SSL enabled, not implemented yet)<br />
+mqtt:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enabled: true (enable MQTT)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: iot.eclipse.org (host of the MQTT broker)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 1883 (port of the MQTT broker)<br />
 
 The following configuration parameters can be overruled 
 from the following environment variables:
@@ -108,10 +109,10 @@ export gost_db_host=192.168.10.40
 ## Roadmap
 
 - Complete implementation of the OGC SensorThings spec
-- Tests!
-- MQTT
+- Test coverage!
 - Frontend
 - Benchmarks
+- Authentication
 - Different storage providers such as MongoDB (Now using PostgreSQL)
 
 ## TODO

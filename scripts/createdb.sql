@@ -1,7 +1,7 @@
-CREATE SCHEMA IF NOT EXISTS %s;
+CREATE SCHEMA %s;
 SET search_path = %s;
 
-CREATE TABLE IF NOT EXISTS featureofinterest
+CREATE TABLE featureofinterest
 (
   id serial NOT NULL,
   description character varying(255),
@@ -13,7 +13,7 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE IF NOT EXISTS thing
+CREATE TABLE thing
 (
   id serial NOT NULL,
   description character varying(255),
@@ -24,7 +24,7 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE IF NOT EXISTS location
+CREATE TABLE location
 (
   id serial NOT NULL,
   description character varying(255),
@@ -36,7 +36,7 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE IF NOT EXISTS thing_to_location
+CREATE TABLE thing_to_location
 (
   thing_id integer,
   location_id integer,
@@ -51,17 +51,17 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE INDEX IF NOT EXISTS fki_location_1
+CREATE INDEX fki_location_1
   ON thing_to_location
   USING btree
   (location_id);
 
-CREATE INDEX IF NOT EXISTS fki_thing_1
+CREATE INDEX fki_thing_1
   ON thing_to_location
   USING btree
   (thing_id);
 
-CREATE TABLE IF NOT EXISTS historicallocation
+CREATE TABLE historicallocation
 (
   id serial NOT NULL,
   thing_id integer,
@@ -79,7 +79,7 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE IF NOT EXISTS sensor
+CREATE TABLE sensor
 (
   id serial NOT NULL,
   description character varying(255),
@@ -91,7 +91,7 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE IF NOT EXISTS observedproperty
+CREATE TABLE observedproperty
 (
   id serial NOT NULL,
   name character varying(120),
@@ -104,7 +104,7 @@ WITH (
 );
 
 
-CREATE TABLE IF NOT EXISTS datastream
+CREATE TABLE datastream
 (
   id serial NOT NULL,
   description character varying(255),
@@ -131,29 +131,29 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE INDEX IF NOT EXISTS fki_observedproperty
+CREATE INDEX fki_observedproperty
   ON datastream
   USING btree
   (observerproperty_id);
 
-CREATE INDEX IF NOT EXISTS fki_sensor
+CREATE INDEX fki_sensor
   ON datastream
   USING btree
   (sensor_id);
 
-CREATE INDEX IF NOT EXISTS fki_thing
+CREATE INDEX fki_thing
   ON datastream
   USING btree
   (thing_id);
 
-CREATE SEQUENCE IF NOT EXISTS observations_id_seq
+CREATE SEQUENCE observations_id_seq
 	START WITH 1
 	INCREMENT BY 1
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
 
-CREATE TABLE IF NOT EXISTS observation
+CREATE TABLE observation
 (
   id integer NOT NULL DEFAULT nextval('observations_id_seq'::regclass),
   phenomenontime tstzrange,
@@ -175,22 +175,22 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE INDEX IF NOT EXISTS fki_datastream
+CREATE INDEX fki_datastream
   ON observation
   USING btree
   (stream_id);
 
-CREATE INDEX IF NOT EXISTS fki_featureofinterest
+CREATE INDEX fki_featureofinterest
   ON observation
   USING btree
   (featureofinterest_id);
 
-CREATE INDEX IF NOT EXISTS fki_location
+CREATE INDEX fki_location
   ON historicallocation
   USING btree
   (location_id);
 
-CREATE INDEX IF NOT EXISTS fki_thing_hl
+CREATE INDEX fki_thing_hl
   ON historicallocation
   USING btree
   (thing_id);
