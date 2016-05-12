@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -13,24 +14,48 @@ const (
 	id          = "myid"
 )
 
+func TestEntityTypeStrings(t *testing.T) {
+	assert.Equal(t, "Thing", EntityTypeThing.ToString())
+	assert.Equal(t, "Location", EntityTypeLocation.ToString())
+	assert.Equal(t, "HistoricalLocation", EntityTypeHistoricalLocation.ToString())
+	assert.Equal(t, "Datastream", EntityTypeDatastream.ToString())
+	assert.Equal(t, "Sensor", EntityTypeSensor.ToString())
+	assert.Equal(t, "ObservedProperty", EntityTypeObservedProperty.ToString())
+	assert.Equal(t, "Observation", EntityTypeObservation.ToString())
+	assert.Equal(t, "FeatureOfInterest", EntityTypeFeatureOfInterest.ToString())
+}
+
+func TestEntityLinkStrings(t *testing.T) {
+	assert.Equal(t, "Things", EntityLinkThings.ToString())
+	assert.Equal(t, "Locations", EntityLinkLocations.ToString())
+	assert.Equal(t, "HistoricalLocations", EntityLinkHistoricalLocations.ToString())
+	assert.Equal(t, "Datastreams", EntityLinkDatastreams.ToString())
+	assert.Equal(t, "Sensors", EntityLinkSensors.ToString())
+	assert.Equal(t, "ObservedProperties", EntityLinkObservedPropertys.ToString())
+	assert.Equal(t, "Observations", EntityLinkObservations.ToString())
+	assert.Equal(t, "FeatureOfInterests", EntityLinkFeatureOfInterests.ToString())
+}
+
 func TestCreateEntitySelfLink(t *testing.T) {
 	//act
 	selfLink := CreateEntitySelfLink(externalURL, lt.ToString(), "")
 	selfLinkWithID := CreateEntitySelfLink(externalURL, lt.ToString(), id)
 
 	//assert
-	assert.Equal(t, "www.myurl.nl/v1.0/Things", selfLink, "Entityselflink is not in the correct format")
-	assert.Equal(t, "www.myurl.nl/v1.0/Things(myid)", selfLinkWithID, "Entityselflink with id is not in the correct format")
+	assert.Equal(t, fmt.Sprintf("%s/v1.0/Things", externalURL), selfLink, "Entityselflink is not in the correct format")
+	assert.Equal(t, fmt.Sprintf("%s/v1.0/Things(myid)", externalURL), selfLinkWithID, "Entityselflink with id is not in the correct format")
 }
 
 func TestCreateEntityLink(t *testing.T) {
 	//act
-	selfLink := CreateEntityLink(true, lt.ToString(), ls.ToString(), "")
-	selfLinkWithID := CreateEntityLink(true, lt.ToString(), ls.ToString(), id)
+	link := CreateEntityLink(true, lt.ToString(), ls.ToString(), "")
+	linkWithID := CreateEntityLink(true, lt.ToString(), ls.ToString(), id)
+	linkEmpty := CreateEntityLink(false, lt.ToString(), ls.ToString(), "")
 
 	//assert
-	assert.Equal(t, "../Things/Sensors", selfLink, "EntityLink is not in the correct format")
-	assert.Equal(t, "../Things(myid)/Sensors", selfLinkWithID, "EntityLink with id is not in the correct format")
+	assert.Equal(t, "../Things/Sensors", link, "EntityLink is not in the correct format")
+	assert.Equal(t, "../Things(myid)/Sensors", linkWithID, "EntityLink with id is not in the correct format")
+	assert.Equal(t, "", linkEmpty, "EntityLink link should be empty")
 }
 
 func TestCheckMandatoryParamNoErrors(t *testing.T) {
