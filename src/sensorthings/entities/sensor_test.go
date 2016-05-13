@@ -64,17 +64,17 @@ func TestParseEntityResultNotOkSensor(t *testing.T) {
 	err := thing.ParseEntity([]byte(jsonSensorError))
 
 	//assert
-	assert.NotEqual(t, err, nil, "Thing is parse from json should have failed")
+	assert.NotEqual(t, err, nil, "Sensor parse from json should have failed")
 }
 
 func TestSetLinksSensor(t *testing.T) {
 	//arrange
-	thing := &Sensor{ID: id}
+	sensor := &Sensor{ID: id}
 
 	//act
-	thing.SetLinks(externalURL)
+	sensor.SetLinks(externalURL)
 
 	//assert
-	assert.Equal(t, thing.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkSensors.ToString(), id), "Sensor navself incorrect")
-	assert.Equal(t, thing.NavDatastreams, fmt.Sprintf("../%s(%s)/%s", EntityLinkSensors.ToString(), id, EntityLinkDatastreams.ToString()), "Sensor NavDatastreams incorrect")
+	assert.Equal(t, sensor.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkSensors.ToString(), id), "Sensor navself incorrect")
+	assert.Equal(t, sensor.NavDatastreams, fmt.Sprintf("../%s(%s)/%s", EntityLinkSensors.ToString(), id, EntityLinkDatastreams.ToString()), "Sensor NavDatastreams incorrect")
 }

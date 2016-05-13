@@ -61,7 +61,7 @@ func TestParseEntityResultNotOkThing(t *testing.T) {
 	err := thing.ParseEntity([]byte(jsonThingError))
 
 	//assert
-	assert.NotEqual(t, err, nil, "Thing is parse from json should have failed")
+	assert.NotEqual(t, err, nil, "Thing parse from json should have failed")
 }
 
 func TestSetLinksThing(t *testing.T) {
