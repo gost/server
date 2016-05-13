@@ -51,5 +51,5 @@ func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 // SetLinks sets the entity specific navigation links if needed
 func (s *Sensor) SetLinks(externalURL string) {
 	s.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkSensors.ToString(), s.ID)
-	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
+	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, externalURL, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
 }

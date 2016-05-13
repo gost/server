@@ -54,7 +54,7 @@ func (t *Thing) ContainsMandatoryParams() (bool, []error) {
 // SetLinks sets the entity specific navigation links if needed
 func (t *Thing) SetLinks(externalURL string) {
 	t.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkThings.ToString(), t.ID)
-	t.NavLocations = CreateEntityLink(t.Locations == nil, EntityLinkThings.ToString(), EntityLinkLocations.ToString(), t.ID)
-	t.NavDatastreams = CreateEntityLink(t.Datastreams == nil, EntityLinkThings.ToString(), EntityLinkDatastreams.ToString(), t.ID)
-	t.NavHistoricalLocations = CreateEntityLink(t.HistoricalLocations == nil, EntityLinkThings.ToString(), EntityLinkHistoricalLocations.ToString(), t.ID)
+	t.NavLocations = CreateEntityLink(t.Locations == nil, externalURL, EntityLinkThings.ToString(), EntityLinkLocations.ToString(), t.ID)
+	t.NavDatastreams = CreateEntityLink(t.Datastreams == nil, externalURL, EntityLinkThings.ToString(), EntityLinkDatastreams.ToString(), t.ID)
+	t.NavHistoricalLocations = CreateEntityLink(t.HistoricalLocations == nil, externalURL, EntityLinkThings.ToString(), EntityLinkHistoricalLocations.ToString(), t.ID)
 }

@@ -82,6 +82,6 @@ func TestSetLinksLocation(t *testing.T) {
 
 	//assert
 	assert.Equal(t, location.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkLocations.ToString(), id), "Location navself incorrect")
-	assert.Equal(t, location.NavThings, fmt.Sprintf("../%s(%s)/%s", EntityLinkLocations.ToString(), id, EntityLinkThings.ToString()), "Location NavThings incorrect")
-	assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("../%s(%s)/%s", EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
+	assert.Equal(t, location.NavThings, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkThings.ToString()), "Location NavThings incorrect")
+	assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
 }

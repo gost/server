@@ -73,7 +73,7 @@ func TestSetLinksThing(t *testing.T) {
 
 	//assert
 	assert.Equal(t, thing.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkThings.ToString(), id), "Thing navself incorrect")
-	assert.Equal(t, thing.NavDatastreams, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkDatastreams.ToString()), "Thing NavDatastreams incorrect")
-	assert.Equal(t, thing.NavLocations, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkLocations.ToString()), "Thing NavLocations incorrect")
-	assert.Equal(t, thing.NavHistoricalLocations, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Thing NavHistoricalLocations incorrect")
+	assert.Equal(t, thing.NavDatastreams, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkThings.ToString(), id, EntityLinkDatastreams.ToString()), "Thing NavDatastreams incorrect")
+	assert.Equal(t, thing.NavLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkThings.ToString(), id, EntityLinkLocations.ToString()), "Thing NavLocations incorrect")
+	assert.Equal(t, thing.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkThings.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Thing NavHistoricalLocations incorrect")
 }

@@ -102,8 +102,8 @@ func CreateEntitySelfLink(externalURI string, entityLink string, id string) stri
 }
 
 // CreateEntityLink formats the given parameters into a relative navigationlink path
-// for example: ../Things(27815)/Datastreams
-func CreateEntityLink(isNil bool, entityType1 string, entityType2 string, id string) string {
+// for example: http://example.org/OGCSensorThings/v1.0/Things(27815)/Datastreams
+func CreateEntityLink(isNil bool, externalURI string, entityType1 string, entityType2 string, id string) string {
 	if !isNil {
 		return ""
 	}
@@ -112,5 +112,5 @@ func CreateEntityLink(isNil bool, entityType1 string, entityType2 string, id str
 		entityType1 = fmt.Sprintf("%s(%s)", entityType1, id)
 	}
 
-	return fmt.Sprintf("../%s/%s", entityType1, entityType2)
+	return fmt.Sprintf("%s/v1.0/%s/%s", externalURI, entityType1, entityType2)
 }

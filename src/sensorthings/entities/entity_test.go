@@ -48,13 +48,13 @@ func TestCreateEntitySelfLink(t *testing.T) {
 
 func TestCreateEntityLink(t *testing.T) {
 	//act
-	link := CreateEntityLink(true, lt.ToString(), ls.ToString(), "")
-	linkWithID := CreateEntityLink(true, lt.ToString(), ls.ToString(), id)
-	linkEmpty := CreateEntityLink(false, lt.ToString(), ls.ToString(), "")
+	link := CreateEntityLink(true, externalURL, lt.ToString(), ls.ToString(), "")
+	linkWithID := CreateEntityLink(true, externalURL, lt.ToString(), ls.ToString(), id)
+	linkEmpty := CreateEntityLink(false, externalURL, lt.ToString(), ls.ToString(), "")
 
 	//assert
-	assert.Equal(t, "../Things/Sensors", link, "EntityLink is not in the correct format")
-	assert.Equal(t, "../Things(myid)/Sensors", linkWithID, "EntityLink with id is not in the correct format")
+	assert.Equal(t, fmt.Sprintf("%s/v1.0/%s/%s", externalURL, lt.ToString(), ls.ToString()), link, "EntityLink is not in the correct format")
+	assert.Equal(t, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, lt.ToString(), id, ls.ToString()), linkWithID, "EntityLink with id is not in the correct format")
 	assert.Equal(t, "", linkEmpty, "EntityLink link should be empty")
 }
 
