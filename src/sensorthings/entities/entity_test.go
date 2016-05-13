@@ -68,7 +68,7 @@ func TestCheckMandatoryParamNoErrors(t *testing.T) {
 
 	testString := "test"
 	testMap := map[string]string{"test": "test"}
-	testThing := &Thing{ID: "1"}
+	testThing := &Sensor{ID: "1"}
 	testSensor := &Sensor{ID: "1"}
 	testObservedProperty := &ObservedProperty{ID: "1"}
 
@@ -97,7 +97,7 @@ func TestCheckMandatoryParamErrors(t *testing.T) {
 
 	testStringEmpty := ""
 	testMapEmpty := map[string]string{}
-	testThingEmpty := &Thing{}
+	testThingEmpty := &Sensor{}
 	testSensorEmpty := &Sensor{}
 	testObservedPropertyEmpty := &ObservedProperty{}
 

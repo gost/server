@@ -6,7 +6,18 @@ import (
 	"testing"
 )
 
-func TestMissingMandatoryParameters(t *testing.T) {
+var jsonThing = `{
+		"description": "camping lantern",
+		"properties": {
+		"property1": "it’s waterproof"
+		}
+	}`
+
+var jsonThingError = `{
+		"desc": "camping lantern",
+	}`
+
+func TestMissingMandatoryParametersThing(t *testing.T) {
 	//arrange
 	thing := &Thing{}
 
@@ -20,7 +31,7 @@ func TestMissingMandatoryParameters(t *testing.T) {
 	}
 }
 
-func TestMandatoryParametersExist(t *testing.T) {
+func TestMandatoryParametersExistThing(t *testing.T) {
 	//arrange
 	thing := &Thing{Description: "test"}
 
@@ -28,5 +39,41 @@ func TestMandatoryParametersExist(t *testing.T) {
 	_, err := thing.ContainsMandatoryParams()
 
 	//assert
-	assert.Nil(t, err, "All mandatory params are fiulled in shoud not have return an error")
+	assert.Nil(t, err, "All mandatory params are filled in shoud not have return an error")
+}
+
+func TestParseEntityResultOkThing(t *testing.T) {
+	//arrange
+	thing := &Thing{}
+
+	//act
+	err := thing.ParseEntity([]byte(jsonThing))
+
+	//assert
+	assert.Equal(t, err, nil, "Unable to parse json into thing")
+}
+
+func TestParseEntityResultNotOkThing(t *testing.T) {
+	//arrange
+	thing := &Thing{}
+
+	//act
+	err := thing.ParseEntity([]byte(jsonThingError))
+
+	//assert
+	assert.NotEqual(t, err, nil, "Thing is parse from json should have failed")
+}
+
+func TestSetLinksThing(t *testing.T) {
+	//arrange
+	thing := &Thing{ID: id}
+
+	//act
+	thing.SetLinks(externalURL)
+
+	//assert
+	assert.Equal(t, thing.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkThings.ToString(), id), "Thing navself incorrect")
+	assert.Equal(t, thing.NavDatastreams, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkDatastreams.ToString()), "Thing NavDatastreams incorrect")
+	assert.Equal(t, thing.NavLocations, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkLocations.ToString()), "Thing NavLocations incorrect")
+	assert.Equal(t, thing.NavHistoricalLocations, fmt.Sprintf("../%s(%s)/%s", EntityLinkThings.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Thing NavHistoricalLocations incorrect")
 }
