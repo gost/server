@@ -23,10 +23,9 @@ A cross-compilation file can be found here [scripts/xcompile.bat](https://github
 
 ## Getting started for developers
 
-See also [scripts/ubuntu_install.txt](scripts/ubuntu_install.txt) for installation commands on Ubuntu.
-
 1) Install GoLang (https://golang.org/)<br />
 2) Install Postgresql (http://www.postgresql.org/) and PostGIS <br />
+Create a database and run "CREATE EXTENSION postgis;" on it<br />
 3) Clone code
 ```sh
 git clone https://github.com/Geodan/gost.git
@@ -38,9 +37,8 @@ go get gopkg.in/yaml.v2
 go get github.com/lib/pq
 go get github.com/eclipse/paho.mqtt.golang
 ```
-5) Change connection to database<br />
-Edit config.yaml or set environment settings
-6) Create database
+5) Edit config.yaml or set environment settings to change connection to database<br />
+6) Create GOST schema
 ```sh
 go run main.go -install ./scripts/createdb.sql
 ```
@@ -49,7 +47,10 @@ go run main.go -install ./scripts/createdb.sql
 go run main.go
 ```
 
-8) Go in browser to http://localhost:8080/dashboard to test if the server is running
+8) Go in browser to http://localhost:8080/v1.0 to test if the server is running
+
+<br /><br />
+Or try [scripts/ubuntu_install.sh](scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
 
 ## Sample requests
 
