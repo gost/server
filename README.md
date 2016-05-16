@@ -119,3 +119,7 @@ export gost_db_host=192.168.10.40
 ## TODO
 
 [See wiki](https://github.com/Geodan/gost/wiki/TODO)
+
+## Benchmarks
+
+[Publish observation (MQTT)](https://github.com/Geodan/gost/wiki/Benchmark---publish-observation-(MQTT))
