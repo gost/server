@@ -3,15 +3,16 @@ package mqtt
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"github.com/geodan/gost/src/configuration"
 )
 
 func TestMqtt(t *testing.T) {
-	// todo add mqtt tests...
 	// arrange
-	var a = 1
-	var b = 2
+	config := configuration.MQTTConfig{}
+	config.Host = "iot.eclipse.org"
+	config.Port = 1883
+
 	// act
-	var res = a + b
-	// assert
-	assert.Equal(t, 3, res, "computer error again")
+	mqttClient := CreateMQTTClient(config)
+	assert.NotNil(t, mqttClient, "function should return MqqtClient")
 }
