@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestConfig(t *testing.T) {
+func TestCreateEndPoints(t *testing.T) {
 	// todo add config tests...
 	// arrange
 	var a = 1
