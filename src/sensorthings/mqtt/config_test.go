@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestModels(t *testing.T) {
+func TestCreateTopics(t *testing.T) {
 	// todo add models tests...
 	// arrange
 	var a = 1
