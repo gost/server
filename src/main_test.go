@@ -57,7 +57,7 @@ func init() {
 	conf := configuration.Config{}
 	yaml.Unmarshal(content, &conf)
 
-	database := postgis.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL)
+	database := postgis.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL, conf.Database.MaxIdleConns, conf.Database.MaxOpenConns)
 	database.Start()
 
 	mqttClient := mqtt.CreateMQTTClient(conf.MQTT)
