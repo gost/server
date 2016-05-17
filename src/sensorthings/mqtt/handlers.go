@@ -1,7 +1,6 @@
 package mqtt
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/geodan/gost/src/sensorthings/entities"
@@ -41,8 +40,7 @@ func observationsByDatastream(a *models.API, message []byte, id string) {
 	}
 
 	api := *a
-	no, err2 := api.PostObservationByDatastream(id, o)
-	fmt.Printf("New id: %s\n", no.ID)
+	_, err2 := api.PostObservationByDatastream(id, o)
 	if err2 != nil {
 		log.Printf("%v", err2)
 	}

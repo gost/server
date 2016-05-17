@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalL
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation where id = $1", TimeFormat)
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where id = $1", TimeFormat, gdb.Schema)
 	historicallocation, err := processHistoricalLocation(gdb.Db, sql, intID)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalL
 
 // GetHistoricalLocations retrieves all historicallocations
 func (gdb *GostDatabase) GetHistoricalLocations() ([]*entities.HistoricalLocation, error) {
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation", TimeFormat)
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation", TimeFormat, gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql)
 }
 
@@ -39,7 +39,7 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string) ([]*entit
 	if err != nil {
 		return nil, err
 	}
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM historicallocation where thing_id = $1", TimeFormat)
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where thing_id = $1", TimeFormat, gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql, tID)
 }
 
@@ -98,7 +98,7 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 
-	sql := "INSERT INTO historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3)"
+	sql := fmt.Sprintf("INSERT INTO %s.historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3)", gdb.Schema)
 	_, err3 := gdb.Db.Exec(sql, time.Now(), tid, lid)
 	if err3 != nil {
 		return err3

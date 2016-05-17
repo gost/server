@@ -18,13 +18,13 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 		return nil, err
 	}
 
-	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location where id = $1"
+	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location where id = $1", gdb.Schema)
 	return processLocation(gdb.Db, sql, intID)
 }
 
 // GetLocations retrieves all locations
 func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
-	sql := "select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from location"
+	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location", gdb.Schema)
 	return processLocations(gdb.Db, sql)
 
 }
@@ -36,7 +36,7 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID string) ([]*entities.Locati
 		return nil, err
 	}
 
-	sql := "select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from location inner join thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1"
+	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1", gdb.Schema, gdb.Schema)
 	return processLocations(gdb.Db, sql, intID)
 
 }
@@ -94,7 +94,7 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
-	sql := fmt.Sprintf("INSERT INTO location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", string(locationBytes[:]))
+	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", gdb.Schema, string(locationBytes[:]))
 	err := gdb.Db.QueryRow(sql, location.Description, 1).Scan(&locationID)
 	if err != nil {
 		return nil, err
@@ -107,7 +107,7 @@ func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Loc
 // LocationExists checks if a location is present in the database based on a given id
 func (gdb *GostDatabase) LocationExists(locationID int) bool {
 	var result bool
-	sql := "SELECT exists (SELECT 1 FROM  location WHERE id = $1 LIMIT 1)"
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.location WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
 	if err != nil {
 		return false
@@ -129,7 +129,7 @@ func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 
-	sql := "INSERT INTO thing_to_location (thing_id, location_id) VALUES ($1, $2)"
+	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
 	_, err3 := gdb.Db.Exec(sql, tid, lid)
 	if err3 != nil {
 		return err3

@@ -119,6 +119,7 @@ type Database interface {
 
 	GetObservation(string) (*entities.Observation, error)
 	GetObservations() ([]*entities.Observation, error)
+	GetObservationsByDatastream(string) ([]*entities.Observation, error)
 	PostObservation(entities.Observation) (*entities.Observation, error)
 
 	GetHistoricalLocation(string) (*entities.HistoricalLocation, error)

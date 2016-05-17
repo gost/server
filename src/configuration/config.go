@@ -14,21 +14,25 @@ type Config struct {
 
 // ServerConfig contains the general server information
 type ServerConfig struct {
-	Name        string `yaml:"name"`
-	Host        string `yaml:"host"`
-	Port        int    `yaml:"port"`
-	ExternalURI string `yaml:"externalUri"`
+	Name              string `yaml:"name"`
+	Host              string `yaml:"host"`
+	Port              int    `yaml:"port"`
+	ExternalURI       string `yaml:"externalUri"`
+	MaxEntityResponse string `yaml:"maxEntityResponse"`
+	IndentedJSON      string `yaml:"indentedJson"`
 }
 
 // DatabaseConfig contains the database server information, can be overruled by environment variables
 type DatabaseConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Database string `yaml:"database"`
-	Schema   string `yaml:"schema"`
-	SSL      bool   `yaml:"ssl"`
+	Host         string `yaml:"host"`
+	Port         int    `yaml:"port"`
+	User         string `yaml:"user"`
+	Password     string `yaml:"password"`
+	Database     string `yaml:"database"`
+	Schema       string `yaml:"schema"`
+	SSL          bool   `yaml:"ssl"`
+	MaxIdleConns int    `yaml:"maxIdleConns"`
+	MaxOpenConns int    `yaml:"maxOpenConns"`
 }
 
 // MQTTConfig contains the MQTT client information

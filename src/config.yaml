@@ -3,6 +3,8 @@ server:
     host: localhost
     port: 8080
     externalUri: http://localhost:8080/
+    maxEntityResponse: 20
+    indentedJson: true
 database:
     host: localhost
     port: 5432
@@ -11,7 +13,9 @@ database:
     database: gost
     schema: v1
     ssl: false
+    maxIdleConns: 30
+    maxOpenConns: 100
 mqtt:
     enabled: true
-    host: iot.eclipse.org
+    host: 127.0.0.1
     port: 1883

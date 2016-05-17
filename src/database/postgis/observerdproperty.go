@@ -17,7 +17,7 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 
 	var opID int
 	var name, definition, description string
-	sql := "select id, name, definition, description FROM observedproperty where id = $1"
+	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty where id = $1", gdb.Schema)
 	err = gdb.Db.QueryRow(sql, intID).Scan(&opID, &name, &definition, &description)
 
 	if err != nil {
@@ -36,7 +36,7 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, error) {
-	sql := "select id, name, definition, description FROM observedproperty"
+	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty", gdb.Schema)
 	rows, err := gdb.Db.Query(sql)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, 
 // PostObservedProperty adds an ObservedProperty to the database
 func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var opID int
-	sql := "INSERT INTO observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id"
+	sql := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, op.Name, op.Definition, op.Description).Scan(&opID)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*en
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
 func (gdb *GostDatabase) ObservedPropertyExists(thingID int) bool {
 	var result bool
-	sql := "SELECT exists (SELECT 1 FROM observedproperty WHERE id = $1 LIMIT 1)"
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observedproperty WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
 	if err != nil {
 		return false

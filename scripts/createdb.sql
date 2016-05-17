@@ -153,15 +153,10 @@ CREATE SEQUENCE observations_id_seq
 	NO MAXVALUE
 	CACHE 1;
 
-CREATE TABLE observation
+CREATE UNLOGGED TABLE observation
 (
   id integer NOT NULL DEFAULT nextval('observations_id_seq'::regclass),
-  phenomenontime tstzrange,
-  result double precision,
-  resulttime timestamp with time zone,
-  resultquality character varying(25),
-  validtime tstzrange,
-  parameters jsonb,
+  data jsonb,
   stream_id integer,
   featureofinterest_id integer,
   CONSTRAINT fk_datastream FOREIGN KEY (stream_id)

@@ -47,7 +47,7 @@ func (m *MQTT) Start(api *models.API) {
 	topics := *a.GetTopics()
 	for _, t := range topics {
 		topic := t
-		if token := m.client.Subscribe(topic.Path, 0, func(client paho.Client, msg paho.Message) { topic.Handler(m.api, msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
+		if token := m.client.Subscribe(topic.Path, 0, func(client paho.Client, msg paho.Message) { go topic.Handler(m.api, msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
 			fmt.Println(token.Error())
 		}
 	}

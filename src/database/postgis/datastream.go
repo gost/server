@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 		return nil, err
 	}
 
-	sql := "select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream where id = $1"
+	sql := fmt.Sprintf("select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM %s.datastream where id = $1", gdb.Schema)
 	datastream, err := processDatastream(gdb.Db, sql, intID)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 
 // GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
-	sql := "select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream"
+	sql := fmt.Sprintf("select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) FROM datastream", gdb.Schema)
 	return processDatastreams(gdb.Db, sql)
 }
 
@@ -40,7 +40,7 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Data
 		return nil, err
 	}
 
-	sql := "select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) FROM datastream inner join thing on thing.id = datastream.thing_id where thing.id = $1"
+	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
@@ -126,7 +126,7 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 		geom = fmt.Sprintf("public.ST_GeomFromGeoJSON('%s')", string(observedAreaBytes[:]))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observerproperty_id) VALUES ($1, $2, %s, $3, $4, $5) RETURNING id", geom)
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observerproperty_id) VALUES ($1, $2, %s, $3, $4, $5) RETURNING id", gdb.Schema, geom)
 	err = gdb.Db.QueryRow(sql, d.Description, unitOfMeasurement, tID, sID, oID).Scan(&dsID)
 	if err != nil {
 		return nil, err
@@ -145,7 +145,7 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 // DatastreamExists checks if a Datastream is present in the database based on a given id
 func (gdb *GostDatabase) DatastreamExists(databaseID int) bool {
 	var result bool
-	sql := "SELECT exists (SELECT 1 FROM datastream WHERE id = $1 LIMIT 1)"
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.datastream WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, databaseID).Scan(&result)
 	if err != nil {
 		return false

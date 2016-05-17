@@ -2,11 +2,10 @@ package entities
 
 import (
 	"encoding/json"
-	"fmt"
-	"time"
 
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"time"
 )
 
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends
@@ -16,7 +15,7 @@ type Observation struct {
 	ID                   string                 `json:"@iot.id,omitempty"`
 	NavSelf              string                 `json:"@iot.selfLink,omitempty"`
 	PhenomenonTime       string                 `json:"phenomenonTime,omitempty"`
-	Result               float64                `json:"result,omitempty"`
+	Result               interface{}            `json:"result,omitempty"`
 	ResultTime           string                 `json:"resultTime,omitempty"`
 	ResultQuality        string                 `json:"resultQuality,omitempty"`
 	ValidTime            string                 `json:"validTime,omitempty"`
@@ -48,9 +47,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	// When a SensorThings service receives a POST Observations without phenonmenonTime, the service SHALL
 	// assign the current server time to the value of the phenomenonTime.
 	if len(o.PhenomenonTime) == 0 {
-		now := time.Now().UTC()
-		nowIso8601 := now.Format(time.RFC3339Nano)
-		o.PhenomenonTime = fmt.Sprintf("%s", nowIso8601)
+		o.PhenomenonTime = time.Now().UTC().Format(time.RFC3339Nano)
 	}
 
 	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
@@ -59,7 +56,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 		o.ResultTime = "NULL"
 	}
 
-	err := []error{}
+	var err []error
 	CheckMandatoryParam(&err, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
 	CheckMandatoryParam(&err, o.Result, o.GetEntityType(), "result")
 	CheckMandatoryParam(&err, o.ResultTime, o.GetEntityType(), "resultTime")
@@ -77,4 +74,23 @@ func (o *Observation) SetLinks(externalURL string) {
 	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservations.ToString(), o.ID)
 	o.NavDatastream = CreateEntityLink(o.Datastream == nil, externalURL, EntityLinkObservations.ToString(), EntityTypeDatastream.ToString(), o.ID)
 	o.NavFeatureOfInterest = CreateEntityLink(o.FeatureOfInterest == nil, externalURL, EntityLinkObservations.ToString(), EntityTypeFeatureOfInterest.ToString(), o.ID)
+}
+
+// MarshalPostgresJSON marshalls an observation entity for saving into PostgreSQL
+func (o *Observation) MarshalPostgresJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		PhenomenonTime string                 `json:"phenomenonTime,omitempty"`
+		Result         interface{}            `json:"result,omitempty"`
+		ResultTime     string                 `json:"resultTime,omitempty"`
+		ResultQuality  string                 `json:"resultQuality,omitempty"`
+		ValidTime      string                 `json:"validTime,omitempty"`
+		Parameters     map[string]interface{} `json:"parameters,omitempty"`
+	}{
+		PhenomenonTime: o.PhenomenonTime,
+		Result:         o.Result,
+		ResultTime:     o.ResultTime,
+		ResultQuality:  o.ResultQuality,
+		ValidTime:      o.ValidTime,
+		Parameters:     o.Parameters,
+	})
 }

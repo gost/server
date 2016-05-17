@@ -28,24 +28,25 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, 
 
 // GetObservationsByDatastream todo
 func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	observations, err := a.db.GetObservationsByDatastream(datastreamID)
+	return processObservations(a, observations, err)
 }
 
-func processObservations(a *APIv1, datastreams []*entities.Observation, err error) (*models.ArrayResponse, error) {
+func processObservations(a *APIv1, observations []*entities.Observation, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
 	uri := a.config.GetExternalServerURI()
-	for idx, item := range datastreams {
+	for idx, item := range observations {
 		i := *item
 		i.SetLinks(uri)
-		datastreams[idx] = &i
+		observations[idx] = &i
 	}
 
-	var data interface{} = datastreams
+	var data interface{} = observations
 	return &models.ArrayResponse{
-		Count: len(datastreams),
+		Count: len(observations),
 		Data:  &data,
 	}, nil
 }
@@ -57,7 +58,7 @@ func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Obs
 		return nil, err
 	}
 
-	//ToDo check for linked featureofinterest
+	//ToDo check for linked featureofinterest -> POST
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {
 		return nil, []error{err2}
