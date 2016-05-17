@@ -2,12 +2,23 @@
 *.o
 *.a
 *.so
+*.exe
+*.bin
 
 # Folders
-_obj
-_test
-.idea
-.vscode
+_obj/
+_test/
+pkg/
+debug/
+bin/
+/out/
+
+# IDE / Editor exceptions
+.idea/
+.vscode/
+*.iml
+*.iws
+atlassian-ide-plugin.xml
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -19,11 +30,6 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
-*.exe
+# Results
 *.test
 *.prof
-*.idea
-/debug
-
-gost.iml
-/bin
