@@ -9,13 +9,13 @@ import (
 // FeatureOfInterest in SensorThings represents the phenomena an Observation is detecting. In some cases a FeatureOfInterest
 // can be the Location of the Sensor and therefore of the Observation. A FeatureOfInterest is linked to a single Observation
 type FeatureOfInterest struct {
-	ID              string         `json:"@iot.id,omitempty"`
-	NavSelf         string         `json:"@iot.selfLink,omitempty"`
-	Description     string         `json:"description,omitempty"`
-	EncodingType    string         `json:"encodingtype,omitempty"`
-	Feature         string         `json:"feature,omitempty"`
-	NavObservations string         `json:"Observations@iot.navigationLink,omitempty"`
-	Observations    []*Observation `json:"Observations,omitempty"`
+	ID              string                 `json:"@iot.id,omitempty"`
+	NavSelf         string                 `json:"@iot.selfLink,omitempty"`
+	Description     string                 `json:"description,omitempty"`
+	EncodingType    string                 `json:"encodingtype,omitempty"`
+	Feature         map[string]interface{} `json:"feature,omitempty"`
+	NavObservations string                 `json:"Observations@iot.navigationLink,omitempty"`
+	Observations    []*Observation         `json:"Observations,omitempty"`
 }
 
 // GetEntityType returns the EntityType for FeatureOfInterest

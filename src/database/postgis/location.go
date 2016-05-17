@@ -77,9 +77,10 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 		}
 
 		l := entities.Location{
-			ID:          strconv.Itoa(sensorID),
-			Description: description,
-			Location:    locationMap,
+			ID:           strconv.Itoa(sensorID),
+			Description:  description,
+			Location:     locationMap,
+			EncodingType: entities.EncodingValues[encodingtype].Value,
 		}
 
 		locations = append(locations, &l)
@@ -94,8 +95,9 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
+	encoding, _ := entities.CreateEncodingType(location.EncodingType)
 	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql, location.Description, 1).Scan(&locationID)
+	err := gdb.Db.QueryRow(sql, location.Description, encoding.Code).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}

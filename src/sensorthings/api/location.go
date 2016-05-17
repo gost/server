@@ -15,6 +15,11 @@ func (a *APIv1) PostLocation(location entities.Location) (*entities.Location, []
 		return nil, err
 	}
 
+	supported, err2 := entities.IsEncodingSupported(location.GetEntityType(), location.EncodingType)
+	if !supported || err2 != nil {
+		return nil, []error{err2}
+	}
+
 	l, err2 := a.db.PostLocation(location)
 	if err2 != nil {
 		return nil, []error{err2}

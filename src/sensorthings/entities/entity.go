@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"errors"
 	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 )
@@ -89,6 +90,35 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 	if isNil {
 		*errorList = append(err, gostErrors.NewBadRequestError(fmt.Errorf("Missing mandatory parameter: %s.%s", entityType, paramName)))
 	}
+}
+
+// IsEncodingSupported returns true of the Location entity supports the given encoding type
+func IsEncodingSupported(entityType EntityType, encodingType string) (bool, error) {
+	notSupported := gostErrors.NewBadRequestError(errors.New("encodingType not supported"))
+	encoding, err := CreateEncodingType(encodingType)
+	if err != nil {
+		return false, notSupported
+	}
+
+	switch entityType {
+	case EntityTypeFeatureOfInterest:
+		if encoding == EncodingGeoJSON {
+			return true, nil
+		}
+		break
+	case EntityTypeLocation:
+		if encoding == EncodingGeoJSON {
+			return true, nil
+		}
+		break
+	case EntityTypeSensor:
+		if encoding == EncodingPDF || encoding == EncodingSensorML {
+			return true, nil
+		}
+		break
+	}
+
+	return false, notSupported
 }
 
 // CreateEntitySelfLink formats the given parameters into an external navigationlink to the entity
