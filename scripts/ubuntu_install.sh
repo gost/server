@@ -71,5 +71,8 @@ mqtt:
 #Setup database schema for GOST
 ~/dev/go/src/github.com/geodan/gost/bin/gost -install ~/dev/go/src/github.com/geodan/gost/bin/createdb.sql -config ~/dev/go/src/github.com/geodan/gost/bin/config.yaml
 
+#Open port
+sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT -m comment --comment "GOST Server port"
+
 #Run GOST
 ~/dev/go/src/github.com/geodan/gost/bin/gost -config ~/dev/go/src/github.com/geodan/gost/bin/config.yaml
