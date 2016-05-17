@@ -13,7 +13,7 @@ func TestCreateApi(t *testing.T) {
 	// arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false)
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
 	stAPI := NewAPI(database, cfg, mqttServer)
 
 	// act
