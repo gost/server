@@ -32,9 +32,16 @@ func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*
 	return processDatastreams(a, datastreams, err)
 }
 
-// GetDatastreamsBySensor todo
-func (a *APIv1) GetDatastreamsBySensor(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+// GetDatastreamsBySensor returns all datastreams linked to the given sensor
+func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	datastreams, err := a.db.GetDatastreamsBySensor(sensorID)
+	return processDatastreams(a, datastreams, err)
+}
+
+// GetDatastreamsBySensor returns all datastreams linked to the given sensor
+func (a *APIv1) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID)
+	return processDatastreams(a, datastreams, err)
 }
 
 func processDatastreams(a *APIv1, datastreams []*entities.Datastream, err error) (*models.ArrayResponse, error) {

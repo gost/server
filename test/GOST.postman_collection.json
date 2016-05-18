@@ -13,7 +13,9 @@
 				"6d66cf0e-68eb-8dd8-46a2-f6ed8c150a75",
 				"121c077e-c797-25dd-c3b6-a5ea5a2b9968",
 				"23b2207b-0afb-2f11-6ecf-1c8ac315e194",
-				"3addc6c7-5c34-9640-48a8-6d28a2870df8"
+				"3addc6c7-5c34-9640-48a8-6d28a2870df8",
+				"e137d0a2-428f-b0a0-19a8-fc943739ee16",
+				"e3f64813-ed31-c0b6-4736-7a4fa6fd7312"
 			],
 			"owner": 0,
 			"collectionId": "d17054e5-c8d2-4312-6242-114a555a95a2"
@@ -742,6 +744,46 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"resultTime\": \"2015-04-13T00:00:05Z\",\r\n  \"result\": 38,\r\n  \"resultQuality\": \"heul goei\",\r\n  \"validTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"parameters\": {\"wie\": \"Barry\", \"waarom\": \"Zomaar\"},\r\n  \"Datastream\": {\"@iot.id\":\"1\"}\r\n}"
+		},
+		{
+			"id": "e137d0a2-428f-b0a0-19a8-fc943739ee16",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Sensors(1)/Datastreams",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463565683916,
+			"name": "V GET Datastreams by sensor",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "e3f64813-ed31-c0b6-4736-7a4fa6fd7312",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/ObservedProperties(1)/Datastreams",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463566016267,
+			"name": "V GET Datastreams by ObservedProperty",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
 			"id": "e97507d2-4e9a-710f-b425-c3442602d032",

@@ -197,6 +197,15 @@ func HandleGetDatastreamsBySensor(w http.ResponseWriter, r *http.Request, endpoi
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
+// HandleGetDatastreamsByObservedProperty todo
+func HandleGetDatastreamsByObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetDatastreamsByObservedProperty(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandlePostDatastream todo
 func HandlePostDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api

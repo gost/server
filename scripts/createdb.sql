@@ -115,9 +115,9 @@ CREATE TABLE datastream
   resulttime tstzrange,
   thing_id integer,
   sensor_id integer,
-  observerproperty_id integer,
+  observedproperty_id integer,
   CONSTRAINT datastream_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_observedproperty FOREIGN KEY (observerproperty_id)
+  CONSTRAINT fk_observedproperty FOREIGN KEY (observedproperty_id)
       REFERENCES observedproperty (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT fk_sensor FOREIGN KEY (sensor_id)
@@ -134,7 +134,7 @@ WITH (
 CREATE INDEX fki_observedproperty
   ON datastream
   USING btree
-  (observerproperty_id);
+  (observedproperty_id);
 
 CREATE INDEX fki_sensor
   ON datastream

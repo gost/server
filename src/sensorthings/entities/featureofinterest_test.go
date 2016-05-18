@@ -1,10 +1,9 @@
 package entities
 
-
 import (
-"fmt"
-"github.com/stretchr/testify/assert"
-"testing"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestMissingMandatoryParametersFeatureOfInterest(t *testing.T) {
@@ -20,5 +19,3 @@ func TestMissingMandatoryParametersFeatureOfInterest(t *testing.T) {
 		assert.Contains(t, fmt.Sprintf("%v", err[0]), "description")
 	}
 }
-
-

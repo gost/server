@@ -47,6 +47,7 @@ type API interface {
 	GetDatastreams(qo *odata.QueryOptions) (*ArrayResponse, error)
 	GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetDatastreamsByObservedProperty(sensorID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error)
 	PostDatastreamByThing(thingID string, datastream *entities.Datastream) (*entities.Datastream, []error)
 	PatchDatastream(id string, datastream *entities.Datastream) (*entities.Datastream, error)
@@ -111,6 +112,8 @@ type Database interface {
 	GetDatastream(string) (*entities.Datastream, error)
 	GetDatastreams() ([]*entities.Datastream, error)
 	GetDatastreamsByThing(string) ([]*entities.Datastream, error)
+	GetDatastreamsBySensor(string) ([]*entities.Datastream, error)
+	GetDatastreamsByObservedProperty(string) ([]*entities.Datastream, error)
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
 
 	GetFeatureOfInterest(string) (*entities.FeatureOfInterest, error)

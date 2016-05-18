@@ -44,6 +44,28 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Data
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
+// GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
+func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string) ([]*entities.Datastream, error) {
+	tID, err := strconv.Atoi(sensorID)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = $1", gdb.Schema, gdb.Schema)
+	return processDatastreams(gdb.Db, sql, tID)
+}
+
+// GetDatastreamsBySensor retrieves all datastreams linked to the given ObservedProerty
+func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string) ([]*entities.Datastream, error) {
+	tID, err := strconv.Atoi(oID)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = $1", gdb.Schema, gdb.Schema)
+	return processDatastreams(gdb.Db, sql, tID)
+}
+
 func processDatastream(db *sql.DB, sql string, args ...interface{}) (*entities.Datastream, error) {
 	datastreams, err := processDatastreams(db, sql, args...)
 	if err != nil {
@@ -126,7 +148,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		geom = fmt.Sprintf("public.ST_GeomFromGeoJSON('%s')", string(observedAreaBytes[:]))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observerproperty_id) VALUES ($1, $2, %s, $3, $4, $5) RETURNING id", gdb.Schema, geom)
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id) VALUES ($1, $2, %s, $3, $4, $5) RETURNING id", gdb.Schema, geom)
 	err = gdb.Db.QueryRow(sql, d.Description, unitOfMeasurement, tID, sID, oID).Scan(&dsID)
 	if err != nil {
 		return nil, err

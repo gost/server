@@ -110,6 +110,7 @@ func createDatastreams(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}", HandleGetDatastream},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/Datastreams", HandleGetDatastreamsByThing},
 			{models.HTTPOperationGet, "/v1.0/Sensors{id}/Datastreams", HandleGetDatastreamsBySensor},
+			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/Datastreams", HandleGetDatastreamsByObservedProperty},
 			{models.HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
 			{models.HTTPOperationPost, "/v1.0/Things{id}/Datastreams", HandlePostDatastreamByThing},
 			{models.HTTPOperationDelete, "/v1.0/Datastreams{id}", HandleDeleteDatastream},
