@@ -52,6 +52,40 @@ type Entity interface {
 	ContainsMandatoryParams() (bool, []error)
 	SetLinks(externalURL string)
 	GetEntityType() EntityType
+	GetSupportedEncoding() map[int]EncodingType
+}
+
+// EncodingType holds the information on a EncodingType
+type EncodingType struct {
+	Code  int
+	Value string
+}
+
+// List of supported EncodingTypes, do not change!!
+var (
+	EncodingUnknown  = EncodingType{0, "unknown"}
+	EncodingGeoJSON  = EncodingType{1, "application/vnd.geo+json"}
+	EncodingPDF      = EncodingType{2, "application/pdf"}
+	EncodingSensorML = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
+)
+
+// EncodingValues is a list of names mapped to their EncodingValue
+var EncodingValues = []EncodingType{
+	EncodingUnknown,
+	EncodingGeoJSON,
+	EncodingPDF,
+	EncodingSensorML,
+}
+
+// CreateEncodingType returns the int representation for a given encoding, returns an error when encoding is not supported
+func CreateEncodingType(encoding string) (EncodingType, error) {
+	for _, k := range EncodingValues {
+		if k.Value == encoding {
+			return k, nil
+		}
+	}
+
+	return EncodingUnknown, errors.New("Encoding not supported")
 }
 
 // CheckMandatoryParam checks if the given parameter is nil, if true then an ApiError will be added to the
@@ -92,30 +126,18 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 	}
 }
 
-// IsEncodingSupported returns true of the Location entity supports the given encoding type
-func IsEncodingSupported(entityType EntityType, encodingType string) (bool, error) {
+// CheckEncodingSupported returns true of the Location entity supports the given encoding type
+func CheckEncodingSupported(entity Entity, encodingType string) (bool, error) {
 	notSupported := gostErrors.NewBadRequestError(errors.New("encodingType not supported"))
 	encoding, err := CreateEncodingType(encodingType)
 	if err != nil {
 		return false, notSupported
 	}
 
-	switch entityType {
-	case EntityTypeFeatureOfInterest:
-		if encoding == EncodingGeoJSON {
-			return true, nil
-		}
-		break
-	case EntityTypeLocation:
-		if encoding == EncodingGeoJSON {
-			return true, nil
-		}
-		break
-	case EntityTypeSensor:
-		if encoding == EncodingPDF || encoding == EncodingSensorML {
-			return true, nil
-		}
-		break
+	supportedEncodings := entity.GetSupportedEncoding()
+	_, ok := supportedEncodings[encoding.Code]
+	if ok {
+		return true, nil
 	}
 
 	return false, notSupported

@@ -27,7 +27,7 @@ type Datastream struct {
 }
 
 // GetEntityType returns the EntityType for Datastream
-func (d *Datastream) GetEntityType() EntityType {
+func (d Datastream) GetEntityType() EntityType {
 	return EntityTypeDatastream
 }
 
@@ -43,7 +43,7 @@ func (d *Datastream) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a Datastream are available before posting
-func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
+func (d Datastream) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, d.Description, d.GetEntityType(), "description")
 	CheckMandatoryParam(&err, d.UnitOfMeasurement, d.GetEntityType(), "unitOfMeasurement")
@@ -60,10 +60,15 @@ func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
-func (d *Datastream) SetLinks(externalURL string) {
+func (d Datastream) SetLinks(externalURL string) {
 	d.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkDatastreams.ToString(), d.ID)
 	d.NavThing = CreateEntityLink(d.Thing == nil, externalURL, EntityLinkDatastreams.ToString(), EntityTypeThing.ToString(), d.ID)
 	d.NavSensor = CreateEntityLink(d.Sensor == nil, externalURL, EntityLinkDatastreams.ToString(), EntityTypeSensor.ToString(), d.ID)
 	d.NavObservations = CreateEntityLink(d.Observations == nil, externalURL, EntityLinkDatastreams.ToString(), EntityLinkObservations.ToString(), d.ID)
 	d.NavObservedProperty = CreateEntityLink(d.ObservedProperty == nil, externalURL, EntityLinkDatastreams.ToString(), EntityTypeObservedProperty.ToString(), d.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (d Datastream) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{}
 }

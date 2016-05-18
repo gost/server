@@ -111,7 +111,7 @@ func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
 
 // PostThing receives a posted thing entity and adds it to the database
 // returns the created Thing including the generated id
-func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error) {
+func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
 	var thingID int
 	sql := fmt.Sprintf("INSERT INTO %s.thing (description, properties) VALUES ($1, $2) RETURNING id", gdb.Schema)
@@ -121,7 +121,7 @@ func (gdb *GostDatabase) PostThing(thing entities.Thing) (*entities.Thing, error
 	}
 
 	thing.ID = strconv.Itoa(thingID)
-	return &thing, nil
+	return thing, nil
 }
 
 // ThingExists checks if a thing is present in the database based on a given id

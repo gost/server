@@ -27,7 +27,7 @@ type Observation struct {
 }
 
 // GetEntityType returns the EntityType for Observation
-func (o *Observation) GetEntityType() EntityType {
+func (o Observation) GetEntityType() EntityType {
 	return EntityTypeObservation
 }
 
@@ -43,7 +43,7 @@ func (o *Observation) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Observation are available before posting.
-func (o *Observation) ContainsMandatoryParams() (bool, []error) {
+func (o Observation) ContainsMandatoryParams() (bool, []error) {
 	// When a SensorThings service receives a POST Observations without phenonmenonTime, the service SHALL
 	// assign the current server time to the value of the phenomenonTime.
 	if len(o.PhenomenonTime) == 0 {
@@ -70,14 +70,14 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (o *Observation) SetLinks(externalURL string) {
+func (o Observation) SetLinks(externalURL string) {
 	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservations.ToString(), o.ID)
 	o.NavDatastream = CreateEntityLink(o.Datastream == nil, externalURL, EntityLinkObservations.ToString(), EntityTypeDatastream.ToString(), o.ID)
 	o.NavFeatureOfInterest = CreateEntityLink(o.FeatureOfInterest == nil, externalURL, EntityLinkObservations.ToString(), EntityTypeFeatureOfInterest.ToString(), o.ID)
 }
 
 // MarshalPostgresJSON marshalls an observation entity for saving into PostgreSQL
-func (o *Observation) MarshalPostgresJSON() ([]byte, error) {
+func (o Observation) MarshalPostgresJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		PhenomenonTime string                 `json:"phenomenonTime,omitempty"`
 		Result         interface{}            `json:"result,omitempty"`
@@ -93,4 +93,9 @@ func (o *Observation) MarshalPostgresJSON() ([]byte, error) {
 		ValidTime:      o.ValidTime,
 		Parameters:     o.Parameters,
 	})
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (o Observation) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{}
 }

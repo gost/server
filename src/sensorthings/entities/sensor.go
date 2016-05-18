@@ -19,7 +19,7 @@ type Sensor struct {
 }
 
 // GetEntityType returns the EntityType for Sensor
-func (s *Sensor) GetEntityType() EntityType {
+func (s Sensor) GetEntityType() EntityType {
 	return EntityTypeSensor
 }
 
@@ -35,7 +35,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Sensor are available before posting.
-func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
+func (s Sensor) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, s.Description, s.GetEntityType(), "description")
 	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingtype")
@@ -49,7 +49,12 @@ func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (s *Sensor) SetLinks(externalURL string) {
+func (s Sensor) SetLinks(externalURL string) {
 	s.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkSensors.ToString(), s.ID)
 	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, externalURL, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (s Sensor) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF}
 }

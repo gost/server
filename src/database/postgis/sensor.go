@@ -65,7 +65,7 @@ func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
 }
 
 // PostSensor todo
-func (gdb *GostDatabase) PostSensor(sensor entities.Sensor) (*entities.Sensor, error) {
+func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
 	encoding, _ := entities.CreateEncodingType(sensor.EncodingType)
 	sql := fmt.Sprintf("INSERT INTO %s.sensor (description, encodingtype, metadata) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
@@ -75,7 +75,7 @@ func (gdb *GostDatabase) PostSensor(sensor entities.Sensor) (*entities.Sensor, e
 	}
 
 	sensor.ID = strconv.Itoa(sensorID)
-	return &sensor, nil
+	return sensor, nil
 }
 
 // SensorExists checks if a sensor is present in the database based on a given id

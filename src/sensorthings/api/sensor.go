@@ -41,13 +41,13 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error
 }
 
 // PostSensor adds a new sensor to the database
-func (a *APIv1) PostSensor(sensor entities.Sensor) (*entities.Sensor, []error) {
+func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) {
 	_, err := sensor.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
 
-	supported, err2 := entities.IsEncodingSupported(sensor.GetEntityType(), sensor.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(sensor, sensor.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -61,7 +61,7 @@ func (a *APIv1) PostSensor(sensor entities.Sensor) (*entities.Sensor, []error) {
 }
 
 // PatchSensor updates a sensor in the database
-func (a *APIv1) PatchSensor(id string, sensor entities.Sensor) (*entities.Sensor, error) {
+func (a *APIv1) PatchSensor(id string, sensor *entities.Sensor) (*entities.Sensor, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

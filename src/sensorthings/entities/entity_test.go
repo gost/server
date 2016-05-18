@@ -115,3 +115,41 @@ func TestCheckMandatoryParamErrors(t *testing.T) {
 	assert.Len(t, errLis4, 1, "CheckMandatoryParam Sensor should have returned an error")
 	assert.Len(t, errLis5, 1, "CheckMandatoryParam ObservedProperty should have returned an error")
 }
+
+func TestEncodingToString(t *testing.T) {
+	//assert
+	assert.Equal(t, "unknown", EncodingUnknown.Value)
+	assert.Equal(t, 0, EncodingUnknown.Code, "EncodingUnknown code changed")
+
+	assert.Equal(t, "application/vnd.geo+json", EncodingUnknown.Value)
+	assert.Equal(t, 1, EncodingGeoJSON.Code, "EncodingGeoJSON code changed")
+
+	assert.Equal(t, "application/pdf", EncodingUnknown.Value)
+	assert.Equal(t, 2, EncodingPDF.Code, "EncodingPDF code changed")
+
+	assert.Equal(t, "http://www.opengis.net/doc/IS/SensorML/2.0", EncodingUnknown.Value)
+	assert.Equal(t, 3, EncodingSensorML.Code, "EncodingSensorML code changed")
+}
+
+func TestEncodingTypeOk(t *testing.T) {
+	//arrange
+	sml := "http://www.opengis.net/doc/IS/SensorML/2.0"
+
+	//act
+	encoding, err := CreateEncodingType(sml)
+
+	//assert
+	assert.NotNil(t, err, fmt.Sprintf("Creating encoding type for %s should not have returned an error", sml))
+	assert.Equal(t, 3, encoding.Code, fmt.Sprintf("Incorrect encoding code for %s", sml))
+}
+
+func TestEncodingTypeFail(t *testing.T) {
+	//arrange
+	sml := "http://www.opengis.net/doc/IS/SensorM/2.0"
+
+	//act
+	_, err := CreateEncodingType(sml)
+
+	//assert
+	assert.Nil(t, err, fmt.Sprintf("Creating encoding type for %s should not returned an error", sml))
+}

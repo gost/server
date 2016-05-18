@@ -19,7 +19,7 @@ type FeatureOfInterest struct {
 }
 
 // GetEntityType returns the EntityType for FeatureOfInterest
-func (f *FeatureOfInterest) GetEntityType() EntityType {
+func (f FeatureOfInterest) GetEntityType() EntityType {
 	return EntityTypeFeatureOfInterest
 }
 
@@ -35,7 +35,7 @@ func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a FeatureOfInterest are available before posting
-func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
+func (f FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, f.Description, f.GetEntityType(), "description")
 	CheckMandatoryParam(&err, f.EncodingType, f.GetEntityType(), "encodingtype")
@@ -49,7 +49,12 @@ func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (f *FeatureOfInterest) SetLinks(externalURL string) {
+func (f FeatureOfInterest) SetLinks(externalURL string) {
 	f.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkFeatureOfInterests.ToString(), f.ID)
 	f.NavObservations = CreateEntityLink(f.Observations == nil, externalURL, EntityLinkFeatureOfInterests.ToString(), EntityLinkObservations.ToString(), f.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (f FeatureOfInterest) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON}
 }

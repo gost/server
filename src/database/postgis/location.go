@@ -91,8 +91,7 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 
 // PostLocation receives a posted location entity and adds it to the database
 // returns the created Location including the generated id
-//TODO: ENCODINGTYPE
-func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Location, error) {
+func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Location, error) {
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
@@ -103,7 +102,7 @@ func (gdb *GostDatabase) PostLocation(location entities.Location) (*entities.Loc
 	}
 
 	location.ID = strconv.Itoa(locationID)
-	return &location, nil
+	return location, nil
 }
 
 // LocationExists checks if a location is present in the database based on a given id

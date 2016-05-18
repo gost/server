@@ -41,13 +41,13 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, err 
 }
 
 // PostFeatureOfInterest adds a FeatureOfInterest to the database
-func (a *APIv1) PostFeatureOfInterest(foi entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
+func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
 	_, err := foi.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
 
-	supported, err2 := entities.IsEncodingSupported(foi.GetEntityType(), foi.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(foi, foi.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -61,7 +61,7 @@ func (a *APIv1) PostFeatureOfInterest(foi entities.FeatureOfInterest) (*entities
 }
 
 // PatchFeatureOfInterest todo
-func (a *APIv1) PatchFeatureOfInterest(id string, foi entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) PatchFeatureOfInterest(id string, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
