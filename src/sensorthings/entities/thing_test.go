@@ -77,3 +77,11 @@ func TestSetLinksThing(t *testing.T) {
 	assert.Equal(t, thing.NavLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkThings.ToString(), id, EntityLinkLocations.ToString()), "Thing NavLocations incorrect")
 	assert.Equal(t, thing.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkThings.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Thing NavHistoricalLocations incorrect")
 }
+
+func TestGetSupportedEncodingThing(t *testing.T) {
+	//arrange
+	thing := &Thing{}
+
+	//assert
+	assert.Equal(t, 0, len(thing.GetSupportedEncoding()), "Thing shoud not supprt any encoding")
+}

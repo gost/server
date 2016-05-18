@@ -47,7 +47,7 @@ func (h HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (h HistoricalLocation) SetLinks(externalURL string) {
+func (h *HistoricalLocation) SetLinks(externalURL string) {
 	h.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkHistoricalLocations.ToString(), h.ID)
 	h.NavThing = CreateEntityLink(h.Thing == nil, externalURL, EntityLinkHistoricalLocations.ToString(), EntityTypeThing.ToString(), h.ID)
 	h.NavLocations = CreateEntityLink(h.Locations == nil, externalURL, EntityLinkHistoricalLocations.ToString(), EntityLinkLocations.ToString(), h.ID)

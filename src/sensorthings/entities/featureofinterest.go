@@ -49,7 +49,7 @@ func (f FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (f FeatureOfInterest) SetLinks(externalURL string) {
+func (f *FeatureOfInterest) SetLinks(externalURL string) {
 	f.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkFeatureOfInterests.ToString(), f.ID)
 	f.NavObservations = CreateEntityLink(f.Observations == nil, externalURL, EntityLinkFeatureOfInterests.ToString(), EntityLinkObservations.ToString(), f.ID)
 }

@@ -78,3 +78,18 @@ func TestSetLinksSensor(t *testing.T) {
 	assert.Equal(t, sensor.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkSensors.ToString(), id), "Sensor navself incorrect")
 	assert.Equal(t, sensor.NavDatastreams, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkSensors.ToString(), id, EntityLinkDatastreams.ToString()), "Sensor NavDatastreams incorrect")
 }
+
+func TestGetSupportedEncodingSensor(t *testing.T) {
+	//arrange
+	sensor := &Sensor{}
+
+	//act
+	encodings := sensor.GetSupportedEncoding()
+	_, ok := encodings[EncodingPDF.Code]
+	_, ok2 := encodings[EncodingSensorML.Code]
+
+	//assert
+	assert.Equal(t, 2, len(encodings), "Sensor should support 2 encodings")
+	assert.Equal(t, true, ok, "Sensor should support EncodingPDF")
+	assert.Equal(t, true, ok2, "Sensor should support EncodingSensorML")
+}

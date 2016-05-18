@@ -76,7 +76,7 @@ func BenchmarkIncomingObservation(b *testing.B) {
 func createAndParseObservation() {
 	o := &entities.Observation{}
 	o.ParseEntity(jsonBytes)
-	testAPI.PostObservationByDatastream("1", *o)
+	testAPI.PostObservationByDatastream("1", o)
 }
 
 func Fib(n int) int {

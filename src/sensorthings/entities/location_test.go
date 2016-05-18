@@ -85,3 +85,16 @@ func TestSetLinksLocation(t *testing.T) {
 	assert.Equal(t, location.NavThings, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkThings.ToString()), "Location NavThings incorrect")
 	assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
 }
+
+func TestGetSupportedEncodingLocation(t *testing.T) {
+	//arrange
+	location := &Location{}
+
+	//act
+	encodings := location.GetSupportedEncoding()
+	_, ok := encodings[EncodingGeoJSON.Code]
+
+	//assert
+	assert.Equal(t, 1, len(encodings), "Location should support 1 encoding")
+	assert.Equal(t, true, ok, "Location should support EncodingGeoJSON")
+}
