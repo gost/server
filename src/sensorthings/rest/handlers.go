@@ -140,6 +140,15 @@ func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *models
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
+// HandleGetLocationsByHistoricalLocations todo
+func HandleGetLocationsByHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetLocationsByHistoricalLocation(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandleGetLocationsByThing todo
 func HandleGetLocationsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
@@ -262,6 +271,13 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *mod
 	handlePatchRequest(w, endpoint, r, ds, &handle)
 }
 
+// HandleGetSensorByDatastream todo
+func HandleGetSensorByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensor(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandleGetSensor todo
 func HandleGetSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
@@ -310,6 +326,15 @@ func HandleGetObservations(w http.ResponseWriter, r *http.Request, endpoint *mod
 func HandleGetObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservation(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetObservationsByFeatureOfInterest todo
+func HandleGetObservationsByFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetObservationsByFeatureOfInterest(getEntityID(r), q)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -364,6 +389,15 @@ func HandleGetFeatureOfInterests(w http.ResponseWriter, r *http.Request, endpoin
 func HandleGetFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetFeatureOfInterest(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetFeatureOfInterestByObservation todo
+func HandleGetFeatureOfInterestByObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetFeatureOfInterestByObservation(getEntityID(r), q)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 

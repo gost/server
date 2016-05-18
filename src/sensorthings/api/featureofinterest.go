@@ -19,6 +19,17 @@ func (a *APIv1) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entiti
 	return l, nil
 }
 
+// GetFeatureOfInterestByObservation todo
+func (a *APIv1) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	l, err := a.db.GetFeatureOfInterestByObservation(id)
+	if err != nil {
+		return nil, err
+	}
+
+	l.SetLinks(a.config.GetExternalServerURI())
+	return l, nil
+}
+
 // GetFeatureOfInterests todo
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	fois, err := a.db.GetFeatureOfInterests()

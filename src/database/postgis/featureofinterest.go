@@ -21,6 +21,17 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id string) (*entities.FeatureOfInt
 	return processFeatureOfInterest(gdb.Db, sql, intID)
 }
 
+// GetFeatureOfInterestByObservation returns a feature of interest by given observation id
+func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id string) (*entities.FeatureOfInterest, error) {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("select featureofinterest.id, featureofinterest.description, featureofinterest.encodingtype, public.ST_AsGeoJSON(featureofinterest.feature) AS feature from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = $1 limit 1", gdb.Schema, gdb.Schema)
+	return processFeatureOfInterest(gdb.Db, sql, intID)
+}
+
 // GetFeatureOfInterests returns all feature of interests
 func (gdb *GostDatabase) GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(feature) AS feature from %s.featureofinterest", gdb.Schema)

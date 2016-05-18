@@ -19,6 +19,17 @@ func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, 
 	return s, nil
 }
 
+// GetSensorByDatastream retrieves a sensor by given datastream
+func (a *APIv1) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	s, err := a.db.GetSensorByDatastream(id)
+	if err != nil {
+		return nil, err
+	}
+
+	s.SetLinks(a.config.GetExternalServerURI())
+	return s, nil
+}
+
 // GetSensors retrieves an array of sensors based on the given query
 func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	sensors, err := a.db.GetSensors()

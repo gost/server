@@ -26,6 +26,12 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, 
 	return processObservations(a, observations, err)
 }
 
+// GetObservationsByFeatureOfInterest todo
+func (a *APIv1) GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	observations, err := a.db.GetObservationsByFeatureOfInterest(foiID)
+	return processObservations(a, observations, err)
+}
+
 // GetObservationsByDatastream todo
 func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	observations, err := a.db.GetObservationsByDatastream(datastreamID)

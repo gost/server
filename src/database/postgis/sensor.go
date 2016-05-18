@@ -5,6 +5,8 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"strconv"
 
+	"database/sql"
+	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -15,28 +17,54 @@ func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
 		return nil, err
 	}
 
-	var sensorID int
-	var description, metadata string
 	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor where id = $1", gdb.Schema)
-	err = gdb.Db.QueryRow(sql, intID).Scan(&sensorID, &description, &metadata)
-
+	sensor, err := processSensor(gdb.Db, sql, intID)
 	if err != nil {
-		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("Sensors(%s) does not exist", id))
+		return nil, err
 	}
 
-	sensor := entities.Sensor{
-		ID:          strconv.Itoa(sensorID),
-		Description: description,
-		Metadata:    metadata,
+	return sensor, nil
+}
+
+// GetSensorByDatastream todo
+func (gdb *GostDatabase) GetSensorByDatastream(id string) (*entities.Sensor, error) {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
 	}
 
-	return &sensor, nil
+	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor inner join %s.datastream on datastream.sensor_id = sensor.id where datastream.id = $1", gdb.Schema, gdb.Schema)
+	sensor, err := processSensor(gdb.Db, sql, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	return sensor, nil
 }
 
 // GetSensors todo
 func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, metadata FROM %s.sensor", gdb.Schema)
-	rows, err := gdb.Db.Query(sql)
+	return processSensors(gdb.Db, sql)
+}
+
+func processSensor(db *sql.DB, sql string, args ...interface{}) (*entities.Sensor, error) {
+	sensors, err := processSensors(db, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(sensors) == 0 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor not found"))
+	}
+
+	return sensors[0], nil
+}
+
+func processSensors(db *sql.DB, sql string, args ...interface{}) ([]*entities.Sensor, error) {
+	rows, err := db.Query(sql, args...)
+	defer rows.Close()
+
 	if err != nil {
 		return nil, err
 	}

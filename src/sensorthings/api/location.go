@@ -68,6 +68,12 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, err
 	return processLocations(a, locations, err)
 }
 
+// GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
+func (a *APIv1) GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	locations, err := a.db.GetLocationsByHistoricalLocation(hlID)
+	return processLocations(a, locations, err)
+}
+
 // GetLocationsByThing retrieves the latest locations linked to a thing
 func (a *APIv1) GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	locations, err := a.db.GetLocationsByThing(thingID)

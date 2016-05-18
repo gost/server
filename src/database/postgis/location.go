@@ -26,7 +26,17 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location", gdb.Schema)
 	return processLocations(gdb.Db, sql)
+}
 
+// GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
+func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string) ([]*entities.Location, error) {
+	intID, err := strconv.Atoi(hlID)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = $1 limit 1", gdb.Schema, gdb.Schema)
+	return processLocations(gdb.Db, sql, intID)
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
@@ -38,7 +48,6 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID string) ([]*entities.Locati
 
 	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1", gdb.Schema, gdb.Schema)
 	return processLocations(gdb.Db, sql, intID)
-
 }
 
 func processLocation(db *sql.DB, sql string, args ...interface{}) (*entities.Location, error) {

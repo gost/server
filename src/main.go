@@ -25,12 +25,12 @@ func main() {
 		return
 	}
 	gostMqttHost := os.Getenv("gost_mqtt_host")
-	if(gostMqttHost != "") {
+	if gostMqttHost != "" {
 		conf.MQTT.Host = gostMqttHost
 	}
-	
+
 	gostMqttPort := os.Getenv("gost_mqtt_port")
-	if(gostMqttPort != "") {
+	if gostMqttPort != "" {
 		port, err := strconv.Atoi(gostMqttPort)
 		if err == nil {
 			conf.MQTT.Port = int(port)
@@ -38,24 +38,24 @@ func main() {
 	}
 
 	gostServerHost := os.Getenv("gost_server_host")
-	if(gostServerHost != "") {
+	if gostServerHost != "" {
 		conf.Server.Host = gostServerHost
 	}
 
-	gostServerExternalUri := os.Getenv("gost_server_external_uri")
-	if(gostServerExternalUri != "") {
-		conf.Server.ExternalURI = gostServerExternalUri
+	gostServerExternalURI := os.Getenv("gost_server_external_uri")
+	if gostServerExternalURI != "" {
+		conf.Server.ExternalURI = gostServerExternalURI
 	}
-	
+
 	gostServerPort := os.Getenv("gost_server_port")
-	if(gostServerPort != "") {
+	if gostServerPort != "" {
 		port, err := strconv.Atoi(gostServerPort)
 		if err == nil {
 			conf.Server.Port = int(port)
 		}
 	}
 	gostDbHost := os.Getenv("gost_db_host")
-	if (gostDbHost != "") {
+	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
 	}
 	gostDbPort := os.Getenv("gost_db_port")

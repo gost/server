@@ -33,6 +33,7 @@ type API interface {
 
 	GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error)
 	GetLocations(qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostLocation(location *entities.Location) (*entities.Location, []error)
 	PostLocationByThing(thingID string, location *entities.Location) (*entities.Location, []error)
@@ -58,6 +59,7 @@ type API interface {
 	DeleteDatastream(id string) error
 
 	GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests(qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	PatchFeatureOfInterest(id string, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
@@ -66,6 +68,7 @@ type API interface {
 	GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error)
 	GetObservations(qo *odata.QueryOptions) (*ArrayResponse, error)
 	GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostObservation(observation *entities.Observation) (*entities.Observation, []error)
 	PostObservationByDatastream(datastreamID string, observation *entities.Observation) (*entities.Observation, []error)
 	PatchObservation(id string, observation *entities.Observation) (*entities.Observation, error)
@@ -79,6 +82,7 @@ type API interface {
 	DeleteObservedProperty(id string) error
 
 	GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error)
+	GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error)
 	GetSensors(qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error)
 	PatchSensor(id string, sensor *entities.Sensor) (*entities.Sensor, error)
@@ -103,6 +107,7 @@ type Database interface {
 
 	GetLocation(string) (*entities.Location, error)
 	GetLocations() ([]*entities.Location, error)
+	GetLocationsByHistoricalLocation(string) ([]*entities.Location, error)
 	GetLocationsByThing(string) ([]*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
 	LinkLocation(string, locationID string) error
@@ -113,6 +118,7 @@ type Database interface {
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
 
 	GetSensor(string) (*entities.Sensor, error)
+	GetSensorByDatastream(string) (*entities.Sensor, error)
 	GetSensors() ([]*entities.Sensor, error)
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
 
@@ -125,12 +131,14 @@ type Database interface {
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
 
 	GetFeatureOfInterest(string) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterestByObservation(string) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 
 	GetObservation(string) (*entities.Observation, error)
 	GetObservations() ([]*entities.Observation, error)
 	GetObservationsByDatastream(string) ([]*entities.Observation, error)
+	GetObservationsByFeatureOfInterest(string) ([]*entities.Observation, error)
 	PostObservation(*entities.Observation) (*entities.Observation, error)
 
 	GetHistoricalLocation(string) (*entities.HistoricalLocation, error)

@@ -172,6 +172,7 @@ func createLocations(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Locations", HandleGetLocations},
 			{models.HTTPOperationGet, "/v1.0/Locations{id}", HandleGetLocation},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Locations", HandleGetLocationsByHistoricalLocations},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/Locations", HandleGetLocationsByThing},
 			{models.HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
 			{models.HTTPOperationPost, "/v1.0/Things{id}/Locations", HandlePostLocationByThing},
@@ -201,6 +202,7 @@ func createSensors(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Sensors", HandleGetSensors},
 			{models.HTTPOperationGet, "/v1.0/Sensors{id}", HandleGetSensor},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Sensor", HandleGetSensorByDatastream},
 			{models.HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
 			{models.HTTPOperationDelete, "/v1.0/Sensors{id}", HandleDeleteSensor},
 			{models.HTTPOperationPatch, "/v1.0/Sensors{id}", HandlePatchSensor},
@@ -230,6 +232,7 @@ func createObservations(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Observations", HandleGetObservations},
 			{models.HTTPOperationGet, "/v1.0/Observations{id}", HandleGetObservation},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Observations", HandleGetObservationsByDatastream},
+			{models.HTTPOperationGet, "/v1.0/FeatureOfInterest{id}/Observations", HandleGetObservationsByFeatureOfInterest},
 			{models.HTTPOperationPost, "/v1.0/Observations", HandlePostObservation},
 			{models.HTTPOperationPost, "/v1.0/Datastreams{id}/Observations", HandlePostObservationByDatastream},
 			{models.HTTPOperationDelete, "/v1.0/Observations{id}", HandleDeleteObservation},
@@ -258,6 +261,7 @@ func createFeaturesOfInterest(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest", HandleGetFeatureOfInterests},
 			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}", HandleGetFeatureOfInterest},
+			{models.HTTPOperationGet, "/v1.0/Observations{id}/FeatureOfInterest", HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", HandlePostFeatureOfInterest},
 			{models.HTTPOperationDelete, "/v1.0/FeaturesOfInterest{id}", HandleDeleteFeatureOfInterest},
 			{models.HTTPOperationPatch, "/v1.0/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
