@@ -40,14 +40,14 @@ go get github.com/eclipse/paho.mqtt.golang
 5) Edit config.yaml or set environment settings to change connection to database<br />
 6) Create GOST schema
 ```sh
-go run main.go -install ./scripts/createdb.sql
+go run main.go -install ../scripts/createdb.sql
 ```
 7) Start
 ```sh
 go run main.go
 ```
 
-8) Go in browser to http://localhost:8080/v1.0 to test if the server is running
+8) In browser open http://localhost:8080/v1.0 to test if the server is running
 
 <br /><br />
 Or try [scripts/ubuntu_install.sh](scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
