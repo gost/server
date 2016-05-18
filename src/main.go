@@ -24,9 +24,38 @@ func main() {
 		log.Fatal("config read error: ", err)
 		return
 	}
+	gostMqttHost := os.Getenv("gost_mqtt_host")
+	if(gostMqttHost != "") {
+		conf.MQTT.Host = gostMqttHost
+	}
+	
+	gostMqttPort := os.Getenv("gost_mqtt_port")
+	if(gostMqttPort != "") {
+		port, err := strconv.Atoi(gostMqttPort)
+		if err == nil {
+			conf.MQTT.Port = int(port)
+		}
+	}
 
+	gostServerHost := os.Getenv("gost_server_host")
+	if(gostServerHost != "") {
+		conf.Server.Host = gostServerHost
+	}
+
+	gostServerExternalUri := os.Getenv("gost_server_external_uri")
+	if(gostServerExternalUri != "") {
+		conf.Server.ExternalURI = gostServerExternalUri
+	}
+	
+	gostServerPort := os.Getenv("gost_server_port")
+	if(gostServerPort != "") {
+		port, err := strconv.Atoi(gostServerPort)
+		if err == nil {
+			conf.Server.Port = int(port)
+		}
+	}
 	gostDbHost := os.Getenv("gost_db_host")
-	if gostDbHost != "" {
+	if (gostDbHost != "") {
 		conf.Database.Host = gostDbHost
 	}
 	gostDbPort := os.Getenv("gost_db_port")
