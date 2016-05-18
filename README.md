@@ -91,13 +91,13 @@ gost_db_host, gost_db_port, gost_db_user, gost_db_password
 Example setting Gost environment variable on Windows:
 
 ```sh
-set gost_db_host=192.168.10.40
+set gost_db_host=192.168.40.10
 ```
 
 Example setting Gost environment variable on Mac/Linux:
 
 ```sh
-export gost_db_host=192.168.10.40
+export gost_db_host=192.168.40.10
 ```
 
 ## Dependencies
