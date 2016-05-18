@@ -13,12 +13,13 @@
 				"6d66cf0e-68eb-8dd8-46a2-f6ed8c150a75",
 				"121c077e-c797-25dd-c3b6-a5ea5a2b9968",
 				"23b2207b-0afb-2f11-6ecf-1c8ac315e194",
+				"10e58e8a-7658-496e-5537-0b84199bfa99",
 				"3addc6c7-5c34-9640-48a8-6d28a2870df8",
 				"e137d0a2-428f-b0a0-19a8-fc943739ee16",
 				"e3f64813-ed31-c0b6-4736-7a4fa6fd7312"
 			],
 			"owner": 0,
-			"collectionId": "d17054e5-c8d2-4312-6242-114a555a95a2"
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc"
 		},
 		{
 			"id": "6696ea83-a2fd-48fb-7086-fa56372c6ac5",
@@ -38,7 +39,8 @@
 			"order": [
 				"2ece3fea-cec0-74d0-a054-3dbd2c8efcbb",
 				"0ac00e95-e625-9018-0e8b-9855ae6b8003",
-				"23a75794-1fc2-4aa1-9544-a18099d0f498"
+				"23a75794-1fc2-4aa1-9544-a18099d0f498",
+				"553b3f1e-0264-6420-7d48-2b6e2daed164"
 			],
 			"owner": 0,
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc"
@@ -79,7 +81,8 @@
 				"b48ea64e-b0af-1c21-f462-ee9ba55437be",
 				"55518165-6aeb-f078-b01f-46f512edc571",
 				"62aa279b-bf45-875c-6a64-39974b5f9181",
-				"135a3554-b7c6-52d5-60d4-7c264445564d"
+				"135a3554-b7c6-52d5-60d4-7c264445564d",
+				"164e572f-99dd-ee25-aed5-0587477eb5f8"
 			],
 			"owner": 0,
 			"collectionId": "d17054e5-c8d2-4312-6242-114a555a95a2"
@@ -178,6 +181,26 @@
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
+			"id": "10e58e8a-7658-496e-5537-0b84199bfa99",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations(1)/Datastream",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463585281454,
+			"name": "V GET Datastream by observation",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
 			"id": "121c077e-c797-25dd-c3b6-a5ea5a2b9968",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
 			"url": "localhost:8080/v1.0/Datastreams",
@@ -201,7 +224,7 @@
 		{
 			"id": "135a3554-b7c6-52d5-60d4-7c264445564d",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
-			"url": "http://localhost:8080/v1.0/ObservedProperties(1)",
+			"url": "http://localhost:8080/v1.0/ObservedProperties",
 			"preRequestScript": null,
 			"pathVariables": {},
 			"method": "GET",
@@ -211,13 +234,32 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1462303782462,
+			"time": 1463584336736,
 			"name": "V GET ObservedProperty",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}",
-			"folder": "608fc284-8d4a-1683-e339-90c5a134b8e8"
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "164e572f-99dd-ee25-aed5-0587477eb5f8",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "http://localhost:8080/v1.0/Datastreams(1)/ObservedProperties",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463583922191,
+			"name": "V GET ObservedProperty by datastream",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
 			"id": "17c03b32-6b4e-2624-7528-5b60d7ab2c36",
@@ -459,6 +501,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"folder": "4c14dc23-c5b4-6ef4-4f32-11b785931bf0",
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "553b3f1e-0264-6420-7d48-2b6e2daed164",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Locations(1)/HistoricalLocations",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463585652649,
+			"name": "V GET HistoricalLocations by location",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{

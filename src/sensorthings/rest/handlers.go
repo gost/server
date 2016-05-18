@@ -105,7 +105,7 @@ func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoin
 func HandleGetObservedPropertyByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetObservedPropertiesByDatastream(getEntityID(r), q)
+		return a.GetObservedPropertyByDatastream(getEntityID(r), q)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -196,6 +196,15 @@ func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *mode
 func HandleGetDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastream(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetDatastreamByObservation todo
+func HandleGetDatastreamByObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetDatastreamByObservation(getEntityID(r), q)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -393,6 +402,15 @@ func HandleGetHistoricalLocationsByThing(w http.ResponseWriter, r *http.Request,
 	a := *api
 	handle := func(q *odata.QueryOptions) (interface{}, error) {
 		return a.GetHistoricalLocationsByThing(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetHistoricalLocationsByLocation todo
+func HandleGetHistoricalLocationsByLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetHistoricalLocationsByLocation(getEntityID(r), q)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }

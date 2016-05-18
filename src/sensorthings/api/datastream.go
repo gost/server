@@ -32,6 +32,17 @@ func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*
 	return processDatastreams(a, datastreams, err)
 }
 
+// GetDatastreamByObservation returns a datastream linked to the given observation
+func (a *APIv1) GetDatastreamByObservation(observationID string, qo *odata.QueryOptions) (*entities.Datastream, error) {
+	ds, err := a.db.GetDatastreamByObservation(observationID)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.SetLinks(a.config.GetExternalServerURI())
+	return ds, nil
+}
+
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
 func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	datastreams, err := a.db.GetDatastreamsBySensor(sensorID)

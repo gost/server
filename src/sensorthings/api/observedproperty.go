@@ -19,6 +19,17 @@ func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entitie
 	return op, nil
 }
 
+// GetObservedPropertyByDatastream todo
+func (a *APIv1) GetObservedPropertyByDatastream(datastreamID string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	op, err := a.db.GetObservedPropertyByDatastream(datastreamID)
+	if err != nil {
+		return nil, err
+	}
+
+	op.SetLinks(a.config.GetExternalServerURI())
+	return op, nil
+}
+
 // GetObservedProperties todo
 func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	ops, err := a.db.GetObservedProperties()
@@ -40,11 +51,6 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResp
 	}
 
 	return &response, nil
-}
-
-// GetObservedPropertiesByDatastream todo
-func (a *APIv1) GetObservedPropertiesByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // PostObservedProperty todo

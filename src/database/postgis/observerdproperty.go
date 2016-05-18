@@ -5,6 +5,8 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"strconv"
 
+	"database/sql"
+	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -15,29 +17,52 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 		return nil, err
 	}
 
-	var opID int
-	var name, definition, description string
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty where id = $1", gdb.Schema)
-	err = gdb.Db.QueryRow(sql, intID).Scan(&opID, &name, &definition, &description)
-
+	observedProperty, err := processObservedProperty(gdb.Db, sql, intID)
 	if err != nil {
-		return nil, gostErrors.NewRequestNotFound(fmt.Errorf("ObservedProperties(%s) does not exist", id))
+		return nil, err
 	}
 
-	op := entities.ObservedProperty{
-		ID:          strconv.Itoa(opID),
-		Name:        name,
-		Definition:  definition,
-		Description: description,
+	return observedProperty, nil
+}
+
+// GetObservedPropertyByDatastream returns an ObservedProperty by id
+func (gdb *GostDatabase) GetObservedPropertyByDatastream(id string) (*entities.ObservedProperty, error) {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return nil, err
 	}
 
-	return &op, nil
+	sql := fmt.Sprintf("select observedproperty.id, observedproperty.name, observedproperty.definition, observedproperty.description FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = $1", gdb.Schema, gdb.Schema)
+	observedProperty, err := processObservedProperty(gdb.Db, sql, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	return observedProperty, nil
 }
 
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, error) {
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty", gdb.Schema)
-	rows, err := gdb.Db.Query(sql)
+	return processObservedProperties(gdb.Db, sql)
+}
+
+func processObservedProperty(db *sql.DB, sql string, args ...interface{}) (*entities.ObservedProperty, error) {
+	observedProperties, err := processObservedProperties(db, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(observedProperties) == 0 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty not found"))
+	}
+
+	return observedProperties[0], nil
+}
+
+func processObservedProperties(db *sql.DB, sql string, args ...interface{}) ([]*entities.ObservedProperty, error) {
+	rows, err := db.Query(sql, args...)
 	if err != nil {
 		return nil, err
 	}

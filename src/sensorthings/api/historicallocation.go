@@ -25,6 +25,12 @@ func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions) (*models.ArrayRes
 	return processHistoricalLocations(a, hl, err)
 }
 
+// GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
+func (a *APIv1) GetHistoricalLocationsByLocation(locationID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	hl, err := a.db.GetHistoricalLocationsByLocation(locationID)
+	return processHistoricalLocations(a, hl, err)
+}
+
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
 func (a *APIv1) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	hl, err := a.db.GetHistoricalLocationsByThing(thingID)

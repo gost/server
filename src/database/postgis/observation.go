@@ -18,13 +18,12 @@ func (gdb *GostDatabase) GetObservation(id string) (*entities.Observation, error
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where id = $1", gdb.Schema)
-
-	datastream, err := processObservation(gdb.Db, sql, intID)
+	observation, err := processObservation(gdb.Db, sql, intID)
 	if err != nil {
 		return nil, err
 	}
 
-	return datastream, nil
+	return observation, nil
 }
 
 // GetObservations retrieves all datastreams

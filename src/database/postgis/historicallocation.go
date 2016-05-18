@@ -33,6 +33,16 @@ func (gdb *GostDatabase) GetHistoricalLocations() ([]*entities.HistoricalLocatio
 	return processHistoricalLocations(gdb.Db, sql)
 }
 
+// GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
+func (gdb *GostDatabase) GetHistoricalLocationsByLocation(thingID string) ([]*entities.HistoricalLocation, error) {
+	tID, err := strconv.Atoi(thingID)
+	if err != nil {
+		return nil, err
+	}
+	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where location_id = $1", TimeFormat, gdb.Schema)
+	return processHistoricalLocations(gdb.Db, sql, tID)
+}
+
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
 func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string) ([]*entities.HistoricalLocation, error) {
 	tID, err := strconv.Atoi(thingID)

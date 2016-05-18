@@ -33,6 +33,17 @@ func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
 	return processDatastreams(gdb.Db, sql)
 }
 
+// GetDatastreamByObservation retrieves a datastream linked to the given observation
+func (gdb *GostDatabase) GetDatastreamByObservation(observationID string) (*entities.Datastream, error) {
+	tID, err := strconv.Atoi(observationID)
+	if err != nil {
+		return nil, err
+	}
+
+	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = $1", gdb.Schema, gdb.Schema)
+	return processDatastream(gdb.Db, sql, tID)
+}
+
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
 func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Datastream, error) {
 	tID, err := strconv.Atoi(thingID)
