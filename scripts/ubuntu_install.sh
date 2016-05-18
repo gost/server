@@ -9,6 +9,7 @@ sudo apt-get -y install mosquitto
 # create dirs
 #-------------------------
 cd ~
+rm -rf dev
 mkdir -p dev/go/src/github.com/geodan
 
 #-------------------------
