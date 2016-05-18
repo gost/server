@@ -9,13 +9,13 @@ import (
 )
 
 // PostLocation todo
-func (a *APIv1) PostLocation(location entities.Location) (*entities.Location, []error) {
+func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, []error) {
 	_, err := location.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
 
-	supported, err2 := entities.IsEncodingSupported(location.GetEntityType(), location.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(location, location.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -30,7 +30,7 @@ func (a *APIv1) PostLocation(location entities.Location) (*entities.Location, []
 
 // PostLocationByThing checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
-func (a *APIv1) PostLocationByThing(thingID string, location entities.Location) (*entities.Location, []error) {
+func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location) (*entities.Location, []error) {
 	l, err := a.PostLocation(location)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func processLocations(a *APIv1, locations []*entities.Location, err error) (*mod
 }
 
 // PatchLocation todo
-func (a *APIv1) PatchLocation(id string, location entities.Location) (*entities.Location, error) {
+func (a *APIv1) PatchLocation(id string, location *entities.Location) (*entities.Location, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

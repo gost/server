@@ -57,7 +57,7 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, err error)
 }
 
 // PostDatastream todo
-func (a *APIv1) PostDatastream(datastream entities.Datastream) (*entities.Datastream, []error) {
+func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
 	_, err := datastream.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
@@ -72,13 +72,13 @@ func (a *APIv1) PostDatastream(datastream entities.Datastream) (*entities.Datast
 }
 
 // PostDatastreamByThing todo
-func (a *APIv1) PostDatastreamByThing(thingID string, datastream entities.Datastream) (*entities.Datastream, []error) {
+func (a *APIv1) PostDatastreamByThing(thingID string, datastream *entities.Datastream) (*entities.Datastream, []error) {
 	datastream.Thing = &entities.Thing{ID: thingID}
 	return a.PostDatastream(datastream)
 }
 
 // PatchDatastream todo
-func (a *APIv1) PatchDatastream(id string, datastream entities.Datastream) (*entities.Datastream, error) {
+func (a *APIv1) PatchDatastream(id string, datastream *entities.Datastream) (*entities.Datastream, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

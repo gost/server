@@ -18,7 +18,7 @@ type HistoricalLocation struct {
 }
 
 // GetEntityType returns the EntityType for HistoricalLocation
-func (h *HistoricalLocation) GetEntityType() EntityType {
+func (h HistoricalLocation) GetEntityType() EntityType {
 	return EntityTypeHistoricalLocation
 }
 
@@ -34,7 +34,7 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a HistoricalLocation are available before posting
-func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
+func (h HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, h.Time, h.GetEntityType(), "time")
 	CheckMandatoryParam(&err, h.Thing, h.GetEntityType(), "Thing")
@@ -47,8 +47,13 @@ func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (h *HistoricalLocation) SetLinks(externalURL string) {
+func (h HistoricalLocation) SetLinks(externalURL string) {
 	h.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkHistoricalLocations.ToString(), h.ID)
 	h.NavThing = CreateEntityLink(h.Thing == nil, externalURL, EntityLinkHistoricalLocations.ToString(), EntityTypeThing.ToString(), h.ID)
 	h.NavLocations = CreateEntityLink(h.Locations == nil, externalURL, EntityLinkHistoricalLocations.ToString(), EntityLinkLocations.ToString(), h.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (h HistoricalLocation) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{}
 }

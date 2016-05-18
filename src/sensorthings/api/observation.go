@@ -52,7 +52,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, err err
 }
 
 // PostObservation todo
-func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Observation, []error) {
+func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
 	_, err := observation.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
@@ -77,13 +77,13 @@ func (a *APIv1) PostObservation(observation entities.Observation) (*entities.Obs
 }
 
 // PostObservationByDatastream creates a Datastream with given id for the Observation and calls PostObservation
-func (a *APIv1) PostObservationByDatastream(datastreamID string, observation entities.Observation) (*entities.Observation, []error) {
+func (a *APIv1) PostObservationByDatastream(datastreamID string, observation *entities.Observation) (*entities.Observation, []error) {
 	observation.Datastream = &entities.Datastream{ID: datastreamID}
 	return a.PostObservation(observation)
 }
 
 // PatchObservation todo
-func (a *APIv1) PatchObservation(id string, observation entities.Observation) (*entities.Observation, error) {
+func (a *APIv1) PatchObservation(id string, observation *entities.Observation) (*entities.Observation, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

@@ -19,7 +19,7 @@ type ObservedProperty struct {
 }
 
 // GetEntityType returns the EntityType for ObservedProperty
-func (o *ObservedProperty) GetEntityType() EntityType {
+func (o ObservedProperty) GetEntityType() EntityType {
 	return EntityTypeObservedProperty
 }
 
@@ -35,7 +35,7 @@ func (o *ObservedProperty) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for ObservedProperty are available before posting.
-func (o *ObservedProperty) ContainsMandatoryParams() (bool, []error) {
+func (o ObservedProperty) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, o.Name, o.GetEntityType(), "name")
 	CheckMandatoryParam(&err, o.Definition, o.GetEntityType(), "definition")
@@ -49,7 +49,12 @@ func (o *ObservedProperty) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (o *ObservedProperty) SetLinks(externalURL string) {
+func (o ObservedProperty) SetLinks(externalURL string) {
 	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservedPropertys.ToString(), o.ID)
 	o.NavDatastreams = CreateEntityLink(o.Datastreams == nil, externalURL, EntityLinkObservedPropertys.ToString(), EntityLinkDatastreams.ToString(), o.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (o ObservedProperty) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{}
 }

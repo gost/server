@@ -27,7 +27,7 @@ type Location struct {
 }
 
 // GetEntityType returns the EntityType for Location
-func (l *Location) GetEntityType() EntityType {
+func (l Location) GetEntityType() EntityType {
 	return EntityTypeLocation
 }
 
@@ -43,7 +43,7 @@ func (l *Location) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Location are available before posting.
-func (l *Location) ContainsMandatoryParams() (bool, []error) {
+func (l Location) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, l.Description, l.GetEntityType(), "description")
 	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingtype")
@@ -57,8 +57,13 @@ func (l *Location) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (l *Location) SetLinks(externalURL string) {
+func (l Location) SetLinks(externalURL string) {
 	l.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkLocations.ToString(), l.ID)
 	l.NavThings = CreateEntityLink(l.Things == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkThings.ToString(), l.ID)
 	l.NavHistoricalLocations = CreateEntityLink(l.HistoricalLocations == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkHistoricalLocations.ToString(), l.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (l Location) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON}
 }

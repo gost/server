@@ -102,7 +102,7 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 // TODO: !!!!ADD phenomenonTime SUPPORT!!!!
 // TODO: !!!!ADD resulttime SUPPORT!!!!
 // TODO: !!!!ADD observationtype SUPPORT!!!!
-func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datastream, error) {
+func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datastream, error) {
 	var dsID int
 	tID, err := strconv.Atoi(d.Thing.ID)
 	if err != nil || !gdb.ThingExists(tID) {
@@ -139,7 +139,7 @@ func (gdb *GostDatabase) PostDatastream(d entities.Datastream) (*entities.Datast
 	d.Sensor = nil
 	d.ObservedProperty = nil
 
-	return &d, nil
+	return d, nil
 }
 
 // DatastreamExists checks if a Datastream is present in the database based on a given id

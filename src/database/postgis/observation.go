@@ -90,7 +90,7 @@ func processObservations(db *sql.DB, sql string, args ...interface{}) ([]*entiti
 }
 
 // PostObservation todo
-func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Observation, error) {
+func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Observation, error) {
 	var oID int
 
 	dID, err := strconv.Atoi(o.Datastream.ID)
@@ -128,5 +128,5 @@ func (gdb *GostDatabase) PostObservation(o entities.Observation) (*entities.Obse
 	o.Datastream = nil
 	o.FeatureOfInterest = nil
 
-	return &o, nil
+	return o, nil
 }

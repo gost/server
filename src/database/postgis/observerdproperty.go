@@ -69,7 +69,7 @@ func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, 
 }
 
 // PostObservedProperty adds an ObservedProperty to the database
-func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var opID int
 	sql := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, op.Name, op.Definition, op.Description).Scan(&opID)
@@ -78,7 +78,7 @@ func (gdb *GostDatabase) PostObservedProperty(op entities.ObservedProperty) (*en
 	}
 
 	op.ID = strconv.Itoa(opID)
-	return &op, nil
+	return op, nil
 }
 
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.

@@ -28,7 +28,7 @@ func (gdb *GostDatabase) GetFeatureOfInterests() ([]*entities.FeatureOfInterest,
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
-func (gdb *GostDatabase) PostFeatureOfInterest(f entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	var fID int
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
@@ -39,7 +39,7 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f entities.FeatureOfInterest) (*e
 	}
 
 	f.ID = strconv.Itoa(fID)
-	return &f, nil
+	return f, nil
 }
 
 func processFeatureOfInterest(db *sql.DB, sql string, args ...interface{}) (*entities.FeatureOfInterest, error) {

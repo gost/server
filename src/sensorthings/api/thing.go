@@ -56,7 +56,7 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error)
 
 // PostThing checks if a posted thing entity is valid and adds it to the database
 // a posted thing can also contain Locations and DataStreams
-func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
+func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	_, err := thing.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
@@ -70,10 +70,9 @@ func (a *APIv1) PostThing(thing entities.Thing) (*entities.Thing, []error) {
 	// Handle locations
 	if thing.Locations != nil {
 		for _, l := range thing.Locations {
-			location := *l
 			// New location posted
 			if len(l.ID) == 0 { //Id is null so a new location is posted
-				_, err3 := a.PostLocationByThing(nt.ID, location)
+				_, err3 := a.PostLocationByThing(nt.ID, l)
 				if err3 != nil {
 					return nil, err3
 				}
@@ -104,6 +103,6 @@ func (a *APIv1) DeleteThing(id string) error {
 }
 
 // PatchThing todo
-func (a *APIv1) PatchThing(id string, thing entities.Thing) (*entities.Thing, error) {
+func (a *APIv1) PatchThing(id string, thing *entities.Thing) (*entities.Thing, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("patch thing not implemented yet"))
 }

@@ -58,7 +58,7 @@ func (a *APIv1) PostHistoricalLocation(thingID string, locationID string) []erro
 }
 
 // PatchHistoricalLocation todo
-func (a *APIv1) PatchHistoricalLocation(id string, hl entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+func (a *APIv1) PatchHistoricalLocation(id string, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

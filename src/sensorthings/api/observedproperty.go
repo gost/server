@@ -48,7 +48,7 @@ func (a *APIv1) GetObservedPropertiesByDatastream(datastreamID string, qo *odata
 }
 
 // PostObservedProperty todo
-func (a *APIv1) PostObservedProperty(op entities.ObservedProperty) (*entities.ObservedProperty, []error) {
+func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
 	_, err := op.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (a *APIv1) PostObservedProperty(op entities.ObservedProperty) (*entities.Ob
 }
 
 // PatchObservedProperty todo
-func (a *APIv1) PatchObservedProperty(id string, op entities.ObservedProperty) (*entities.ObservedProperty, error) {
+func (a *APIv1) PatchObservedProperty(id string, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 

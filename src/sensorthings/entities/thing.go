@@ -24,7 +24,7 @@ type Thing struct {
 }
 
 // GetEntityType returns the EntityType for Thing
-func (t *Thing) GetEntityType() EntityType {
+func (t Thing) GetEntityType() EntityType {
 	return EntityTypeThing
 }
 
@@ -40,7 +40,7 @@ func (t *Thing) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Thing are available before posting.
-func (t *Thing) ContainsMandatoryParams() (bool, []error) {
+func (t Thing) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, t.Description, t.GetEntityType(), "description")
 
@@ -52,9 +52,14 @@ func (t *Thing) ContainsMandatoryParams() (bool, []error) {
 }
 
 // SetLinks sets the entity specific navigation links if needed
-func (t *Thing) SetLinks(externalURL string) {
+func (t Thing) SetLinks(externalURL string) {
 	t.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkThings.ToString(), t.ID)
 	t.NavLocations = CreateEntityLink(t.Locations == nil, externalURL, EntityLinkThings.ToString(), EntityLinkLocations.ToString(), t.ID)
 	t.NavDatastreams = CreateEntityLink(t.Datastreams == nil, externalURL, EntityLinkThings.ToString(), EntityLinkDatastreams.ToString(), t.ID)
 	t.NavHistoricalLocations = CreateEntityLink(t.HistoricalLocations == nil, externalURL, EntityLinkThings.ToString(), EntityLinkHistoricalLocations.ToString(), t.ID)
+}
+
+// GetSupportedEncoding returns the supported encoding tye for this entity
+func (t Thing) GetSupportedEncoding() map[int]EncodingType {
+	return map[int]EncodingType{}
 }
