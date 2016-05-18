@@ -86,7 +86,12 @@ mqtt:<br />
 
 The following configuration parameters can be overruled 
 from the following environment variables:
-gost_db_host, gost_db_port, gost_db_user, gost_db_password
+
+db: gost_db_host, gost_db_port, gost_db_user, gost_db_password. 
+
+mqtt: gost_mqtt_host, gost_mqtt_port
+
+server: gost_server_host, gost_server_port, gost_server_external_uri
 
 Example setting Gost environment variable on Windows:
 
