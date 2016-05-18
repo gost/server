@@ -104,7 +104,9 @@
 				"506e1078-7fa1-8ebe-b849-6727ce55af8a",
 				"6c6c41cc-bfae-e95d-279c-35742272dcdb",
 				"c2e2d314-76b9-df51-8d73-f4b243416fef",
-				"b16efa60-72af-47c3-45e1-2151779dd3e3"
+				"b16efa60-72af-47c3-45e1-2151779dd3e3",
+				"2b51d097-55e0-0a3b-076c-d969523b2f13",
+				"17c03b32-6b4e-2624-7528-5b60d7ab2c36"
 			],
 			"owner": 0,
 			"collectionId": "d17054e5-c8d2-4312-6242-114a555a95a2"
@@ -218,6 +220,26 @@
 			"folder": "608fc284-8d4a-1683-e339-90c5a134b8e8"
 		},
 		{
+			"id": "17c03b32-6b4e-2624-7528-5b60d7ab2c36",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/HistoricalLocations(1)/Thing",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463569629701,
+			"name": "V GET Thing by HistoricalLocation",
+			"description": "Get Things",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
 			"id": "2342a9bf-6e88-ca09-4731-dde3194c12e0",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
 			"url": "localhost:8080/v1.0/Locations",
@@ -296,6 +318,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
+		},
+		{
+			"id": "2b51d097-55e0-0a3b-076c-d969523b2f13",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Locations(1)/Things",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1463569356156,
+			"name": "V GET Things by location",
+			"description": "Get Things",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
 			"id": "2ece3fea-cec0-74d0-a054-3dbd2c8efcbb",

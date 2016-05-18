@@ -24,6 +24,8 @@ type API interface {
 
 	GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error)
+	GetThingsByLocation(id string, qo *odata.QueryOptions) (*ArrayResponse, error)
+	GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThings(qo *odata.QueryOptions) (*ArrayResponse, error)
 	PostThing(thing *entities.Thing) (*entities.Thing, []error)
 	PatchThing(id string, thing *entities.Thing) (*entities.Thing, error)
@@ -92,6 +94,8 @@ type Database interface {
 
 	GetThing(string) (*entities.Thing, error)
 	GetThingByDatastream(string) (*entities.Thing, error)
+	GetThingsByLocation(string) ([]*entities.Thing, error)
+	GetThingByHistoricalLocation(string) (*entities.Thing, error)
 	GetThings() ([]*entities.Thing, error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
 

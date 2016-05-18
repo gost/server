@@ -31,27 +31,46 @@ func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entiti
 	return t, nil
 }
 
+// GetThingsByLocation returns things based on the given location id and QueryOptions
+func (a *APIv1) GetThingsByLocation(id string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	things, err := a.db.GetThingsByLocation(id)
+	return processThings(a, things, err)
+}
+
+// GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
+func (a *APIv1) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+	t, err := a.db.GetThingByHistoricalLocation(id)
+	if err != nil {
+		return nil, err
+	}
+
+	t.SetLinks(a.config.GetExternalServerURI())
+	return t, nil
+}
+
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	things, err := a.db.GetThings()
+	return processThings(a, things, err)
+}
+
+func processThings(a *APIv1, observations []*entities.Thing, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
 	uri := a.config.GetExternalServerURI()
-	for idx, item := range things {
+	for idx, item := range observations {
 		i := *item
 		i.SetLinks(uri)
-		things[idx] = &i
+		observations[idx] = &i
 	}
 
-	var data interface{} = things
-	response := models.ArrayResponse{
-		Count: len(things),
+	var data interface{} = observations
+	return &models.ArrayResponse{
+		Count: len(observations),
 		Data:  &data,
-	}
-
-	return &response, nil
+	}, nil
 }
 
 // PostThing checks if a posted thing entity is valid and adds it to the database

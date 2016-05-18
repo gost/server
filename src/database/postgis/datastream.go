@@ -55,7 +55,7 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string) ([]*entities.Da
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
-// GetDatastreamsBySensor retrieves all datastreams linked to the given ObservedProerty
+// GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
 func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string) ([]*entities.Datastream, error) {
 	tID, err := strconv.Atoi(oID)
 	if err != nil {

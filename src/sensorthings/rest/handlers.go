@@ -48,6 +48,22 @@ func HandleGetThingByDatastream(w http.ResponseWriter, r *http.Request, endpoint
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
+// HandleGetThingsByLocation retrieves and sends Things based on the given Location ID and filter
+func HandleGetThingsByLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThingsByLocation(getEntityID(r), q) }
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
+// HandleGetThingByHistoricalLocation retrieves and sends a specific Thing based on the given HistoricalLocation ID and filter
+func HandleGetThingByHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	handle := func(q *odata.QueryOptions) (interface{}, error) {
+		return a.GetThingByHistoricalLocation(getEntityID(r), q)
+	}
+	handleGetRequest(w, endpoint, r, &handle)
+}
+
 // HandlePostThing tries to insert a new Thing and sends back the created Thing
 func HandlePostThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api

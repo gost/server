@@ -38,7 +38,7 @@ func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) 
 	return processDatastreams(a, datastreams, err)
 }
 
-// GetDatastreamsBySensor returns all datastreams linked to the given sensor
+// GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
 func (a *APIv1) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID)
 	return processDatastreams(a, datastreams, err)

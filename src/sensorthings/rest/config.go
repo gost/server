@@ -71,6 +71,8 @@ func createThings(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/Things", HandleGetThings},
 			{models.HTTPOperationGet, "/v1.0/Things{id}", HandleGetThing},
+			{models.HTTPOperationGet, "/v1.0/Locations{id}/Things", HandleGetThingsByLocation},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Thing", HandleGetThingByHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Thing", HandleGetThingByDatastream},
 			{models.HTTPOperationPost, "/v1.0/Things", HandlePostThing},
 			{models.HTTPOperationDelete, "/v1.0/Things{id}", HandleDeleteThing},
