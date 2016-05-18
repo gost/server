@@ -30,13 +30,19 @@ CREATE EXTENSION postgis;
 \q
 EOF
 
+#Open port
+sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT -m comment --comment "GOST Server port"
+
 #-------------------------
 # install gost
 #-------------------------
 cd ~/dev/go/src/github.com/geodan
 git clone https://github.com/Geodan/gost.git
+cd gost/src
+go get .
 
+export gost_server_host=0.0.0.0
+export gost_server_external_uri=http://37.97.183.133:8080/
 
-#Open port
-sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT -m comment --comment "GOST Server port"
-
+go run main.go -install ../scripts/createdb.sql
+go run main.go
