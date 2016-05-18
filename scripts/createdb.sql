@@ -1,3 +1,5 @@
+drop schema v1 cascade;
+
 CREATE SCHEMA %s;
 SET search_path = %s;
 
