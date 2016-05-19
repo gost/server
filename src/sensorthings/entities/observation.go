@@ -43,7 +43,7 @@ func (o *Observation) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Observation are available before posting.
-func (o Observation) ContainsMandatoryParams() (bool, []error) {
+func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	// When a SensorThings service receives a POST Observations without phenonmenonTime, the service SHALL
 	// assign the current server time to the value of the phenomenonTime.
 	if len(o.PhenomenonTime) == 0 {

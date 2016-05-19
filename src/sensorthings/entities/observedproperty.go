@@ -35,7 +35,7 @@ func (o *ObservedProperty) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for ObservedProperty are available before posting.
-func (o ObservedProperty) ContainsMandatoryParams() (bool, []error) {
+func (o *ObservedProperty) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, o.Name, o.GetEntityType(), "name")
 	CheckMandatoryParam(&err, o.Definition, o.GetEntityType(), "definition")

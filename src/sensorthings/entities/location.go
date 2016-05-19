@@ -43,7 +43,7 @@ func (l *Location) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Location are available before posting.
-func (l Location) ContainsMandatoryParams() (bool, []error) {
+func (l *Location) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, l.Description, l.GetEntityType(), "description")
 	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingtype")

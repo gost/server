@@ -40,7 +40,7 @@ func (t *Thing) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Thing are available before posting.
-func (t Thing) ContainsMandatoryParams() (bool, []error) {
+func (t *Thing) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, t.Description, t.GetEntityType(), "description")
 

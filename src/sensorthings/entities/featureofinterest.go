@@ -35,7 +35,7 @@ func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a FeatureOfInterest are available before posting
-func (f FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
+func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, f.Description, f.GetEntityType(), "description")
 	CheckMandatoryParam(&err, f.EncodingType, f.GetEntityType(), "encodingtype")

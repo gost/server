@@ -35,7 +35,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for Sensor are available before posting.
-func (s Sensor) ContainsMandatoryParams() (bool, []error) {
+func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, s.Description, s.GetEntityType(), "description")
 	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingtype")

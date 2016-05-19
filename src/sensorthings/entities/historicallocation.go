@@ -34,7 +34,7 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a HistoricalLocation are available before posting
-func (h HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
+func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, h.Time, h.GetEntityType(), "time")
 	CheckMandatoryParam(&err, h.Thing, h.GetEntityType(), "Thing")
