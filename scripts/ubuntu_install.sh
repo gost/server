@@ -33,6 +33,10 @@ EOF
 
 #Open port
 sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT -m comment --comment "GOST Server port"
+sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 1883 -j ACCEPT -m comment --comment "Mosquitto MQTT port"
+sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 9001 -j ACCEPT -m comment --comment "Mosquitto MQTT Websocket port"
+
+
 
 #-------------------------
 # install gost
