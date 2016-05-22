@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" class="html">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>GOST Dashboard</title>
+
+    <link href="js/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="js/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="js/vendor/openlayers/ol-3.15.1.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
+  </head>
+
+  <body class="nav-md" ng-app="gostApp" ng-controller="MainCtrl">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view menu">
+              <a id="menu_toggle">
+                  <img src="assets/img/icon.svg" class="header-icon">
+                  <div class="header-title-wrapper">
+                      <div class="header-title">GOST</div>
+                      <div class="header-sub-title">Dashboard</div>
+                   </div>
+                </a>
+            <div class="clearfix"></div>
+            <br />
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a href="#home"><i class="fa fa-home"></i> Home <span class="fa"></span></a></li>
+                  <li><a href="#things"><i class="fa fa-cube"></i> Things <span class="fa"></span></a></li>
+                  <li><a href="#locations"><i class="fa fa-map-marker"></i> Locations <span class="fa"></span></a></li>
+                  <li><a href="#historicallocations"><i class="fa fa-history"></i> Historical Locations <span class="fa"></span></a></li>
+                  <li><a href="#sensors"><i class="fa fa-dashboard"></i> Sensors <span class="fa"></span></a></li>
+                  <li><a href="#observedproperties"><i class="fa fa-list"></i> Observed Properties <span class="fa"></span></a></li>
+				  <li><a href="#datastreams"><i class="fa fa-line-chart"></i> Datastreams <span class="fa"></span></a></li>
+				  <li><a href="#observations"><i class="fa fa-eye"></i> Observations <span class="fa"></span></a></li>
+				  <li><a href="#featuresofinterest"><i class="fa fa-map"></i> Features Of Interest <span class="fa"></span></a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav class="" role="navigation">
+                <div class="header">
+                  <i ng-class="headerIcon"></i>  {{ Page.title() }}
+                </div>
+                <ul class="nav navbar-nav navbar-right">
+                  <li class=""></li>
+                </ul>
+            </nav>
+          </div>
+        </div>
+
+        <div class="right_col" role="main">
+          <div ng-view></div>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="js/vendor/angular/angular.min.js"></script>
+	<script src="js/vendor/angular/angular-route.min.js"></script>
+    <script src="js/vendor/angular/angular-sanitize.min.js"></script>
+    <script src="js/vendor/jquery/jquery.min.js"></script>
+    <script src="js/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/vendor/openlayers/ol-3.15.1.js"></script>
+    <script src='js/vendor/fastclick/fastclick.js'></script>
+    <script src='js/vendor/angular-chart/Chart.min.js'></script>
+
+    <script src="js/app.js"></script>
+    <script src="js/controllers/home-controller.js"></script>
+    <script src="js/controllers/datastream-controller.js"></script>
+    <script src="js/controllers/datastreams-controller.js"></script>
+    <script src="js/controllers/features-of-interest-controller.js"></script>
+    <script src="js/controllers/historical-locations-controller.js"></script>
+    <script src="js/controllers/locations-controller.js"></script>
+    <script src="js/controllers/main-controller.js"></script>
+    <script src="js/controllers/observations-controller.js"></script>
+    <script src="js/controllers/observed-properties-controller.js"></script>
+    <script src="js/controllers/sensors-controller.js"></script>
+    <script src="js/controllers/thing-controller.js"></script>
+    <script src="js/controllers/things-controller.js"></script>
+
+    <script src="js/gentella.js"></script>
+  </body>
+</html>

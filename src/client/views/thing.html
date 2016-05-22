@@ -1,0 +1,79 @@
+<div>
+    <ul class="nav nav-tabs">
+        <li ng-click="tabPropertiesClicked()" class="active"><a data-target="#properties" data-toggle="tab">Properties</a></li>
+        <li ng-click="tabLocationsClicked()"><a data-target="#locations" data-toggle="tab">Locations</a></li>
+        <li ng-click="tabHistoricalLocationsClicked()"><a data-target="#historicallocations" data-toggle="tab">Historical Locations</a></li>
+        <li ng-click="tabDatastreamsClicked()"><a data-target="#datastreams" data-toggle="tab">Datastreams</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="properties">
+            <div class="entityInfo">
+                <span class="entityInfoHeader">Id</span> <br />
+                <pre class="entityInfoInfo">{{id}}</pre>
+                <span class="entityInfoHeader">Description</span><br />
+                <pre class="entityInfoInfo">{{description}}</pre>
+                <span class="entityInfoHeader">Properties</span> <br />
+                <pre class="entityInfoInfo">{{properties | json:4}}</pre>
+            </div>
+        </div>
+        <div class="tab-pane" id="locations">
+            <table class="table table-bordered table-hover st-table">
+                <thead class="st-thead">
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Encoding</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in locationsList">
+                        <td>{{x["@iot.id"]}}</td>
+                        <td>{{x["description"]}}</td>
+                        <td>{{x["encodingtype"]}}</td>
+                        <td>{{x["location"]}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div class="tab-pane" id="historicallocationsList">
+            <table class="table table-bordered table-hover st-table">
+                <thead class="st-thead">
+                <tr>
+                    <th>ID</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="x in historicalLocationsList">
+                    <td>{{x["@iot.id"]}}</td>
+                    <td>{{x["time"]}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="tab-pane" id="datastreams">
+            <table class="table table-bordered table-hover st-table">
+                <thead class="st-thead">
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Unit of Measurement</th>
+                    <th>Observed Area</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="x in datastreamsList" ng-click="datastreamClicked(x['@iot.id'])">
+                    <td>{{x["@iot.id"]}}</td>
+                    <td>{{x["description"]}}</td>
+                    <td>{{x["unitOfMeasurement"]}}</td>
+                    <td>{{x["observedArea"]}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="map" ng-show="mapVisible" class="map" height="400px" width="400px"></div>
+</div>

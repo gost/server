@@ -1,0 +1,20 @@
+<div>
+    <table class="table table-bordered table-hover st-table">
+        <thead class="st-thead">
+        <tr>
+            <th>ID</th>
+            <th>Description</th>
+            <th>Encoding</th>
+            <th>Location</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="x in locationsList">
+            <td>{{x["@iot.id"]}}</td>
+            <td>{{x["description"]}}</td>
+            <td>{{x["encodingtype"]}}</td>
+            <td>{{x["location"]}}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
