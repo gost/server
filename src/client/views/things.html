@@ -25,10 +25,14 @@
                     <h4 class="modal-title"><i class="fa fa-cube"></i> NEW THING</h4>
                 </div>
                 <div class="modal-body">
-                    <p>description</p>
-                    <input type="text" ng-model="newThing.description" /><br />
-                    <p>properties</p>
-                    <input type="text" ng-model="newThing.properties" /><br />
+                    <div class="input-group">
+                        <span class="input-group-addon" >description</span>
+                        <input type="text" ng-model="newThing.description" />
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon" >properties</span>
+                        <input type="text" ng-model="newThing.properties" /><br />
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <input type="submit" class="btn btn-default" ng-click="addNewThing(newThing)" value="Save" />

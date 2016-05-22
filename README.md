@@ -1,4 +1,5 @@
 <img src="src/client/assets/img/icon.png" width="353"><br />
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Geodan/gost/blob/master/LICENSE)
 [![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/Geodan/gost)
 [![Build Status](http://beta.drone.io/api/badges/drone/drone/status.svg)](https://drone.io/github.com/Geodan/gost/latest)
 [![Go Report Card](https://goreportcard.com/badge/geodan/gost)](https://goreportcard.com/report/geodan/gost)
@@ -10,10 +11,6 @@ GOST (Go-SensorThings) is a sensor server written in Go. It implements the [OGC 
 ## Disclaimer
 
 GOST is alpha software and is not considered appropriate for customer use. Feel free to help development :-)
-
-## License
-
-GOST is licensed under [MIT](https://opensource.org/licenses/MIT).
 
 ## Binaries
 

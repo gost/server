@@ -21,20 +21,25 @@
 	float: left;
 }
 
-.header-title-wrapper{
+#header-wrapper{
+    overflow: hidden;
+    height: 55px;
+}
+
+#header-title-wrapper{
 	float: left;
 	margin-top: 5px;
 	margin-left: 10px;
 }
 
-.header-title{
+#header-title{
 	font-size: 22px;
 	font-weight:800;
 	letter-spacing: 1px;
 	color: #ECF0F1;
 }
 
-.header-sub-title{
+#header-sub-title{
 	font-size: 16px;
 	font-weight: 400;
 	letter-spacing: 5px;
@@ -56,6 +61,17 @@
 
 .st-table .st-thead{
     color: #000000;
+}
+
+.mqtt-head{
+    color: #000000;
+    font-weight: 600;
+    padding-right: 15px;
+}
+
+.mqtt-description{
+    color: #000000;
+    font-weight: 600;
 }
 
 .entityInfo{
@@ -328,7 +344,7 @@ html, body, #map {
   text-shadow: 1px 1px #000;
 }
 .menu_section >ul {
-  margin-top: 10px;
+  margin-top: -20px;
 }
 .profile_pic {
   width: 35%;

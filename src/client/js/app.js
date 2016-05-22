@@ -22,6 +22,7 @@ gostApp.config(function ($routeProvider) {
         when('/datastreams', { templateUrl: 'views/datastreams.html', controller: "DatastreamsCtrl" }).
         when('/observations', { templateUrl: 'views/observations.html', controller: "ObservationsCtrl" }).
         when('/featuresofinterest', { templateUrl: 'views/featuresofinterest.html', controller: "FeaturesOfInterestCtrl" }).
+        when('/mqtt', { templateUrl: 'views/mqtt.html', controller: "MqttCtrl" }).
         otherwise({redirectTo: '/home' });;
 })
 
@@ -166,3 +167,28 @@ function createObservationChart(labels, values){
         }
     });
 }
+
+$('.fs-button').on('click', function(){
+      if (!document.fullscreenElement &&    // alternative standard method
+          !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) {
+          document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+});

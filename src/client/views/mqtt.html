@@ -1,0 +1,71 @@
+<div>
+    <h2 class="mqtt-head">Broker</h2>
+    <table>
+        <tr>
+            <td class="mqtt-head">version</td>
+            <td>{{brokerVersion}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">timestamp</td>
+            <td>{{brokerTimestamp}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">uptime</td>
+            <td>{{brokerUptime}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">subscriptions</td>
+            <td>{{brokerSubscriptions}}</td>
+        </tr>
+    </table>
+
+    <div role="separator" class="divider"></div>
+
+    <h2 class="mqtt-head">Clients</h2>
+    <table>
+        <tr>
+            <td class="mqtt-head">connected</td>
+            <td>{{clientsConnected}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">disconnected</td>
+            <td>{{clientsDisconnected}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">expired</td>
+            <td>{{clientsExpired}}</td>
+        </tr>
+    </table>
+
+    <div role="separator" class="divider"></div>
+
+    <h2 class="mqtt-head">Messages</h2>
+    <table>
+        <tr>
+            <td class="mqtt-head">sent</td>
+            <td>{{messagesSent}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">received</td>
+            <td>{{messagesReceived}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">stored</td>
+            <td>{{messagesStored}}</td>
+        </tr>
+    </table>
+
+    <div role="separator" class="divider"></div>
+
+    <h2 class="mqtt-head">Traffic</h2>
+    <table>
+        <tr>
+            <td class="mqtt-head">bytes sent</td>
+            <td>{{trafficSent}}</td>
+        </tr>
+        <tr>
+            <td class="mqtt-head">bytes received</td>
+            <td>{{trafficReceived}}</td>
+        </tr>
+    </table>
+</div>
