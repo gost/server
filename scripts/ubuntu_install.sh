@@ -36,12 +36,12 @@ EOF
 #-------------------------
 # Port configuration
 #-------------------------
-sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT -m comment --comment "GOST Server port"
+sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT -m comment --comment "GOST Server port"
 sudo iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 1883 -j ACCEPT -m comment --comment "Mosquitto MQTT port"
 
 #Add port to firewall
 sudo ufw allow 1883
-sudo ufw allow 8080
+sudo ufw allow 80
 
 #-------------------------
 # Get latest version of GOST from github
@@ -76,7 +76,9 @@ After=syslog.target network.target postgresql.service
 
 [Service]
 Environment=export gost_server_host=0.0.0.0
-Environment=gost_server_external_uri=http://37.97.183.133:8080/
+Environment=export gost_server_port=80
+Environment=export gost_server_external_uri=http://mysite.com
+Environment=export gost_server_client_content=/usr/local/bin/gost/client/
 ExecStart=/usr/local/bin/gost/gost -config /usr/local/bin/gost/config.yaml
 
 [Install]
