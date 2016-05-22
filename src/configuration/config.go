@@ -18,6 +18,7 @@ type ServerConfig struct {
 	Host              string `yaml:"host"`
 	Port              int    `yaml:"port"`
 	ExternalURI       string `yaml:"externalUri"`
+	ClientContent     string `yaml:"clientContent"`
 	MaxEntityResponse string `yaml:"maxEntityResponse"`
 	IndentedJSON      string `yaml:"indentedJson"`
 }

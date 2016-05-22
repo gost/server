@@ -15,7 +15,7 @@ func CreateRouter(api *models.API) *mux.Router {
 	a := *api
 	endpoints := *a.GetEndpoints()
 	router := mux.NewRouter().StrictSlash(true)
-	router.PathPrefix("/Dashboard/").Handler(http.StripPrefix("/Dashboard/", http.FileServer(http.Dir("./clientv2/"))))
+	router.PathPrefix("/Dashboard/").Handler(http.StripPrefix("/Dashboard/", http.FileServer(http.Dir(a.GetConfig().Server.ClientContent))))
 	setDashboardRedirects(router)
 
 	for _, endpoint := range endpoints {

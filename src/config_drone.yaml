@@ -3,6 +3,7 @@ server:
     host: localhost
     port: 8080
     externalUri: http://localhost:8080/
+    clientContent: ./client/
     maxEntityResponse: 20
     indentedJson: true
 database:
@@ -17,5 +18,5 @@ database:
     maxOpenConns: 100
 mqtt:
     enabled: true
-    host: iot.eclipse.org
+    host: 127.0.0.1
     port: 1883

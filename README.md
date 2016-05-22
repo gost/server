@@ -1,4 +1,4 @@
-<img src="src/client/resources/assets/img/icon.png" width="353"><br />
+<img src="src/client/assets/img/icon.png" width="353"><br />
 [![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/Geodan/gost)
 [![Build Status](http://beta.drone.io/api/badges/drone/drone/status.svg)](https://drone.io/github.com/Geodan/gost/latest)
 [![Go Report Card](https://goreportcard.com/badge/geodan/gost)](https://goreportcard.com/report/geodan/gost)
@@ -71,6 +71,9 @@ server: <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: localhost (host of webserver, set to 0.0.0.0 if hosting on external machine)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 8080 (port of webserver)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;externalUri: http://localhost:8080/ (change to the uri where users can reach the service)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clientContent: ./client/ (Location of the client folder (dashboard))<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxEntityResponse: 50 (Max entities to return if no $top and $skip is given, not implemented yet)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indentedJson: true (return indented JSON, not implemented yet)<br />
 database:<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: localhost (location of PostGIS server)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 5432 (port of PostGIS database)<br />
@@ -91,7 +94,7 @@ db: gost_db_host, gost_db_port, gost_db_user, gost_db_password.
 
 mqtt: gost_mqtt_host, gost_mqtt_port
 
-server: gost_server_host, gost_server_port, gost_server_external_uri
+server: gost_server_host, gost_server_port, gost_server_external_uri, gost_client_content
 
 Example setting Gost environment variable on Windows:
 

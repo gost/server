@@ -47,6 +47,11 @@ func main() {
 		conf.Server.ExternalURI = gostServerExternalURI
 	}
 
+	gostClientContent := os.Getenv("gost_client_content")
+	if gostClientContent != "" {
+		conf.Server.ClientContent = gostClientContent
+	}
+
 	gostServerPort := os.Getenv("gost_server_port")
 	if gostServerPort != "" {
 		port, err := strconv.Atoi(gostServerPort)
