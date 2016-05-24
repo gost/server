@@ -33,7 +33,15 @@ Where is the physical or virtual object located?
 Request: 
 
 ```sh
-curl -X POST -d "{\"description\":\"My house\",\"encodingType\":\"application/vnd.geo+json\",\"location\":{\"type\":\"Point\",\"coordinates\":[-114.13046,51.083694]},\"Things\":[{\"@iot.id\":5}]}" --header "Content-Type:application/json" http://localhost:8080/v1.0/Locations
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "description": "my backyard",
+    "encodingType": "application/vnd.geo+json",
+    "location": {
+        "type": "Point",
+        "coordinates": [-117.123,
+        54.123]
+    }
+}' "http://gost.geodan.nl/v1.0/Locations"
 ```
 
 Parameters: Things.@iot.id
@@ -43,12 +51,12 @@ Response:
 ```json
 {
   "@iot.id": "1",
-  "description": "My house",
+  "description": "my backyard",
   "encodingtype": "application/vnd.geo+json",
   "location": {
      "coordinates": [
-        -114.13046,
-        51.083694
+        -117.123,
+        54.123
      ],
      "type": "Point"
   },
