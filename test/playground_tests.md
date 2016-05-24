@@ -2,6 +2,12 @@
 
 Here a collection of sample requests to start working with the GOST API. It contains 6 steps: create a Thing, create a Location, create an ObservedProperty, create a Sensor, create a Datastream and create an Observation.
 
+Instructions:
+
+. replace http://localhost:8080 with the url of your own test server
+
+. when something is created with a HTTP Post request, and Id is returned. Uses this Id in subsequent requests (see parameters)
+
 ## 1] Create a Thing
 
 A thing is an object in either the physical or virtual world.
@@ -41,7 +47,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "coordinates": [-117.123,
         54.123]
     }
-}' "http://gost.geodan.nl/v1.0/Locations"
+}' "http://localhost:8080/v1.0/Locations"
 ```
 
 Parameters: Things.@iot.id
