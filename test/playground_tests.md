@@ -91,7 +91,11 @@ What property is the sensor observing?
 Request: 
 
 ```sh
-curl -X POST -d "{\"name\": \"air_temperature\", \"definition\": \"http://mmisw.org/ont/ioos/parameter/air_temperature\", \"description\": \"Temperature of air in situ.\"}" --header "Content-Type:application/json" http://localhost:8080/v1.0/ObservedProperties
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+  "name": "air_temperature",
+  "description": "Temperature of air in situ.",
+  "definition": "http://mmisw.org/ont/ioos/parameter/air_temperature"
+}' "http://localhost:8080/v1.0/ObservedProperties"
 ```
 
 Parameters: -
