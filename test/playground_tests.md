@@ -36,9 +36,9 @@ Response:
       "organisation": "Geodan",
       "owner": "Bert"
    },
-   "Locations@iot.navigationLink": "../Things(5)/Locations",
-   "Datastreams@iot.navigationLink": "../Things(5)/Datastreams",
-   "HistoricalLocations@iot.navigationLink": "../Things(5)/HistoricalLocations"
+   "Locations@iot.navigationLink": "http://localhost:8080/v1/Things(5)/Locations",
+   "Datastreams@iot.navigationLink": "http://localhost:8080/v1/Things(5)/Datastreams",
+   "HistoricalLocations@iot.navigationLink": "http://localhost:8080/v1/Things(5)/HistoricalLocations"
 }
 ```
 
