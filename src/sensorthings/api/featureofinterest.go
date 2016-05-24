@@ -68,6 +68,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 		return nil, []error{err2}
 	}
 
+	l.SetLinks(a.config.GetExternalServerURI())
 	return l, nil
 }
 

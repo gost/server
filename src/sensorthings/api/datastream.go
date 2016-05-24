@@ -86,6 +86,8 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 		return nil, []error{err2}
 	}
 
+	ns.SetLinks(a.config.GetExternalServerURI())
+
 	return ns, nil
 }
 

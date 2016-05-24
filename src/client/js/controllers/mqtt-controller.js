@@ -6,7 +6,7 @@ gostApp.controller('MqttCtrl', function ($scope) {
         client.unsubscribe("$SYS/broker/#");
     });
 
-    client = new Paho.MQTT.Client(location.hostname, Number(9001), "skdfhksdjfh");
+    client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     client.connect({ onSuccess: onConnect });

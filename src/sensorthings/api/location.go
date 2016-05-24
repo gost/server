@@ -24,7 +24,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 	if err2 != nil {
 		return nil, []error{err2}
 	}
-
+	l.SetLinks(a.config.GetExternalServerURI())
 	return l, nil
 }
 
@@ -47,6 +47,8 @@ func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location)
 			return nil, err3
 		}
 	}
+
+	l.SetLinks(a.config.GetExternalServerURI())
 
 	return l, nil
 }
@@ -109,7 +111,7 @@ func (a *APIv1) DeleteLocation(id string) error {
 func (a *APIv1) LinkLocation(thingID string, locationID string) error {
 	err3 := a.db.LinkLocation(thingID, locationID)
 	if err3 != nil {
-		return err3
+		return gostErrors.NewBadRequestError(err3)
 	}
 
 	return nil

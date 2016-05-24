@@ -65,6 +65,8 @@ func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.O
 		return nil, []error{err2}
 	}
 
+	nop.SetLinks(a.config.GetExternalServerURI())
+
 	return nop, nil
 }
 

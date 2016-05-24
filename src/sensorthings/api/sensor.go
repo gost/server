@@ -68,6 +68,8 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 		return nil, []error{err2}
 	}
 
+	ns.SetLinks(a.config.GetExternalServerURI())
+
 	return ns, nil
 }
 
