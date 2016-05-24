@@ -6,7 +6,7 @@ Instructions:
 
 . replace http://localhost:8080 with the url of your own test server
 
-. when something is created with a HTTP Post request, and Id is returned. Use this Id in subsequent requests (see parameters)
+. when something is created with a HTTP Post request, and @iot.id is returned. Use this @iot.id in subsequent requests (see parameters)
 
 ## 1] Create a Thing
 
