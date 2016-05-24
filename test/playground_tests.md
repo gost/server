@@ -181,6 +181,13 @@ Response:
 Request: 
 
 ```sh
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+  "phenomenonTime": "2016-05-09T11:04:15.790Z",
+  "resultTime" : "2016-05-09T11:04:15.790Z",
+  "result" : 38,
+  "Datastream":{"@iot.id":"1"}
+}' "http://localhost:8080/v1.0/Observations"
+
 curl -X POST -d " { \"phenomenonTime\": \"2016-05-09T11:04:15.790Z\", \"result\": 20 }" --header "Content-Type:application/json" http://localhost:8080/v1.0/Datastreams(1)/Observations
 ```
 
@@ -194,9 +201,9 @@ Response:
    "@iot.id": "2",
    "@iot.selfLink": "http://localhost:8080/v1.0/Observations(2)",
    "phenomenonTime": "2016-05-09T11:04:15.790Z",
-   "result": 20,
-   "resultTime": "NULL",
-   "Datastream@iot.navigationLink": "../Observations(2)/Datastream",
-   "FeatureOfInterest@iot.navigationLink": "../Observations(2)/FeatureOfInterest"
+   "result": 38,
+   "resultTime": "2016-05-09T11:04:15.790Z",
+   "Datastream@iot.navigationLink": "http://localhost:8080/v1.0/Observations(2)/Datastream",
+   "FeatureOfInterest@iot.navigationLink": "http://localhost:8080/v1.0/Observations(185)/FeatureOfInterest"
 }
 ```
