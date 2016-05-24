@@ -57,10 +57,10 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "coordinates": [-117.123,
         54.123]
     }
-}' "http://localhost:8080/v1.0/Locations"
+}' "http://localhost:8080/v1.0/Things(1)/Locations"
 ```
 
-Parameters: Things.@iot.id
+Parameters: Things.@iot.id in the url path
 
 Response:
 
