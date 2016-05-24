@@ -67,6 +67,7 @@ Response:
 ```json
 {
   "@iot.id": "1",
+  "@iot.selfLink": "http://localhost:8080/v1.0/Locations(1)",
   "description": "my backyard",
   "encodingtype": "application/vnd.geo+json",
   "location": {
@@ -105,6 +106,7 @@ Response:
 ```json
 {
    "@iot.id": "2",
+   "@iot.selfLink": "http://localhost:8080/v1.0/ObservedProperties(2)",
    "description": "Temperature of air in situ.",
    "name": "air_temperature",
    "definition": "http://mmisw.org/ont/ioos/parameter/air_temperature"
@@ -132,6 +134,7 @@ Response:
 ```json
 {
    "@iot.id": "1",
+   "@iot.selfLink": "http://localhost:8080/v1.0/Sensors(1)",
    "description": "Thermometer",
    "encodingtype": "application/pdf",
    "metadata": "https://en.wikipedia.org/wiki/Thermometer"
@@ -166,6 +169,7 @@ Response:
 ```json
 {
    "@iot.id": "8",
+   "@iot.selfLink": "http://localhost:8080/v1.0/Datastreams(8)",
    "description": "Thermometer readings",
    "unitOfMeasurement": {
       "definition": "http://unitsofmeasure.org/ucum.html#para-30",
