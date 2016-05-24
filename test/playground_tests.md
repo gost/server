@@ -149,7 +149,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
     "unitOfMeasurement": {
         "symbol": "°C",
         "name": "degree Celsius",
-        "definition": "http://unitsofmeasure.org/ucum.html#para-30
+        "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "Thermometer readings",
