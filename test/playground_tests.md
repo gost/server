@@ -144,8 +144,18 @@ The Datastream represents a series of observations.
 Request:
 
 ```sh
-curl -X POST -d "{ \"description\": \"Thermometer readings\", \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\", \"unitOfMeasurement\": { \"name\": \"degree Celsius\", \"symbol\": \"°C\", \"definition\": \"http://unitsofmeasure.org/ucum.html#para-30\" }, \"Sensor\": { \"@iot.id\": \"1\" }, \"ObservedProperty\": { \"@iot.id\": \"1\" }, \"Thing\": { \"@iot.id\": \"5\" } }" --header "Content-Type:application/json" http://localhost:8080/v1.0/Datastreams
-```
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "unitOfMeasurement": {
+        "symbol": "°C",
+        "name": "degree Celsius",
+        "definition": "http://unitsofmeasure.org/ucum.html#para-30
+    },
+  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+  "description": "Thermometer readings",
+  "Thing": {"@iot.id": "1"},
+  "ObservedProperty": {"@iot.id": "1"},
+  "Sensor": {"@iot.id": "1"}
+}' "http://localhost:8080/v1.0/Datastreams"```
 
 Parameters: Sensor.@iot.id, ObservedProperty.@iot.id, Thing.@iot.id
 
@@ -158,7 +168,7 @@ Response:
    "unitOfMeasurement": {
       "definition": "http://unitsofmeasure.org/ucum.html#para-30",
       "name": "degree Celsius",
-      "symbol": "∩┐╜C"
+      "symbol": "°C"
    },
    "observationType": "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"
 }
