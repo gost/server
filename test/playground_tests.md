@@ -187,8 +187,6 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "result" : 38,
   "Datastream":{"@iot.id":"1"}
 }' "http://localhost:8080/v1.0/Observations"
-
-curl -X POST -d " { \"phenomenonTime\": \"2016-05-09T11:04:15.790Z\", \"result\": 20 }" --header "Content-Type:application/json" http://localhost:8080/v1.0/Datastreams(1)/Observations
 ```
 
 Parameters:
