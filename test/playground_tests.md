@@ -15,7 +15,13 @@ A thing is an object in either the physical or virtual world.
 Request:
 
 ```sh
-curl -X POST -d "{\"description\": \"my thermometer\"}" --header "Content-Type:application/json" http://localhost:8080/v1.0/Things
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
+    "description": "my thermometer",
+    "properties": {
+        "organisation": "Geodan",
+        "owner": "Bert"
+    }
+}' "http://localhost:8080/v1.0/Things"
 ```
 
 Parameters: -
@@ -26,6 +32,10 @@ Response:
    "@iot.id": "5",
    "@iot.selfLink": "http://localhost:8080/v1.0/Things(5)",
    "description": "my thermometer",
+   "properties": {
+      "organisation": "Geodan",
+      "owner": "Bert"
+   },
    "Locations@iot.navigationLink": "../Things(5)/Locations",
    "Datastreams@iot.navigationLink": "../Things(5)/Datastreams",
    "HistoricalLocations@iot.navigationLink": "../Things(5)/HistoricalLocations"
