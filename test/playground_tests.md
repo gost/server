@@ -118,8 +118,11 @@ The sensor is what actually makes the observations.
 Request:
 
 ```sh
-curl -X POST -d "{ \"description\": \"Thermometer\", \"encodingType\": \"application/pdf\", \"metadata\": \"https://en.wikipedia.org/wiki/Thermometer\" }" --header "Content-Type:application/json" http://localhost:8080/v1.0/Sensors
-```
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
+    "description": "Thermometer",
+    "encodingType": "application/pdf",
+    "metadata": "https://en.wikipedia.org/wiki/Thermometer"
+}' "http://localhost:8080/v1.0/Sensors"```
 
 Parameters: -
 
