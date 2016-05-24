@@ -67,6 +67,8 @@ var (
 	EncodingGeoJSON  = EncodingType{1, "application/vnd.geo+json"}
 	EncodingPDF      = EncodingType{2, "application/pdf"}
 	EncodingSensorML = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
+	EncodingTextHtml = EncodingType{4, "text/html"}
+
 )
 
 // EncodingValues is a list of names mapped to their EncodingValue
@@ -75,7 +77,7 @@ var EncodingValues = []EncodingType{
 	EncodingGeoJSON,
 	EncodingPDF,
 	EncodingSensorML,
-}
+	EncodingTextHtml}
 
 // CreateEncodingType returns the int representation for a given encoding, returns an error when encoding is not supported
 func CreateEncodingType(encoding string) (EncodingType, error) {
