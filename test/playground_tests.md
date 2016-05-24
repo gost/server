@@ -142,6 +142,7 @@ curl -X POST -d " { \"phenomenonTime\": \"2016-05-09T11:04:15.790Z\", \"result\"
 ```
 
 Parameters:
+Datastream.@iot.id in the url path
 
 Response:
 
