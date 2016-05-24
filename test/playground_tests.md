@@ -156,7 +156,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "Thing": {"@iot.id": "1"},
   "ObservedProperty": {"@iot.id": "1"},
   "Sensor": {"@iot.id": "1"}
-}' "http://localhost:8080/v1.0/Datastreams"```
+}' "http://localhost:8080/v1.0/Datastreams"
+```
 
 Parameters: Sensor.@iot.id, ObservedProperty.@iot.id, Thing.@iot.id
 
