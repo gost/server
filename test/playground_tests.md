@@ -122,7 +122,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
     "description": "Thermometer",
     "encodingType": "application/pdf",
     "metadata": "https://en.wikipedia.org/wiki/Thermometer"
-}' "http://localhost:8080/v1.0/Sensors"```
+}' "http://localhost:8080/v1.0/Sensors"
+```
 
 Parameters: -
 
