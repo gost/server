@@ -35,9 +35,12 @@ func TestGetEntityType(t *testing.T){
 
 func TestContainsMandatoryParameters(t *testing.T){
 	// arrange
+	datastream := &Datastream{}
 
 	// act
+	contains, _ :=datastream.ContainsMandatoryParams()
 
 	// assert
+	assert.False(t,contains, "Datastream is expected not to have mandatory paramaters")
 }
 
