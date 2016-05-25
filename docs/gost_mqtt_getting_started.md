@@ -29,6 +29,10 @@ todo
 
 . .NET
 
+using NuGet package M2Mqtt (https://www.nuget.org/packages/M2Mqtt/)
+
+<script src="https://gist.github.com/bertt/e7f30456a44e4e138ebf784bcddefad9"></script>
+
 todo
 
 . Python
