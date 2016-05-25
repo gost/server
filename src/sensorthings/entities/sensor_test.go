@@ -89,7 +89,7 @@ func TestGetSupportedEncodingSensor(t *testing.T) {
 	_, ok2 := encodings[EncodingSensorML.Code]
 
 	//assert
-	assert.Equal(t, 2, len(encodings), "Sensor should support 2 encodings")
+	assert.Equal(t, 3, len(encodings), "Sensor should support 2 encodings")
 	assert.Equal(t, true, ok, "Sensor should support EncodingPDF")
 	assert.Equal(t, true, ok2, "Sensor should support EncodingSensorML")
 }
