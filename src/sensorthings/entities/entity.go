@@ -68,7 +68,6 @@ var (
 	EncodingPDF      = EncodingType{2, "application/pdf"}
 	EncodingSensorML = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
 	EncodingTextHtml = EncodingType{4, "text/html"}
-
 )
 
 // EncodingValues is a list of names mapped to their EncodingValue

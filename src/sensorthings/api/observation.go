@@ -93,7 +93,7 @@ func (a *APIv1) PatchObservation(id string, observation *entities.Observation) (
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteObservation todo
+// DeleteObservation deletes a given Observation from the database
 func (a *APIv1) DeleteObservation(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteObservation(id)
 }

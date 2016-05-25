@@ -56,5 +56,5 @@ func (s *Sensor) SetLinks(externalURL string) {
 
 // GetSupportedEncoding returns the supported encoding tye for this entity
 func (s Sensor) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHtml.Code : EncodingTextHtml}
+	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHtml.Code: EncodingTextHtml}
 }

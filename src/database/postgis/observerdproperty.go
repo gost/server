@@ -117,3 +117,18 @@ func (gdb *GostDatabase) ObservedPropertyExists(thingID int) bool {
 
 	return result
 }
+
+// DeleteObservedProperty tries to delete a ObservedProperty by the given id
+func (gdb *GostDatabase) DeleteObservedProperty(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observedproperty WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

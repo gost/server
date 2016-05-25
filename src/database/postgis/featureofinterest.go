@@ -101,6 +101,21 @@ func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*
 	return featureOfInterests, nil
 }
 
+// DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id
+func (gdb *GostDatabase) DeleteFeatureOfInterest(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.featureofinterest WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // FeatureOfInterestExists checks if a FeatureOfInterest is present in the database based on a given id.
 func (gdb *GostDatabase) FeatureOfInterestExists(databaseID int) bool {
 	var result bool

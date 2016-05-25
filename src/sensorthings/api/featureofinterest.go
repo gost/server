@@ -77,7 +77,7 @@ func (a *APIv1) PatchFeatureOfInterest(id string, foi *entities.FeatureOfInteres
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteFeatureOfInterest todo
+// DeleteFeatureOfInterest deletes a given FeatureOfInterest from the database
 func (a *APIv1) DeleteFeatureOfInterest(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteFeatureOfInterest(id)
 }

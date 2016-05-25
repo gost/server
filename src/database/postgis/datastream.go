@@ -175,6 +175,21 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	return d, nil
 }
 
+// Delete tries to delete a Datastream by the given id
+func (gdb *GostDatabase) DeleteDatastream(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.datastream WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // DatastreamExists checks if a Datastream is present in the database based on a given id
 func (gdb *GostDatabase) DatastreamExists(databaseID int) bool {
 	var result bool

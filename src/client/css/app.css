@@ -95,6 +95,10 @@
     float: right;
 }
 
+.delete-entity{
+    color: #990000;
+}
+
 #observationChartWrapper{
     margin-top: 10px;
 }

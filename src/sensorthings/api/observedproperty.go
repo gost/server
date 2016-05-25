@@ -75,7 +75,7 @@ func (a *APIv1) PatchObservedProperty(id string, op *entities.ObservedProperty) 
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteObservedProperty todo
+// DeleteObservedProperty deletes a given ObservedProperty from the database
 func (a *APIv1) DeleteObservedProperty(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteObservedProperty(id)
 }

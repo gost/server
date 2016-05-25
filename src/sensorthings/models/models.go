@@ -104,6 +104,7 @@ type Database interface {
 	GetThingByHistoricalLocation(string) (*entities.Thing, error)
 	GetThings() ([]*entities.Thing, error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
+	DeleteThing(string) error
 
 	GetLocation(string) (*entities.Location, error)
 	GetLocations() ([]*entities.Location, error)
@@ -111,16 +112,19 @@ type Database interface {
 	GetLocationsByThing(string) ([]*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
 	LinkLocation(string, locationID string) error
+	DeleteLocation(string) error
 
 	GetObservedProperty(string) (*entities.ObservedProperty, error)
 	GetObservedPropertyByDatastream(string) (*entities.ObservedProperty, error)
 	GetObservedProperties() ([]*entities.ObservedProperty, error)
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
+	DeleteObservedProperty(string) error
 
 	GetSensor(string) (*entities.Sensor, error)
 	GetSensorByDatastream(string) (*entities.Sensor, error)
 	GetSensors() ([]*entities.Sensor, error)
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
+	DeleteSensor(string) error
 
 	GetDatastream(string) (*entities.Datastream, error)
 	GetDatastreams() ([]*entities.Datastream, error)
@@ -129,23 +133,27 @@ type Database interface {
 	GetDatastreamsBySensor(string) ([]*entities.Datastream, error)
 	GetDatastreamsByObservedProperty(string) ([]*entities.Datastream, error)
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
+	DeleteDatastream(string) error
 
 	GetFeatureOfInterest(string) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByObservation(string) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
+	DeleteFeatureOfInterest(string) error
 
 	GetObservation(string) (*entities.Observation, error)
 	GetObservations() ([]*entities.Observation, error)
 	GetObservationsByDatastream(string) ([]*entities.Observation, error)
 	GetObservationsByFeatureOfInterest(string) ([]*entities.Observation, error)
 	PostObservation(*entities.Observation) (*entities.Observation, error)
+	DeleteObservation(string) error
 
 	GetHistoricalLocation(string) (*entities.HistoricalLocation, error)
 	GetHistoricalLocations() ([]*entities.HistoricalLocation, error)
 	GetHistoricalLocationsByLocation(string) ([]*entities.HistoricalLocation, error)
 	GetHistoricalLocationsByThing(string) ([]*entities.HistoricalLocation, error)
 	PostHistoricalLocation(thingID string, locationID string) error
+	DeleteHistoricalLocation(string) error
 
 	ThingExists(thingID int) bool
 	LocationExists(thingID int) bool

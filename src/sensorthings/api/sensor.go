@@ -80,5 +80,5 @@ func (a *APIv1) PatchSensor(id string, sensor *entities.Sensor) (*entities.Senso
 
 // DeleteSensor deletes a sensor from the database by given sensor id
 func (a *APIv1) DeleteSensor(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteSensor(id)
 }

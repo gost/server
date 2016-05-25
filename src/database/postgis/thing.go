@@ -141,3 +141,18 @@ func (gdb *GostDatabase) ThingExists(thingID int) bool {
 
 	return result
 }
+
+// DeleteThing tries to delete a Thing by the given id
+func (gdb *GostDatabase) DeleteThing(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.thing WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

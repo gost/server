@@ -6,6 +6,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"log"
 )
 
 // PostLocation todo
@@ -39,12 +40,22 @@ func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location)
 	if len(thingID) != 0 {
 		err2 := a.LinkLocation(thingID, l.ID)
 		if err2 != nil {
+			err2 = a.DeleteLocation(l.ID)
+			if err2 != nil {
+				log.Printf("Error rolling back location %v", err2)
+			}
+
 			return nil, []error{err2}
 		}
 
-		err3 := a.PostHistoricalLocation(thingID, l.ID)
-		if err3 != nil {
-			return nil, err3
+		err = a.PostHistoricalLocation(thingID, l.ID)
+		if err != nil {
+			err2 = a.DeleteHistoricalLocation(l.ID)
+			if err2 != nil {
+				log.Printf("Error rolling back location %v", err2)
+			}
+
+			return nil, []error{err2}
 		}
 	}
 
@@ -102,9 +113,9 @@ func (a *APIv1) PatchLocation(id string, location *entities.Location) (*entities
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteLocation todo
+// DeleteLocation deletes a given Location from the database
 func (a *APIv1) DeleteLocation(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteLocation(id)
 }
 
 // LinkLocation links a thing with a location in the database

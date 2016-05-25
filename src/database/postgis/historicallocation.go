@@ -103,8 +103,8 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 		return fmt.Errorf("Thing(%s) does not exist", thingID)
 	}
 
-	lid, err2 := strconv.Atoi(thingID)
-	if !gdb.ThingExists(lid) || err2 != nil {
+	lid, err2 := strconv.Atoi(locationID)
+	if !gdb.LocationExists(lid) || err2 != nil {
 		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 
@@ -112,6 +112,21 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 	_, err3 := gdb.Db.Exec(sql, time.Now(), tid, lid)
 	if err3 != nil {
 		return err3
+	}
+
+	return nil
+}
+
+// DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id
+func (gdb *GostDatabase) DeleteHistoricalLocation(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.historicallocation WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
 	}
 
 	return nil

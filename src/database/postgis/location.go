@@ -126,6 +126,22 @@ func (gdb *GostDatabase) LocationExists(locationID int) bool {
 	return result
 }
 
+// DeleteLocation removes a given location from the database
+func (gdb *GostDatabase) DeleteLocation(locationID string) error {
+	intID, err := strconv.Atoi(locationID)
+	if err != nil {
+		return err
+	}
+
+	sql := fmt.Sprintf("DELETE FROM %s.location WHERE id = $1", gdb.Schema)
+	_, err = gdb.Db.Exec(sql, intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // LinkLocation links a thing with a location
 // fails when a thing or location cannot be found for the given id's
 func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
@@ -134,8 +150,8 @@ func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
 		return fmt.Errorf("Thing(%s) does not exist", thingID)
 	}
 
-	lid, err2 := strconv.Atoi(thingID)
-	if !gdb.ThingExists(lid) || err2 != nil {
+	lid, err2 := strconv.Atoi(locationID)
+	if !gdb.LocationExists(lid) || err2 != nil {
 		return fmt.Errorf("Location(%s) does not exist", locationID)
 	}
 

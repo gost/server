@@ -117,3 +117,18 @@ func (gdb *GostDatabase) SensorExists(thingID int) bool {
 
 	return result
 }
+
+// DeleteSensor tries to delete a Sensor by the given id
+func (gdb *GostDatabase) DeleteSensor(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.sensor WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

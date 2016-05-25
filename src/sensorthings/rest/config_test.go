@@ -1,17 +1,35 @@
 package rest
 
 import (
+	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
 func TestCreateEndPoints(t *testing.T) {
-	// todo add config tests...
-	// arrange
-	var a = 1
-	var b = 2
-	// act
-	var res = a + b
-	// assert
-	assert.Equal(t, 3, res, "computer error again")
+	//arrange
+	endpoints := CreateEndPoints("http://test.com")
+
+	//assert
+	assert.Equal(t, len(endpoints), 10)
+}
+
+func TestCreateEndPointVersion(t *testing.T) {
+	//arrange
+	ve := createVersion("http://test.com")
+
+	//assert
+	containsVersionPath := containsEndpoint("Version", ve.Operations)
+	assert.Equal(t, true, containsVersionPath, "Version endpoint needs to contain an endpoint containing the path Version")
+}
+
+func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
+	for _, o := range eps {
+		if strings.Contains(o.Path, "Version") {
+			return true
+		}
+	}
+
+	return false
 }

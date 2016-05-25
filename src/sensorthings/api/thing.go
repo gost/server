@@ -116,9 +116,9 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	return nt, nil
 }
 
-// DeleteThing todo
+// DeleteThing deletes a given Thing from the database
 func (a *APIv1) DeleteThing(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("delete thing not implemented yet"))
+	return a.db.DeleteThing(id)
 }
 
 // PatchThing todo

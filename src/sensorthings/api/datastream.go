@@ -102,7 +102,7 @@ func (a *APIv1) PatchDatastream(id string, datastream *entities.Datastream) (*en
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteDatastream todo
+// DeleteDatastream deletes a datastream from the database
 func (a *APIv1) DeleteDatastream(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteDatastream(id)
 }

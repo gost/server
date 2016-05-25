@@ -140,3 +140,18 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 
 	return o, nil
 }
+
+// DeleteObservation tries to delete a Observation by the given id
+func (gdb *GostDatabase) DeleteObservation(id string) error {
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observation WHERE id = $1", gdb.Schema), intID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

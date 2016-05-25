@@ -68,7 +68,7 @@ func (a *APIv1) PatchHistoricalLocation(id string, hl *entities.HistoricalLocati
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
-// DeleteHistoricalLocation todo
+// DeleteHistoricalLocation deletes a given HistoricalLocation from the database
 func (a *APIv1) DeleteHistoricalLocation(id string) error {
-	return gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.DeleteHistoricalLocation(id)
 }

@@ -6,6 +6,7 @@
             <th>Description</th>
             <th>Encoding</th>
             <th>Metadata</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -14,6 +15,7 @@
             <td>{{x["description"]}}</td>
             <td>{{x["encodingtype"]}}</td>
             <td>{{x["metadata"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteSensorClicked(x['@iot.id'])"></div></td>
         </tr>
         </tbody>
     </table>
