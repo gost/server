@@ -15,7 +15,7 @@ Mosquitto is an open source message broker that implements the MQTT protocol ver
 mosquitto_sub -h gost.geodan.nl -t "Datastreams(1)/Observations"
 ```
 
-. Desktop tool: MQTT.fx
+. Desktop tool: MQTT.fx (http://mqttfx.jfx4ee.org/)
 
 Connect to: gost.geodan.nl
 
