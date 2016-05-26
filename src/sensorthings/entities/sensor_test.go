@@ -42,7 +42,7 @@ func TestMandatoryParametersExistSensor(t *testing.T) {
 	_, err := sensor.ContainsMandatoryParams()
 
 	//assert
-	assert.Nil(t, err, "All mandatory params are filled in shoud not have returned an error")
+	assert.Nil(t, err, "All mandatory params are filled in should not have returned an error")
 }
 
 func TestParseEntityResultOkSensor(t *testing.T) {

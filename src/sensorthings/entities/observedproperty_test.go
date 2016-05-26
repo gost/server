@@ -42,7 +42,7 @@ func TestMandatoryParametersExistObservedProperty(t *testing.T) {
 	_, err := op.ContainsMandatoryParams()
 
 	//assert
-	assert.Nil(t, err, "All mandatory params are filled in shoud not have returned an error")
+	assert.Nil(t, err, "All mandatory params are filled in should not have returned an error")
 }
 
 func TestParseEntityResultOkObservedProperty(t *testing.T) {
@@ -83,6 +83,9 @@ func TestGetSupportedEncodingObservedProperty(t *testing.T) {
 	//arrange
 	op := &ObservedProperty{}
 
+	// act
+	supportedEncoding := op.GetSupportedEncoding()
+
 	//assert
-	assert.Equal(t, 0, len(op.GetSupportedEncoding()), "ObservedProperty shoud not supprt any encoding")
+	assert.Equal(t, 0, len(supportedEncoding), "ObservedProperty should not support any encoding")
 }

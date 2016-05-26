@@ -39,7 +39,7 @@ func TestMandatoryParametersExistThing(t *testing.T) {
 	_, err := thing.ContainsMandatoryParams()
 
 	//assert
-	assert.Nil(t, err, "All mandatory params are filled in shoud not have return an error")
+	assert.Nil(t, err, "All mandatory params are filled in should not have return an error")
 }
 
 func TestParseEntityResultOkThing(t *testing.T) {
@@ -83,5 +83,5 @@ func TestGetSupportedEncodingThing(t *testing.T) {
 	thing := &Thing{}
 
 	//assert
-	assert.Equal(t, 0, len(thing.GetSupportedEncoding()), "Thing shoud not supprt any encoding")
+	assert.Equal(t, 0, len(thing.GetSupportedEncoding()), "Thing should not support any encoding")
 }
