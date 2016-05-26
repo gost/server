@@ -26,4 +26,15 @@ gostApp.controller('ThingsCtrl', function ($scope, $http) {
             alert( "failure: " + JSON.stringify({data: data}));
         });
     };
+
+     $scope.deleteThingClicked = function (entity) {
+        var res = $http.delete(getUrl() + '/v1.0/Things(' + entity["@iot.id"] + ')');
+        res.success(function(data, status, headers, config) {
+            var index = $scope.thingsList.indexOf(entity);
+            $scope.thingsList.splice(index, 1);
+        });
+        res.error(function(data, status, headers, config) {
+            alert( "failure: " + JSON.stringify({data: data}));
+        });
+     };
 });

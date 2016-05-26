@@ -6,6 +6,7 @@
             <th>Description</th>
             <th>Name</th>
             <th>Definition</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -14,6 +15,7 @@
             <td>{{x["description"]}}</td>
             <td>{{x["name"]}}</td>
             <td>{{x["definition"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteObservedPropertyClicked(x)"></div></td>
         </tr>
         </tbody>
     </table>

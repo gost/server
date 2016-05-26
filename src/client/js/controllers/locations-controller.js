@@ -11,4 +11,15 @@ gostApp.controller('LocationsCtrl', function ($scope, $http) {
 
         zoomToGeoJSONLayerExtent();
     });
+
+     $scope.deleteLocationClicked = function (entity) {
+        var res = $http.delete(getUrl() + '/v1.0/Locations(' + entity["@iot.id"] + ')');
+        res.success(function(data, status, headers, config) {
+            var index = $scope.locationsList.indexOf(entity);
+            $scope.locationsList.splice(index, 1);
+        });
+        res.error(function(data, status, headers, config) {
+            alert( "failure: " + JSON.stringify({data: data}));
+        });
+     };
 });

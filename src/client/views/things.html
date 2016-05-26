@@ -5,13 +5,15 @@
             <th>ID</th>
             <th>Description</th>
             <th>Properties</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in thingsList" ng-click="thingClicked(x['@iot.id'])">
-            <td>{{x["@iot.id"]}}</td>
-            <td>{{x["description"]}}</td>
-            <td>{{x["properties"]}}</td>
+        <tr ng-repeat="x in thingsList" >
+            <td ng-click="thingClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-click="thingClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-click="thingClicked(x['@iot.id'])">{{x["properties"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteThingClicked(x)"></div></td>
         </tr>
         </tbody>
     </table>

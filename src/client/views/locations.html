@@ -6,6 +6,7 @@
             <th>Description</th>
             <th>Encoding</th>
             <th>Location</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
@@ -14,6 +15,7 @@
             <td>{{x["description"]}}</td>
             <td>{{x["encodingtype"]}}</td>
             <td>{{x["location"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteLocationClicked(x)"></div></td>
         </tr>
         </tbody>
     </table>

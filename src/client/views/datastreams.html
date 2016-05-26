@@ -6,14 +6,16 @@
             <th>Description</th>
             <th>Unit of Measurement</th>
             <th>Observed Area</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="x in datastreamsList" ng-click="datastreamClicked(x['@iot.id'])">
-            <td>{{x["@iot.id"]}}</td>
-            <td>{{x["description"]}}</td>
-            <td>{{x["unitOfMeasurement"]}}</td>
-            <td>{{x["observedArea"]}}</td>
+        <tr ng-repeat="x in datastreamsList" >
+            <td ng-click="datastreamClicked(x['@iot.id'])">{{x["@iot.id"]}}</td>
+            <td ng-click="datastreamClicked(x['@iot.id'])">{{x["description"]}}</td>
+            <td ng-click="datastreamClicked(x['@iot.id'])">{{x["unitOfMeasurement"]}}</td>
+            <td ng-click="datastreamClicked(x['@iot.id'])">{{x["observedArea"]}}</td>
+            <td><div class="fa fa-remove delete-entity" ng-click="deleteDatastreamClicked(x)"></div></td>
         </tr>
         </tbody>
     </table>
