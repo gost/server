@@ -1,4 +1,4 @@
-## GOST Configuration
+## Gost Configuration
 
 Default configuration file: config.yaml
 
