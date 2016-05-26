@@ -24,7 +24,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 [Gost configuration](docs/gost_configuration.md)
 
-## Sample requests
+## Samples
 
 HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 
 For a complete collection of working requests install Postman and import the [Postman file](test/GOST.json.postman_collection) 
