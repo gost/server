@@ -9,7 +9,7 @@ import (
 // FeatureOfInterest in SensorThings represents the phenomena an Observation is detecting. In some cases a FeatureOfInterest
 // can be the Location of the Sensor and therefore of the Observation. A FeatureOfInterest is linked to a single Observation
 type FeatureOfInterest struct {
-	ID              string                 `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf         string                 `json:"@iot.selfLink,omitempty"`
 	Description     string                 `json:"description,omitempty"`
 	EncodingType    string                 `json:"encodingtype,omitempty"`

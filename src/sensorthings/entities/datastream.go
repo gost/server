@@ -10,7 +10,7 @@ import (
 // data (Observations) to a single Datastream. A Datastream can have only one Sensor and that Sensor can only
 // sense one ObservedProperty.
 type Datastream struct {
-	ID                  string                 `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf             string                 `json:"@iot.selfLink,omitempty"`
 	Description         string                 `json:"description,omitempty"`
 	UnitOfMeasurement   map[string]interface{} `json:"unitOfMeasurement,omitempty"`

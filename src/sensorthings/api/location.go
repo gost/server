@@ -40,9 +40,9 @@ func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location)
 	if len(thingID) != 0 {
 		err2 := a.LinkLocation(thingID, l.ID)
 		if err2 != nil {
-			err2 = a.DeleteLocation(l.ID)
-			if err2 != nil {
-				log.Printf("Error rolling back location %v", err2)
+			err3 := a.DeleteLocation(l.ID)
+			if err3 != nil {
+				log.Printf("Error rolling back location %v", err3)
 			}
 
 			return nil, []error{err2}
@@ -50,9 +50,9 @@ func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location)
 
 		err = a.PostHistoricalLocation(thingID, l.ID)
 		if err != nil {
-			err2 = a.DeleteHistoricalLocation(l.ID)
-			if err2 != nil {
-				log.Printf("Error rolling back location %v", err2)
+			err3 := a.DeleteHistoricalLocation(l.ID)
+			if err3 != nil {
+				log.Printf("Error rolling back location %v", err3)
 			}
 
 			return nil, []error{err2}

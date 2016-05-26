@@ -85,12 +85,11 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 			return nil, err
 		}
 
-		l := entities.Location{
-			ID:           strconv.Itoa(sensorID),
-			Description:  description,
-			Location:     locationMap,
-			EncodingType: entities.EncodingValues[encodingtype].Value,
-		}
+		l := entities.Location{}
+		l.ID = strconv.Itoa(sensorID)
+		l.Description = description
+		l.Location = locationMap
+		l.EncodingType = entities.EncodingValues[encodingtype].Value
 
 		locations = append(locations, &l)
 	}

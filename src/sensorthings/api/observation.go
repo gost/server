@@ -84,7 +84,9 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 // PostObservationByDatastream creates a Datastream with given id for the Observation and calls PostObservation
 func (a *APIv1) PostObservationByDatastream(datastreamID string, observation *entities.Observation) (*entities.Observation, []error) {
-	observation.Datastream = &entities.Datastream{ID: datastreamID}
+	d := &entities.Datastream{}
+	d.ID = datastreamID
+	observation.Datastream = d
 	return a.PostObservation(observation)
 }
 

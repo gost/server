@@ -15,7 +15,7 @@ import (
 // thermostat (e.g., room temperature readings) should also be the building or the room. In this case, the content
 // of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type Location struct {
-	ID                     string                 `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	EncodingType           string                 `json:"encodingtype,omitempty"`

@@ -69,7 +69,8 @@ func TestParseEntityResultNotOkObservedProperty(t *testing.T) {
 
 func TestSetLinksSObservedProperty(t *testing.T) {
 	//arrange
-	op := &ObservedProperty{ID: id}
+	op := &ObservedProperty{}
+	op.ID = id
 
 	//act
 	op.SetLinks(externalURL)

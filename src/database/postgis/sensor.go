@@ -80,12 +80,12 @@ func processSensors(db *sql.DB, sql string, args ...interface{}) ([]*entities.Se
 			return nil, err
 		}
 
-		sensor := entities.Sensor{
-			ID:           strconv.Itoa(id),
-			Description:  description,
-			Metadata:     metadata,
-			EncodingType: entities.EncodingValues[encodingtype].Value,
-		}
+		sensor := entities.Sensor{}
+		sensor.ID = strconv.Itoa(id)
+		sensor.Description = description
+		sensor.Metadata = metadata
+		sensor.EncodingType = entities.EncodingValues[encodingtype].Value
+
 		sensors = append(sensors, &sensor)
 	}
 

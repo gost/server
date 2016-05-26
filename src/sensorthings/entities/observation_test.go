@@ -1,11 +1,12 @@
 package entities
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestGetEntityTypeReturnsCorrectType (t *testing.T) {
+func TestGetEntityTypeReturnsCorrectType(t *testing.T) {
 	//arrange
 	observation := &Observation{}
 
@@ -16,20 +17,20 @@ func TestGetEntityTypeReturnsCorrectType (t *testing.T) {
 	assert.Equal(t, EntityTypeObservation, entityType, "getEntityType should return correct type")
 }
 
-func TestSetLinksReturnsCorrectLinks (t *testing.T) {
+func TestSetLinksReturnsCorrectLinks(t *testing.T) {
 	// arrange
 	observation := &Observation{}
 
 	// act
-	observation.SetLinks( "www.nu.nl" )
+	observation.SetLinks("www.nu.nl")
 
 	// assert
-	assert.NotNil( t, observation.NavSelf, " NAvSelf should be filled in" )
-	assert.NotNil( t, observation.NavDatastream, " NavDatastream should be filled in" )
-	assert.NotNil( t, observation.NavFeatureOfInterest, " NavFeatureOfInterest should be filled in" )
+	assert.NotNil(t, observation.NavSelf, " NAvSelf should be filled in")
+	assert.NotNil(t, observation.NavDatastream, " NavDatastream should be filled in")
+	assert.NotNil(t, observation.NavFeatureOfInterest, " NavFeatureOfInterest should be filled in")
 }
 
-func TestGetSupportedEncodingShouldNotReturnAnyEncoding (t *testing.T) {
+func TestGetSupportedEncodingShouldNotReturnAnyEncoding(t *testing.T) {
 	// arrange
 	observation := &Observation{}
 
@@ -40,8 +41,7 @@ func TestGetSupportedEncodingShouldNotReturnAnyEncoding (t *testing.T) {
 	assert.Equal(t, 0, len(supportedEncoding), "Observation should not supprt any encoding")
 }
 
-
-func TestParseEntityShouldFail (t *testing.T){
+func TestParseEntityShouldFail(t *testing.T) {
 	//arrange
 	observation := &Observation{}
 
@@ -54,20 +54,19 @@ func TestParseEntityShouldFail (t *testing.T){
 
 func TestMissingMandatoryParametersObservation(t *testing.T) {
 	//arrange
-	// observation := &Observation{}
+	observation := &Observation{}
 
 	//act
-	// _, _ := observation.ContainsMandatoryParams()
+	ok, err := observation.ContainsMandatoryParams()
 
-	// todo: something goes wrong here?
-	// assert.False(t, ok)
-	// assert.NotNil(t, err, "Observation mandatory parameters not filled in should have returned error")
-	// if len(err) > 0 {
-	//	assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
-	//}
+	assert.False(t, ok)
+	assert.NotNil(t, err, "Observation mandatory parameters not filled in should have returned error")
+	if len(err) > 0 {
+		assert.Contains(t, fmt.Sprintf("%v", err[0]), "result")
+	}
 }
 
-func TestMarshalPostgresJSONReturnsSomething(t *testing.T){
+func TestMarshalPostgresJSONReturnsSomething(t *testing.T) {
 	// arrange
 	observation := &Observation{}
 
@@ -76,15 +75,16 @@ func TestMarshalPostgresJSONReturnsSomething(t *testing.T){
 
 	// assert
 
-	assert.NotNil(t,bytes)
+	assert.NotNil(t, bytes)
 }
 
 func TestMandatoryParametersExistObservation(t *testing.T) {
 	//arrange
 	observation := &Observation{
-		Result: 20,
+		Result:     20,
 		Datastream: &Datastream{},
 	}
+	observation.Datastream.ID = "1"
 
 	//act
 	ok, err := observation.ContainsMandatoryParams()
@@ -93,6 +93,3 @@ func TestMandatoryParametersExistObservation(t *testing.T) {
 	assert.Nil(t, err, "All mandatory params are filled in should not have returned an error")
 	assert.True(t, ok, "Observation mandatory parameters should be ok")
 }
-
-
-

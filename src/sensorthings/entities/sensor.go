@@ -9,7 +9,7 @@ import (
 // Sensor in SensorThings represents the physical device capable of observing a physical property and converting
 // it to an electrical impulse and be converted to a empirical value to represent a measurement value of the physical property
 type Sensor struct {
-	ID             string        `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf        string        `json:"@iot.selfLink,omitempty"`
 	Description    string        `json:"description,omitempty"`
 	EncodingType   string        `json:"encodingtype,omitempty"`
@@ -56,5 +56,5 @@ func (s *Sensor) SetLinks(externalURL string) {
 
 // GetSupportedEncoding returns the supported encoding tye for this entity
 func (s Sensor) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHtml.Code: EncodingTextHtml}
+	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHTML.Code: EncodingTextHTML}
 }

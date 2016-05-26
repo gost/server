@@ -11,7 +11,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 )
 
-// GetDatastream todo
+// GetDatastream retrieves a datastream by id
 func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -119,12 +119,12 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 			return nil, err
 		}
 
-		datastream := entities.Datastream{
-			ID:                strconv.Itoa(id),
-			Description:       description,
-			UnitOfMeasurement: unitOfMeasurementMap,
-			ObservedArea:      observedAreaMap,
-		}
+		datastream := entities.Datastream{}
+		datastream.ID = strconv.Itoa(id)
+		datastream.Description = description
+		datastream.UnitOfMeasurement = unitOfMeasurementMap
+		datastream.ObservedArea = observedAreaMap
+
 		datastreams = append(datastreams, &datastream)
 	}
 
@@ -175,7 +175,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	return d, nil
 }
 
-// Delete tries to delete a Datastream by the given id
+// DeleteDatastream tries to delete a Datastream by the given id
 func (gdb *GostDatabase) DeleteDatastream(id string) error {
 	intID, err := strconv.Atoi(id)
 	if err != nil {

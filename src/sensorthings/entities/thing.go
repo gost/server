@@ -11,7 +11,7 @@ import (
 // more Datastreams to collect Observations. A minimal Thing can be created without a Location and Datastream
 // and there are options to create a Things with a nested linked Location and Datastream.
 type Thing struct {
-	ID                     string                 `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	Properties             map[string]interface{} `json:"properties,omitempty"`

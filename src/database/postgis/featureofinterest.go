@@ -88,14 +88,13 @@ func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*
 			return nil, err
 		}
 
-		l := entities.FeatureOfInterest{
-			ID:           strconv.Itoa(ID),
-			Description:  description,
-			Feature:      featureMap,
-			EncodingType: entities.EncodingValues[encodingtype].Value,
-		}
+		foi := entities.FeatureOfInterest{}
+		foi.ID = strconv.Itoa(ID)
+		foi.Description = description
+		foi.Feature = featureMap
+		foi.EncodingType = entities.EncodingValues[encodingtype].Value
 
-		featureOfInterests = append(featureOfInterests, &l)
+		featureOfInterests = append(featureOfInterests, &foi)
 	}
 
 	return featureOfInterests, nil

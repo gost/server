@@ -69,7 +69,8 @@ func TestParseEntityResultNotOkSensor(t *testing.T) {
 
 func TestSetLinksSensor(t *testing.T) {
 	//arrange
-	sensor := &Sensor{ID: id}
+	sensor := &Sensor{}
+	sensor.ID = id
 
 	//act
 	sensor.SetLinks(externalURL)

@@ -68,9 +68,15 @@ func TestCheckMandatoryParamNoErrors(t *testing.T) {
 
 	testString := "test"
 	testMap := map[string]string{"test": "test"}
-	testThing := &Sensor{ID: "1"}
-	testSensor := &Sensor{ID: "1"}
-	testObservedProperty := &ObservedProperty{ID: "1"}
+
+	testThing := &Sensor{}
+	testThing.ID = "1"
+
+	testSensor := &Sensor{}
+	testSensor.ID = "1"
+
+	testObservedProperty := &ObservedProperty{}
+	testObservedProperty.ID = "1"
 
 	//act
 	CheckMandatoryParam(&errLis1, testString, et, "test")

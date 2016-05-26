@@ -19,6 +19,7 @@ const (
 	EntityTypeObservedProperty   EntityType = "ObservedProperty"
 	EntityTypeObservation        EntityType = "Observation"
 	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
+	EntityTypeUnknown            EntityType = "Unknown"
 )
 
 // ToString return the string representation of the EntityType.
@@ -40,6 +41,36 @@ const (
 	EntityLinkObservations        EntityLink = "Observations"
 	EntityLinkFeatureOfInterests  EntityLink = "FeatureOfInterests"
 )
+
+// BaseEntity is the entry point for an entity
+type BaseEntity struct {
+	ID string `json:"@iot.id,omitempty"`
+}
+
+// ParseEntity defined to implement Entity
+func (b *BaseEntity) ParseEntity(data []byte) error {
+	return nil
+}
+
+// ContainsMandatoryParams defined to implement Entity
+func (b *BaseEntity) ContainsMandatoryParams() (bool, []error) {
+	return false, nil
+}
+
+// SetLinks defined to implement Entity
+func (b *BaseEntity) SetLinks(externalURL string) error {
+	return nil
+}
+
+// GetEntityType defined to implement Entity
+func (b *BaseEntity) GetEntityType() EntityType {
+	return EntityTypeUnknown
+}
+
+// GetSupportedEncoding defined to implement Entity
+func (b *BaseEntity) GetSupportedEncoding() map[int]EncodingType {
+	return nil
+}
 
 // ToString return the string representation of the EntityLink.
 func (e EntityLink) ToString() string {
@@ -67,7 +98,7 @@ var (
 	EncodingGeoJSON  = EncodingType{1, "application/vnd.geo+json"}
 	EncodingPDF      = EncodingType{2, "application/pdf"}
 	EncodingSensorML = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
-	EncodingTextHtml = EncodingType{4, "text/html"}
+	EncodingTextHTML = EncodingType{4, "text/html"}
 )
 
 // EncodingValues is a list of names mapped to their EncodingValue
@@ -76,7 +107,7 @@ var EncodingValues = []EncodingType{
 	EncodingGeoJSON,
 	EncodingPDF,
 	EncodingSensorML,
-	EncodingTextHtml}
+	EncodingTextHTML}
 
 // CreateEncodingType returns the int representation for a given encoding, returns an error when encoding is not supported
 func CreateEncodingType(encoding string) (EncodingType, error) {
@@ -93,32 +124,65 @@ func CreateEncodingType(encoding string) (EncodingType, error) {
 // given list of errors.
 func CheckMandatoryParam(errorList *[]error, param interface{}, entityType EntityType, paramName string) {
 	isNil := false
-	switch t := param.(type) {
-	case string:
-		if len(t) == 0 {
-			isNil = true
+
+	if param != nil {
+		switch t := param.(type) {
+		case string:
+			if len(t) == 0 {
+				isNil = true
+			}
+			break
+		case map[string]string:
+			if len(t) == 0 {
+				isNil = true
+			}
+			break
+		case *Thing:
+			var contains bool
+			if t != nil {
+				contains, _ = t.ContainsMandatoryParams()
+			}
+
+			if t == nil || (len(t.ID) == 0 && !contains) {
+				isNil = true
+			}
+			break
+		case *Sensor:
+			var contains bool
+			if t != nil {
+				contains, _ = t.ContainsMandatoryParams()
+			}
+
+			if t == nil || (len(t.ID) == 0 && !contains) {
+
+				isNil = true
+			}
+			break
+		case *ObservedProperty:
+			var contains bool
+			if t != nil {
+				contains, _ = t.ContainsMandatoryParams()
+			}
+
+			if t == nil || (len(t.ID) == 0 && !contains) {
+
+				isNil = true
+			}
+			break
+		case *Datastream:
+			var contains bool
+			if t != nil {
+				contains, _ = t.ContainsMandatoryParams()
+			}
+
+			if t == nil || (len(t.ID) == 0 && !contains) {
+
+				isNil = true
+			}
+			break
 		}
-		break
-	case map[string]string:
-		if len(t) == 0 {
-			isNil = true
-		}
-		break
-	case *Thing:
-		if t == nil || len(t.ID) == 0 {
-			isNil = true
-		}
-		break
-	case *Sensor:
-		if t == nil || len(t.ID) == 0 {
-			isNil = true
-		}
-		break
-	case *ObservedProperty:
-		if t == nil || len(t.ID) == 0 {
-			isNil = true
-		}
-		break
+	} else {
+		isNil = true
 	}
 
 	err := *errorList

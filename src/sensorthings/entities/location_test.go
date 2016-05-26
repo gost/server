@@ -75,7 +75,8 @@ func TestParseEntityResultNotOkLocation(t *testing.T) {
 
 func TestSetLinksLocation(t *testing.T) {
 	//arrange
-	location := &Location{ID: id}
+	location := &Location{}
+	location.ID = id
 
 	//act
 	location.SetLinks(externalURL)

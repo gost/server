@@ -80,12 +80,11 @@ func processObservedProperties(db *sql.DB, sql string, args ...interface{}) ([]*
 			return nil, err2
 		}
 
-		op := entities.ObservedProperty{
-			ID:          strconv.Itoa(opID),
-			Name:        name,
-			Definition:  definition,
-			Description: description,
-		}
+		op := entities.ObservedProperty{}
+		op.ID = strconv.Itoa(opID)
+		op.Name = name
+		op.Definition = definition
+		op.Description = description
 
 		observedProperties = append(observedProperties, &op)
 	}

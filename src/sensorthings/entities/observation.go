@@ -12,7 +12,7 @@ import (
 // Observations to a specified Datastream. An Observation requires a FeaturOfInterest entity, if none is provided in the request,
 // the Location of the Thing associated with the Datastream, will be assigned to the new Observation as the FeaturOfInterest.
 type Observation struct {
-	ID                   string                 `json:"@iot.id,omitempty"`
+	BaseEntity
 	NavSelf              string                 `json:"@iot.selfLink,omitempty"`
 	PhenomenonTime       string                 `json:"phenomenonTime,omitempty"`
 	Result               interface{}            `json:"result,omitempty"`

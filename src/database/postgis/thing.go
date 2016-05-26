@@ -45,7 +45,7 @@ func (gdb *GostDatabase) GetThingsByLocation(id string) ([]*entities.Thing, erro
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select thing.id, thing.description, thing.properties from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id	INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE thing.id = $1;", gdb.Schema, gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select thing.id, thing.description, thing.properties from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id	INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = $1;", gdb.Schema, gdb.Schema, gdb.Schema)
 	return processThings(gdb.Db, sql, tID)
 }
 
@@ -103,11 +103,10 @@ func processThings(db *sql.DB, sql string, args ...interface{}) ([]*entities.Thi
 			return nil, err
 		}
 
-		thing := entities.Thing{
-			ID:          strconv.Itoa(thingID),
-			Description: description,
-			Properties:  propMap,
-		}
+		thing := entities.Thing{}
+		thing.ID = strconv.Itoa(thingID)
+		thing.Description = description
+		thing.Properties = propMap
 
 		things = append(things, &thing)
 	}

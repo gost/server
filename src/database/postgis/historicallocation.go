@@ -84,10 +84,10 @@ func processHistoricalLocations(db *sql.DB, sql string, args ...interface{}) ([]
 			return nil, err
 		}
 
-		datastream := entities.HistoricalLocation{
-			ID:   strconv.Itoa(id),
-			Time: time,
-		}
+		datastream := entities.HistoricalLocation{}
+		datastream.ID = strconv.Itoa(id)
+		datastream.Time = time
+
 		hls = append(hls, &datastream)
 	}
 
