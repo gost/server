@@ -1,6 +1,9 @@
 
 ### Gost installation 
 
+
+## Build from Source
+
 1) Install GoLang (https://golang.org/)<br />
 2) Install Postgresql (http://www.postgresql.org/) and PostGIS <br />
 Create a database and run "CREATE EXTENSION postgis;" on it<br />
@@ -27,5 +30,6 @@ go run main.go
 
 8) In browser open http://localhost:8080/v1.0 to test if the server is running
 
-<br /><br />
-Or try [scripts/ubuntu_install.sh](scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
+## Build from install script
+
+Use  [scripts/ubuntu_install.sh](scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
