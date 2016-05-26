@@ -10,11 +10,12 @@ GOST (Go-SensorThings) is a sensor server written in Go. It implements the [OGC 
 
 ## Disclaimer
 
-GOST is alpha software and is not considered appropriate for customer use. Feel free to help development :-)
+GOST is alpha software and is not (yet) considered appropriate for customer use. Feel free to help development :-)
 
 ## Binaries
 
-Release 0.1: 2016-05-11 [https://github.com/Geodan/gost/releases/tag/0.1](https://github.com/Geodan/gost/releases/tag/0.1)
+Release 0.1: 2016-05-11 [https://github.com/Geodan/gost/releases/tag/0.1] (https://github.com/Geodan/gost/releases/tag/0.1)
+
 Binaries are build for Windows, Ubuntu and OSX.
 
 ## Installation and configuration
