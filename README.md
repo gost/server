@@ -20,9 +20,9 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## Installation and configuration
 
-For installation of Gost see (docs/gost_installation.md)
+[Gost installation](docs/gost_installation.md)
 
-For configuration of Gost see (docs/gost_configuration.md)
+[Gost configuration](docs/gost_configuration.md)
 
 ## Sample requests
 
