@@ -13,7 +13,6 @@ import (
 // are generated based upon this URL
 func CreateEndPoints(externalURL string) []models.Endpoint {
 	endpoints := []models.Endpoint{
-		createVersion(externalURL),
 		createRoot(externalURL),
 		createThings(externalURL),
 		createDatastreams(externalURL),
