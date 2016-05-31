@@ -12,7 +12,7 @@ type Sensor struct {
 	BaseEntity
 	NavSelf        string        `json:"@iot.selfLink,omitempty"`
 	Description    string        `json:"description,omitempty"`
-	EncodingType   string        `json:"encodingtype,omitempty"`
+	EncodingType   string        `json:"encodingType,omitempty"`
 	Metadata       string        `json:"metadata,omitempty"`
 	NavDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty"`
 	Datastreams    []*Datastream `json:"Datastreams,omitempty"`

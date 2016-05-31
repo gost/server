@@ -18,7 +18,7 @@ type Location struct {
 	BaseEntity
 	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
 	Description            string                 `json:"description,omitempty"`
-	EncodingType           string                 `json:"encodingtype,omitempty"`
+	EncodingType           string                 `json:"encodingType,omitempty"`
 	Location               map[string]interface{} `json:"location,omitempty"`
 	NavThings              string                 `json:"Things@iot.navigationLink,omitempty"`
 	NavHistoricalLocations string                 `json:"HistoricalLocations@iot.navigationLink,omitempty"`
