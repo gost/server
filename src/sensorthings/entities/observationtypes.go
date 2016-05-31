@@ -1,9 +1,10 @@
 package entities
 
 import (
+	"errors"
 )
 
-// ObservationType
+// ObservationType holds the information on a EncodingType
 type ObservationType struct {
 	Code int
 	Value string
@@ -23,3 +24,14 @@ var ObservationTypes = []ObservationType{
 	OMMeasurement,
 	OMObservation,
 	OMTruthObservation}
+
+// Get the observationType based on value, returns error
+func GetObservationTypeByValue(observationType string) (ObservationType, error) {
+	for _, k := range ObservationTypes {
+		if k.Value == observationType {
+			return k, nil
+		}
+	}
+
+	return OMCategoryObservation, errors.New("ObservationType not supported")
+}
