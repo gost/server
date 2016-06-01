@@ -31,16 +31,16 @@ Gost is being tested with the OGC SensorThings API Test Suite [https://github.co
 
 Gost Compliance Testing Status:
 
-| Conformance Class                     | Reference | Test Class                                 | Status                   |
-|---------------------------------------|-----------|--------------------------------------------|--------------------------| 
-| Sensing Core                          | A.1       | sta10.sensingCore.Capability1Tests         | Issues identified        |
-| Filtering Extension                   | A.2       | sta10.filteringExtension.Capability3Tests  | Testing not started      |
-| Create-Update-Delete                  | A.3       | sta10.createUpdateDelete.Capability2Tests  | Issues identified        |
-| Batch Request                         | A.4       | -                                          | Tests not implemented    |
-| Sensing MultiDatastream Extension     | A.5       | -                                          | Tests not implemented    |
-| Sensing Data Array Extension          | A.6       | -                                          | Tests not implemented    |
-| MQTT Extension for Create and Update  | A.7       | -                                          | Tests not implemented    |
-| MQTT Extension for Receiving Updates  | A.8       | -                                          | Tests not implemented    |
+| Conformance Class                     | Reference | Implementation status | Test Class                                 | Test Status              |
+|---------------------------------------|-----------|-----------------------|--------------------------------------------|--------------------------| 
+| Sensing Core                          | A.1       | partly                | sta10.sensingCore.Capability1Tests         | Issues identified        |
+| Filtering Extension                   | A.2       | partly                | sta10.filteringExtension.Capability3Tests  | Testing not started      |
+| Create-Update-Delete                  | A.3       | partly                | sta10.createUpdateDelete.Capability2Tests  | Issues identified        |
+| Batch Request                         | A.4       | -                     | -                                          | Tests not implemented    |
+| Sensing MultiDatastream Extension     | A.5       | -                     | -                                          | Tests not implemented    |
+| Sensing Data Array Extension          | A.6       | -                     | -                                          | Tests not implemented    |
+| MQTT Extension for Create and Update  | A.7       | partly                | -                                          | Tests not implemented    |
+| MQTT Extension for Receiving Updates  | A.8       | partly                | -                                          | Tests not implemented    |
 
 ## Installation and configuration
 
