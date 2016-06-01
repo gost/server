@@ -42,14 +42,6 @@ Gost Compliance Testing Status:
 | MQTT Extension for Create and Update  | A.7       | -                                          | Tests Not implemented    |
 | MQTT Extension for Receiving Updates  | A.8       | -                                          | Tests Not implemented    |
 
-A.2 Filtering Extension Conformance: Testing not started yet
-
-A.3 Create Update Delete Conformance: Some issues identified
-
-
-
-
-
 ## Installation and configuration
 
 [Gost installation](docs/gost_installation.md)
