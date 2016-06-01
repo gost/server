@@ -13,6 +13,7 @@ import (
 // are generated based upon this URL
 func CreateEndPoints(externalURL string) []models.Endpoint {
 	endpoints := []models.Endpoint{
+		createVersion(externalURL),
 		createRoot(externalURL),
 		createThings(externalURL),
 		createDatastreams(externalURL),
@@ -27,30 +28,33 @@ func CreateEndPoints(externalURL string) []models.Endpoint {
 	return endpoints
 }
 
-func createVersion(externalURL string) *Endpoint {
-	return &Endpoint{
-		Name: "Version",
-		URL:  fmt.Sprintf("%s/%s", externalURL, "Version"),
-		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/Version", HandleVersion},
-		},
-	}
-}
-
 func createRoot(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Root",
-		URL:  fmt.Sprintf("%s/%s", externalURL, "v1.0"),
+		Name:       "Root",
+		OutputInfo: false,
+		URL:        fmt.Sprintf("%s/%s", externalURL, "v1.0"),
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0", HandleAPIRoot},
 		},
 	}
 }
 
+func createVersion(externalURL string) *Endpoint {
+	return &Endpoint{
+		Name:       "Version",
+		OutputInfo: false,
+		URL:        fmt.Sprintf("%s/%s", externalURL, "Version"),
+		Operations: []models.EndpointOperation{
+			{models.HTTPOperationGet, "/Version", HandleVersion},
+		},
+	}
+}
+
 func createThings(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Things",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Things")),
+		Name:       "Things",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Things")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -82,8 +86,9 @@ func createThings(externalURL string) *Endpoint {
 
 func createDatastreams(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Datastreams",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Datastreams")),
+		Name:       "Datastreams",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Datastreams")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -123,8 +128,9 @@ func createDatastreams(externalURL string) *Endpoint {
 
 func createObservedProperties(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "ObservedProperties",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "ObservedProperties")),
+		Name:       "ObservedProperties",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "ObservedProperties")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -151,8 +157,9 @@ func createObservedProperties(externalURL string) *Endpoint {
 
 func createLocations(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Locations",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Locations")),
+		Name:       "Locations",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Locations")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
@@ -183,8 +190,9 @@ func createLocations(externalURL string) *Endpoint {
 
 func createSensors(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Sensors",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Sensors")),
+		Name:       "Sensors",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Sensors")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -211,8 +219,9 @@ func createSensors(externalURL string) *Endpoint {
 
 func createObservations(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "Observations",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Observations")),
+		Name:       "Observations",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Observations")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -242,8 +251,9 @@ func createObservations(externalURL string) *Endpoint {
 
 func createFeaturesOfInterest(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "FeaturesOfInterest",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "FeaturesOfInterest")),
+		Name:       "FeaturesOfInterest",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "FeaturesOfInterest")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,
@@ -270,8 +280,9 @@ func createFeaturesOfInterest(externalURL string) *Endpoint {
 
 func createHistoricalLocations(externalURL string) *Endpoint {
 	return &Endpoint{
-		Name: "HistoricalLocations",
-		URL:  fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "HistoricalLocations")),
+		Name:       "HistoricalLocations",
+		OutputInfo: true,
+		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "HistoricalLocations")),
 		SupportedQueryOptions: []odata.QueryOptionType{
 			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
 			odata.QueryOptionExpand, odata.QueryOptionSelect,

@@ -12,7 +12,7 @@ func TestCreateEndPoints(t *testing.T) {
 	endpoints := CreateEndPoints("http://test.com")
 
 	//assert
-	assert.Equal(t, len(endpoints), 9)
+	assert.Equal(t, 10, len(endpoints))
 }
 
 func TestCreateEndPointVersion(t *testing.T) {

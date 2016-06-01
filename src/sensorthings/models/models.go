@@ -174,6 +174,7 @@ type Endpoint interface {
 	GetSupportedQueryOptions() []odata.QueryOptionType
 	GetSupportedExpandParams() []string
 	GetSupportedSelectParams() []string
+	ShowOutputInfo() bool
 	SupportsQueryOptionType(queryOptionType odata.QueryOptionType) bool
 	AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (bool, []error)
 }

@@ -13,6 +13,7 @@ import (
 type Endpoint struct {
 	Name                  string                     `json:"name"` // Name of the endpoint
 	URL                   string                     `json:"url"`  // External URL to the endpoint
+	OutputInfo            bool                       `json:"-"`    //Output when BasePathInfo is requested by the user
 	Operations            []models.EndpointOperation `json:"-"`
 	SupportedQueryOptions []odata.QueryOptionType    `json:"-"`
 	SupportedExpandParams []string                   `json:"-"`
@@ -22,6 +23,11 @@ type Endpoint struct {
 // GetName returns the endpoint name
 func (e *Endpoint) GetName() string {
 	return e.Name
+}
+
+// GetName returns the endpoint name
+func (e *Endpoint) ShowOutputInfo() bool {
+	return e.OutputInfo
 }
 
 // GetURL returns the external url

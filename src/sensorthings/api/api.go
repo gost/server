@@ -44,9 +44,17 @@ func (a *APIv1) GetVersionInfo() *models.VersionInfo {
 
 // GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
 func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
-	var ep interface{} = a.GetEndpoints()
+	bpi := []models.Endpoint{}
+	ep := *a.GetEndpoints()
+	for _, e := range ep {
+		if e.ShowOutputInfo() {
+			bpi = append(bpi, e)
+		}
+	}
+
+	var i interface{} = bpi
 	basePathInfo := models.ArrayResponse{
-		Data: &ep,
+		Data: &i,
 	}
 
 	return &basePathInfo
