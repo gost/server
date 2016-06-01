@@ -32,4 +32,4 @@ go run main.go
 
 ## Build from install script
 
-Use  [scripts/ubuntu_install.sh](scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
+Use  [../scripts/ubuntu_install.sh](../scripts/ubuntu_install.sh) to install and run the latest version of GOST (including dependencies) - Tested on a clean Ubuntu 16.04 LTS installation.
