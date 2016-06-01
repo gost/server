@@ -34,8 +34,8 @@ Gost Compliance Testing Status:
 | Conformance Class                     | Reference | Test Class                                 | Status                   |
 |---------------------------------------|-----------|--------------------------------------------|--------------------------| 
 | Sensing Core                          | A.1       | sta10.sensingCore.Capability1Tests         | Issues identified        |
-| Filtering Extension                   | A.2       | sta10.createUpdateDelete.Capability2Tests  | Testing not started      |
-| Create-Update-Delete                  | A.3       | sta10.filteringExtension.Capability3Tests  | Issues identified        |
+| Filtering Extension                   | A.2       | sta10.filteringExtension.Capability3Tests  | Testing not started      |
+| Create-Update-Delete                  | A.3       | sta10.createUpdateDelete.Capability2Tests  | Issues identified        |
 | Batch Request                         | A.4       | -                                          | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                                          | Tests not implemented    |
 | Sensing Data Array Extension          | A.6       | -                                          | Tests not implemented    |
