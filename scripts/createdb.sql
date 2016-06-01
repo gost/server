@@ -5,7 +5,7 @@ SET search_path = %s;
 
 CREATE TABLE featureofinterest
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   description character varying(255),
   encodingtype integer,
   feature public.geometry,
@@ -17,7 +17,7 @@ WITH (
 
 CREATE TABLE thing
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   description character varying(255),
   properties jsonb,
   CONSTRAINT thing_pkey PRIMARY KEY (id)
@@ -28,7 +28,7 @@ WITH (
 
 CREATE TABLE location
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   description character varying(255),
   encodingtype integer,
   location public.geometry,
@@ -40,8 +40,8 @@ WITH (
 
 CREATE TABLE thing_to_location
 (
-  thing_id integer,
-  location_id integer,
+  thing_id bigint,
+  location_id bigint,
   CONSTRAINT fk_location_1 FOREIGN KEY (location_id)
       REFERENCES location (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE,
@@ -65,9 +65,9 @@ CREATE INDEX fki_thing_1
 
 CREATE TABLE historicallocation
 (
-  id serial NOT NULL,
-  thing_id integer,
-  location_id integer,
+  id bigserial NOT NULL,
+  thing_id bigint,
+  location_id bigint,
   "time" timestamp with time zone,
   CONSTRAINT historicallocation_pkey PRIMARY KEY (id),
   CONSTRAINT fk_location FOREIGN KEY (location_id)
@@ -83,7 +83,7 @@ WITH (
 
 CREATE TABLE sensor
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   description character varying(255),
   encodingtype integer,
   metadata character varying(255),
@@ -95,7 +95,7 @@ WITH (
 
 CREATE TABLE observedproperty
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   name character varying(120),
   definition character varying(255),
   description character varying(255),
@@ -115,9 +115,9 @@ CREATE TABLE datastream
   observedarea public.geometry,
   phenomenontime tstzrange,
   resulttime tstzrange,
-  thing_id integer,
-  sensor_id integer,
-  observedproperty_id integer,
+  thing_id bigint,
+  sensor_id bigint,
+  observedproperty_id bigint,
   CONSTRAINT datastream_pkey PRIMARY KEY (id),
   CONSTRAINT fk_observedproperty FOREIGN KEY (observedproperty_id)
       REFERENCES observedproperty (id) MATCH SIMPLE
@@ -157,10 +157,10 @@ CREATE SEQUENCE observations_id_seq
 
 CREATE UNLOGGED TABLE observation
 (
-  id integer NOT NULL DEFAULT nextval('observations_id_seq'::regclass),
+  id bigint NOT NULL DEFAULT nextval('observations_id_seq'::regclass),
   data jsonb,
-  stream_id integer,
-  featureofinterest_id integer,
+  stream_id bigint,
+  featureofinterest_id bigint,
   CONSTRAINT fk_datastream FOREIGN KEY (stream_id)
       REFERENCES datastream (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE,

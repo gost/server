@@ -547,7 +547,7 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 	handle := *h
 	err := handle()
 	if err != nil {
-		sendError(w, []error{gostErrors.NewBadRequestError(err)})
+		sendError(w, []error{err})
 		return
 	}
 

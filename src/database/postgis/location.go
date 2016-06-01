@@ -133,9 +133,13 @@ func (gdb *GostDatabase) DeleteLocation(locationID string) error {
 	}
 
 	sql := fmt.Sprintf("DELETE FROM %s.location WHERE id = $1", gdb.Schema)
-	_, err = gdb.Db.Exec(sql, intID)
+	r, err := gdb.Db.Exec(sql, intID)
 	if err != nil {
 		return err
+	}
+
+	if c, _ := r.RowsAffected(); c == 0 {
+		return gostErrors.NewRequestNotFound(errors.New("Location not found"))
 	}
 
 	return nil

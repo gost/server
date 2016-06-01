@@ -124,9 +124,13 @@ func (gdb *GostDatabase) DeleteObservedProperty(id string) error {
 		return err
 	}
 
-	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observedproperty WHERE id = $1", gdb.Schema), intID)
+	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observedproperty WHERE id = $1", gdb.Schema), intID)
 	if err != nil {
 		return err
+	}
+
+	if c, _ := r.RowsAffected(); c == 0 {
+		return gostErrors.NewRequestNotFound(errors.New("ObservedProperty not found"))
 	}
 
 	return nil

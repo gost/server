@@ -125,9 +125,13 @@ func (gdb *GostDatabase) DeleteSensor(id string) error {
 		return err
 	}
 
-	_, err = gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.sensor WHERE id = $1", gdb.Schema), intID)
+	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.sensor WHERE id = $1", gdb.Schema), intID)
 	if err != nil {
 		return err
+	}
+
+	if c, _ := r.RowsAffected(); c == 0 {
+		return gostErrors.NewRequestNotFound(errors.New("Sensor not found"))
 	}
 
 	return nil
