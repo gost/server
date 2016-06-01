@@ -1,4 +1,15 @@
-drop schema v1 cascade;
+DO $$
+BEGIN
+     IF EXISTS(
+        SELECT schema_name
+          FROM information_schema.schemata
+          WHERE schema_name = 'v1'
+      )
+    THEN
+      EXECUTE 'drop schema v1 cascade';
+    END IF;
+END
+$$;
 
 CREATE SCHEMA %s;
 SET search_path = %s;
