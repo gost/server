@@ -36,11 +36,11 @@ Gost Compliance Testing Status:
 | Sensing Core                          | A.1       | sta10.sensingCore.Capability1Tests         | Issues identified        |
 | Filtering Extension                   | A.2       | sta10.createUpdateDelete.Capability2Tests  | Issues identified        |
 | Create-Update-Delete                  | A.3       | sta10.filteringExtension.Capability3Tests  | Testing not started      |
-| Batch Request                         | A.4       | -                                          | Tests Not implemented    |
-| Sensing MultiDatastream Extension     | A.5       | -                                          | Tests Not implemented    |
-| Sensing Data Array Extension          | A.6       | -                                          | Tests Not implemented    |
-| MQTT Extension for Create and Update  | A.7       | -                                          | Tests Not implemented    |
-| MQTT Extension for Receiving Updates  | A.8       | -                                          | Tests Not implemented    |
+| Batch Request                         | A.4       | -                                          | Tests not implemented    |
+| Sensing MultiDatastream Extension     | A.5       | -                                          | Tests not implemented    |
+| Sensing Data Array Extension          | A.6       | -                                          | Tests not implemented    |
+| MQTT Extension for Create and Update  | A.7       | -                                          | Tests not implemented    |
+| MQTT Extension for Receiving Updates  | A.8       | -                                          | Tests not implemented    |
 
 ## Installation and configuration
 
