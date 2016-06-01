@@ -27,7 +27,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## OGC Compliance testing
 
-Gost is being tested with the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
+Gost is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
 
 Gost Compliance Testing Status:
 
