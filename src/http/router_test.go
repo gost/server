@@ -23,3 +23,18 @@ func TestCreateRouter(t *testing.T) {
 	// assert
 	assert.NotNil(t, router, "Router should be created")
 }
+
+func TestDashboardRedirects(t *testing.T) {
+	// arrange
+	cfg := configuration.Config{}
+	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	a := api.NewAPI(database, cfg, mqttServer)
+	router := CreateRouter(&a)
+
+	// act
+	setDashboardRedirects(router)
+
+	// assert
+	assert.NotNil(t, router.Methods, "router should have methods for dasthboard redirects")
+}
