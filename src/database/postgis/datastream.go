@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream where id = $1", gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream where id = $1", gdb.Schema)
 	datastream, err := processDatastream(gdb.Db, sql, intID)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 
 // GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
-	sql := fmt.Sprintf("select id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream", gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream", gdb.Schema)
 	return processDatastreams(gdb.Db, sql)
 }
 
@@ -40,7 +40,7 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID string) (*enti
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = $1", gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastream(gdb.Db, sql, tID)
 }
 
@@ -51,7 +51,7 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Data
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, odatastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
@@ -62,7 +62,7 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string) ([]*entities.Da
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = $1", gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
@@ -73,7 +73,7 @@ func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string) ([]*entiti
 		return nil, err
 	}
 
-	sql := fmt.Sprintf("select datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = $1", gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
@@ -103,8 +103,9 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 		var id int
 		var description, unitofmeasurement string
 		var observedarea *string
+		var ot int
 
-		err := rows.Scan(&id, &description, &unitofmeasurement, &observedarea)
+		err := rows.Scan(&ot, &id, &description, &unitofmeasurement, &observedarea)
 		if err != nil {
 			return nil, err
 		}
@@ -124,6 +125,8 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 		datastream.Description = description
 		datastream.UnitOfMeasurement = unitOfMeasurementMap
 		datastream.ObservedArea = observedAreaMap
+		obs, _ := entities.GetObservationTypeById(ot)
+		datastream.ObservationType = obs.Value
 
 		datastreams = append(datastreams, &datastream)
 	}
@@ -134,7 +137,6 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 // PostDatastream todo
 // TODO: !!!!ADD phenomenonTime SUPPORT!!!!
 // TODO: !!!!ADD resulttime SUPPORT!!!!
-// TODO: !!!!ADD observationtype SUPPORT!!!!
 func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datastream, error) {
 	var dsID int
 	tID, err := strconv.Atoi(d.Thing.ID)
