@@ -1,6 +1,9 @@
 package odata
 
-import "strings"
+import (
+	"github.com/bugsnag/bugsnag-go/errors"
+	"strings"
+)
 
 // QuerySelect is used to return only the entity property values desired, this is used
 // help to reduce the amount of information in a response from the server.
@@ -19,7 +22,20 @@ func (q *QuerySelect) Parse(value string) error {
 
 // IsValid checks if the given $select values are supported for the endpoint
 func (q *QuerySelect) IsValid(values []string) (bool, error) {
-	//ToDo: check if select values are valid for endpoint
+	for _, rp := range q.Params {
+		found := false
+		for _, hp := range values {
+			if rp == hp {
+				found = true
+			}
+		}
+
+		if !found {
+			return false, errors.Errorf("Paramater %s not supported", rp)
+		}
+
+	}
+
 	return true, nil
 }
 

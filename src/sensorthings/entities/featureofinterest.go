@@ -22,6 +22,11 @@ func (f FeatureOfInterest) GetEntityType() EntityType {
 	return EntityTypeFeatureOfInterest
 }
 
+// GetPropertyNames returns the available properties for a FeatureOfInterest
+func (f *FeatureOfInterest) GetPropertyNames() []string {
+	return []string{"id", "description", "encodingtype", "feature"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 	foi := &f

@@ -11,6 +11,13 @@ import (
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
 func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+
+	//props := entities.Thing.GetPropertyNames()
+	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
+	if err != nil {
+		return nil, err
+	}
+
 	t, err := a.db.GetThing(id, qo)
 	if err != nil {
 		return nil, err

@@ -3,8 +3,11 @@ package api
 import (
 	"github.com/geodan/gost/src/configuration"
 
+	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/mqtt"
+	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/geodan/gost/src/sensorthings/rest"
 )
 
@@ -76,4 +79,21 @@ func (a *APIv1) GetTopics() *[]models.Topic {
 	}
 
 	return &a.topics
+}
+
+// QueryOptionsSupported checks if the query options are supported for the current entity
+func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.Entity) (bool, error) {
+	if qo == nil {
+		return true, nil
+	}
+
+	if qo.QuerySelect != nil {
+		s, err := qo.QuerySelect.IsValid(entity.GetPropertyNames())
+		if !s {
+			return false, gostErrors.NewBadRequestError(err)
+		}
+	}
+
+	return true, nil
+	//qo.QueryExpand.IsValid("PARAMS", "EPNAME")
 }

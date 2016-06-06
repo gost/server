@@ -21,6 +21,11 @@ func (h HistoricalLocation) GetEntityType() EntityType {
 	return EntityTypeHistoricalLocation
 }
 
+// GetPropertyNames returns the available properties for a HistoricalLocation
+func (h *HistoricalLocation) GetPropertyNames() []string {
+	return []string{"id", "time"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (h *HistoricalLocation) ParseEntity(data []byte) error {
 	hl := &h

@@ -22,6 +22,11 @@ func (s Sensor) GetEntityType() EntityType {
 	return EntityTypeSensor
 }
 
+// GetPropertyNames returns the available properties for a Sensor
+func (s *Sensor) GetPropertyNames() []string {
+	return []string{"id", "description", "encodingType", "metadata"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (s *Sensor) ParseEntity(data []byte) error {
 	sensor := &s

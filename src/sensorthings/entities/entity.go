@@ -68,6 +68,11 @@ func (b *BaseEntity) GetEntityType() EntityType {
 	return EntityTypeUnknown
 }
 
+// GetPropertyNames returns the available properties of an entity
+func (b *BaseEntity) GetPropertyNames() []string {
+	return nil
+}
+
 // GetSelfLink returns the self link of the entity
 func (b *BaseEntity) GetSelfLink() string {
 	return b.NavSelf
@@ -90,6 +95,7 @@ type Entity interface {
 	SetLinks(externalURL string)
 	GetSelfLink() string
 	GetEntityType() EntityType
+	GetPropertyNames() []string
 	GetSupportedEncoding() map[int]EncodingType
 }
 

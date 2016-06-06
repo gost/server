@@ -30,6 +30,11 @@ func (d Datastream) GetEntityType() EntityType {
 	return EntityTypeDatastream
 }
 
+// GetPropertyNames returns the available properties for a Datastream
+func (d *Datastream) GetPropertyNames() []string {
+	return []string{"id", "description", "unitOfMeasurement", "observationType", "observedArea"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (d *Datastream) ParseEntity(data []byte) error {
 	datastream := &d

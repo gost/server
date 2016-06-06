@@ -22,6 +22,11 @@ func (o ObservedProperty) GetEntityType() EntityType {
 	return EntityTypeObservedProperty
 }
 
+// GetPropertyNames returns the available properties for a ObservedProperty
+func (o *ObservedProperty) GetPropertyNames() []string {
+	return []string{"id", "description", "name", "definition"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (o *ObservedProperty) ParseEntity(data []byte) error {
 	op := &o

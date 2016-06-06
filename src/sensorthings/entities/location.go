@@ -30,6 +30,11 @@ func (l Location) GetEntityType() EntityType {
 	return EntityTypeLocation
 }
 
+// GetPropertyNames returns the available properties for a Location
+func (l *Location) GetPropertyNames() []string {
+	return []string{"id", "description", "encodingType", "location"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (l *Location) ParseEntity(data []byte) error {
 	location := &l

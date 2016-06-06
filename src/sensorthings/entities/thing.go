@@ -27,6 +27,11 @@ func (t Thing) GetEntityType() EntityType {
 	return EntityTypeThing
 }
 
+// GetPropertyNames returns the available properties for a Thing
+func (t *Thing) GetPropertyNames() []string {
+	return []string{"id", "description", "properties"}
+}
+
 // ParseEntity tries to parse the given json byte array into the current entity
 func (t *Thing) ParseEntity(data []byte) error {
 	thing := &t
