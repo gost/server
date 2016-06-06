@@ -9,10 +9,11 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetHistoricalLocation retireves a HistoricalLocation by id
-func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalLocation, error) {
+func (gdb *GostDatabase) GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -28,13 +29,13 @@ func (gdb *GostDatabase) GetHistoricalLocation(id string) (*entities.HistoricalL
 }
 
 // GetHistoricalLocations retrieves all historicallocations
-func (gdb *GostDatabase) GetHistoricalLocations() ([]*entities.HistoricalLocation, error) {
+func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
 	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation", TimeFormat, gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql)
 }
 
 // GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
-func (gdb *GostDatabase) GetHistoricalLocationsByLocation(thingID string) ([]*entities.HistoricalLocation, error) {
+func (gdb *GostDatabase) GetHistoricalLocationsByLocation(thingID string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
 	tID, err := strconv.Atoi(thingID)
 	if err != nil {
 		return nil, err
@@ -44,7 +45,7 @@ func (gdb *GostDatabase) GetHistoricalLocationsByLocation(thingID string) ([]*en
 }
 
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
-func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string) ([]*entities.HistoricalLocation, error) {
+func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
 	tID, err := strconv.Atoi(thingID)
 	if err != nil {
 		return nil, err

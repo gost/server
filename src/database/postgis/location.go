@@ -9,10 +9,11 @@ import (
 	"encoding/json"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetLocation retrieves the location for the given id from the database
-func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
+func (gdb *GostDatabase) GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -23,13 +24,13 @@ func (gdb *GostDatabase) GetLocation(id string) (*entities.Location, error) {
 }
 
 // GetLocations retrieves all locations
-func (gdb *GostDatabase) GetLocations() ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location", gdb.Schema)
 	return processLocations(gdb.Db, sql)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
-func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string) ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOptions) ([]*entities.Location, error) {
 	intID, err := strconv.Atoi(hlID)
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string) ([]*entit
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
-func (gdb *GostDatabase) GetLocationsByThing(thingID string) ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocationsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.Location, error) {
 	intID, err := strconv.Atoi(thingID)
 	if err != nil {
 		return nil, err

@@ -7,11 +7,12 @@ import (
 	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 	"strconv"
 )
 
 // GetFeatureOfInterest returns a feature of interest by id
-func (gdb *GostDatabase) GetFeatureOfInterest(id string) (*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -22,7 +23,7 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id string) (*entities.FeatureOfInt
 }
 
 // GetFeatureOfInterestByObservation returns a feature of interest by given observation id
-func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id string) (*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -33,7 +34,7 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id string) (*entities
 }
 
 // GetFeatureOfInterests returns all feature of interests
-func (gdb *GostDatabase) GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(feature) AS feature from %s.featureofinterest", gdb.Schema)
 	return processFeatureOfInterests(gdb.Db, sql)
 }

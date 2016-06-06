@@ -9,10 +9,11 @@ import (
 	"database/sql"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetThing returns a thing entity based on id and query
-func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
+func (gdb *GostDatabase) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -28,7 +29,7 @@ func (gdb *GostDatabase) GetThing(id string) (*entities.Thing, error) {
 }
 
 //GetThingByDatastream retrieves the thing linked to a datastream
-func (gdb *GostDatabase) GetThingByDatastream(id string) (*entities.Thing, error) {
+func (gdb *GostDatabase) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
 	tID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func (gdb *GostDatabase) GetThingByDatastream(id string) (*entities.Thing, error
 }
 
 //GetThingsByLocation retrieves the thing linked to a location
-func (gdb *GostDatabase) GetThingsByLocation(id string) ([]*entities.Thing, error) {
+func (gdb *GostDatabase) GetThingsByLocation(id string, qo *odata.QueryOptions) ([]*entities.Thing, error) {
 	tID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -50,7 +51,7 @@ func (gdb *GostDatabase) GetThingsByLocation(id string) ([]*entities.Thing, erro
 }
 
 //GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
-func (gdb *GostDatabase) GetThingByHistoricalLocation(id string) (*entities.Thing, error) {
+func (gdb *GostDatabase) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
 	tID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -61,7 +62,7 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id string) (*entities.Thin
 }
 
 // GetThings returns an array of things
-func (gdb *GostDatabase) GetThings() ([]*entities.Thing, error) {
+func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, error) {
 	sql := fmt.Sprintf("select id, description, properties FROM %s.thing", gdb.Schema)
 	return processThings(gdb.Db, sql)
 }

@@ -8,10 +8,11 @@ import (
 	"database/sql"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetObservation todo
-func (gdb *GostDatabase) GetObservation(id string) (*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -27,13 +28,13 @@ func (gdb *GostDatabase) GetObservation(id string) (*entities.Observation, error
 }
 
 // GetObservations retrieves all datastreams
-func (gdb *GostDatabase) GetObservations() ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, error) {
 	sql := fmt.Sprintf("select id, data FROM %s.observation", gdb.Schema)
 	return processObservations(gdb.Db, sql)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
-func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID string) ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
 	intID, err := strconv.Atoi(foiID)
 	if err != nil {
 		return nil, err
@@ -44,7 +45,7 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID string) ([]*en
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
-func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID string) ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
 	intID, err := strconv.Atoi(dataStreamID)
 	if err != nil {
 		return nil, err

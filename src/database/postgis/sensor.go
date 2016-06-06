@@ -8,10 +8,11 @@ import (
 	"database/sql"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetSensor todo
-func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
+func (gdb *GostDatabase) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func (gdb *GostDatabase) GetSensor(id string) (*entities.Sensor, error) {
 }
 
 // GetSensorByDatastream todo
-func (gdb *GostDatabase) GetSensorByDatastream(id string) (*entities.Sensor, error) {
+func (gdb *GostDatabase) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -43,7 +44,7 @@ func (gdb *GostDatabase) GetSensorByDatastream(id string) (*entities.Sensor, err
 }
 
 // GetSensors todo
-func (gdb *GostDatabase) GetSensors() ([]*entities.Sensor, error) {
+func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error) {
 	sql := fmt.Sprintf("select id, description, encodingtype, metadata FROM %s.sensor", gdb.Schema)
 	return processSensors(gdb.Db, sql)
 }

@@ -10,7 +10,7 @@ import (
 
 // GetDatastream retrieves a sensor by id and given query
 func (a *APIv1) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	ds, err := a.db.GetDatastream(id)
+	ds, err := a.db.GetDatastream(id, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -21,20 +21,20 @@ func (a *APIv1) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Data
 
 // GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	datastreams, err := a.db.GetDatastreams()
+	datastreams, err := a.db.GetDatastreams(qo)
 	return processDatastreams(a, datastreams, err)
 
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
 func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	datastreams, err := a.db.GetDatastreamsByThing(thingID)
+	datastreams, err := a.db.GetDatastreamsByThing(thingID, qo)
 	return processDatastreams(a, datastreams, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
 func (a *APIv1) GetDatastreamByObservation(observationID string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	ds, err := a.db.GetDatastreamByObservation(observationID)
+	ds, err := a.db.GetDatastreamByObservation(observationID, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,13 +45,13 @@ func (a *APIv1) GetDatastreamByObservation(observationID string, qo *odata.Query
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
 func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	datastreams, err := a.db.GetDatastreamsBySensor(sensorID)
+	datastreams, err := a.db.GetDatastreamsBySensor(sensorID, qo)
 	return processDatastreams(a, datastreams, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
 func (a *APIv1) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID)
+	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
 	return processDatastreams(a, datastreams, err)
 }
 

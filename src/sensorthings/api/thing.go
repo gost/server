@@ -11,7 +11,7 @@ import (
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
 func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	t, err := a.db.GetThing(id)
+	t, err := a.db.GetThing(id, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, er
 
 // GetThingByDatastream returns a thing entity based on the given datastream id and QueryOptions
 func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	t, err := a.db.GetThingByDatastream(id)
+	t, err := a.db.GetThingByDatastream(id, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -33,13 +33,13 @@ func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entiti
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
 func (a *APIv1) GetThingsByLocation(id string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	things, err := a.db.GetThingsByLocation(id)
+	things, err := a.db.GetThingsByLocation(id, qo)
 	return processThings(a, things, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
 func (a *APIv1) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	t, err := a.db.GetThingByHistoricalLocation(id)
+	t, err := a.db.GetThingByHistoricalLocation(id, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (a *APIv1) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) 
 
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
-	things, err := a.db.GetThings()
+	things, err := a.db.GetThings(qo)
 	return processThings(a, things, err)
 }
 

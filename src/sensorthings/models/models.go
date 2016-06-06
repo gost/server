@@ -98,62 +98,62 @@ type Database interface {
 	Start()
 	CreateSchema(location string) error
 
-	GetThing(string) (*entities.Thing, error)
-	GetThingByDatastream(string) (*entities.Thing, error)
-	GetThingsByLocation(string) ([]*entities.Thing, error)
-	GetThingByHistoricalLocation(string) (*entities.Thing, error)
-	GetThings() ([]*entities.Thing, error)
+	GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error)
+	GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error)
+	GetThingsByLocation(id string, qo *odata.QueryOptions) ([]*entities.Thing, error)
+	GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error)
+	GetThings(qo *odata.QueryOptions) ([]*entities.Thing, error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
-	DeleteThing(string) error
+	DeleteThing(id string) error
 
-	GetLocation(string) (*entities.Location, error)
-	GetLocations() ([]*entities.Location, error)
-	GetLocationsByHistoricalLocation(string) ([]*entities.Location, error)
-	GetLocationsByThing(string) ([]*entities.Location, error)
+	GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error)
+	GetLocations(qo *odata.QueryOptions) ([]*entities.Location, error)
+	GetLocationsByHistoricalLocation(id string, qo *odata.QueryOptions) ([]*entities.Location, error)
+	GetLocationsByThing(id string, qo *odata.QueryOptions) ([]*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
-	LinkLocation(string, locationID string) error
-	DeleteLocation(string) error
+	LinkLocation(id string, locationID string) error
+	DeleteLocation(id string) error
 
-	GetObservedProperty(string) (*entities.ObservedProperty, error)
-	GetObservedPropertyByDatastream(string) (*entities.ObservedProperty, error)
-	GetObservedProperties() ([]*entities.ObservedProperty, error)
+	GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
+	GetObservedPropertyByDatastream(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
+	GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, error)
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
-	DeleteObservedProperty(string) error
+	DeleteObservedProperty(id string) error
 
-	GetSensor(string) (*entities.Sensor, error)
-	GetSensorByDatastream(string) (*entities.Sensor, error)
-	GetSensors() ([]*entities.Sensor, error)
+	GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error)
+	GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error)
+	GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error)
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
-	DeleteSensor(string) error
+	DeleteSensor(id string) error
 
-	GetDatastream(string) (*entities.Datastream, error)
-	GetDatastreams() ([]*entities.Datastream, error)
-	GetDatastreamByObservation(string) (*entities.Datastream, error)
-	GetDatastreamsByThing(string) ([]*entities.Datastream, error)
-	GetDatastreamsBySensor(string) ([]*entities.Datastream, error)
-	GetDatastreamsByObservedProperty(string) ([]*entities.Datastream, error)
+	GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error)
+	GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, error)
+	GetDatastreamByObservation(id string, qo *odata.QueryOptions) (*entities.Datastream, error)
+	GetDatastreamsByThing(id string, qo *odata.QueryOptions) ([]*entities.Datastream, error)
+	GetDatastreamsBySensor(id string, qo *odata.QueryOptions) ([]*entities.Datastream, error)
+	GetDatastreamsByObservedProperty(id string, qo *odata.QueryOptions) ([]*entities.Datastream, error)
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
-	DeleteDatastream(string) error
+	DeleteDatastream(id string) error
 
-	GetFeatureOfInterest(string) (*entities.FeatureOfInterest, error)
-	GetFeatureOfInterestByObservation(string) (*entities.FeatureOfInterest, error)
-	GetFeatureOfInterests() ([]*entities.FeatureOfInterest, error)
+	GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
-	DeleteFeatureOfInterest(string) error
+	DeleteFeatureOfInterest(id string) error
 
-	GetObservation(string) (*entities.Observation, error)
-	GetObservations() ([]*entities.Observation, error)
-	GetObservationsByDatastream(string) ([]*entities.Observation, error)
-	GetObservationsByFeatureOfInterest(string) ([]*entities.Observation, error)
+	GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error)
+	GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, error)
+	GetObservationsByDatastream(id string, qo *odata.QueryOptions) ([]*entities.Observation, error)
+	GetObservationsByFeatureOfInterest(id string, qo *odata.QueryOptions) ([]*entities.Observation, error)
 	PostObservation(*entities.Observation) (*entities.Observation, error)
-	DeleteObservation(string) error
+	DeleteObservation(id string) error
 
-	GetHistoricalLocation(string) (*entities.HistoricalLocation, error)
-	GetHistoricalLocations() ([]*entities.HistoricalLocation, error)
-	GetHistoricalLocationsByLocation(string) ([]*entities.HistoricalLocation, error)
-	GetHistoricalLocationsByThing(string) ([]*entities.HistoricalLocation, error)
-	PostHistoricalLocation(thingID string, locationID string) error
-	DeleteHistoricalLocation(string) error
+	GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error)
+	GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error)
+	GetHistoricalLocationsByLocation(id string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error)
+	GetHistoricalLocationsByThing(id string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error)
+	PostHistoricalLocation(id string, locationID string) error
+	DeleteHistoricalLocation(id string) error
 
 	ThingExists(thingID int) bool
 	LocationExists(thingID int) bool

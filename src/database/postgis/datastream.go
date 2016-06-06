@@ -9,10 +9,11 @@ import (
 	"database/sql"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetDatastream retrieves a datastream by id
-func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -28,13 +29,13 @@ func (gdb *GostDatabase) GetDatastream(id string) (*entities.Datastream, error) 
 }
 
 // GetDatastreams retrieves all datastreams
-func (gdb *GostDatabase) GetDatastreams() ([]*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, error) {
 	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream", gdb.Schema)
 	return processDatastreams(gdb.Db, sql)
 }
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
-func (gdb *GostDatabase) GetDatastreamByObservation(observationID string) (*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastreamByObservation(observationID string, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	tID, err := strconv.Atoi(observationID)
 	if err != nil {
 		return nil, err
@@ -45,7 +46,7 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID string) (*enti
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
-func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
 	tID, err := strconv.Atoi(thingID)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID string) ([]*entities.Data
 }
 
 // GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
-func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string) ([]*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
 	tID, err := strconv.Atoi(sensorID)
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string) ([]*entities.Da
 }
 
 // GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
-func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string) ([]*entities.Datastream, error) {
+func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
 	tID, err := strconv.Atoi(oID)
 	if err != nil {
 		return nil, err

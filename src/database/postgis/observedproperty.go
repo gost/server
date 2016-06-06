@@ -8,10 +8,11 @@ import (
 	"database/sql"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // GetObservedProperty returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func (gdb *GostDatabase) GetObservedProperty(id string) (*entities.ObservedPrope
 }
 
 // GetObservedPropertyByDatastream returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedPropertyByDatastream(id string) (*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedPropertyByDatastream(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return nil, err
@@ -43,7 +44,7 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id string) (*entities.O
 }
 
 // GetObservedProperties returns all observed properties
-func (gdb *GostDatabase) GetObservedProperties() ([]*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty", gdb.Schema)
 	return processObservedProperties(gdb.Db, sql)
 }
