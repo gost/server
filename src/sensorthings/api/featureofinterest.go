@@ -10,6 +10,11 @@ import (
 
 // GetFeatureOfInterest todo
 func (a *APIv1) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
+	if err != nil {
+		return nil, err
+	}
+
 	l, err := a.db.GetFeatureOfInterest(id, qo)
 	if err != nil {
 		return nil, err
@@ -21,6 +26,11 @@ func (a *APIv1) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entiti
 
 // GetFeatureOfInterestByObservation todo
 func (a *APIv1) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
+	if err != nil {
+		return nil, err
+	}
+
 	l, err := a.db.GetFeatureOfInterestByObservation(id, qo)
 	if err != nil {
 		return nil, err
@@ -32,6 +42,11 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOpti
 
 // GetFeatureOfInterests todo
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
+	if err != nil {
+		return nil, err
+	}
+
 	fois, err := a.db.GetFeatureOfInterests(qo)
 	return processFeatureOfInterest(a, fois, err)
 }

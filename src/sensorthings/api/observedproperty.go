@@ -10,6 +10,11 @@ import (
 
 // GetObservedProperty todo
 func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
+	if err != nil {
+		return nil, err
+	}
+
 	op, err := a.db.GetObservedProperty(id, qo)
 	if err != nil {
 		return nil, err
@@ -21,6 +26,11 @@ func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entitie
 
 // GetObservedPropertyByDatastream todo
 func (a *APIv1) GetObservedPropertyByDatastream(datastreamID string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
+	if err != nil {
+		return nil, err
+	}
+
 	op, err := a.db.GetObservedPropertyByDatastream(datastreamID, qo)
 	if err != nil {
 		return nil, err
@@ -32,6 +42,11 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID string, qo *odata.Q
 
 // GetObservedProperties todo
 func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
+	if err != nil {
+		return nil, err
+	}
+
 	ops, err := a.db.GetObservedProperties(qo)
 	if err != nil {
 		return nil, err

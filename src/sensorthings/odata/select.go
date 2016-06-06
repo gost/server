@@ -1,8 +1,10 @@
 package odata
 
 import (
-	"github.com/bugsnag/bugsnag-go/errors"
 	"strings"
+
+	"errors"
+	"fmt"
 )
 
 // QuerySelect is used to return only the entity property values desired, this is used
@@ -31,7 +33,7 @@ func (q *QuerySelect) IsValid(values []string) (bool, error) {
 		}
 
 		if !found {
-			return false, errors.Errorf("Paramater %s not supported", rp)
+			return false, errors.New(fmt.Sprintf("Paramater %s not supported", rp))
 		}
 
 	}

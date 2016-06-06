@@ -10,6 +10,11 @@ import (
 
 // GetSensor retrieves a sensor by id and given query
 func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
+	if err != nil {
+		return nil, err
+	}
+
 	s, err := a.db.GetSensor(id, qo)
 	if err != nil {
 		return nil, err
@@ -21,6 +26,11 @@ func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, 
 
 // GetSensorByDatastream retrieves a sensor by given datastream
 func (a *APIv1) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
+	if err != nil {
+		return nil, err
+	}
+
 	s, err := a.db.GetSensorByDatastream(id, qo)
 	if err != nil {
 		return nil, err
@@ -32,6 +42,11 @@ func (a *APIv1) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entit
 
 // GetSensors retrieves an array of sensors based on the given query
 func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
+	if err != nil {
+		return nil, err
+	}
+
 	sensors, err := a.db.GetSensors(qo)
 	if err != nil {
 		return nil, err

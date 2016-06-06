@@ -11,6 +11,11 @@ import (
 
 // GetObservation returns an observation by id
 func (a *APIv1) GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
+	if err != nil {
+		return nil, err
+	}
+
 	o, err := a.db.GetObservation(id, qo)
 	if err != nil {
 		return nil, err
@@ -22,18 +27,33 @@ func (a *APIv1) GetObservation(id string, qo *odata.QueryOptions) (*entities.Obs
 
 // GetObservations return all observations
 func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
+	if err != nil {
+		return nil, err
+	}
+
 	observations, err := a.db.GetObservations(qo)
 	return processObservations(a, observations, err)
 }
 
 // GetObservationsByFeatureOfInterest todo
 func (a *APIv1) GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
+	if err != nil {
+		return nil, err
+	}
+
 	observations, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
 	return processObservations(a, observations, err)
 }
 
 // GetObservationsByDatastream todo
 func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
+	if err != nil {
+		return nil, err
+	}
+
 	observations, err := a.db.GetObservationsByDatastream(datastreamID, qo)
 	return processObservations(a, observations, err)
 }
