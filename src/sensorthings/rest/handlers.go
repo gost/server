@@ -11,6 +11,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
+	"log"
 )
 
 // HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
@@ -487,6 +488,14 @@ func getEntityID(r *http.Request) string {
 // on what went wrong
 func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 	query := r.URL.Query()
+
+	//If request contains parameters from route wildcard convert it to a select query
+	vars := mux.Vars(r)
+	value := vars["params"]
+	if len(value) > 0 {
+		query["$select"] = []string{value}
+	}
+
 	if len(query) == 0 {
 		return nil, nil
 	}
@@ -504,7 +513,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		return
 	}
 
-	// Check if the requested enpoints supports the parsed queries
+	// Check if the requested endpoints supports the parsed queries
 	endpoint := *e
 	_, err = endpoint.AreQueryOptionsSupported(queryOptions)
 	if err != nil {

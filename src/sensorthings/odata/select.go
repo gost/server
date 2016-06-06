@@ -6,14 +6,14 @@ import "strings"
 // help to reduce the amount of information in a response from the server.
 // If set, the result will include the specified property of the SensorThing entity object.
 type QuerySelect struct {
-	params []string
+	Params []string
 }
 
 // Parse $select values in QuerySelect, at this stage we don't know
 // if the select params are valid, this depends on Select values available
 // for the used endpoint
 func (q *QuerySelect) Parse(value string) error {
-	q.params = strings.Split(value, ",")
+	q.Params = strings.Split(value, ",")
 	return nil
 }
 
