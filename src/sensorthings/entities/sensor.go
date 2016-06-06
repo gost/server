@@ -10,7 +10,6 @@ import (
 // it to an electrical impulse and be converted to a empirical value to represent a measurement value of the physical property
 type Sensor struct {
 	BaseEntity
-	NavSelf        string        `json:"@iot.selfLink,omitempty"`
 	Description    string        `json:"description,omitempty"`
 	EncodingType   string        `json:"encodingType,omitempty"`
 	Metadata       string        `json:"metadata,omitempty"`

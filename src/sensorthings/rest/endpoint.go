@@ -25,7 +25,7 @@ func (e *Endpoint) GetName() string {
 	return e.Name
 }
 
-// GetName returns the endpoint name
+// ShowOutputInfo returns true if the endpoint should output his info when BasePathInfo is requested
 func (e *Endpoint) ShowOutputInfo() bool {
 	return e.OutputInfo
 }

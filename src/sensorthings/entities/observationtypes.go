@@ -4,12 +4,13 @@ import (
 	"errors"
 )
 
-// ObservationType holds the information on a EncodingType
+// ObservationType holds the information on a ObservationType
 type ObservationType struct {
 	Code  int
 	Value string
 }
 
+// List of supported ObservationTypes
 var (
 	OMCategoryObservation = ObservationType{0, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"} // IRI
 	OMCountObservation    = ObservationType{1, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation"}    // integer
@@ -18,6 +19,7 @@ var (
 	OMTruthObservation    = ObservationType{4, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation"}    // boolean
 )
 
+// ObservationTypes is a list of names mapped to their ObservationType Value
 var ObservationTypes = []ObservationType{
 	OMCategoryObservation,
 	OMCountObservation,
@@ -25,7 +27,7 @@ var ObservationTypes = []ObservationType{
 	OMObservation,
 	OMTruthObservation}
 
-// Get the observationType based on value, returns error
+// GetObservationTypeByValue Get the observationType based on value, returns error
 func GetObservationTypeByValue(observationType string) (ObservationType, error) {
 	for _, k := range ObservationTypes {
 		if k.Value == observationType {
@@ -36,8 +38,8 @@ func GetObservationTypeByValue(observationType string) (ObservationType, error) 
 	return OMCategoryObservation, errors.New("ObservationType not supported")
 }
 
-// Get the observationType based on value, returns error
-func GetObservationTypeById(observationType int) (ObservationType, error) {
+// GetObservationTypeByID Get the observationType based on value, returns error
+func GetObservationTypeByID(observationType int) (ObservationType, error) {
 	for _, k := range ObservationTypes {
 		if k.Code == observationType {
 			return k, nil

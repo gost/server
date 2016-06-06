@@ -44,7 +44,8 @@ const (
 
 // BaseEntity is the entry point for an entity
 type BaseEntity struct {
-	ID string `json:"@iot.id,omitempty"`
+	ID      string `json:"@iot.id,omitempty"`
+	NavSelf string `json:"@iot.selfLink,omitempty"`
 }
 
 // ParseEntity defined to implement Entity
@@ -82,10 +83,10 @@ type Entity interface {
 	ParseEntity(data []byte) error
 	ContainsMandatoryParams() (bool, []error)
 	SetLinks(externalURL string)
+	GetSelfLink() string
 	GetEntityType() EntityType
 	GetSupportedEncoding() map[int]EncodingType
 }
-
 
 // CheckMandatoryParam checks if the given parameter is nil, if true then an ApiError will be added to the
 // given list of errors.

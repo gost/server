@@ -125,7 +125,7 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 		datastream.Description = description
 		datastream.UnitOfMeasurement = unitOfMeasurementMap
 		datastream.ObservedArea = observedAreaMap
-		obs, _ := entities.GetObservationTypeById(ot)
+		obs, _ := entities.GetObservationTypeByID(ot)
 		datastream.ObservationType = obs.Value
 
 		datastreams = append(datastreams, &datastream)

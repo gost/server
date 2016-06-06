@@ -12,7 +12,6 @@ import (
 // and there are options to create a Things with a nested linked Location and Datastream.
 type Thing struct {
 	BaseEntity
-	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	Properties             map[string]interface{} `json:"properties,omitempty"`
 	NavLocations           string                 `json:"Locations@iot.navigationLink,omitempty"`

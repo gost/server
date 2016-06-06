@@ -13,7 +13,6 @@ import (
 // the Location of the Thing associated with the Datastream, will be assigned to the new Observation as the FeaturOfInterest.
 type Observation struct {
 	BaseEntity
-	NavSelf              string                 `json:"@iot.selfLink,omitempty"`
 	PhenomenonTime       string                 `json:"phenomenonTime,omitempty"`
 	Result               interface{}            `json:"result,omitempty"`
 	ResultTime           string                 `json:"resultTime,omitempty"`

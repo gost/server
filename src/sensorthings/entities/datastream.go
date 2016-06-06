@@ -11,7 +11,6 @@ import (
 // sense one ObservedProperty.
 type Datastream struct {
 	BaseEntity
-	NavSelf             string                 `json:"@iot.selfLink,omitempty"`
 	Description         string                 `json:"description,omitempty"`
 	UnitOfMeasurement   map[string]interface{} `json:"unitOfMeasurement,omitempty"`
 	ObservationType     string                 `json:"observationType,omitempty"`

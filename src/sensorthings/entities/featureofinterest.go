@@ -10,7 +10,6 @@ import (
 // can be the Location of the Sensor and therefore of the Observation. A FeatureOfInterest is linked to a single Observation
 type FeatureOfInterest struct {
 	BaseEntity
-	NavSelf         string                 `json:"@iot.selfLink,omitempty"`
 	Description     string                 `json:"description,omitempty"`
 	EncodingType    string                 `json:"encodingtype,omitempty"`
 	Feature         map[string]interface{} `json:"feature,omitempty"`

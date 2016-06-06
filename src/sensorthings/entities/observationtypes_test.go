@@ -28,7 +28,7 @@ func TestGetObservationTypeByCodeShouldReturnCorrectObservationType(t *testing.T
 	input := 0
 
 	// act
-	res, err := GetObservationTypeById(input)
+	res, err := GetObservationTypeByID(input)
 
 	// assert
 	assert.Nil(t, err, "Error should not be nil")

@@ -10,7 +10,6 @@ import (
 // linked to a Datatream which can only have one ObserveProperty
 type ObservedProperty struct {
 	BaseEntity
-	NavSelf        string        `json:"@iot.selfLink,omitempty"`
 	Description    string        `json:"description,omitempty"`
 	Name           string        `json:"name,omitempty"`
 	Definition     string        `json:"definition,omitempty"`

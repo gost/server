@@ -16,7 +16,6 @@ import (
 // of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type Location struct {
 	BaseEntity
-	NavSelf                string                 `json:"@iot.selfLink,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	EncodingType           string                 `json:"encodingType,omitempty"`
 	Location               map[string]interface{} `json:"location,omitempty"`
