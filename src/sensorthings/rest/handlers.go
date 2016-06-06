@@ -558,7 +558,6 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
 	byteData, _ := ioutil.ReadAll(r.Body)
 	err := entity.ParseEntity(byteData)
-
 	if err != nil {
 		sendError(w, []error{err})
 		return
@@ -570,6 +569,8 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 		sendError(w, err2)
 		return
 	}
+
+	w.Header().Add("location", entity.GetSelfLink())
 
 	sendJSONResponse(w, http.StatusCreated, data)
 }

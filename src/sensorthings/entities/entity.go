@@ -68,6 +68,11 @@ func (b *BaseEntity) GetEntityType() EntityType {
 	return EntityTypeUnknown
 }
 
+// GetSelfLink returns the self link of the entity
+func (b *BaseEntity) GetSelfLink() string {
+	return b.NavSelf
+}
+
 // GetSupportedEncoding defined to implement Entity
 func (b *BaseEntity) GetSupportedEncoding() map[int]EncodingType {
 	return nil
