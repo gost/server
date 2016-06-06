@@ -570,7 +570,7 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 		return
 	}
 
-	w.Header().Add("location", entity.GetSelfLink())
+	w.Header().Add("Location", entity.GetSelfLink())
 
 	sendJSONResponse(w, http.StatusCreated, data)
 }
