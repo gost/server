@@ -9,7 +9,7 @@ import (
 )
 
 // GetDatastream retrieves a sensor by id and given query
-func (a *APIv1) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error) {
+func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, e
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
-func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (a *APIv1) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) (*
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
-func (a *APIv1) GetDatastreamByObservation(observationID string, qo *odata.QueryOptions) (*entities.Datastream, error) {
+func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (a *APIv1) GetDatastreamByObservation(observationID string, qo *odata.Query
 }
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
-func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (a *APIv1) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) 
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
-func (a *APIv1) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 }
 
 // PostDatastreamByThing todo
-func (a *APIv1) PostDatastreamByThing(thingID string, datastream *entities.Datastream) (*entities.Datastream, []error) {
+func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.Datastream) (*entities.Datastream, []error) {
 	t := &entities.Thing{}
 	t.ID = thingID
 	datastream.Thing = t
@@ -171,11 +171,11 @@ func (a *APIv1) PostDatastreamByThing(thingID string, datastream *entities.Datas
 }
 
 // PatchDatastream todo
-func (a *APIv1) PatchDatastream(id string, datastream *entities.Datastream) (*entities.Datastream, error) {
+func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteDatastream deletes a datastream from the database
-func (a *APIv1) DeleteDatastream(id string) error {
+func (a *APIv1) DeleteDatastream(id interface{}) error {
 	return a.db.DeleteDatastream(id)
 }

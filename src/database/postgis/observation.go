@@ -12,10 +12,10 @@ import (
 )
 
 // GetObservation todo
-func (gdb *GostDatabase) GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where id = $1", gdb.Schema)
@@ -34,10 +34,10 @@ func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Ob
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
-func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
-	intID, err := strconv.Atoi(foiID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+	intID, ok := ToIntID(foiID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = $1", gdb.Schema)
@@ -45,10 +45,10 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID string, qo *od
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
-func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
-	intID, err := strconv.Atoi(dataStreamID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+	intID, ok := ToIntID(dataStreamID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = $1", gdb.Schema)
@@ -104,8 +104,8 @@ func processObservations(db *sql.DB, sql string, args ...interface{}) ([]*entiti
 func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Observation, error) {
 	var oID int
 
-	dID, err := strconv.Atoi(o.Datastream.ID)
-	if err != nil {
+	dID, ok := ToIntID(o.Datastream.ID)
+	if !ok {
 		return nil, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 	}
 
@@ -125,7 +125,7 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	sql := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
 
 	//ToDo: Check error fk exist?
-	err = gdb.Db.QueryRow(sql).Scan(&oID)
+	err := gdb.Db.QueryRow(sql).Scan(&oID)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +143,10 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 }
 
 // DeleteObservation tries to delete a Observation by the given id
-func (gdb *GostDatabase) DeleteObservation(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteObservation(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observation WHERE id = $1", gdb.Schema), intID)

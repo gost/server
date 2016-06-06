@@ -38,7 +38,7 @@ func TestEntityLinkStrings(t *testing.T) {
 
 func TestCreateEntitySelfLink(t *testing.T) {
 	//act
-	selfLink := CreateEntitySelfLink(externalURL, lt.ToString(), "")
+	selfLink := CreateEntitySelfLink(externalURL, lt.ToString(), nil)
 	selfLinkWithID := CreateEntitySelfLink(externalURL, lt.ToString(), id)
 
 	//assert
@@ -48,9 +48,9 @@ func TestCreateEntitySelfLink(t *testing.T) {
 
 func TestCreateEntityLink(t *testing.T) {
 	//act
-	link := CreateEntityLink(true, externalURL, lt.ToString(), ls.ToString(), "")
+	link := CreateEntityLink(true, externalURL, lt.ToString(), ls.ToString(), nil)
 	linkWithID := CreateEntityLink(true, externalURL, lt.ToString(), ls.ToString(), id)
-	linkEmpty := CreateEntityLink(false, externalURL, lt.ToString(), ls.ToString(), "")
+	linkEmpty := CreateEntityLink(false, externalURL, lt.ToString(), ls.ToString(), nil)
 
 	//assert
 	assert.Equal(t, fmt.Sprintf("%s/v1.0/%s/%s", externalURL, lt.ToString(), ls.ToString()), link, "EntityLink is not in the correct format")
@@ -121,4 +121,3 @@ func TestCheckMandatoryParamErrors(t *testing.T) {
 	assert.Len(t, errLis4, 1, "CheckMandatoryParam Sensor should have returned an error")
 	assert.Len(t, errLis5, 1, "CheckMandatoryParam ObservedProperty should have returned an error")
 }
-

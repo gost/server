@@ -13,10 +13,10 @@ import (
 )
 
 // GetHistoricalLocation retireves a HistoricalLocation by id
-func (gdb *GostDatabase) GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where id = $1", TimeFormat, gdb.Schema)
@@ -35,20 +35,20 @@ func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*enti
 }
 
 // GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
-func (gdb *GostDatabase) GetHistoricalLocationsByLocation(thingID string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
-	tID, err := strconv.Atoi(thingID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
+	tID, ok := ToIntID(locationID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where location_id = $1", TimeFormat, gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql, tID)
 }
 
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
-func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
-	tID, err := strconv.Atoi(thingID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
+	tID, ok := ToIntID(thingID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where thing_id = $1", TimeFormat, gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql, tID)
@@ -98,15 +98,15 @@ func processHistoricalLocations(db *sql.DB, sql string, args ...interface{}) ([]
 // PostHistoricalLocation adds a historical location to the database
 // returns the created historical location including the generated id
 // fails when a thing or location cannot be found for the given id's
-func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID string) error {
-	tid, err := strconv.Atoi(thingID)
-	if !gdb.ThingExists(tid) || err != nil {
-		return fmt.Errorf("Thing(%s) does not exist", thingID)
+func (gdb *GostDatabase) PostHistoricalLocation(thingID interface{}, locationID interface{}) error {
+	tid, ok := ToIntID(thingID)
+	if !ok || !gdb.ThingExists(tid) {
+		return gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	lid, err2 := strconv.Atoi(locationID)
-	if !gdb.LocationExists(lid) || err2 != nil {
-		return fmt.Errorf("Location(%s) does not exist", locationID)
+	lid, ok := ToIntID(locationID)
+	if !ok || !gdb.LocationExists(lid) {
+		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %s.historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3)", gdb.Schema)
@@ -119,10 +119,10 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID string, locationID strin
 }
 
 // DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id
-func (gdb *GostDatabase) DeleteHistoricalLocation(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteHistoricalLocation(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.historicallocation WHERE id = $1", gdb.Schema), intID)

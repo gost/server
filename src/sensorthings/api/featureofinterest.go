@@ -9,7 +9,7 @@ import (
 )
 
 // GetFeatureOfInterest todo
-func (a *APIv1) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (a *APIv1) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entiti
 }
 
 // GetFeatureOfInterestByObservation todo
-func (a *APIv1) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
 		return nil, err
@@ -88,11 +88,11 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 }
 
 // PatchFeatureOfInterest todo
-func (a *APIv1) PatchFeatureOfInterest(id string, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteFeatureOfInterest deletes a given FeatureOfInterest from the database
-func (a *APIv1) DeleteFeatureOfInterest(id string) error {
+func (a *APIv1) DeleteFeatureOfInterest(id interface{}) error {
 	return a.db.DeleteFeatureOfInterest(id)
 }

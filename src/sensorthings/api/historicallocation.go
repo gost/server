@@ -9,7 +9,7 @@ import (
 )
 
 // GetHistoricalLocation retrieves a single HistoricalLocation by id
-func (a *APIv1) GetHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
+func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions) (*models.ArrayRes
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
-func (a *APIv1) GetHistoricalLocationsByLocation(locationID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (a *APIv1) GetHistoricalLocationsByLocation(locationID string, qo *odata.Qu
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
-func (a *APIv1) GetHistoricalLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 
 // PostHistoricalLocation is triggered by code and cannot be used from any endpoint PostHistoricalLocation
 // adds a HistoricalLocation into the database
-func (a *APIv1) PostHistoricalLocation(thingID string, locationID string) []error {
+func (a *APIv1) PostHistoricalLocation(thingID interface{}, locationID interface{}) []error {
 	err := a.db.PostHistoricalLocation(thingID, locationID)
 	if err != nil {
 		return []error{err}
@@ -84,11 +84,11 @@ func (a *APIv1) PostHistoricalLocation(thingID string, locationID string) []erro
 }
 
 // PatchHistoricalLocation todo
-func (a *APIv1) PatchHistoricalLocation(id string, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+func (a *APIv1) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteHistoricalLocation deletes a given HistoricalLocation from the database
-func (a *APIv1) DeleteHistoricalLocation(id string) error {
+func (a *APIv1) DeleteHistoricalLocation(id interface{}) error {
 	return a.db.DeleteHistoricalLocation(id)
 }

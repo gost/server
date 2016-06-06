@@ -97,3 +97,9 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 	return true, nil
 	//qo.QueryExpand.IsValid("PARAMS", "EPNAME")
 }
+
+func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
+	if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 {
+		entity.SetLinks(a.config.GetExternalServerURI())
+	}
+}

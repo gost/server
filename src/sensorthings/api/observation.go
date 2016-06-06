@@ -10,7 +10,7 @@ import (
 )
 
 // GetObservation returns an observation by id
-func (a *APIv1) GetObservation(id string, qo *odata.QueryOptions) (*entities.Observation, error) {
+func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, 
 }
 
 // GetObservationsByFeatureOfInterest todo
-func (a *APIv1) GetObservationsByFeatureOfInterest(foiID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (a *APIv1) GetObservationsByFeatureOfInterest(foiID string, qo *odata.Query
 }
 
 // GetObservationsByDatastream todo
-func (a *APIv1) GetObservationsByDatastream(datastreamID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 }
 
 // PostObservationByDatastream creates a Datastream with given id for the Observation and calls PostObservation
-func (a *APIv1) PostObservationByDatastream(datastreamID string, observation *entities.Observation) (*entities.Observation, []error) {
+func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observation *entities.Observation) (*entities.Observation, []error) {
 	d := &entities.Datastream{}
 	d.ID = datastreamID
 	observation.Datastream = d
@@ -111,11 +111,11 @@ func (a *APIv1) PostObservationByDatastream(datastreamID string, observation *en
 }
 
 // PatchObservation todo
-func (a *APIv1) PatchObservation(id string, observation *entities.Observation) (*entities.Observation, error) {
+func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteObservation deletes a given Observation from the database
-func (a *APIv1) DeleteObservation(id string) error {
+func (a *APIv1) DeleteObservation(id interface{}) error {
 	return a.db.DeleteObservation(id)
 }

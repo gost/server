@@ -9,7 +9,7 @@ import (
 )
 
 // GetObservedProperty todo
-func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (a *APIv1) GetObservedProperty(id string, qo *odata.QueryOptions) (*entitie
 }
 
 // GetObservedPropertyByDatastream todo
-func (a *APIv1) GetObservedPropertyByDatastream(datastreamID string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
 	if err != nil {
 		return nil, err
@@ -86,11 +86,11 @@ func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.O
 }
 
 // PatchObservedProperty todo
-func (a *APIv1) PatchObservedProperty(id string, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
+func (a *APIv1) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteObservedProperty deletes a given ObservedProperty from the database
-func (a *APIv1) DeleteObservedProperty(id string) error {
+func (a *APIv1) DeleteObservedProperty(id interface{}) error {
 	return a.db.DeleteObservedProperty(id)
 }

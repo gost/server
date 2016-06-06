@@ -9,7 +9,7 @@ import (
 )
 
 // GetSensor retrieves a sensor by id and given query
-func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (a *APIv1) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, 
 }
 
 // GetSensorByDatastream retrieves a sensor by given datastream
-func (a *APIv1) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
 	if err != nil {
 		return nil, err
@@ -89,11 +89,11 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 }
 
 // PatchSensor updates a sensor in the database
-func (a *APIv1) PatchSensor(id string, sensor *entities.Sensor) (*entities.Sensor, error) {
+func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteSensor deletes a sensor from the database by given sensor id
-func (a *APIv1) DeleteSensor(id string) error {
+func (a *APIv1) DeleteSensor(id interface{}) error {
 	return a.db.DeleteSensor(id)
 }

@@ -12,10 +12,10 @@ import (
 )
 
 // GetFeatureOfInterest returns a feature of interest by id
-func (gdb *GostDatabase) GetFeatureOfInterest(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(feature) AS feature from %s.featureofinterest where id = $1", gdb.Schema)
@@ -23,10 +23,10 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id string, qo *odata.QueryOptions)
 }
 
 // GetFeatureOfInterestByObservation returns a feature of interest by given observation id
-func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	sql := fmt.Sprintf("select featureofinterest.id, featureofinterest.description, featureofinterest.encodingtype, public.ST_AsGeoJSON(featureofinterest.feature) AS feature from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = $1 limit 1", gdb.Schema, gdb.Schema)
@@ -102,10 +102,10 @@ func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*
 }
 
 // DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id
-func (gdb *GostDatabase) DeleteFeatureOfInterest(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteFeatureOfInterest(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.featureofinterest WHERE id = $1", gdb.Schema), intID)

@@ -13,10 +13,10 @@ import (
 )
 
 // GetLocation retrieves the location for the given id from the database
-func (gdb *GostDatabase) GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location where id = $1", gdb.Schema)
@@ -30,10 +30,10 @@ func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Locat
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
-func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOptions) ([]*entities.Location, error) {
-	intID, err := strconv.Atoi(hlID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) ([]*entities.Location, error) {
+	intID, ok := ToIntID(hlID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
 	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = $1 limit 1", gdb.Schema, gdb.Schema)
@@ -41,10 +41,10 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID string, qo *odata
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
-func (gdb *GostDatabase) GetLocationsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.Location, error) {
-	intID, err := strconv.Atoi(thingID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, error) {
+	intID, ok := ToIntID(thingID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
 	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1", gdb.Schema, gdb.Schema)
@@ -115,7 +115,7 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 }
 
 // LocationExists checks if a location is present in the database based on a given id
-func (gdb *GostDatabase) LocationExists(locationID int) bool {
+func (gdb *GostDatabase) LocationExists(locationID interface{}) bool {
 	var result bool
 	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.location WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
@@ -127,10 +127,10 @@ func (gdb *GostDatabase) LocationExists(locationID int) bool {
 }
 
 // DeleteLocation removes a given location from the database
-func (gdb *GostDatabase) DeleteLocation(locationID string) error {
-	intID, err := strconv.Atoi(locationID)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteLocation(locationID interface{}) error {
+	intID, ok := ToIntID(locationID)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	sql := fmt.Sprintf("DELETE FROM %s.location WHERE id = $1", gdb.Schema)
@@ -148,15 +148,15 @@ func (gdb *GostDatabase) DeleteLocation(locationID string) error {
 
 // LinkLocation links a thing with a location
 // fails when a thing or location cannot be found for the given id's
-func (gdb *GostDatabase) LinkLocation(thingID string, locationID string) error {
-	tid, err := strconv.Atoi(thingID)
-	if !gdb.ThingExists(tid) || err != nil {
-		return fmt.Errorf("Thing(%s) does not exist", thingID)
+func (gdb *GostDatabase) LinkLocation(thingID interface{}, locationID interface{}) error {
+	tid, ok := ToIntID(thingID)
+	if !ok || !gdb.ThingExists(tid) {
+		return gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	lid, err2 := strconv.Atoi(locationID)
-	if !gdb.LocationExists(lid) || err2 != nil {
-		return fmt.Errorf("Location(%s) does not exist", locationID)
+	lid, ok := ToIntID(locationID)
+	if !ok || !gdb.LocationExists(lid) {
+		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)

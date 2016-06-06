@@ -12,10 +12,10 @@ import (
 )
 
 // GetObservedProperty returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedProperty(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty where id = $1", gdb.Schema)
@@ -28,10 +28,10 @@ func (gdb *GostDatabase) GetObservedProperty(id string, qo *odata.QueryOptions) 
 }
 
 // GetObservedPropertyByDatastream returns an ObservedProperty by id
-func (gdb *GostDatabase) GetObservedPropertyByDatastream(id string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select observedproperty.id, observedproperty.name, observedproperty.definition, observedproperty.description FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = $1", gdb.Schema, gdb.Schema)
@@ -107,7 +107,7 @@ func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*e
 }
 
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
-func (gdb *GostDatabase) ObservedPropertyExists(thingID int) bool {
+func (gdb *GostDatabase) ObservedPropertyExists(thingID interface{}) bool {
 	var result bool
 	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observedproperty WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
@@ -119,10 +119,10 @@ func (gdb *GostDatabase) ObservedPropertyExists(thingID int) bool {
 }
 
 // DeleteObservedProperty tries to delete a ObservedProperty by the given id
-func (gdb *GostDatabase) DeleteObservedProperty(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteObservedProperty(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observedproperty WHERE id = $1", gdb.Schema), intID)

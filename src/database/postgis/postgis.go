@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"github.com/geodan/gost/src/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
+	"strconv"
 	"strings"
 )
 
@@ -152,4 +153,21 @@ func TimeRangeToString(start, end *string) string {
 	}
 
 	return ""
+}
+
+// ToIntID converts an interface to int id used for the id's in teh database
+func ToIntID(id interface{}) (int, bool) {
+	switch t := id.(type) {
+	case string:
+		intID, err := strconv.Atoi(t)
+		if err != nil {
+			return 0, false
+		}
+		return intID, true
+	case float64:
+		var intId int = int(t)
+		return intId, true
+	}
+
+	return 0, false
 }

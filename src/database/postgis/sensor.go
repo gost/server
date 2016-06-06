@@ -12,10 +12,10 @@ import (
 )
 
 // GetSensor todo
-func (gdb *GostDatabase) GetSensor(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor where id = $1", gdb.Schema)
@@ -28,10 +28,10 @@ func (gdb *GostDatabase) GetSensor(id string, qo *odata.QueryOptions) (*entities
 }
 
 // GetSensorByDatastream todo
-func (gdb *GostDatabase) GetSensorByDatastream(id string, qo *odata.QueryOptions) (*entities.Sensor, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor inner join %s.datastream on datastream.sensor_id = sensor.id where datastream.id = $1", gdb.Schema, gdb.Schema)
@@ -120,10 +120,10 @@ func (gdb *GostDatabase) SensorExists(thingID int) bool {
 }
 
 // DeleteSensor tries to delete a Sensor by the given id
-func (gdb *GostDatabase) DeleteSensor(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteSensor(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.sensor WHERE id = $1", gdb.Schema), intID)

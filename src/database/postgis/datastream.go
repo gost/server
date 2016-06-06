@@ -13,10 +13,10 @@ import (
 )
 
 // GetDatastream retrieves a datastream by id
-func (gdb *GostDatabase) GetDatastream(id string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream where id = $1", gdb.Schema)
@@ -35,10 +35,10 @@ func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Dat
 }
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
-func (gdb *GostDatabase) GetDatastreamByObservation(observationID string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	tID, err := strconv.Atoi(observationID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
+	tID, ok := ToIntID(observationID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = $1", gdb.Schema, gdb.Schema)
@@ -46,21 +46,21 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID string, qo *od
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
-func (gdb *GostDatabase) GetDatastreamsByThing(thingID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
-	tID, err := strconv.Atoi(thingID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
+	tID, ok := ToIntID(thingID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, odatastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
+	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
 	return processDatastreams(gdb.Db, sql, tID)
 }
 
 // GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
-func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
-	tID, err := strconv.Atoi(sensorID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
+	tID, ok := ToIntID(sensorID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = $1", gdb.Schema, gdb.Schema)
@@ -68,10 +68,10 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID string, qo *odata.Query
 }
 
 // GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
-func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
-	tID, err := strconv.Atoi(oID)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
+	tID, ok := ToIntID(oID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = $1", gdb.Schema, gdb.Schema)
@@ -85,7 +85,7 @@ func processDatastream(db *sql.DB, sql string, args ...interface{}) (*entities.D
 	}
 
 	if len(datastreams) == 0 {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream not found"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	return datastreams[0], nil
@@ -140,18 +140,19 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 // TODO: !!!!ADD resulttime SUPPORT!!!!
 func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datastream, error) {
 	var dsID int
-	tID, err := strconv.Atoi(d.Thing.ID)
-	if err != nil || !gdb.ThingExists(tID) {
+
+	tID, ok := ToIntID(d.Thing.ID)
+	if !ok || !gdb.ThingExists(tID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("Thing does not exist"))
 	}
 
-	sID, err := strconv.Atoi(d.Sensor.ID)
-	if err != nil || !gdb.SensorExists(sID) {
+	sID, ok := ToIntID(d.Sensor.ID)
+	if !ok || !gdb.SensorExists(sID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("Sensor does not exist"))
 	}
 
-	oID, err := strconv.Atoi(d.ObservedProperty.ID)
-	if err != nil || !gdb.ObservedPropertyExists(oID) {
+	oID, ok := ToIntID(d.ObservedProperty.ID)
+	if !ok || !gdb.ObservedPropertyExists(oID) {
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservedProperty does not exist"))
 	}
 
@@ -186,10 +187,10 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 }
 
 // DeleteDatastream tries to delete a Datastream by the given id
-func (gdb *GostDatabase) DeleteDatastream(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteDatastream(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.datastream WHERE id = $1", gdb.Schema), intID)

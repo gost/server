@@ -44,8 +44,8 @@ const (
 
 // BaseEntity is the entry point for an entity
 type BaseEntity struct {
-	ID      string `json:"@iot.id,omitempty"`
-	NavSelf string `json:"@iot.selfLink,omitempty"`
+	ID      interface{} `json:"@iot.id,omitempty"`
+	NavSelf string      `json:"@iot.selfLink,omitempty"`
 }
 
 // ParseEntity defined to implement Entity
@@ -122,7 +122,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 				contains, _ = t.ContainsMandatoryParams()
 			}
 
-			if t == nil || (len(t.ID) == 0 && !contains) {
+			if t == nil || (t.ID == nil && !contains) {
 				isNil = true
 			}
 			break
@@ -132,7 +132,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 				contains, _ = t.ContainsMandatoryParams()
 			}
 
-			if t == nil || (len(t.ID) == 0 && !contains) {
+			if t == nil || (t.ID == nil && !contains) {
 
 				isNil = true
 			}
@@ -143,7 +143,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 				contains, _ = t.ContainsMandatoryParams()
 			}
 
-			if t == nil || (len(t.ID) == 0 && !contains) {
+			if t == nil || (t.ID == nil && !contains) {
 
 				isNil = true
 			}
@@ -154,7 +154,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 				contains, _ = t.ContainsMandatoryParams()
 			}
 
-			if t == nil || (len(t.ID) == 0 && !contains) {
+			if t == nil || (t.ID == nil && !contains) {
 
 				isNil = true
 			}
@@ -189,9 +189,9 @@ func CheckEncodingSupported(entity Entity, encodingType string) (bool, error) {
 
 // CreateEntitySelfLink formats the given parameters into an external navigationlink to the entity
 // for example: http://example.org/OGCSensorThings/v1.0/Things(27815)
-func CreateEntitySelfLink(externalURI string, entityLink string, id string) string {
-	if len(id) != 0 {
-		entityLink = fmt.Sprintf("%s(%s)", entityLink, id)
+func CreateEntitySelfLink(externalURI string, entityLink string, id interface{}) string {
+	if id != nil {
+		entityLink = fmt.Sprintf("%s(%v)", entityLink, id)
 	}
 
 	return fmt.Sprintf("%s/v1.0/%s", externalURI, entityLink)
@@ -199,13 +199,13 @@ func CreateEntitySelfLink(externalURI string, entityLink string, id string) stri
 
 // CreateEntityLink formats the given parameters into a relative navigationlink path
 // for example: http://example.org/OGCSensorThings/v1.0/Things(27815)/Datastreams
-func CreateEntityLink(isNil bool, externalURI string, entityType1 string, entityType2 string, id string) string {
+func CreateEntityLink(isNil bool, externalURI string, entityType1 string, entityType2 string, id interface{}) string {
 	if !isNil {
 		return ""
 	}
 
-	if len(id) != 0 {
-		entityType1 = fmt.Sprintf("%s(%s)", entityType1, id)
+	if id != nil {
+		entityType1 = fmt.Sprintf("%s(%v)", entityType1, id)
 	}
 
 	return fmt.Sprintf("%s/v1.0/%s/%s", externalURI, entityType1, entityType2)

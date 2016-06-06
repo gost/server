@@ -10,7 +10,7 @@ import (
 
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
-func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -21,12 +21,12 @@ func (a *APIv1) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, er
 		return nil, err
 	}
 
-	t.SetLinks(a.config.GetExternalServerURI())
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
 // GetThingByDatastream returns a thing entity based on the given datastream id and QueryOptions
-func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -37,18 +37,22 @@ func (a *APIv1) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entiti
 		return nil, err
 	}
 
-	t.SetLinks(a.config.GetExternalServerURI())
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
-func (a *APIv1) GetThingsByLocation(id string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
+	if err != nil {
+		return nil, err
+	}
 	things, err := a.db.GetThingsByLocation(id, qo)
-	return processThings(a, things, err)
+	return processThings(a, things, qo, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
-func (a *APIv1) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -58,7 +62,7 @@ func (a *APIv1) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) 
 		return nil, err
 	}
 
-	t.SetLinks(a.config.GetExternalServerURI())
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
@@ -69,18 +73,17 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error)
 		return nil, err
 	}
 	things, err := a.db.GetThings(qo)
-	return processThings(a, things, err)
+	return processThings(a, things, qo, err)
 }
 
-func processThings(a *APIv1, observations []*entities.Thing, err error) (*models.ArrayResponse, error) {
+func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerURI()
 	for idx, item := range observations {
 		i := *item
-		i.SetLinks(uri)
+		a.SetLinks(&i, qo)
 		observations[idx] = &i
 	}
 
@@ -108,7 +111,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	if thing.Locations != nil {
 		for _, l := range thing.Locations {
 			// New location posted
-			if len(l.ID) == 0 { //Id is null so a new location is posted
+			if l.ID == nil { //Id is null so a new location is posted
 				_, err3 := a.PostLocationByThing(nt.ID, l)
 				if err3 != nil {
 					return nil, err3
@@ -135,11 +138,11 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 }
 
 // DeleteThing deletes a given Thing from the database
-func (a *APIv1) DeleteThing(id string) error {
+func (a *APIv1) DeleteThing(id interface{}) error {
 	return a.db.DeleteThing(id)
 }
 
 // PatchThing todo
-func (a *APIv1) PatchThing(id string, thing *entities.Thing) (*entities.Thing, error) {
+func (a *APIv1) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("patch thing not implemented yet"))
 }

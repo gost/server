@@ -31,13 +31,13 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 
 // PostLocationByThing checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
-func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location) (*entities.Location, []error) {
+func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error) {
 	l, err := a.PostLocation(location)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(thingID) != 0 {
+	if thingID != nil {
 		err2 := a.LinkLocation(thingID, l.ID)
 		if err2 != nil {
 			err3 := a.DeleteLocation(l.ID)
@@ -65,7 +65,7 @@ func (a *APIv1) PostLocationByThing(thingID string, location *entities.Location)
 }
 
 // GetLocation retrieves a single location by id
-func (a *APIv1) GetLocation(id string, qo *odata.QueryOptions) (*entities.Location, error) {
+func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
@@ -92,7 +92,7 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, err
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
-func (a *APIv1) GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (a *APIv1) GetLocationsByHistoricalLocation(hlID string, qo *odata.QueryOpt
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
-func (a *APIv1) GetLocationsByThing(thingID string, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
@@ -129,17 +129,17 @@ func processLocations(a *APIv1, locations []*entities.Location, err error) (*mod
 }
 
 // PatchLocation todo
-func (a *APIv1) PatchLocation(id string, location *entities.Location) (*entities.Location, error) {
+func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
 	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
 }
 
 // DeleteLocation deletes a given Location from the database
-func (a *APIv1) DeleteLocation(id string) error {
+func (a *APIv1) DeleteLocation(id interface{}) error {
 	return a.db.DeleteLocation(id)
 }
 
 // LinkLocation links a thing with a location in the database
-func (a *APIv1) LinkLocation(thingID string, locationID string) error {
+func (a *APIv1) LinkLocation(thingID interface{}, locationID interface{}) error {
 	err3 := a.db.LinkLocation(thingID, locationID)
 	if err3 != nil {
 		return gostErrors.NewBadRequestError(err3)

@@ -13,14 +13,14 @@ import (
 )
 
 // GetThing returns a thing entity based on id and query
-func (gdb *GostDatabase) GetThing(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, description, properties from %s.thing where id = $1", gdb.Schema)
-	datastream, err := processThing(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+createSelectString(qo, "")+" from %s.thing where id = %v", gdb.Schema, intID)
+	datastream, err := processThing(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -28,47 +28,74 @@ func (gdb *GostDatabase) GetThing(id string, qo *odata.QueryOptions) (*entities.
 	return datastream, nil
 }
 
-//GetThingByDatastream retrieves the thing linked to a datastream
-func (gdb *GostDatabase) GetThingByDatastream(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	tID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func createSelectString(qo *odata.QueryOptions, prefix string) string {
+	//TODO: Get string from entity
+	pString := fmt.Sprintf("%sid, %sdescription, %sproperties", prefix, prefix, prefix)
+
+	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+		return pString
 	}
 
-	sql := fmt.Sprintf("select thing.id, thing.description, thing.properties from %s.thing INNER JOIN %s.datastream ON datastream.thing_id = thing.id WHERE datastream.id = $1;", gdb.Schema, gdb.Schema)
-	return processThing(gdb.Db, sql, tID)
+	properties := qo.QuerySelect.Params
+	pString = ""
+	for _, p := range properties {
+		toAdd := ""
+
+		if len(pString) > 0 {
+			toAdd += ", "
+		}
+
+		if len(prefix) > 0 {
+			toAdd += prefix
+		}
+
+		pString += toAdd + p
+	}
+
+	return pString
+}
+
+//GetThingByDatastream retrieves the thing linked to a datastream
+func (gdb *GostDatabase) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	}
+
+	sql := fmt.Sprintf("select "+createSelectString(qo, "thing.")+" from %s.thing INNER JOIN %s.datastream ON datastream.thing_id = thing.id WHERE datastream.id = %v;", gdb.Schema, gdb.Schema, intID)
+	return processThing(gdb.Db, sql, qo)
 }
 
 //GetThingsByLocation retrieves the thing linked to a location
-func (gdb *GostDatabase) GetThingsByLocation(id string, qo *odata.QueryOptions) ([]*entities.Thing, error) {
-	tID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("select thing.id, thing.description, thing.properties from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id	INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = $1;", gdb.Schema, gdb.Schema, gdb.Schema)
-	return processThings(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+createSelectString(qo, "thing.")+" from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = %v;", gdb.Schema, gdb.Schema, gdb.Schema, intID)
+	return processThings(gdb.Db, sql, qo)
 }
 
 //GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
-func (gdb *GostDatabase) GetThingByHistoricalLocation(id string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	tID, err := strconv.Atoi(id)
-	if err != nil {
-		return nil, err
+func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select thing.id, thing.description, thing.properties from %s.thing INNER JOIN %s.historicallocation ON historicallocation.thing_id = thing.id WHERE historicallocation.id = $1;", gdb.Schema, gdb.Schema)
-	return processThing(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+createSelectString(qo, "thing.")+" from %s.thing INNER JOIN %s.historicallocation ON historicallocation.thing_id = thing.id WHERE historicallocation.id = %v;", gdb.Schema, gdb.Schema, intID)
+	return processThing(gdb.Db, sql, qo)
 }
 
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, error) {
-	sql := fmt.Sprintf("select id, description, properties FROM %s.thing", gdb.Schema)
-	return processThings(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+createSelectString(qo, "")+" FROM %s.thing", gdb.Schema)
+	return processThings(gdb.Db, sql, qo)
 }
 
-func processThing(db *sql.DB, sql string, args ...interface{}) (*entities.Thing, error) {
-	observations, err := processThings(db, sql, args...)
+func processThing(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Thing, error) {
+	observations, err := processThings(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +107,8 @@ func processThing(db *sql.DB, sql string, args ...interface{}) (*entities.Thing,
 	return observations[0], nil
 }
 
-func processThings(db *sql.DB, sql string, args ...interface{}) ([]*entities.Thing, error) {
-	rows, err := db.Query(sql, args...)
+func processThings(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Thing, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -90,11 +117,32 @@ func processThings(db *sql.DB, sql string, args ...interface{}) ([]*entities.Thi
 
 	var things = []*entities.Thing{}
 	for rows.Next() {
-		var thingID int
+		var thingID interface{}
 		var description string
 		var properties *string
 
-		err = rows.Scan(&thingID, &description, &properties)
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			t := &entities.Thing{}
+			qp = t.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
+		}
+
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &thingID)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+			if p == "properties" {
+				params = append(params, &properties)
+			}
+		}
+
+		err = rows.Scan(params...)
 		if err != nil {
 			return nil, err
 		}
@@ -105,7 +153,7 @@ func processThings(db *sql.DB, sql string, args ...interface{}) ([]*entities.Thi
 		}
 
 		thing := entities.Thing{}
-		thing.ID = strconv.Itoa(thingID)
+		thing.ID = thingID
 		thing.Description = description
 		thing.Properties = propMap
 
@@ -131,7 +179,7 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 }
 
 // ThingExists checks if a thing is present in the database based on a given id
-func (gdb *GostDatabase) ThingExists(thingID int) bool {
+func (gdb *GostDatabase) ThingExists(thingID interface{}) bool {
 	var result bool
 	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.thing WHERE id = $1 LIMIT 1)", gdb.Schema)
 	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
@@ -143,10 +191,10 @@ func (gdb *GostDatabase) ThingExists(thingID int) bool {
 }
 
 // DeleteThing tries to delete a Thing by the given id
-func (gdb *GostDatabase) DeleteThing(id string) error {
-	intID, err := strconv.Atoi(id)
-	if err != nil {
-		return err
+func (gdb *GostDatabase) DeleteThing(id interface{}) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		return gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
 	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.thing WHERE id = $1", gdb.Schema), intID)
