@@ -11,7 +11,6 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
-	"log"
 )
 
 // HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
