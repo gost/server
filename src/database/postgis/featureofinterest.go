@@ -11,6 +11,8 @@ import (
 	"strconv"
 )
 
+var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
+
 // GetFeatureOfInterest returns a feature of interest by id
 func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	intID, ok := ToIntID(id)
@@ -18,8 +20,8 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOpt
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(feature) AS feature from %s.featureofinterest where id = $1", gdb.Schema)
-	return processFeatureOfInterest(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest where id = %v", gdb.Schema, intID)
+	return processFeatureOfInterest(gdb.Db, sql, qo)
 }
 
 // GetFeatureOfInterestByObservation returns a feature of interest by given observation id
@@ -29,14 +31,14 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select featureofinterest.id, featureofinterest.description, featureofinterest.encodingtype, public.ST_AsGeoJSON(featureofinterest.feature) AS feature from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = $1 limit 1", gdb.Schema, gdb.Schema)
-	return processFeatureOfInterest(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
+	return processFeatureOfInterest(gdb.Db, sql, qo)
 }
 
 // GetFeatureOfInterests returns all feature of interests
 func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
-	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(feature) AS feature from %s.featureofinterest", gdb.Schema)
-	return processFeatureOfInterests(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest", gdb.Schema)
+	return processFeatureOfInterests(gdb.Db, sql, qo)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
@@ -54,8 +56,8 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	return f, nil
 }
 
-func processFeatureOfInterest(db *sql.DB, sql string, args ...interface{}) (*entities.FeatureOfInterest, error) {
-	locations, err := processFeatureOfInterests(db, sql, args...)
+func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+	locations, err := processFeatureOfInterests(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +69,8 @@ func processFeatureOfInterest(db *sql.DB, sql string, args ...interface{}) (*ent
 	return locations[0], nil
 }
 
-func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*entities.FeatureOfInterest, error) {
-	rows, err := db.Query(sql, args...)
+func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -77,12 +79,35 @@ func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*
 
 	var featureOfInterests = []*entities.FeatureOfInterest{}
 	for rows.Next() {
-		var ID, encodingtype int
+		var ID interface{}
+		var encodingType int
 		var description, feature string
-		err = rows.Scan(&ID, &description, &encodingtype, &feature)
-		if err != nil {
-			return nil, err
+
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			f := &entities.FeatureOfInterest{}
+			qp = f.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
 		}
+
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &ID)
+			}
+			if p == "encodingtype" {
+				params = append(params, &encodingType)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+			if p == "feature" {
+				params = append(params, &feature)
+			}
+		}
+
+		err = rows.Scan(params...)
 
 		featureMap, err := JSONToMap(&feature)
 		if err != nil {
@@ -90,10 +115,12 @@ func processFeatureOfInterests(db *sql.DB, sql string, args ...interface{}) ([]*
 		}
 
 		foi := entities.FeatureOfInterest{}
-		foi.ID = strconv.Itoa(ID)
+		foi.ID = ID
 		foi.Description = description
 		foi.Feature = featureMap
-		foi.EncodingType = entities.EncodingValues[encodingtype].Value
+		if encodingType != 0 {
+			foi.EncodingType = entities.EncodingValues[encodingType].Value
+		}
 
 		featureOfInterests = append(featureOfInterests, &foi)
 	}
