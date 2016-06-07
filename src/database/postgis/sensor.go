@@ -18,8 +18,8 @@ func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*ent
 		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor where id = $1", gdb.Schema)
-	sensor, err := processSensor(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "")+" from %s.sensor where id = %v", gdb.Schema, intID)
+	sensor, err := processSensor(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, description, encodingtype, metadata from %s.sensor inner join %s.datastream on datastream.sensor_id = sensor.id where datastream.id = $1", gdb.Schema, gdb.Schema)
-	sensor, err := processSensor(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "")+" from %s.sensor inner join %s.datastream on datastream.sensor_id = sensor.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
+	sensor, err := processSensor(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +45,12 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 
 // GetSensors todo
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error) {
-	sql := fmt.Sprintf("select id, description, encodingtype, metadata FROM %s.sensor", gdb.Schema)
-	return processSensors(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "")+" FROM %s.sensor", gdb.Schema)
+	return processSensors(gdb.Db, sql, qo)
 }
 
-func processSensor(db *sql.DB, sql string, args ...interface{}) (*entities.Sensor, error) {
-	sensors, err := processSensors(db, sql, args...)
+func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Sensor, error) {
+	sensors, err := processSensors(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func processSensor(db *sql.DB, sql string, args ...interface{}) (*entities.Senso
 	return sensors[0], nil
 }
 
-func processSensors(db *sql.DB, sql string, args ...interface{}) ([]*entities.Sensor, error) {
-	rows, err := db.Query(sql, args...)
+func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Sensor, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -74,18 +74,46 @@ func processSensors(db *sql.DB, sql string, args ...interface{}) ([]*entities.Se
 	var sensors = []*entities.Sensor{}
 
 	for rows.Next() {
-		var id, encodingtype int
+		var id interface{}
+		var encodingtype int
 		var description, metadata string
-		err = rows.Scan(&id, &description, &encodingtype, &metadata)
+
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			s := &entities.Sensor{}
+			qp = s.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
+		}
+
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &id)
+			}
+			if p == "encodingType" {
+				params = append(params, &encodingtype)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+			if p == "metadata" {
+				params = append(params, &metadata)
+			}
+		}
+
+		err = rows.Scan(params...)
 		if err != nil {
 			return nil, err
 		}
 
 		sensor := entities.Sensor{}
-		sensor.ID = strconv.Itoa(id)
+		sensor.ID = id
 		sensor.Description = description
 		sensor.Metadata = metadata
-		sensor.EncodingType = entities.EncodingValues[encodingtype].Value
+		if encodingtype != 0 {
+			sensor.EncodingType = entities.EncodingValues[encodingtype].Value
+		}
 
 		sensors = append(sensors, &sensor)
 	}

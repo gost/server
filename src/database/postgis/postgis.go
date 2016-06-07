@@ -7,7 +7,9 @@ import (
 	"log"
 
 	"encoding/json"
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
+	"github.com/geodan/gost/src/sensorthings/odata"
 	_ "github.com/lib/pq" // postgres driver
 	"strconv"
 	"strings"
@@ -165,9 +167,39 @@ func ToIntID(id interface{}) (int, bool) {
 		}
 		return intID, true
 	case float64:
-		var intId int = int(t)
-		return intId, true
+		intID, ok := id.(int)
+		if !ok {
+			return 0, false
+		}
+		return intID, true
 	}
 
 	return 0, false
+}
+
+// CreateSelectString creates a select string based on available parameters and or QuerySelect option
+func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string) string {
+	var properties []string
+
+	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+		properties = e.GetPropertyNames()
+	} else {
+		properties = qo.QuerySelect.Params
+	}
+
+	s := ""
+	for _, p := range properties {
+		toAdd := ""
+
+		if len(s) > 0 {
+			toAdd += ", "
+		}
+		if len(prefix) > 0 {
+			toAdd += prefix
+		}
+
+		s += toAdd + p
+	}
+
+	return s
 }
