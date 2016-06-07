@@ -25,7 +25,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 	if err2 != nil {
 		return nil, []error{err2}
 	}
-	l.SetLinks(a.config.GetExternalServerURI())
+	l.SetAllLinks(a.config.GetExternalServerURI())
 	return l, nil
 }
 
@@ -59,7 +59,7 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 		}
 	}
 
-	l.SetLinks(a.config.GetExternalServerURI())
+	l.SetAllLinks(a.config.GetExternalServerURI())
 
 	return l, nil
 }
@@ -76,7 +76,7 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.L
 		return nil, err
 	}
 
-	l.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(l, qo)
 	return l, nil
 }
 
@@ -88,7 +88,7 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, err
 	}
 
 	locations, err := a.db.GetLocations(qo)
-	return processLocations(a, locations, err)
+	return processLocations(a, locations, qo, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
@@ -99,7 +99,7 @@ func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.Que
 	}
 
 	locations, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
-	return processLocations(a, locations, err)
+	return processLocations(a, locations, qo, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
@@ -110,14 +110,13 @@ func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions)
 	}
 
 	locations, err := a.db.GetLocationsByThing(thingID, qo)
-	return processLocations(a, locations, err)
+	return processLocations(a, locations, qo, err)
 }
 
-func processLocations(a *APIv1, locations []*entities.Location, err error) (*models.ArrayResponse, error) {
-	uri := a.config.GetExternalServerURI()
+func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		locations[idx] = &i
 	}
 

@@ -20,7 +20,7 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities
 		return nil, err
 	}
 
-	ds.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(ds, qo)
 	return ds, nil
 }
 
@@ -32,7 +32,7 @@ func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, e
 	}
 
 	datastreams, err := a.db.GetDatastreams(qo)
-	return processDatastreams(a, datastreams, err)
+	return processDatastreams(a, datastreams, qo, err)
 
 }
 
@@ -44,7 +44,7 @@ func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOption
 	}
 
 	datastreams, err := a.db.GetDatastreamsByThing(thingID, qo)
-	return processDatastreams(a, datastreams, err)
+	return processDatastreams(a, datastreams, qo, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
@@ -59,7 +59,7 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 		return nil, err
 	}
 
-	ds.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(ds, qo)
 	return ds, nil
 }
 
@@ -71,7 +71,7 @@ func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOpti
 	}
 
 	datastreams, err := a.db.GetDatastreamsBySensor(sensorID, qo)
-	return processDatastreams(a, datastreams, err)
+	return processDatastreams(a, datastreams, qo, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
@@ -82,18 +82,17 @@ func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.Quer
 	}
 
 	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
-	return processDatastreams(a, datastreams, err)
+	return processDatastreams(a, datastreams, qo, err)
 }
 
-func processDatastreams(a *APIv1, datastreams []*entities.Datastream, err error) (*models.ArrayResponse, error) {
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerURI()
 	for idx, item := range datastreams {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		datastreams[idx] = &i
 	}
 
@@ -157,7 +156,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 		return nil, []error{err2}
 	}
 
-	ns.SetLinks(a.config.GetExternalServerURI())
+	ns.SetAllLinks(a.config.GetExternalServerURI())
 
 	return ns, nil
 }

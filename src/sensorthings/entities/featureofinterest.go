@@ -52,9 +52,19 @@ func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 	return true, nil
 }
 
-// SetLinks sets the entity specific navigation links if needed
-func (f *FeatureOfInterest) SetLinks(externalURL string) {
+// SetAllLinks sets the self link and relational links
+func (f *FeatureOfInterest) SetAllLinks(externalURL string) {
+	f.SetSelfLink(externalURL)
+	f.SetLinks(externalURL)
+}
+
+// SetSelfLink sets the self link for the entity
+func (f *FeatureOfInterest) SetSelfLink(externalURL string) {
 	f.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkFeatureOfInterests.ToString(), f.ID)
+}
+
+// SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
+func (f *FeatureOfInterest) SetLinks(externalURL string) {
 	f.NavObservations = CreateEntityLink(f.Observations == nil, externalURL, EntityLinkFeatureOfInterests.ToString(), EntityLinkObservations.ToString(), f.ID)
 }
 

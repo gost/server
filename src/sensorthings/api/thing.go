@@ -21,7 +21,7 @@ func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thin
 		return nil, err
 	}
 
-	a.SetLinks(t, qo)
+	a.ProcessGetRequest(t, qo)
 	return t, nil
 }
 
@@ -37,7 +37,7 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*e
 		return nil, err
 	}
 
-	a.SetLinks(t, qo)
+	a.ProcessGetRequest(t, qo)
 	return t, nil
 }
 
@@ -62,7 +62,7 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 		return nil, err
 	}
 
-	a.SetLinks(t, qo)
+	a.ProcessGetRequest(t, qo)
 	return t, nil
 }
 
@@ -83,7 +83,7 @@ func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOpti
 
 	for idx, item := range observations {
 		i := *item
-		a.SetLinks(&i, qo)
+		a.ProcessGetRequest(&i, qo)
 		observations[idx] = &i
 	}
 
@@ -132,7 +132,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 		}
 	}
 
-	nt.SetLinks(a.config.GetExternalServerURI())
+	nt.SetAllLinks(a.config.GetExternalServerURI())
 	//push to mqtt
 	return nt, nil
 }

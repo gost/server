@@ -21,7 +21,7 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions) (*entitie
 		return nil, err
 	}
 
-	o.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(o, qo)
 	return o, nil
 }
 
@@ -33,7 +33,7 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions) (*models.ArrayResponse, 
 	}
 
 	observations, err := a.db.GetObservations(qo)
-	return processObservations(a, observations, err)
+	return processObservations(a, observations, qo, err)
 }
 
 // GetObservationsByFeatureOfInterest todo
@@ -44,7 +44,7 @@ func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.
 	}
 
 	observations, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
-	return processObservations(a, observations, err)
+	return processObservations(a, observations, qo, err)
 }
 
 // GetObservationsByDatastream todo
@@ -55,18 +55,17 @@ func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.
 	}
 
 	observations, err := a.db.GetObservationsByDatastream(datastreamID, qo)
-	return processObservations(a, observations, err)
+	return processObservations(a, observations, qo, err)
 }
 
-func processObservations(a *APIv1, observations []*entities.Observation, err error) (*models.ArrayResponse, error) {
+func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerURI()
 	for idx, item := range observations {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		observations[idx] = &i
 	}
 
@@ -90,7 +89,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		return nil, []error{err2}
 	}
 
-	no.SetLinks(a.config.GetExternalServerURI())
+	no.SetAllLinks(a.config.GetExternalServerURI())
 
 	json, _ := json.Marshal(no)
 	s := string(json)

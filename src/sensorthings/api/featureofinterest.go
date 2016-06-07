@@ -20,7 +20,7 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*e
 		return nil, err
 	}
 
-	l.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(l, qo)
 	return l, nil
 }
 
@@ -36,7 +36,7 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 		return nil, err
 	}
 
-	l.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(l, qo)
 	return l, nil
 }
 
@@ -48,14 +48,13 @@ func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions) (*models.ArrayResp
 	}
 
 	fois, err := a.db.GetFeatureOfInterests(qo)
-	return processFeatureOfInterest(a, fois, err)
+	return processFeatureOfInterest(a, fois, qo, err)
 }
 
-func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, err error) (*models.ArrayResponse, error) {
-	uri := a.config.GetExternalServerURI()
+func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		fois[idx] = &i
 	}
 
@@ -83,7 +82,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 		return nil, []error{err2}
 	}
 
-	l.SetLinks(a.config.GetExternalServerURI())
+	l.SetAllLinks(a.config.GetExternalServerURI())
 	return l, nil
 }
 

@@ -490,9 +490,16 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 
 	//If request contains parameters from route wildcard convert it to a select query
 	vars := mux.Vars(r)
-	value := vars["params"]
+	value := []string{vars["params"]}
+
 	if len(value) > 0 {
-		query["$select"] = []string{value}
+		//If $ref found create select query with id
+		if vars["params"] == "$ref" {
+			value = []string{"id"}
+			query["$ref"] = []string{"true"}
+		}
+
+		query["$select"] = value
 	}
 
 	if len(query) == 0 {

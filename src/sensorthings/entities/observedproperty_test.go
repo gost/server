@@ -73,7 +73,7 @@ func TestSetLinksSObservedProperty(t *testing.T) {
 	op.ID = id
 
 	//act
-	op.SetLinks(externalURL)
+	op.SetAllLinks(externalURL)
 
 	//assert
 	assert.Equal(t, op.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkObservedPropertys.ToString(), id), "ObservedProperty navself incorrect")

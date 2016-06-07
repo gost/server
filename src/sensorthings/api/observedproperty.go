@@ -20,7 +20,7 @@ func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*en
 		return nil, err
 	}
 
-	op.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(op, qo)
 	return op, nil
 }
 
@@ -36,7 +36,7 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 		return nil, err
 	}
 
-	op.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(op, qo)
 	return op, nil
 }
 
@@ -52,10 +52,9 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions) (*models.ArrayResp
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerURI()
 	for idx, item := range ops {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		ops[idx] = &i
 	}
 
@@ -80,7 +79,7 @@ func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.O
 		return nil, []error{err2}
 	}
 
-	nop.SetLinks(a.config.GetExternalServerURI())
+	nop.SetAllLinks(a.config.GetExternalServerURI())
 
 	return nop, nil
 }

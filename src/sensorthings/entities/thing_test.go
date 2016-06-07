@@ -70,7 +70,7 @@ func TestSetLinksThing(t *testing.T) {
 	thing.ID = id
 
 	//act
-	thing.SetLinks(externalURL)
+	thing.SetAllLinks(externalURL)
 
 	//assert
 	assert.Equal(t, thing.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkThings.ToString(), id), "Thing navself incorrect")

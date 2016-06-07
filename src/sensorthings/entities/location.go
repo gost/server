@@ -60,9 +60,19 @@ func (l *Location) ContainsMandatoryParams() (bool, []error) {
 	return true, nil
 }
 
-// SetLinks sets the entity specific navigation links if needed
-func (l *Location) SetLinks(externalURL string) {
+// SetAllLinks sets the self link and relational links
+func (l *Location) SetAllLinks(externalURL string) {
+	l.SetSelfLink(externalURL)
+	l.SetLinks(externalURL)
+}
+
+// SetSelfLink sets the self link for the entity
+func (l *Location) SetSelfLink(externalURL string) {
 	l.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkLocations.ToString(), l.ID)
+}
+
+// SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
+func (l *Location) SetLinks(externalURL string) {
 	l.NavThings = CreateEntityLink(l.Things == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkThings.ToString(), l.ID)
 	l.NavHistoricalLocations = CreateEntityLink(l.HistoricalLocations == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkHistoricalLocations.ToString(), l.ID)
 }

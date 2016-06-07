@@ -83,6 +83,11 @@ func (b *BaseEntity) GetSupportedEncoding() map[int]EncodingType {
 	return nil
 }
 
+// SetID sets a newID on the entity
+func (b *BaseEntity) SetID(newID interface{}) {
+	b.ID = newID
+}
+
 // ToString return the string representation of the EntityLink.
 func (e EntityLink) ToString() string {
 	return fmt.Sprintf("%s", e)
@@ -92,6 +97,9 @@ func (e EntityLink) ToString() string {
 type Entity interface {
 	ParseEntity(data []byte) error
 	ContainsMandatoryParams() (bool, []error)
+	SetID(newID interface{})
+	SetAllLinks(externalURL string)
+	SetSelfLink(externalURL string)
 	SetLinks(externalURL string)
 	GetSelfLink() string
 	GetEntityType() EntityType

@@ -98,8 +98,13 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 	//qo.QueryExpand.IsValid("PARAMS", "EPNAME")
 }
 
-func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
-	if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 {
-		entity.SetLinks(a.config.GetExternalServerURI())
+func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions) {
+	// a $ref request, id's are selected to create selfLink, remove after setting self url
+	if qo != nil && qo.QueryOptionRef {
+		entity.SetSelfLink(a.config.GetExternalServerURI())
+		entity.SetID(nil)
+
+	} else if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 { //no query options, set all links
+		entity.SetAllLinks(a.config.GetExternalServerURI())
 	}
 }

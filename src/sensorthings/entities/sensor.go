@@ -52,9 +52,19 @@ func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 	return true, nil
 }
 
-// SetLinks sets the entity specific navigation links if needed
-func (s *Sensor) SetLinks(externalURL string) {
+// SetAllLinks sets the self link and relational links
+func (s *Sensor) SetAllLinks(externalURL string) {
+	s.SetSelfLink(externalURL)
+	s.SetLinks(externalURL)
+}
+
+// SetSelfLink sets the self link for the entity
+func (s *Sensor) SetSelfLink(externalURL string) {
 	s.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkSensors.ToString(), s.ID)
+}
+
+// SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
+func (s *Sensor) SetLinks(externalURL string) {
 	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, externalURL, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
 }
 

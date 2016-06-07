@@ -29,6 +29,7 @@ const (
 	QueryOptionCount
 	QueryOptionFilter
 	QueryOptionResultFormat
+	QueryOptionRef
 )
 
 // QueryOptionValues is a list of names mapped to their QueryOptionType
@@ -41,6 +42,7 @@ var QueryOptionValues = []string{
 	QueryOptionCount:        "$count",
 	QueryOptionFilter:       "$filter",
 	QueryOptionResultFormat: "$resultFormat",
+	QueryOptionRef:          "$ref",
 }
 
 // String returns the string representation of the current QueryOptionType
@@ -58,6 +60,7 @@ type QueryOptions struct {
 	QueryCount        *QueryCount
 	QueryFilter       *QueryFilter
 	QueryResultFormat *QueryResultFormat
+	QueryOptionRef    bool
 }
 
 // CreateQueryOptions parses the requested request parameters into usable Query options
@@ -103,6 +106,9 @@ func CreateQueryOptions(queryParams url.Values) (*QueryOptions, []error) {
 		case QueryOptionResultFormat.String():
 			qo.QueryResultFormat = &QueryResultFormat{}
 			ParseQueryOption(value, qo.QueryResultFormat, err)
+			break
+		case QueryOptionRef.String():
+			qo.QueryOptionRef = true
 			break
 		default:
 			// Req 21 If a service does not support a system query option, it SHALL fail any request that contains the

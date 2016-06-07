@@ -93,7 +93,7 @@ func processSensors(db *sql.DB, sql string, args ...interface{}) ([]*entities.Se
 	return sensors, nil
 }
 
-// PostSensor todo
+// PostSensor posts a sensor to the database
 func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
 	encoding, _ := entities.CreateEncodingType(sensor.EncodingType)

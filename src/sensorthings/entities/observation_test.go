@@ -22,7 +22,7 @@ func TestSetLinksReturnsCorrectLinks(t *testing.T) {
 	observation := &Observation{}
 
 	// act
-	observation.SetLinks("www.nu.nl")
+	observation.SetAllLinks("www.nu.nl")
 
 	// assert
 	assert.NotNil(t, observation.NavSelf, " NAvSelf should be filled in")

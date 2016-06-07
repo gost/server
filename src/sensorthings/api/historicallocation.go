@@ -20,7 +20,7 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*
 		return nil, err
 	}
 
-	hl.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(hl, qo)
 	return hl, nil
 }
 
@@ -32,7 +32,7 @@ func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions) (*models.ArrayRes
 	}
 
 	hl, err := a.db.GetHistoricalLocations(qo)
-	return processHistoricalLocations(a, hl, err)
+	return processHistoricalLocations(a, hl, qo, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
@@ -43,7 +43,7 @@ func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *oda
 	}
 
 	hl, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
-	return processHistoricalLocations(a, hl, err)
+	return processHistoricalLocations(a, hl, qo, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
@@ -54,14 +54,13 @@ func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.Que
 	}
 
 	hl, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
-	return processHistoricalLocations(a, hl, err)
+	return processHistoricalLocations(a, hl, qo, err)
 }
 
-func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, err error) (*models.ArrayResponse, error) {
-	uri := a.config.GetExternalServerURI()
+func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
 	for idx, item := range historicalLocations {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		historicalLocations[idx] = &i
 	}
 

@@ -73,7 +73,7 @@ func TestSetLinksSensor(t *testing.T) {
 	sensor.ID = id
 
 	//act
-	sensor.SetLinks(externalURL)
+	sensor.SetAllLinks(externalURL)
 
 	//assert
 	assert.Equal(t, sensor.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkSensors.ToString(), id), "Sensor navself incorrect")

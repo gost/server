@@ -20,7 +20,7 @@ func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sen
 		return nil, err
 	}
 
-	s.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(s, qo)
 	return s, nil
 }
 
@@ -36,7 +36,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*
 		return nil, err
 	}
 
-	s.SetLinks(a.config.GetExternalServerURI())
+	a.ProcessGetRequest(s, qo)
 	return s, nil
 }
 
@@ -52,10 +52,9 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error
 		return nil, err
 	}
 
-	uri := a.config.GetExternalServerURI()
 	for idx, item := range sensors {
 		i := *item
-		i.SetLinks(uri)
+		a.ProcessGetRequest(&i, qo)
 		sensors[idx] = &i
 	}
 
@@ -83,7 +82,7 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 		return nil, []error{err2}
 	}
 
-	ns.SetLinks(a.config.GetExternalServerURI())
+	ns.SetAllLinks(a.config.GetExternalServerURI())
 
 	return ns, nil
 }

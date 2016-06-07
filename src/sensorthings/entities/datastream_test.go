@@ -12,7 +12,7 @@ func TestSetLinksReturnsVariousLinks(t *testing.T) {
 	// todo: what happens if there is no ID?
 
 	// act
-	datastream.SetLinks("http://www.nu.nl")
+	datastream.SetAllLinks("http://www.nu.nl")
 
 	// assert
 	assert.NotNil(t, datastream.NavSelf, "NavSelf should be filled in")

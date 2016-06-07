@@ -79,7 +79,7 @@ func TestSetLinksLocation(t *testing.T) {
 	location.ID = id
 
 	//act
-	location.SetLinks(externalURL)
+	location.SetAllLinks(externalURL)
 
 	//assert
 	assert.Equal(t, location.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkLocations.ToString(), id), "Location navself incorrect")
