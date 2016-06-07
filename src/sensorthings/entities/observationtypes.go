@@ -12,15 +12,17 @@ type ObservationType struct {
 
 // List of supported ObservationTypes
 var (
-	OMCategoryObservation = ObservationType{0, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"} // IRI
-	OMCountObservation    = ObservationType{1, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation"}    // integer
-	OMMeasurement         = ObservationType{2, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"}         // double
-	OMObservation         = ObservationType{3, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"}         // any
-	OMTruthObservation    = ObservationType{4, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation"}    // boolean
+	OMCategoryUnknown     = ObservationType{0, ""}
+	OMCategoryObservation = ObservationType{1, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"} // IRI
+	OMCountObservation    = ObservationType{2, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CountObservation"}    // integer
+	OMMeasurement         = ObservationType{3, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement"}         // double
+	OMObservation         = ObservationType{4, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Observation"}         // any
+	OMTruthObservation    = ObservationType{5, "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_TruthObservation"}    // boolean
 )
 
 // ObservationTypes is a list of names mapped to their ObservationType Value
 var ObservationTypes = []ObservationType{
+	OMCategoryUnknown,
 	OMCategoryObservation,
 	OMCountObservation,
 	OMMeasurement,

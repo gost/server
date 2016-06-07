@@ -19,13 +19,13 @@ func TestGetObservationTypeByValueShouldReturnCorrectObservationType(t *testing.
 
 	// assert
 	assert.Nil(t, err, "Error should not be nil")
-	assert.True(t, res.Code == 0, "Code should be 0")
+	assert.True(t, res.Code == 1, "Code should be 1")
 }
 
 func TestGetObservationTypeByCodeShouldReturnCorrectObservationType(t *testing.T) {
 	// arrange
 	expected := "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"
-	input := 0
+	input := 1
 
 	// act
 	res, err := GetObservationTypeByID(input)

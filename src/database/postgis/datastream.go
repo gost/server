@@ -12,6 +12,8 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
+var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
+
 // GetDatastream retrieves a datastream by id
 func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	intID, ok := ToIntID(id)
@@ -19,8 +21,8 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream where id = $1", gdb.Schema)
-	datastream, err := processDatastream(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream where id = %v", gdb.Schema, intID)
+	datastream, err := processDatastream(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +32,8 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 
 // GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, error) {
-	sql := fmt.Sprintf("select observationtype, id, description, unitofmeasurement, public.ST_AsGeoJSON(observedarea) AS observedarea FROM %s.datastream", gdb.Schema)
-	return processDatastreams(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream", gdb.Schema)
+	return processDatastreams(gdb.Db, sql, qo)
 }
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
@@ -41,8 +43,8 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, q
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = $1", gdb.Schema, gdb.Schema)
-	return processDatastream(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = %v", gdb.Schema, gdb.Schema, tID)
+	return processDatastream(gdb.Db, sql, qo)
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
@@ -52,8 +54,8 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.Qu
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = $1", gdb.Schema, gdb.Schema)
-	return processDatastreams(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = %v", gdb.Schema, gdb.Schema, tID)
+	return processDatastreams(gdb.Db, sql, qo)
 }
 
 // GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
@@ -63,8 +65,8 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = $1", gdb.Schema, gdb.Schema)
-	return processDatastreams(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = %v", gdb.Schema, gdb.Schema, tID)
+	return processDatastreams(gdb.Db, sql, qo)
 }
 
 // GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
@@ -74,12 +76,12 @@ func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *o
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observationtype, datastream.id, datastream.description, datastream.unitofmeasurement, public.ST_AsGeoJSON(datastream.observedarea) AS observedarea  FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = $1", gdb.Schema, gdb.Schema)
-	return processDatastreams(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = %v", gdb.Schema, gdb.Schema, tID)
+	return processDatastreams(gdb.Db, sql, qo)
 }
 
-func processDatastream(db *sql.DB, sql string, args ...interface{}) (*entities.Datastream, error) {
-	datastreams, err := processDatastreams(db, sql, args...)
+func processDatastream(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Datastream, error) {
+	datastreams, err := processDatastreams(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +93,8 @@ func processDatastream(db *sql.DB, sql string, args ...interface{}) (*entities.D
 	return datastreams[0], nil
 }
 
-func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entities.Datastream, error) {
-	rows, err := db.Query(sql, args...)
+func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Datastream, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -101,15 +103,39 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 
 	var datastreams = []*entities.Datastream{}
 	for rows.Next() {
-		var id int
+		var id interface{}
 		var description, unitofmeasurement string
 		var observedarea *string
 		var ot int
 
-		err := rows.Scan(&ot, &id, &description, &unitofmeasurement, &observedarea)
-		if err != nil {
-			return nil, err
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			d := &entities.Datastream{}
+			qp = d.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
 		}
+
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &id)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+			if p == "unitOfMeasurement" {
+				params = append(params, &unitofmeasurement)
+			}
+			if p == "observationType" {
+				params = append(params, &ot)
+			}
+			if p == "observedArea" {
+				params = append(params, &observedarea)
+			}
+		}
+
+		err = rows.Scan(params...)
 
 		unitOfMeasurementMap, err := JSONToMap(&unitofmeasurement)
 		if err != nil {
@@ -122,12 +148,14 @@ func processDatastreams(db *sql.DB, sql string, args ...interface{}) ([]*entitie
 		}
 
 		datastream := entities.Datastream{}
-		datastream.ID = strconv.Itoa(id)
+		datastream.ID = id
 		datastream.Description = description
 		datastream.UnitOfMeasurement = unitOfMeasurementMap
 		datastream.ObservedArea = observedAreaMap
-		obs, _ := entities.GetObservationTypeByID(ot)
-		datastream.ObservationType = obs.Value
+		if ot != 0 {
+			obs, _ := entities.GetObservationTypeByID(ot)
+			datastream.ObservationType = obs.Value
+		}
 
 		datastreams = append(datastreams, &datastream)
 	}
