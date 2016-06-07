@@ -7,7 +7,7 @@ server:
     maxEntityResponse: 20
     indentedJson: true
 database:
-    host: localhost
+    host: 192.168.40.10
     port: 5432
     user: postgres
     password: postgres
