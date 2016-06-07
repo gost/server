@@ -98,6 +98,7 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 	//qo.QueryExpand.IsValid("PARAMS", "EPNAME")
 }
 
+// ProcessGetRequest processes the entities by setting the necessary links before sending back
 func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions) {
 	// a $ref request, id's are selected to create selfLink, remove after setting self url
 	if qo != nil && qo.QueryOptionRef {

@@ -3,7 +3,6 @@ package odata
 import (
 	"strings"
 
-	"errors"
 	"fmt"
 )
 
@@ -33,7 +32,7 @@ func (q *QuerySelect) IsValid(values []string) (bool, error) {
 		}
 
 		if !found {
-			return false, errors.New(fmt.Sprintf("Parameter %s not supported", rp))
+			return false, fmt.Errorf("Parameter %s not supported", rp)
 		}
 
 	}
