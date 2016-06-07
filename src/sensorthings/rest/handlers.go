@@ -492,7 +492,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 	vars := mux.Vars(r)
 	value := []string{vars["params"]}
 
-	if len(value) > 0 {
+	if len(vars["params"]) > 0 {
 		//If $ref found create select query with id
 		if vars["params"] == "$ref" {
 			value = []string{"id"}

@@ -33,7 +33,7 @@ func (q *QuerySelect) IsValid(values []string) (bool, error) {
 		}
 
 		if !found {
-			return false, errors.New(fmt.Sprintf("Paramater %s not supported", rp))
+			return false, errors.New(fmt.Sprintf("Parameter %s not supported", rp))
 		}
 
 	}
@@ -48,7 +48,7 @@ func (q *QuerySelect) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QuerySelect is nil
 func (q *QuerySelect) IsNil() bool {
-	if q == nil {
+	if q == nil || len(q.Params) == 0 {
 		return true
 	}
 
