@@ -12,6 +12,8 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
+var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
+
 // GetLocation retrieves the location for the given id from the database
 func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(id)
@@ -19,14 +21,14 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location where id = $1", gdb.Schema)
-	return processLocation(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location where id = %v", gdb.Schema, intID)
+	return processLocation(gdb.Db, sql, qo)
 }
 
 // GetLocations retrieves all locations
 func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, error) {
-	sql := fmt.Sprintf("select id, description, encodingtype, public.ST_AsGeoJSON(location) AS location from %s.location", gdb.Schema)
-	return processLocations(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location", gdb.Schema)
+	return processLocations(gdb.Db, sql, qo)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
@@ -36,8 +38,8 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = $1 limit 1", gdb.Schema, gdb.Schema)
-	return processLocations(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
+	return processLocations(gdb.Db, sql, qo)
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
@@ -47,12 +49,12 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.Quer
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	sql := fmt.Sprintf("select location.id, location.description, location.encodingtype, public.ST_AsGeoJSON(location.location) AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = $1 limit 1", gdb.Schema, gdb.Schema)
-	return processLocations(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = %v limit 1", gdb.Schema, gdb.Schema, intID)
+	return processLocations(gdb.Db, sql, qo)
 }
 
-func processLocation(db *sql.DB, sql string, args ...interface{}) (*entities.Location, error) {
-	locations, err := processLocations(db, sql, args...)
+func processLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Location, error) {
+	locations, err := processLocations(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -64,19 +66,44 @@ func processLocation(db *sql.DB, sql string, args ...interface{}) (*entities.Loc
 	return locations[0], nil
 }
 
-func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.Location, error) {
-	rows, err := db.Query(sql, args...)
+func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Location, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
-
 	if err != nil {
 		return nil, err
 	}
 
 	var locations = []*entities.Location{}
 	for rows.Next() {
-		var sensorID, encodingtype int
+		var sensorID interface{}
+		var encodingType int
 		var description, location string
-		err = rows.Scan(&sensorID, &description, &encodingtype, &location)
+
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			s := &entities.Location{}
+			qp = s.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
+		}
+
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &sensorID)
+			}
+			if p == "encodingType" {
+				params = append(params, &encodingType)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+			if p == "location" {
+				params = append(params, &location)
+			}
+		}
+
+		err = rows.Scan(params...)
 		if err != nil {
 			return nil, err
 		}
@@ -87,11 +114,12 @@ func processLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.
 		}
 
 		l := entities.Location{}
-		l.ID = strconv.Itoa(sensorID)
+		l.ID = sensorID
 		l.Description = description
 		l.Location = locationMap
-		l.EncodingType = entities.EncodingValues[encodingtype].Value
-
+		if encodingType != 0 {
+			l.EncodingType = entities.EncodingValues[encodingType].Value
+		}
 		locations = append(locations, &l)
 	}
 

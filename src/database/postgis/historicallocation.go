@@ -4,13 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
+
+var hlMapping = map[string]string{"time": fmt.Sprintf("to_char(time at time zone 'UTC', '%s') as time", TimeFormat)}
 
 // GetHistoricalLocation retireves a HistoricalLocation by id
 func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
@@ -19,8 +20,8 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where id = $1", TimeFormat, gdb.Schema)
-	historicallocation, err := processHistoricalLocation(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where id = %v", gdb.Schema, intID)
+	historicallocation, err := processHistoricalLocation(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +31,8 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 
 // GetHistoricalLocations retrieves all historicallocations
 func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation", TimeFormat, gdb.Schema)
-	return processHistoricalLocations(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation", gdb.Schema)
+	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 
 // GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
@@ -40,8 +41,8 @@ func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where location_id = $1", TimeFormat, gdb.Schema)
-	return processHistoricalLocations(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where location_id = %v", gdb.Schema, tID)
+	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
@@ -50,12 +51,12 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
-	sql := fmt.Sprintf("select id, to_char(time at time zone 'UTC', '%s') as time FROM %s.historicallocation where thing_id = $1", TimeFormat, gdb.Schema)
-	return processHistoricalLocations(gdb.Db, sql, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where thing_id = %v", gdb.Schema, tID)
+	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 
-func processHistoricalLocation(db *sql.DB, sql string, args ...interface{}) (*entities.HistoricalLocation, error) {
-	hls, err := processHistoricalLocations(db, sql, args...)
+func processHistoricalLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
+	hls, err := processHistoricalLocations(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +68,8 @@ func processHistoricalLocation(db *sql.DB, sql string, args ...interface{}) (*en
 	return hls[0], nil
 }
 
-func processHistoricalLocations(db *sql.DB, sql string, args ...interface{}) ([]*entities.HistoricalLocation, error) {
-	rows, err := db.Query(sql, args...)
+func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -77,16 +78,31 @@ func processHistoricalLocations(db *sql.DB, sql string, args ...interface{}) ([]
 
 	var hls = []*entities.HistoricalLocation{}
 	for rows.Next() {
-		var id int
+		var id interface{}
 		var time string
 
-		err := rows.Scan(&id, &time)
-		if err != nil {
-			return nil, err
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			s := &entities.Location{}
+			qp = s.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
 		}
 
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &id)
+			}
+			if p == "time" {
+				params = append(params, &time)
+			}
+		}
+
+		err = rows.Scan(params...)
+
 		datastream := entities.HistoricalLocation{}
-		datastream.ID = strconv.Itoa(id)
+		datastream.ID = id
 		datastream.Time = time
 
 		hls = append(hls, &datastream)
