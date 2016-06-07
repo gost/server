@@ -25,5 +25,5 @@ const (
 // will be formatted into "The value -1 for $top is invalid, please provide a non-negative integer"
 func CreateQueryError(msg QueryErrorMessage, status int, value ...string) error {
 	m := fmt.Sprintf("%s", msg)
-	return gostErrors.NewErrorWithStatusCode(fmt.Errorf("%s %s", m, value), status)
+	return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value), status)
 }
