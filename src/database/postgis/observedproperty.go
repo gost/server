@@ -18,8 +18,8 @@ func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOpti
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty where id = $1", gdb.Schema)
-	observedProperty, err := processObservedProperty(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "")+" FROM %s.observedproperty where id = %v", gdb.Schema, intID)
+	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select observedproperty.id, observedproperty.name, observedproperty.definition, observedproperty.description FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = $1", gdb.Schema, gdb.Schema)
-	observedProperty, err := processObservedProperty(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "observedproperty.")+" FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
+	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,12 +45,12 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
-	sql := fmt.Sprintf("select id, name, definition, description FROM %s.observedproperty", gdb.Schema)
-	return processObservedProperties(gdb.Db, sql)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "")+" FROM %s.observedproperty", gdb.Schema)
+	return processObservedProperties(gdb.Db, sql, qo)
 }
 
-func processObservedProperty(db *sql.DB, sql string, args ...interface{}) (*entities.ObservedProperty, error) {
-	observedProperties, err := processObservedProperties(db, sql, args...)
+func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
+	observedProperties, err := processObservedProperties(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func processObservedProperty(db *sql.DB, sql string, args ...interface{}) (*enti
 	return observedProperties[0], nil
 }
 
-func processObservedProperties(db *sql.DB, sql string, args ...interface{}) ([]*entities.ObservedProperty, error) {
-	rows, err := db.Query(sql, args...)
+func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
+	rows, err := db.Query(sql)
 	if err != nil {
 		return nil, err
 	}
@@ -72,17 +72,42 @@ func processObservedProperties(db *sql.DB, sql string, args ...interface{}) ([]*
 	var observedProperties = []*entities.ObservedProperty{}
 
 	for rows.Next() {
-		var opID int
+		var opID interface{}
 		var name string
 		var definition string
 		var description string
-		err2 := rows.Scan(&opID, &name, &definition, &description)
-		if err2 != nil {
-			return nil, err2
+
+		var params []interface{}
+		var qp []string
+		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			op := &entities.ObservedProperty{}
+			qp = op.GetPropertyNames()
+		} else {
+			qp = qo.QuerySelect.Params
 		}
 
+		for _, p := range qp {
+			if p == "id" {
+				params = append(params, &opID)
+			}
+			if p == "name" {
+				params = append(params, &name)
+			}
+			if p == "definition" {
+				params = append(params, &definition)
+			}
+			if p == "description" {
+				params = append(params, &description)
+			}
+		}
+
+		err = rows.Scan(params...)
+
+		if err != nil {
+			return nil, err
+		}
 		op := entities.ObservedProperty{}
-		op.ID = strconv.Itoa(opID)
+		op.ID = opID
 		op.Name = name
 		op.Definition = definition
 		op.Description = description
