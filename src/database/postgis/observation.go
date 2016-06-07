@@ -18,8 +18,8 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where id = $1", gdb.Schema)
-	observation, err := processObservation(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where id = %v", gdb.Schema, intID)
+	observation, err := processObservation(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 // GetObservations retrieves all datastreams
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, error) {
 	sql := fmt.Sprintf("select id, data FROM %s.observation", gdb.Schema)
-	return processObservations(gdb.Db, sql)
+	return processObservations(gdb.Db, sql, qo)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
@@ -40,8 +40,8 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, q
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = $1", gdb.Schema)
-	return processObservations(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo)
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
@@ -51,12 +51,12 @@ func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, q
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = $1", gdb.Schema)
-	return processObservations(gdb.Db, sql, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo)
 }
 
-func processObservation(db *sql.DB, sql string, args ...interface{}) (*entities.Observation, error) {
-	observations, err := processObservations(db, sql, args...)
+func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Observation, error) {
+	observations, err := processObservations(db, sql, qo)
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,8 @@ func processObservation(db *sql.DB, sql string, args ...interface{}) (*entities.
 	return observations[0], nil
 }
 
-func processObservations(db *sql.DB, sql string, args ...interface{}) ([]*entities.Observation, error) {
-	rows, err := db.Query(sql, args...)
+func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
@@ -92,6 +92,42 @@ func processObservations(db *sql.DB, sql string, args ...interface{}) ([]*entiti
 
 		if err != nil {
 			return nil, err
+		}
+
+		if qo != nil && qo.QuerySelect != nil && len(qo.QuerySelect.Params) > 0 {
+			set := make(map[string]bool)
+			for _, v := range qo.QuerySelect.Params {
+				set[v] = true
+			}
+
+			_, ok := set["id"]
+			if !ok {
+				observation.ID = nil
+			}
+			_, ok = set["phenomenonTime"]
+			if !ok {
+				observation.PhenomenonTime = ""
+			}
+			_, ok = set["result"]
+			if !ok {
+				observation.Result = nil
+			}
+			_, ok = set["resultTime"]
+			if !ok {
+				observation.ResultTime = ""
+			}
+			_, ok = set["resultQuality"]
+			if !ok {
+				observation.ResultQuality = ""
+			}
+			_, ok = set["validTime"]
+			if !ok {
+				observation.ValidTime = ""
+			}
+			_, ok = set["parameters"]
+			if !ok {
+				observation.Parameters = nil
+			}
 		}
 
 		observations = append(observations, &observation)

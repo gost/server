@@ -178,7 +178,7 @@ func ToIntID(id interface{}) (int, bool) {
 }
 
 // CreateSelectString creates a select string based on available parameters and or QuerySelect option
-func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string) string {
+func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string, trail string) string {
 	var properties []string
 
 	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
@@ -199,6 +199,10 @@ func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string
 		}
 
 		s += toAdd + p
+
+		if len(trail) > 0 {
+			s += trail
+		}
 	}
 
 	return s

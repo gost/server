@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOpti
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "")+" FROM %s.observedproperty where id = %v", gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "")+" FROM %s.observedproperty where id = %v", gdb.Schema, intID)
 	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "observedproperty.")+" FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "observedproperty.", "")+" FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
 	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "")+" FROM %s.observedproperty", gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "")+" FROM %s.observedproperty", gdb.Schema)
 	return processObservedProperties(gdb.Db, sql, qo)
 }
 
