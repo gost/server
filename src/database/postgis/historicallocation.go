@@ -84,7 +84,7 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions) 
 		var params []interface{}
 		var qp []string
 		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			s := &entities.Location{}
+			s := &entities.HistoricalLocation{}
 			qp = s.GetPropertyNames()
 		} else {
 			qp = qo.QuerySelect.Params
