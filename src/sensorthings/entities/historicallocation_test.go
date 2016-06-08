@@ -49,3 +49,14 @@ func TestSetAllLinks(t *testing.T) {
 	assert.NotNil(t, historicalLocation.NavSelf)
 	assert.NotNil(t, historicalLocation.NavThing)
 }
+
+func TestParseHistoricalLocationShouldFail(t *testing.T) {
+	//arrange
+	historicalLocation := &HistoricalLocation{}
+
+	//act
+	err := historicalLocation.ParseEntity([]byte("hallo"))
+
+	//assert
+	assert.NotEqual(t, err, nil, "Historical parse from json should have failed")
+}
