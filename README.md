@@ -33,14 +33,14 @@ Gost Compliance Testing Status:
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
-| Sensing Core                          | A.1       | partly                | 4 passed, 2 failed       |
-| Filtering Extension                   | A.2       | partly                | Testing not started      |
-| Create-Update-Delete                  | A.3       | partly                | 0 passed, 9 failed       |
+| Sensing Core                          | A.1       | alpha                 | 4 passed, 2 failed       |
+| Filtering Extension                   | A.2       | alpha                 | Testing not started      |
+| Create-Update-Delete                  | A.3       | alpha                 | 0 passed, 9 failed       |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
 | Sensing Data Array Extension          | A.6       | -                     | Tests not implemented    |
-| MQTT Extension for Create and Update  | A.7       | partly                | Tests not implemented    |
-| MQTT Extension for Receiving Updates  | A.8       | partly                | Tests not implemented    |
+| MQTT Extension for Create and Update  | A.7       | alpha                 | Tests not implemented    |
+| MQTT Extension for Receiving Updates  | A.8       | alpha                 | Tests not implemented    |
 
 ## Installation and configuration
 
