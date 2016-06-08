@@ -31,7 +31,7 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 
 // GetHistoricalLocations retrieves all historicallocations
 func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation", gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 
@@ -41,7 +41,7 @@ func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where location_id = %v", gdb.Schema, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where location_id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, tID)
 	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 
@@ -51,7 +51,7 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where thing_id = %v", gdb.Schema, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where thing_id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, tID)
 	return processHistoricalLocations(gdb.Db, sql, qo)
 }
 

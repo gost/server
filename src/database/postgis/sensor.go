@@ -45,7 +45,7 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 
 // GetSensors todo
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor", gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processSensors(gdb.Db, sql, qo)
 }
 

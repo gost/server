@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where id = %v", gdb.Schema, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where id = %v ", gdb.Schema, intID)
 	observation, err := processObservation(gdb.Db, sql, qo)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 
 // GetObservations retrieves all datastreams
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, error) {
-	sql := fmt.Sprintf("select id, data FROM %s.observation", gdb.Schema)
+	sql := fmt.Sprintf("select id, data FROM %s.observation "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processObservations(gdb.Db, sql, qo)
 }
 
@@ -40,7 +40,7 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, q
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
 	return processObservations(gdb.Db, sql, qo)
 }
 
@@ -51,7 +51,7 @@ func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, q
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v", gdb.Schema, intID)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
 	return processObservations(gdb.Db, sql, qo)
 }
 

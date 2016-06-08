@@ -502,8 +502,14 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		query["$select"] = value
 	}
 
-	if len(query) == 0 {
-		return nil, nil
+	_, ok := query["$top"]
+	if !ok {
+		query["$top"] = []string{"200"}
+	}
+
+	_, ok = query["$skip"]
+	if !ok {
+		query["$skip"] = []string{"0"}
 	}
 
 	qo, e := odata.CreateQueryOptions(query)

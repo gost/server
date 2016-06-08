@@ -217,3 +217,16 @@ func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string
 
 	return s
 }
+
+// CreateTopSkipQueryString creates a LIMIT and OFFSET query string
+func CreateTopSkipQueryString(qo *odata.QueryOptions) string {
+	q := ""
+	if qo != nil && !qo.QueryTop.IsNil() {
+		q += fmt.Sprintf("LIMIT %v", qo.QueryTop.Limit)
+	}
+	if qo != nil && !qo.QuerySkip.IsNil() {
+		q += fmt.Sprintf(" OFFSET %v", qo.QuerySkip.Index)
+	}
+
+	return q
+}

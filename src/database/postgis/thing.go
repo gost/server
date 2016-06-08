@@ -46,7 +46,7 @@ func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOpti
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "thing.", "", nil)+" from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = %v;", gdb.Schema, gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "thing.", "", nil)+" from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = %v  "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, gdb.Schema, intID)
 	return processThings(gdb.Db, sql, qo)
 }
 
@@ -63,7 +63,7 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "", "", nil)+" FROM %s.thing", gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "", "", nil)+" FROM %s.thing "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processThings(gdb.Db, sql, qo)
 }
 

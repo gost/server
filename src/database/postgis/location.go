@@ -27,7 +27,7 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 
 // GetLocations retrieves all locations
 func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location", gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processLocations(gdb.Db, sql, qo)
 }
 
