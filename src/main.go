@@ -24,7 +24,7 @@ func main() {
 		return
 	}
 
-	SetEnvironmentVariables(&conf)
+	configuration.SetEnvironmentVariables(&conf)
 
 	database := postgis.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL, conf.Database.MaxIdleConns, conf.Database.MaxOpenConns)
 	database.Start()

@@ -1,13 +1,11 @@
-package main
+package configuration
 
 import (
 	"os"
 	"strconv"
-
-	"github.com/geodan/gost/src/configuration"
 )
 
-func SetEnvironmentVariables(conf *configuration.Config) {
+func SetEnvironmentVariables(conf *Config) {
 	gostMqttHost := os.Getenv("gost_mqtt_host")
 	if gostMqttHost != "" {
 		conf.MQTT.Host = gostMqttHost

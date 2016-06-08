@@ -1,15 +1,14 @@
-package main
+package configuration
 
 import (
 	"testing"
 
-	"github.com/geodan/gost/src/configuration"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestEnvironmentVariavels(t *testing.T) {
 	// arrange
-	conf := configuration.Config{}
+	conf := Config{}
 
 	// act
 	SetEnvironmentVariables(&conf)
