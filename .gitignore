@@ -12,6 +12,7 @@ pkg/
 debug/
 bin/
 /out/
+debug
 
 # IDE / Editor exceptions
 .idea/
