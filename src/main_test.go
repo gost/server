@@ -1,6 +1,8 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/geodan/gost/src/configuration"
 	"github.com/geodan/gost/src/database/postgis"
 	"github.com/geodan/gost/src/mqtt"
@@ -9,18 +11,17 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
-	"testing"
 )
 
-func TestMain(t *testing.T) {
-	// todo add startup tests...
+func TestUtils(t *testing.T) {
+	// todo add utils tests...
 	// arrange
 	var a = 1
 	var b = 2
 	// act
 	var res = a + b
 	// assert
-	assert.Equal(t, 3, res, "computer error again.")
+	assert.Equal(t, 3, res, "computer error again")
 }
 
 var jsonObservationMinimal = `{ "result": 18 }`
