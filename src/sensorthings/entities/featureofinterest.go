@@ -3,6 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -11,7 +12,7 @@ import (
 type FeatureOfInterest struct {
 	BaseEntity
 	Description     string                 `json:"description,omitempty"`
-	EncodingType    string                 `json:"encodingtype,omitempty"`
+	EncodingType    string                 `json:"encodingType,omitempty"`
 	Feature         map[string]interface{} `json:"feature,omitempty"`
 	NavObservations string                 `json:"Observations@iot.navigationLink,omitempty"`
 	Observations    []*Observation         `json:"Observations,omitempty"`
