@@ -25,7 +25,7 @@ func TestParseTop(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 120, top.limit, "QueryTop.limit should have been 120")
+	assert.Equal(t, 120, top.Limit, "QueryTop.limit should have been 120")
 }
 
 func TestParseFailTop(t *testing.T) {

@@ -25,7 +25,7 @@ func TestParseSkip(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, 435, skip.index, "QuerySkip.index should have been 435")
+	assert.Equal(t, 435, skip.Index, "QuerySkip.index should have been 435")
 }
 
 func TestParseFailSkip(t *testing.T) {
