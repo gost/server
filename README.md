@@ -33,7 +33,7 @@ Gost Compliance Testing Status:
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
-| Sensing Core                          | A.1       | partly                | Issues identified        |
+| Sensing Core                          | A.1       | partly                | 4 passed, 2 failed       |
 | Filtering Extension                   | A.2       | partly                | Testing not started      |
 | Create-Update-Delete                  | A.3       | partly                | Issues identified        |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
