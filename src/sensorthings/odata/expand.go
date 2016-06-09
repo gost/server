@@ -8,12 +8,14 @@ import (
 // QueryExpand is used to return a linked entity member’s full details.
 // Expand retrieves the specified named property and represents it inline to the base entity.
 type QueryExpand struct {
+	QueryBase
 	params []string
 }
 
 // Parse splits the given values by the , delimiter and stores the params, if the delimiter is not
 // a comma the IsValid will filter it out later on
 func (q *QueryExpand) Parse(value string) error {
+	q.RawQuery = value
 	q.params = strings.Split(value, ",")
 	return nil
 }

@@ -10,7 +10,7 @@ import (
 
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
-func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thin
 }
 
 // GetThingByDatastream returns a thing entity based on the given datastream id and QueryOptions
-func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -42,17 +42,17 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (*e
 }
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
-func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
 	}
 	things, err := a.db.GetThingsByLocation(id, qo)
-	return processThings(a, things, qo, err)
+	return processThings(a, things, qo, path, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
-func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
+func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
@@ -67,16 +67,16 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 }
 
 // GetThings returns an array of thing entities based on the QueryOptions
-func (a *APIv1) GetThings(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
 	if err != nil {
 		return nil, err
 	}
 	things, err := a.db.GetThings(qo)
-	return processThings(a, things, qo, err)
+	return processThings(a, things, qo, path, err)
 }
 
-func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
+func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +88,11 @@ func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOpti
 	}
 
 	var data interface{} = observations
+	total := a.db.GetTotalThings()
 	return &models.ArrayResponse{
-		Count: len(observations),
-		Data:  &data,
+		Count:    total,
+		NextLink: a.CreateNextLink(total, path, qo),
+		Data:     &data,
 	}, nil
 }
 

@@ -6,6 +6,8 @@ import (
 
 	"io/ioutil"
 
+	"bytes"
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -30,36 +32,42 @@ func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *models.Endp
 // HandleGetThings retrieves and sends Things based on the given filter if provided
 func HandleGetThings(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThings(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetThings(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetThing retrieves and sends a specific Thing based on the given ID and filter
 func HandleGetThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThing(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetThing(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetThingByDatastream retrieves and sends a specific Thing based on the given datastream ID and filter
 func HandleGetThingByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThingByDatastream(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetThingByDatastream(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetThingsByLocation retrieves and sends Things based on the given Location ID and filter
 func HandleGetThingsByLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetThingsByLocation(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetThingsByLocation(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetThingByHistoricalLocation retrieves and sends a specific Thing based on the given HistoricalLocation ID and filter
 func HandleGetThingByHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetThingByHistoricalLocation(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetThingByHistoricalLocation(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -90,22 +98,24 @@ func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *models.E
 // HandleGetObservedProperty retrieves an ObservedProperty by id
 func HandleGetObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservedProperty(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetObservedProperty(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetObservedProperties retrieves ObservedProperties
 func HandleGetObservedProperties(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservedProperties(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetObservedProperties(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetObservedPropertyByDatastream retrieves the ObservedProperty by given Datastream id
 func HandleGetObservedPropertyByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetObservedPropertyByDatastream(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetObservedPropertyByDatastream(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -136,15 +146,15 @@ func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoin
 // HandleGetLocations retrieves multiple locations based on query parameters
 func HandleGetLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocations(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetLocations(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetLocationsByHistoricalLocations retrieves the locations linked to the given Historical Location (id)
 func HandleGetLocationsByHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetLocationsByHistoricalLocation(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetLocationsByHistoricalLocation(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -152,14 +162,18 @@ func HandleGetLocationsByHistoricalLocations(w http.ResponseWriter, r *http.Requ
 // HandleGetLocationsByThing retrieves the locations by given thing (id)
 func HandleGetLocationsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocationsByThing(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetLocationsByThing(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetLocation retrieves a location by given id
 func HandleGetLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetLocation(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetLocation(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -197,22 +211,24 @@ func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *model
 // HandleGetDatastreams retrieves datastreams based on Query Parameters
 func HandleGetDatastreams(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreams(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetDatastreams(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetDatastream retrieves a datastream by given id
 func HandleGetDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastream(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetDatastream(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetDatastreamByObservation ...
 func HandleGetDatastreamByObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetDatastreamByObservation(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetDatastreamByObservation(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -220,22 +236,26 @@ func HandleGetDatastreamByObservation(w http.ResponseWriter, r *http.Request, en
 // HandleGetDatastreamsByThing ...
 func HandleGetDatastreamsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreamsByThing(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetDatastreamsByThing(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetDatastreamsBySensor ...
 func HandleGetDatastreamsBySensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetDatastreamsBySensor(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetDatastreamsBySensor(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetDatastreamsByObservedProperty ...
 func HandleGetDatastreamsByObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetDatastreamsByObservedProperty(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetDatastreamsByObservedProperty(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -274,21 +294,25 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *mod
 // HandleGetSensorByDatastream ...
 func HandleGetSensorByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensor(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetSensor(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetSensor ...
 func HandleGetSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensor(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetSensor(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetSensors ...
 func HandleGetSensors(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetSensors(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetSensors(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -318,22 +342,24 @@ func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *models.
 // HandleGetObservations ...
 func HandleGetObservations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservations(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetObservations(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetObservation ...
 func HandleGetObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetObservation(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetObservation(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetObservationsByFeatureOfInterest ...
 func HandleGetObservationsByFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetObservationsByFeatureOfInterest(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetObservationsByFeatureOfInterest(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -341,8 +367,8 @@ func HandleGetObservationsByFeatureOfInterest(w http.ResponseWriter, r *http.Req
 // HandleGetObservationsByDatastream ...
 func HandleGetObservationsByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetObservationsByDatastream(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetObservationsByDatastream(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -381,22 +407,24 @@ func HandlePatchObservation(w http.ResponseWriter, r *http.Request, endpoint *mo
 // HandleGetFeatureOfInterests ...
 func HandleGetFeatureOfInterests(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetFeatureOfInterests(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return a.GetFeatureOfInterests(q, path) }
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetFeatureOfInterest ...
 func HandleGetFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetFeatureOfInterest(getEntityID(r), q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetFeatureOfInterest(getEntityID(r), q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetFeatureOfInterestByObservation ...
 func HandleGetFeatureOfInterestByObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetFeatureOfInterestByObservation(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetFeatureOfInterestByObservation(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -427,15 +455,17 @@ func HandlePatchFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoi
 // HandleGetHistoricalLocations ...
 func HandleGetHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetHistoricalLocations(q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetHistoricalLocations(q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
 // HandleGetHistoricalLocationsByThing ...
 func HandleGetHistoricalLocationsByThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetHistoricalLocationsByThing(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetHistoricalLocationsByThing(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -443,8 +473,8 @@ func HandleGetHistoricalLocationsByThing(w http.ResponseWriter, r *http.Request,
 // HandleGetHistoricalLocationsByLocation ...
 func HandleGetHistoricalLocationsByLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
-	handle := func(q *odata.QueryOptions) (interface{}, error) {
-		return a.GetHistoricalLocationsByLocation(getEntityID(r), q)
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetHistoricalLocationsByLocation(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -453,7 +483,9 @@ func HandleGetHistoricalLocationsByLocation(w http.ResponseWriter, r *http.Reque
 func HandleGetHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	id := getEntityID(r)
-	handle := func(q *odata.QueryOptions) (interface{}, error) { return a.GetHistoricalLocation(id, q) }
+	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
+		return a.GetHistoricalLocation(id, q, path)
+	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
 
@@ -517,7 +549,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 }
 
 // handleGetRequest is the default function to handle incoming GET requests
-func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions) (interface{}, error)) {
+func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions, path string) (interface{}, error)) {
 	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
@@ -535,7 +567,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 
 	// Run the handler func such as Api.GetThingById
 	handler := *h
-	data, err2 := handler(queryOptions)
+	data, err2 := handler(queryOptions, fmt.Sprintf(r.Host+r.URL.Path))
 	if err2 != nil {
 		sendError(w, []error{err2})
 		return
@@ -601,12 +633,24 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(status)
-	b, err := json.MarshalIndent(data, "", "   ")
+	b, err := JSONMarshal(data, true)
 	if err != nil {
 		panic(err)
 	}
 
 	w.Write(b)
+}
+
+//JSONMarshal converts the data and converts special characters such as &
+func JSONMarshal(data interface{}, safeEncoding bool) ([]byte, error) {
+	b, err := json.MarshalIndent(data, "", "   ")
+
+	if safeEncoding {
+		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
+		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
+		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
+	}
+	return b, err
 }
 
 // sendError creates an ErrorResponse message and sets it to the user

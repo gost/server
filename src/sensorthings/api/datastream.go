@@ -9,7 +9,7 @@ import (
 )
 
 // GetDatastream retrieves a sensor by id and given query
-func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
+func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -25,30 +25,30 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities
 }
 
 // GetDatastreams retrieves an array of sensors based on the given query
-func (a *APIv1) GetDatastreams(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
 	}
 
 	datastreams, err := a.db.GetDatastreams(qo)
-	return processDatastreams(a, datastreams, qo, err)
+	return processDatastreams(a, datastreams, qo, path, err)
 
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
-func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
 	}
 
 	datastreams, err := a.db.GetDatastreamsByThing(thingID, qo)
-	return processDatastreams(a, datastreams, qo, err)
+	return processDatastreams(a, datastreams, qo, path, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
-func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
+func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
@@ -64,28 +64,28 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 }
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
-func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
 	}
 
 	datastreams, err := a.db.GetDatastreamsBySensor(sensorID, qo)
-	return processDatastreams(a, datastreams, qo, err)
+	return processDatastreams(a, datastreams, qo, path, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
-func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
 	if err != nil {
 		return nil, err
 	}
 
 	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
-	return processDatastreams(a, datastreams, qo, err)
+	return processDatastreams(a, datastreams, qo, path, err)
 }
 
-func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,9 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 
 	var data interface{} = datastreams
 	return &models.ArrayResponse{
-		Count: len(datastreams),
-		Data:  &data,
+		Count:    len(datastreams),
+		NextLink: a.CreateNextLink(a.db.GetTotalDatastreams(), path, qo),
+		Data:     &data,
 	}, nil
 }
 

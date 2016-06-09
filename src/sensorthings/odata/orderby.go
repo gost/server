@@ -8,6 +8,7 @@ import (
 // QueryOrderBy is used to define the order of the results set be ascending (asc) or descending (desc) order.
 // orderby Is used to specify which properties are used to order the collection of entities identified by the resource path.
 type QueryOrderBy struct {
+	QueryBase
 	suffix   string
 	property string
 }
@@ -16,6 +17,7 @@ type QueryOrderBy struct {
 // if the suffix is not "asc" or "desc" or no property is given then
 // parse will return an error
 func (q *QueryOrderBy) Parse(value string) error {
+	q.RawQuery = value
 	ob := strings.Split(value, " ")
 	if len(ob) != 2 || (ob[1] != "asc" && ob[1] != "desc") || len(ob[0]) < 1 {
 		return CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, value)

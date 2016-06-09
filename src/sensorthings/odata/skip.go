@@ -8,12 +8,14 @@ import (
 // QuerySkip is used for retrieving records from a specified index of the entire record set.
 // If set the request will return table entries after the provided index value.
 type QuerySkip struct {
+	QueryBase
 	Index int
 }
 
 // Parse $skip values in QuerySkip, returns error if the supplied value is
 // invalid (non-integer or < 0)
 func (q *QuerySkip) Parse(value string) error {
+	q.RawQuery = value
 	i, err := strconv.Atoi(value)
 	if err != nil || i < 0 {
 		return CreateQueryError(QuerySkipInvalid, http.StatusBadRequest, value)

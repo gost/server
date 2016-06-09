@@ -65,7 +65,7 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 }
 
 // GetLocation retrieves a single location by id
-func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
+func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
@@ -81,39 +81,39 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.L
 }
 
 // GetLocations retrieves all locations from the database and returns it as and ArrayResponse
-func (a *APIv1) GetLocations(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
 	}
 
 	locations, err := a.db.GetLocations(qo)
-	return processLocations(a, locations, qo, err)
+	return processLocations(a, locations, qo, path, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
-func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
 	}
 
 	locations, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
-	return processLocations(a, locations, qo, err)
+	return processLocations(a, locations, qo, path, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
-func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
 	if err != nil {
 		return nil, err
 	}
 
 	locations, err := a.db.GetLocationsByThing(thingID, qo)
-	return processLocations(a, locations, qo, err)
+	return processLocations(a, locations, qo, path, err)
 }
 
-func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
+func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
@@ -122,8 +122,9 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 
 	var data interface{} = locations
 	return &models.ArrayResponse{
-		Count: len(locations),
-		Data:  &data,
+		Count:    len(locations),
+		NextLink: a.CreateNextLink(a.db.GetTotalLocations(), path, qo),
+		Data:     &data,
 	}, nil
 }
 

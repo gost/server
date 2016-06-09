@@ -76,6 +76,15 @@ func (gdb *GostDatabase) Start() {
 	}
 
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
+
+	gdb.InitDatastreams()
+	gdb.InitFeaturesOfInterest()
+	gdb.InitHistoricalLocations()
+	gdb.InitLocations()
+	gdb.InitObservations()
+	gdb.InitObservedProperties()
+	gdb.InitSensors()
+	gdb.InitThings()
 }
 
 // CreateSchema creates the needed schema in the database
@@ -167,11 +176,7 @@ func ToIntID(id interface{}) (int, bool) {
 		}
 		return intID, true
 	case float64:
-		intID, ok := id.(int)
-		if !ok {
-			return 0, false
-		}
-		return intID, true
+		return int(t), true
 	}
 
 	return 0, false

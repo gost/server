@@ -69,7 +69,7 @@ Response:
   "@iot.id": "1",
   "@iot.selfLink": "http://localhost:8080/v1.0/Locations(1)",
   "description": "my backyard",
-  "encodingtype": "application/vnd.geo+json",
+  "encodingType": "application/vnd.geo+json",
   "location": {
      "coordinates": [
         -117.123,
@@ -136,7 +136,7 @@ Response:
    "@iot.id": "1",
    "@iot.selfLink": "http://localhost:8080/v1.0/Sensors(1)",
    "description": "Thermometer",
-   "encodingtype": "application/pdf",
+   "encodingType": "application/pdf",
    "metadata": "https://en.wikipedia.org/wiki/Thermometer"
 }
 ```
@@ -156,9 +156,9 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
     },
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "Thermometer readings",
-  "Thing": {"@iot.id": "{Thing.@iot.id}"},
-  "ObservedProperty": {"@iot.id": "{ObservedProperty.@iot.id}"},
-  "Sensor": {"@iot.id": "{Sensor.@iot.id}"}
+  "Thing": {"@iot.id": {Thing.@iot.id}},
+  "ObservedProperty": {"@iot.id": {ObservedProperty.@iot.id}},
+  "Sensor": {"@iot.id": {Sensor.@iot.id}}
 }' "http://localhost:8080/v1.0/Datastreams"
 ```
 
@@ -189,7 +189,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "phenomenonTime": "2016-05-09T11:04:15.790Z",
   "resultTime" : "2016-05-09T11:04:15.790Z",
   "result" : 38,
-  "Datastream":{"@iot.id":"{Datastream.@iot.id}"}
+  "Datastream":{"@iot.id":{Datastream.@iot.id}}
 }' "http://localhost:8080/v1.0/Observations"
 ```
 

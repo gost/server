@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// SetEnvironmentVariables changes config settings when certain environment variables are found
 func SetEnvironmentVariables(conf *Config) {
 	gostMqttHost := os.Getenv("gost_mqtt_host")
 	if gostMqttHost != "" {

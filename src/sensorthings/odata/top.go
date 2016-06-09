@@ -10,12 +10,14 @@ import (
 // returned within a collection. The service must return the number of
 // available entities up to, but not exceeding, the specified value.
 type QueryTop struct {
+	QueryBase
 	Limit int
 }
 
 // Parse $top values in QueryTop, returns error if the supplied value is
 // invalid (non-integer or < 0)
 func (q *QueryTop) Parse(value string) error {
+	q.RawQuery = value
 	i, err := strconv.Atoi(value)
 	if err != nil || i < 0 {
 		return CreateQueryError(QueryTopInvalid, http.StatusBadRequest, value)

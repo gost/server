@@ -9,7 +9,7 @@ import (
 )
 
 // GetSensor retrieves a sensor by id and given query
-func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
+func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sen
 }
 
 // GetSensorByDatastream retrieves a sensor by given datastream
-func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
+func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*
 }
 
 // GetSensors retrieves an array of sensors based on the given query
-func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Sensor{})
 	if err != nil {
 		return nil, err
@@ -60,8 +60,9 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions) (*models.ArrayResponse, error
 
 	var data interface{} = sensors
 	return &models.ArrayResponse{
-		Count: len(sensors),
-		Data:  &data,
+		Count:    len(sensors),
+		NextLink: a.CreateNextLink(a.db.GetTotalSensors(), path, qo),
+		Data:     &data,
 	}, nil
 }
 

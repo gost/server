@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 
 	"database/sql"
 	gostErrors "github.com/geodan/gost/src/errors"
@@ -12,7 +11,19 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
+var totalDatastreams int
 var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
+
+// GetTotalDatastreams returns the amount of datastreams in the database
+func (gdb *GostDatabase) GetTotalDatastreams() int {
+	return totalDatastreams
+}
+
+// InitDatastreams Initialises the datastream repository, setting totalDatastreams on startup
+func (gdb *GostDatabase) InitDatastreams() {
+	sql := fmt.Sprintf("SELECT Count(*) from %s.datastream", gdb.Schema)
+	gdb.Db.QueryRow(sql).Scan(&totalDatastreams)
+}
 
 // GetDatastream retrieves a datastream by id
 func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
@@ -204,13 +215,14 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		return nil, err
 	}
 
-	d.ID = strconv.Itoa(dsID)
+	d.ID = dsID
 
 	// clear inner entities to serves links upon response
 	d.Thing = nil
 	d.Sensor = nil
 	d.ObservedProperty = nil
 
+	totalDatastreams++
 	return d, nil
 }
 
@@ -230,6 +242,7 @@ func (gdb *GostDatabase) DeleteDatastream(id interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("Datastream not found"))
 	}
 
+	totalDatastreams--
 	return nil
 }
 

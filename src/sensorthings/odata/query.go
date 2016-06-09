@@ -50,6 +50,11 @@ func (q QueryOptionType) String() string {
 	return QueryOptionValues[q]
 }
 
+// QueryBase is the base for all oData queries
+type QueryBase struct {
+	RawQuery string
+}
+
 // QueryOptions holds the parsed query information requested by the user
 type QueryOptions struct {
 	QueryTop          *QueryTop
