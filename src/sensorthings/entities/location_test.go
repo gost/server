@@ -2,8 +2,9 @@ package entities
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var jsonLocation = `{
@@ -96,6 +97,6 @@ func TestGetSupportedEncodingLocation(t *testing.T) {
 	_, ok := encodings[EncodingGeoJSON.Code]
 
 	//assert
-	assert.Equal(t, 1, len(encodings), "Location should support 1 encoding")
+	assert.Equal(t, 2, len(encodings), "Location should support 2 encodings")
 	assert.Equal(t, true, ok, "Location should support EncodingGeoJSON")
 }

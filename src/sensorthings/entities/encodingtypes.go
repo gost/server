@@ -12,11 +12,12 @@ type EncodingType struct {
 
 // List of supported EncodingTypes, do not change!!
 var (
-	EncodingUnknown  = EncodingType{0, "unknown"}
-	EncodingGeoJSON  = EncodingType{1, "application/vnd.geo+json"}
-	EncodingPDF      = EncodingType{2, "application/pdf"}
-	EncodingSensorML = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
-	EncodingTextHTML = EncodingType{4, "text/html"}
+	EncodingUnknown      = EncodingType{0, "unknown"}
+	EncodingGeoJSON      = EncodingType{1, "application/vnd.geo+json"}
+	EncodingPDF          = EncodingType{2, "application/pdf"}
+	EncodingSensorML     = EncodingType{3, "http://www.opengis.net/doc/IS/SensorML/2.0"}
+	EncodingTextHTML     = EncodingType{4, "text/html"}
+	EncodingLocationType = EncodingType{5, "http://example.org/location_types#GeoJSON"}
 )
 
 // EncodingValues is a list of names mapped to their EncodingValue
@@ -25,7 +26,8 @@ var EncodingValues = []EncodingType{
 	EncodingGeoJSON,
 	EncodingPDF,
 	EncodingSensorML,
-	EncodingTextHTML}
+	EncodingTextHTML,
+	EncodingLocationType}
 
 // CreateEncodingType returns the int representation for a given encoding, returns an error when encoding is not supported
 func CreateEncodingType(encoding string) (EncodingType, error) {
@@ -37,4 +39,3 @@ func CreateEncodingType(encoding string) (EncodingType, error) {
 
 	return EncodingUnknown, errors.New("Encoding not supported")
 }
-
