@@ -64,7 +64,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
         $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Sensor").then(function (response) {
             $scope.sensorId = response.data["@iot.id"];
             $scope.sensorDescription = response.data["description"];
-            $scope.sensorEncoding = response.data["encodingtype"];
+            $scope.sensorEncoding = response.data["encodingType"];
             $scope.sensorMetadata = response.data["metadata"];
         });
     };
@@ -86,7 +86,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservedPropertyClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/ObservedProperty").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/ObservedProperties").then(function (response) {
             $scope.observedPropertyId = response.data["@iot.id"];
             $scope.observedPropertyName = response.data["name"];
             $scope.observedPropertyDescription = response.data["description"];
