@@ -176,11 +176,7 @@ func ToIntID(id interface{}) (int, bool) {
 		}
 		return intID, true
 	case float64:
-		intID, ok := id.(int)
-		if !ok {
-			return 0, false
-		}
-		return intID, true
+		return int(t), true
 	}
 
 	return 0, false
