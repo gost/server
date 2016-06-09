@@ -99,6 +99,11 @@
     color: #990000;
 }
 
+#observationChart{
+    width: 100% !important;
+    height: 220px !important;
+}
+
 #observationChartWrapper{
     margin-top: 10px;
 }
