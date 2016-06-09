@@ -3,6 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -70,5 +71,5 @@ func (s *Sensor) SetLinks(externalURL string) {
 
 // GetSupportedEncoding returns the supported encoding tye for this entity
 func (s Sensor) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHTML.Code: EncodingTextHTML}
+	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF, EncodingTextHTML.Code: EncodingTextHTML, EncodingTypeDescription.Code: EncodingTypeDescription}
 }
