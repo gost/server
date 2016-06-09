@@ -17,7 +17,7 @@ SET search_path = %s;
 CREATE TABLE featureofinterest
 (
   id bigserial NOT NULL,
-  description character varying(255),
+  description character varying(500),
   encodingtype integer,
   feature public.geometry,
   CONSTRAINT featureofinterest_pkey PRIMARY KEY (id)
@@ -29,7 +29,7 @@ WITH (
 CREATE TABLE thing
 (
   id bigserial NOT NULL,
-  description character varying(255),
+  description character varying(500),
   properties jsonb,
   CONSTRAINT thing_pkey PRIMARY KEY (id)
 )
@@ -40,7 +40,7 @@ WITH (
 CREATE TABLE location
 (
   id bigserial NOT NULL,
-  description character varying(255),
+  description character varying(500),
   encodingtype integer,
   location public.geometry,
   CONSTRAINT location_pkey PRIMARY KEY (id)
@@ -95,7 +95,7 @@ WITH (
 CREATE TABLE sensor
 (
   id bigserial NOT NULL,
-  description character varying(255),
+  description character varying(500),
   encodingtype integer,
   metadata character varying(255),
   CONSTRAINT sensor_pkey PRIMARY KEY (id)
@@ -109,7 +109,7 @@ CREATE TABLE observedproperty
   id bigserial NOT NULL,
   name character varying(120),
   definition character varying(255),
-  description character varying(255),
+  description character varying(500),
   CONSTRAINT observedproperty_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -120,7 +120,7 @@ WITH (
 CREATE TABLE datastream
 (
   id serial NOT NULL,
-  description character varying(255),
+  description character varying(500),
   unitofmeasurement jsonb,
   observationtype integer,
   observedarea public.geometry,
