@@ -3,7 +3,6 @@ package postgis
 import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
-	"strconv"
 
 	"database/sql"
 	"encoding/json"
@@ -12,7 +11,19 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
+var totalLocations int
 var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
+
+// GetTotalLocations returns the amount of locations in the database
+func (gdb *GostDatabase) GetTotalLocations() int {
+	return totalLocations
+}
+
+// InitLocations Initialises the datastream repository, setting totalLocations on startup
+func (gdb *GostDatabase) InitLocations() {
+	sql := fmt.Sprintf("SELECT Count(*) from %s.location", gdb.Schema)
+	gdb.Db.QueryRow(sql).Scan(&totalLocations)
+}
 
 // GetLocation retrieves the location for the given id from the database
 func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
@@ -138,7 +149,8 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 		return nil, err
 	}
 
-	location.ID = strconv.Itoa(locationID)
+	location.ID = locationID
+	totalLocations++
 	return location, nil
 }
 
@@ -171,6 +183,7 @@ func (gdb *GostDatabase) DeleteLocation(locationID interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("Location not found"))
 	}
 
+	totalLocations--
 	return nil
 }
 

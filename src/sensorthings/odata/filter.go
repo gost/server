@@ -3,11 +3,13 @@ package odata
 // QueryFilter is used to perform conditional operations on the parameter values
 // Count is used to retrieve the total number of items in a collection matching the requested entity.
 type QueryFilter struct {
+	QueryBase
 	count bool
 }
 
 // Parse tries to parse the given filter
 func (q *QueryFilter) Parse(value string) error {
+	q.RawQuery = value
 	//ToDo: implement, documentation not clear enough on how to implement this
 	return nil
 }

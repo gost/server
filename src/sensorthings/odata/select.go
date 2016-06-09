@@ -10,6 +10,7 @@ import (
 // help to reduce the amount of information in a response from the server.
 // If set, the result will include the specified property of the SensorThing entity object.
 type QuerySelect struct {
+	QueryBase
 	Params []string
 }
 
@@ -17,6 +18,7 @@ type QuerySelect struct {
 // if the select params are valid, this depends on Select values available
 // for the used endpoint
 func (q *QuerySelect) Parse(value string) error {
+	q.RawQuery = value
 	q.Params = strings.Split(value, ",")
 	return nil
 }

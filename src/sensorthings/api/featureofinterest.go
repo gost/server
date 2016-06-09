@@ -9,7 +9,7 @@ import (
 )
 
 // GetFeatureOfInterest todo
-func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
 		return nil, err
@@ -25,7 +25,7 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*e
 }
 
 // GetFeatureOfInterestByObservation todo
-func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
+func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
 		return nil, err
@@ -41,17 +41,17 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 }
 
 // GetFeatureOfInterests todo
-func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions) (*models.ArrayResponse, error) {
+func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
 		return nil, err
 	}
 
 	fois, err := a.db.GetFeatureOfInterests(qo)
-	return processFeatureOfInterest(a, fois, qo, err)
+	return processFeatureOfInterest(a, fois, qo, path, err)
 }
 
-func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, err error) (*models.ArrayResponse, error) {
+func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
@@ -60,8 +60,9 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 
 	var data interface{} = fois
 	return &models.ArrayResponse{
-		Count: len(fois),
-		Data:  &data,
+		Count:    len(fois),
+		NextLink: a.CreateNextLink(a.db.GetTotalFeaturesOfInterest(), path, qo),
+		Data:     &data,
 	}, nil
 }
 

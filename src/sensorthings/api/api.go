@@ -3,12 +3,14 @@ package api
 import (
 	"github.com/geodan/gost/src/configuration"
 
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/mqtt"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/geodan/gost/src/sensorthings/rest"
+	"strings"
 )
 
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
@@ -108,4 +110,53 @@ func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions
 	} else if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 { //no query options, set all links
 		entity.SetAllLinks(a.config.GetExternalServerURI())
 	}
+}
+
+// CreateNextLink creates the link to the next page with results
+//  count is the number of total entities in the current query
+//  incomingUrl is the url of the request excluding oData query params
+func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string {
+	// do not create a nextLink when there is no top and skip given
+	if qo == nil && qo.QueryTop.Limit == 0 && qo.QuerySkip.Index == 0 {
+		return ""
+	}
+
+	// do not create a nextLink when the current page has no following one
+	if qo.QueryTop.Limit+qo.QuerySkip.Index >= count || count < qo.QueryTop.Limit {
+		return ""
+	}
+
+	queryString := ""
+	if !qo.QueryFilter.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionFilter.String(), qo.QueryFilter.RawQuery))
+	}
+	if !qo.QueryCount.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionCount.String(), qo.QueryCount.RawQuery))
+	}
+	if !qo.QueryExpand.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionExpand.String(), qo.QueryExpand.RawQuery))
+	}
+	if !qo.QueryOrderBy.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionOrderBy.String(), qo.QueryOrderBy.RawQuery))
+	}
+	if !qo.QueryResultFormat.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionResultFormat.String(), qo.QueryResultFormat.RawQuery))
+	}
+	if !qo.QueryTop.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionTop.String(), qo.QueryTop.RawQuery))
+	}
+	if !qo.QuerySkip.IsNil() {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionSkip.String(), qo.QuerySkip.Index+qo.QueryTop.Limit))
+	}
+
+	return fmt.Sprintf("%s/%s", incomingURL, queryString)
+}
+
+func appendQueryPart(base string, q string) string {
+	prefix := "?"
+	if strings.Contains(base, "?") {
+		prefix = "&"
+	}
+
+	return fmt.Sprintf("%s%s%s", base, prefix, q)
 }
