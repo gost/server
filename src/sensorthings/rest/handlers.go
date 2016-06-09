@@ -295,7 +295,7 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *mod
 func HandleGetSensorByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
-		return a.GetSensor(getEntityID(r), q, path)
+		return a.GetSensorByDatastream(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
