@@ -70,7 +70,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservationsClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Observations").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/Observations?$top=40").then(function (response) {
             response.data.value.reverse();
             $scope.observationsList = response.data.value;
 
