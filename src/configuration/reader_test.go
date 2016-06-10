@@ -9,7 +9,6 @@ import (
 )
 
 var configLocation = "../config.yaml"
-var configLocationDrone = "../config_drone.yaml"
 var configFake = "nonexistingfile.yaml"
 var configWrongData = "testreadconfig.yaml"
 
@@ -37,13 +36,6 @@ func TestReadFile(t *testing.T) {
 	f, err := readFile(configLocation)
 	if err != nil {
 		t.Error("Please make sure there is a config.yaml file in the root directory ", err)
-	}
-
-	assert.NotNil(t, f, "config bytes should not be nil")
-
-	f, err = readFile(configLocationDrone)
-	if err != nil {
-		t.Error("Error for config_drone.yaml", err)
 	}
 
 	assert.NotNil(t, f, "config bytes should not be nil")
