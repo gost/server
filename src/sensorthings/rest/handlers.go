@@ -535,7 +535,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		query["$select"] = value
 	}
 
-	if strings.HasSuffix(r.URL.RawPath, "$value") {
+	if strings.HasSuffix(r.URL.Path, "$value") {
 		query["$value"] = []string{"true"}
 	}
 
