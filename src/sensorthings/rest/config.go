@@ -82,6 +82,7 @@ func createThings(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Things{id}/HistoricalLocations/{params}", HandleGetHistoricalLocationsByThing},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/Locations/{params}", HandleGetLocationsByThing},
 			{models.HTTPOperationGet, "/v1.0/Things{id}/{params}", HandleGetThing},
+			{models.HTTPOperationGet, "/v1.0/Things{id}/{params}/$value", HandleGetThing},
 			{models.HTTPOperationGet, "/v1.0/Things/{params}", HandleGetThings},
 
 			{models.HTTPOperationPost, "/v1.0/Things", HandlePostThing},
@@ -129,8 +130,11 @@ func createDatastreams(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/ObservedProperties/{params}", HandleGetObservedPropertyByDatastream},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Observations/{params}", HandleGetObservationsByDatastream},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Sensor/{params}", HandleGetSensorByDatastream},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Sensor/{params}/$value", HandleGetSensorByDatastream},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Thing/{params}", HandleGetThingByDatastream},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/Thing/{params}/$value", HandleGetThingByDatastream},
 			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/{params}", HandleGetDatastream},
+			{models.HTTPOperationGet, "/v1.0/Datastreams{id}/{params}/$value", HandleGetDatastream},
 			{models.HTTPOperationGet, "/v1.0/Datastreams/{params}", HandleGetDatastreams},
 
 			{models.HTTPOperationPost, "/v1.0/Datastreams", HandlePostDatastream},
@@ -165,8 +169,11 @@ func createObservedProperties(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/Datastreams", HandleGetDatastreamsByObservedProperty},
 
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/Datastreams/{params}", HandleGetDatastreamsByObservedProperty},
+			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/Datastreams/{params}/$value", HandleGetDatastreamsByObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/{params}", HandleGetObservedProperty},
+			{models.HTTPOperationGet, "/v1.0/ObservedProperties{id}/{params}/$value", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/ObservedProperties/{params}", HandleGetObservedProperties},
+			{models.HTTPOperationGet, "/v1.0/ObservedProperties/{params}/$value", HandleGetObservedProperties},
 
 			{models.HTTPOperationPost, "/v1.0/ObservedProperties", HandlePostObservedProperty},
 			{models.HTTPOperationDelete, "/v1.0/ObservedProperties{id}", HandleDeleteObservedProperty},
@@ -203,7 +210,9 @@ func createLocations(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/Locations{id}/Things/{params}", HandleGetThingsByLocation},
 			{models.HTTPOperationGet, "/v1.0/Locations{id}/HistoricalLocations/{params}", HandleGetHistoricalLocationsByLocation},
+			{models.HTTPOperationGet, "/v1.0/Locations{id}/HistoricalLocations/{params}/$value", HandleGetHistoricalLocationsByLocation},
 			{models.HTTPOperationGet, "/v1.0/Locations{id}/{params}", HandleGetLocation},
+			{models.HTTPOperationGet, "/v1.0/Locations{id}/{params}/$value", HandleGetLocation},
 			{models.HTTPOperationGet, "/v1.0/Locations/{params}", HandleGetLocations},
 
 			{models.HTTPOperationPost, "/v1.0/Locations", HandlePostLocation},
@@ -239,6 +248,7 @@ func createSensors(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/Sensors{id}/Datastreams/{params}", HandleGetDatastreamsBySensor},
 			{models.HTTPOperationGet, "/v1.0/Sensors{id}/{params}", HandleGetSensor},
+			{models.HTTPOperationGet, "/v1.0/Sensors{id}/{params}/$value", HandleGetSensor},
 			{models.HTTPOperationGet, "/v1.0/Sensors/{params}", HandleGetSensors},
 
 			{models.HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
@@ -274,8 +284,11 @@ func createObservations(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/Observations{id}/FeatureOfInterest", HandleGetFeatureOfInterestByObservation},
 
 			{models.HTTPOperationGet, "/v1.0/Observations{id}/Datastream/{params}", HandleGetDatastreamByObservation},
+			{models.HTTPOperationGet, "/v1.0/Observations{id}/Datastream/{params}/$value", HandleGetDatastreamByObservation},
 			{models.HTTPOperationGet, "/v1.0/Observations{id}/FeatureOfInterest/{params}", HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/Observations{id}/FeatureOfInterest/{params}/$value", HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationGet, "/v1.0/Observations{id}/{params}", HandleGetObservation},
+			{models.HTTPOperationGet, "/v1.0/Observations{id}/{params}/$value", HandleGetObservation},
 			{models.HTTPOperationGet, "/v1.0/Observations/{params}", HandleGetObservations},
 
 			{models.HTTPOperationPost, "/v1.0/Observations", HandlePostObservation},
@@ -311,6 +324,7 @@ func createFeaturesOfInterest(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/FeatureOfInterest{id}/Observations/{params}", HandleGetObservationsByFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}/{params}", HandleGetFeatureOfInterest},
+			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest{id}/{params}/$value", HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/FeaturesOfInterest/{params}", HandleGetFeatureOfInterests},
 
 			{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", HandlePostFeatureOfInterest},
@@ -338,15 +352,17 @@ func createHistoricalLocations(externalURL string) *Endpoint {
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations", HandleGetHistoricalLocations},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", HandleGetHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Locations", HandleGetLocationsByHistoricalLocations},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Thing", HandleGetThingByHistoricalLocation},
 
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Thing/{params}", HandleGetThingByHistoricalLocation},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Thing/{params}/$value", HandleGetThingByHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/Locations/{params}", HandleGetLocationsByHistoricalLocations},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/{params}", HandleGetHistoricalLocation},
+			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/{params}/$value", HandleGetHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations/{params}", HandleGetHistoricalLocations},
 
-			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", HandleGetHistoricalLocation},
-			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}", HandleGetHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},
 		},
