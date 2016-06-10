@@ -39,10 +39,10 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOpt
 func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "featureofinterest.", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
 	return processFeatureOfInterest(gdb.Db, sql, qo)
 }
 
