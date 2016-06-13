@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -84,6 +85,8 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		return nil, err
 	}
 
+	datastreamID := observation.Datastream.ID
+
 	//ToDo check for linked featureofinterest -> POST
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {
@@ -96,7 +99,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	s := string(json)
 
 	//ToDo: TEST
-	a.mqtt.Publish("Datastreams(1)/Observations", s, 0)
+	a.mqtt.Publish(fmt.Sprintf("Datastreams(%v)/Observations", datastreamID), s, 0)
 	a.mqtt.Publish("Observations", s, 0)
 
 	return no, nil

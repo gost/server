@@ -10,7 +10,6 @@ type QueryFilter struct {
 // Parse tries to parse the given filter
 func (q *QueryFilter) Parse(value string) error {
 	q.RawQuery = value
-	//ToDo: implement, documentation not clear enough on how to implement this
 	return nil
 }
 

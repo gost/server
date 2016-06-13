@@ -39,16 +39,16 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOpt
 func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "featureofinterest.", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
 	return processFeatureOfInterest(gdb.Db, sql, qo)
 }
 
 // GetFeatureOfInterests returns all feature of interests
 func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest "+CreateTopSkipQueryString(qo), gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processFeatureOfInterests(gdb.Db, sql, qo)
 }
 

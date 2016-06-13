@@ -13,20 +13,21 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
+	"strings"
 )
 
 // HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
 func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	bpi := a.GetBasePathInfo()
-	sendJSONResponse(w, http.StatusOK, bpi)
+	sendJSONResponse(w, http.StatusOK, bpi, nil)
 }
 
 // HandleVersion retrieves current version information and sends it back to the user
 func HandleVersion(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	versionInfo := a.GetVersionInfo()
-	sendJSONResponse(w, http.StatusOK, versionInfo)
+	sendJSONResponse(w, http.StatusOK, versionInfo, nil)
 }
 
 // HandleGetThings retrieves and sends Things based on the given filter if provided
@@ -295,7 +296,7 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *mod
 func HandleGetSensorByDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	handle := func(q *odata.QueryOptions, path string) (interface{}, error) {
-		return a.GetSensor(getEntityID(r), q, path)
+		return a.GetSensorByDatastream(getEntityID(r), q, path)
 	}
 	handleGetRequest(w, endpoint, r, &handle)
 }
@@ -534,6 +535,11 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		query["$select"] = value
 	}
 
+	if strings.HasSuffix(r.URL.Path, "$value") {
+		query["$value"] = []string{"true"}
+	}
+
+	// if $top is not found, retrieve max 200
 	_, ok := query["$top"]
 	if !ok {
 		query["$top"] = []string{"200"}
@@ -573,7 +579,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		return
 	}
 
-	sendJSONResponse(w, http.StatusOK, data)
+	sendJSONResponse(w, http.StatusOK, data, queryOptions)
 }
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
@@ -592,7 +598,7 @@ func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reque
 		return
 	}
 
-	sendJSONResponse(w, http.StatusOK, data)
+	sendJSONResponse(w, http.StatusOK, data, nil)
 }
 
 // handlePostRequest
@@ -604,7 +610,7 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 		return
 	}
 
-	sendJSONResponse(w, http.StatusOK, "null")
+	sendJSONResponse(w, http.StatusOK, "null", nil)
 }
 
 // handlePostRequest
@@ -625,17 +631,38 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 
 	w.Header().Add("Location", entity.GetSelfLink())
 
-	sendJSONResponse(w, http.StatusCreated, data)
+	sendJSONResponse(w, http.StatusCreated, data, nil)
 }
 
 // sendJSONResponse sends the desired message to the user
 // the message will be marshalled into an indented JSON format
-func sendJSONResponse(w http.ResponseWriter, status int, data interface{}) {
+func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *odata.QueryOptions) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(status)
 	b, err := JSONMarshal(data, true)
 	if err != nil {
 		panic(err)
+	}
+
+	// $value is requested only send back the value, ToDo: move to API code?
+	if qo != nil && qo.QueryOptionValue {
+		errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.QuerySelect.Params[0])
+		var m map[string]json.RawMessage
+		err = json.Unmarshal(b, &m)
+		if err != nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+			sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+		}
+
+		mVal, ok := m[qo.QuerySelect.Params[0]]
+		if !ok {
+			sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+		}
+
+		value := string(mVal[:])
+		value = strings.TrimPrefix(value, "\"")
+		value = strings.TrimSuffix(value, "\"")
+
+		b = []byte(value)
 	}
 
 	w.Write(b)
@@ -682,5 +709,5 @@ func sendError(w http.ResponseWriter, error []error) {
 		},
 	}
 
-	sendJSONResponse(w, statusCode, errorResponse)
+	sendJSONResponse(w, statusCode, errorResponse, nil)
 }

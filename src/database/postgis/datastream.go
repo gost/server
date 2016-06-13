@@ -43,7 +43,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 
 // GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream "+CreateTopSkipQueryString(qo), gdb.Schema)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processDatastreams(gdb.Db, sql, qo)
 }
 
@@ -65,7 +65,7 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.Qu
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
 	return processDatastreams(gdb.Db, sql, qo)
 }
 
@@ -76,7 +76,7 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
 	return processDatastreams(gdb.Db, sql, qo)
 }
 
@@ -87,7 +87,7 @@ func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *o
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = %v "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, tID)
 	return processDatastreams(gdb.Db, sql, qo)
 }
 
