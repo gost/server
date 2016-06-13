@@ -29,15 +29,30 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     function onMessageArrived(message) {
         switch (message.destinationName) {
             case 'Datastreams(' + $scope.id + ')/Observations':
-                //$scope.brokerVersion = message.payloadString;
-                var r = JSON.parse(message.payloadString);
-                $scope.observationsList.push(r)
+				try {
+					  //$scope.brokerVersion = message.payloadString;
+					var r = JSON.parse(message.payloadString);
+					//$scope.observationsList.push(r)
 
-                values.push(r['result'])
-                labels.push(r['phenomenonTime'])
-                observationChartAddData(labels, values);
-                $scope.$apply();
-                break;
+					values.push(r['result'])
+					labels.push(r['phenomenonTime'])
+					
+					if(values.length > 50){
+						values.splice(0, 1);
+					}
+					
+					if(labels.length > 50){
+						labels.splice(0, 1);
+					}
+					
+					observationChartAddData(labels, values);
+					//$scope.$apply();
+					break;
+				}
+				catch(err) {
+					
+				}
+              
         }
     }
 
