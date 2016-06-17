@@ -1,12 +1,14 @@
 package postgis
 
 import (
+	"errors"
 	"fmt"
-	"github.com/geodan/gost/src/sensorthings/entities"
+	"strings"
 
 	"database/sql"
-	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
@@ -23,7 +25,7 @@ func (gdb *GostDatabase) InitObservations() {
 	gdb.Db.QueryRow(sql).Scan(&totalObservations)
 }
 
-// GetObservation todo
+// GetObservation retrieves an observation by id from the database
 func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -172,9 +174,13 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	obs := fmt.Sprintf("'%s'", string(json[:]))
 	sql := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
 
-	//ToDo: Check error fk exist?
 	err := gdb.Db.QueryRow(sql).Scan(&oID)
 	if err != nil {
+		errString := fmt.Sprintf("%v", err.Error())
+		if strings.Contains(errString, "violates foreign key constraint \"fk_datastream\"") {
+			return nil, gostErrors.NewBadRequestError(err)
+		}
+
 		return nil, err
 	}
 
