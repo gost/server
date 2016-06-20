@@ -123,6 +123,10 @@ function delayedUpdateMap() {
 var myChart;
 
 function createObservationChart(labels, values){
+	if(myChart != null){
+		myChart.destroy();	
+	}
+	
     //$("#observationChartWrapper").empty();
     Chart.defaults.global.responsive = true;
     Chart.defaults.global.maintainAspectRatio = false;
@@ -154,6 +158,7 @@ function createObservationChart(labels, values){
        }
 
     var ctx = $("#observationChart");
+	ctx.innerHTML = "";
     myChart = new Chart(ctx, {
         type: 'line',
         data: chartData,
