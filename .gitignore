@@ -4,6 +4,8 @@
 *.so
 *.exe
 *.bin
+*.db
+*.db.lock
 
 # Folders
 _obj/

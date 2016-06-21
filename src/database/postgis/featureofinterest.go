@@ -107,7 +107,7 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 			if p == "id" {
 				params = append(params, &ID)
 			}
-			if p == "encodingtype" {
+			if p == "encodingType" {
 				params = append(params, &encodingType)
 			}
 			if p == "description" {

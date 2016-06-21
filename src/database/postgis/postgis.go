@@ -168,6 +168,7 @@ func TimeRangeToString(start, end *string) string {
 
 // ToIntID converts an interface to int id used for the id's in teh database
 func ToIntID(id interface{}) (int, bool) {
+
 	switch t := id.(type) {
 	case string:
 		intID, err := strconv.Atoi(t)
@@ -179,7 +180,11 @@ func ToIntID(id interface{}) (int, bool) {
 		return int(t), true
 	}
 
-	return 0, false
+	intID, err := strconv.Atoi(fmt.Sprintf("%v", id))
+	if err != nil {
+		return 0, false
+	}
+	return intID, true
 }
 
 // CreateSelectString creates a select string based on available parameters and or QuerySelect option

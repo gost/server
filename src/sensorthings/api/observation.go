@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -26,7 +27,7 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions, path stri
 	return o, nil
 }
 
-// GetObservations return all observations
+// GetObservations return all observations by given QueryOptions
 func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
@@ -37,7 +38,7 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*models.Ar
 	return processObservations(a, observations, qo, path, err)
 }
 
-// GetObservationsByFeatureOfInterest todo
+// GetObservationsByFeatureOfInterest returns all observation by given FeatureOfInterest end QueryOptions
 func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
@@ -48,7 +49,7 @@ func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.
 	return processObservations(a, observations, qo, path, err)
 }
 
-// GetObservationsByDatastream todo
+// GetObservationsByDatastream returns all observations by given Datastream and QueryOptions
 func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.Observation{})
 	if err != nil {
@@ -78,7 +79,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}, nil
 }
 
-// PostObservation todo
+// PostObservation checks for correctness of the observation and calls PostObservation on the database
 func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
 	_, err := observation.ContainsMandatoryParams()
 	if err != nil {
@@ -87,7 +88,19 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 	datastreamID := observation.Datastream.ID
 
-	//ToDo check for linked featureofinterest -> POST
+	if observation.FeatureOfInterest == nil || observation.FeatureOfInterest.ID == nil {
+		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, datastreamID.(string))
+
+		if err != nil {
+			return nil, []error{gostErrors.NewBadRequestError(errors.New("Unable to link or create FeatureOfInterest for Observation. The linked Thing should have a location or supply (deep insert) a new FeatureOfInterest or link to a known FeatureOfInterest by id \"FeatureOfInterest\":{\"@iot.id\":30198}"))}
+		}
+
+		observation.FeatureOfInterest = &entities.FeatureOfInterest{}
+		observation.FeatureOfInterest.ID = foiID
+	}
+
+	//ToDo deep insert FeatureOfInterest if exist
+
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {
 		return nil, []error{err2}
@@ -98,14 +111,14 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	json, _ := json.Marshal(no)
 	s := string(json)
 
-	//ToDo: TEST
+	//ToDo: MQTT TEST
 	a.mqtt.Publish(fmt.Sprintf("Datastreams(%v)/Observations", datastreamID), s, 0)
 	a.mqtt.Publish("Observations", s, 0)
 
 	return no, nil
 }
 
-// PostObservationByDatastream creates a Datastream with given id for the Observation and calls PostObservation
+// PostObservationByDatastream creates an Observation with a linked datastream by given datastream id and calls PostObservation on the database
 func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observation *entities.Observation) (*entities.Observation, []error) {
 	d := &entities.Datastream{}
 	d.ID = datastreamID

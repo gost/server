@@ -55,6 +55,8 @@ func createDatabase(db models.Database, sqlFile string) {
 // createAndStartServer creates the GOST HTTPServer and starts it
 func createAndStartServer(api *models.API) {
 	a := *api
+	a.Start()
+
 	gostServer := http.CreateServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
 	gostServer.Start()
 }

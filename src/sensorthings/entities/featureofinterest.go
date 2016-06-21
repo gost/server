@@ -25,7 +25,7 @@ func (f FeatureOfInterest) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a FeatureOfInterest
 func (f *FeatureOfInterest) GetPropertyNames() []string {
-	return []string{"id", "description", "encodingtype", "feature"}
+	return []string{"id", "description", "encodingType", "feature"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -43,7 +43,7 @@ func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, f.Description, f.GetEntityType(), "description")
-	CheckMandatoryParam(&err, f.EncodingType, f.GetEntityType(), "encodingtype")
+	CheckMandatoryParam(&err, f.EncodingType, f.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, f.Feature, f.GetEntityType(), "feature")
 
 	if len(err) != 0 {
