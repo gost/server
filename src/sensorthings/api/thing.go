@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -146,5 +144,6 @@ func (a *APIv1) DeleteThing(id interface{}) error {
 
 // PatchThing todo
 func (a *APIv1) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("patch thing not implemented yet"))
+	nt, _ := a.db.PatchThing(id, thing)
+	return nt, nil
 }

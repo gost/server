@@ -107,6 +107,7 @@ type Database interface {
 	GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (t *entities.Thing, e error)
 	GetThings(qo *odata.QueryOptions) (t []*entities.Thing, e error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
+	PatchThing(interface{}, *entities.Thing) (*entities.Thing, error)
 	DeleteThing(id interface{}) error
 
 	InitLocations()

@@ -3,10 +3,12 @@ package postgis
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/geodan/gost/src/sensorthings/entities"
 
 	"database/sql"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
@@ -162,6 +164,22 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 	thing.ID = thingID
 	totalThings++
 	return thing, nil
+}
+
+// PatchThing receives a to be patched Thing entity and changes it in the database
+// returns the created Thing
+func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
+	intID, _ := ToIntID(id)
+	// update field description for now, todo add other fields
+	sql := fmt.Sprintf("update %s.thing set description = $1 where id= $2", gdb.Schema)
+	_, err := gdb.Db.Exec(sql, thing.Description, intID)
+	if err != nil {
+		return nil, err
+	}
+	// get the thing and return
+	var t *entities.Thing
+	t, err = gdb.GetThing(id, nil)
+	return t, nil
 }
 
 // ThingExists checks if a thing is present in the database based on a given id
