@@ -159,17 +159,7 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 		return nil, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 	}
 
-	fID := "NULL"
-
-	/*if o.FeatureOfInterest != nil && len(o.FeatureOfInterest.ID) != 0 {
-		fID, err := strconv.Atoi(o.FeatureOfInterest.ID)
-		if err != nil {
-			return nil, gostErrors.NewBadRequestError(errors.New("FeatureOfInterest does not exist"))
-		}
-	}*/
-	//REMOVE EXIST and insert return error based on database error
-
-	//marshal for
+	fID := o.FeatureOfInterest.ID
 	json, _ := o.MarshalPostgresJSON()
 	obs := fmt.Sprintf("'%s'", string(json[:]))
 	sql := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)

@@ -43,7 +43,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, s.Description, s.GetEntityType(), "description")
-	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingtype")
+	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, s.Metadata, s.GetEntityType(), "metadata")
 
 	if len(err) != 0 {

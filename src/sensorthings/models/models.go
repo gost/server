@@ -15,6 +15,7 @@ const (
 
 // API describes all request and responses to fulfill the SensorThings API standard
 type API interface {
+	Start()
 	GetConfig() *configuration.Config
 
 	GetVersionInfo() *VersionInfo

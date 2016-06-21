@@ -1,35 +1,48 @@
 package api
 
 import (
-	"github.com/geodan/gost/src/configuration"
-
 	"fmt"
+	"strings"
+
+	"github.com/geodan/gost/src/configuration"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/mqtt"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/geodan/gost/src/sensorthings/rest"
-	"strings"
 )
 
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
 // provider, config, endpoint information to setup te needed services
 type APIv1 struct {
-	db        models.Database
-	config    configuration.Config
-	endPoints []models.Endpoint
-	topics    []models.Topic
-	mqtt      models.MQTTClient
+	db            models.Database
+	internalDB    *InternalDatabase
+	foiRepository *FoiRepository
+	config        configuration.Config
+	endPoints     []models.Endpoint
+	topics        []models.Topic
+	mqtt          models.MQTTClient
 }
 
 // NewAPI Initialise a new SensorThings API
 func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTClient) models.API {
+	intDB := &InternalDatabase{}
+	fRepo := &FoiRepository{db: intDB}
+
 	return &APIv1{
-		db:     database,
-		mqtt:   mqtt,
-		config: config,
+		db:            database,
+		internalDB:    intDB,
+		mqtt:          mqtt,
+		config:        config,
+		foiRepository: fRepo,
 	}
+}
+
+// Start is used to set the initial state of the api such as loading of the foi states
+func (a *APIv1) Start() {
+	a.internalDB.Open()
+	a.foiRepository.LoadInMemory()
 }
 
 // GetConfig return the current configuration.Config set for the api
@@ -97,7 +110,6 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 	}
 
 	return true, nil
-	//qo.QueryExpand.IsValid("PARAMS", "EPNAME")
 }
 
 // ProcessGetRequest processes the entities by setting the necessary links before sending back

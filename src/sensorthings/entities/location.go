@@ -51,7 +51,7 @@ func (l *Location) ParseEntity(data []byte) error {
 func (l *Location) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
 	CheckMandatoryParam(&err, l.Description, l.GetEntityType(), "description")
-	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingtype")
+	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, l.Location, l.GetEntityType(), "location")
 
 	if len(err) != 0 {

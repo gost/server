@@ -87,7 +87,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities
 
 	for rows.Next() {
 		var id interface{}
-		var encodingtype int
+		var encodingType int
 		var description, metadata string
 
 		var params []interface{}
@@ -104,7 +104,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities
 				params = append(params, &id)
 			}
 			if p == "encodingType" {
-				params = append(params, &encodingtype)
+				params = append(params, &encodingType)
 			}
 			if p == "description" {
 				params = append(params, &description)
@@ -123,8 +123,8 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities
 		sensor.ID = id
 		sensor.Description = description
 		sensor.Metadata = metadata
-		if encodingtype != 0 {
-			sensor.EncodingType = entities.EncodingValues[encodingtype].Value
+		if encodingType != 0 {
+			sensor.EncodingType = entities.EncodingValues[encodingType].Value
 		}
 
 		sensors = append(sensors, &sensor)
