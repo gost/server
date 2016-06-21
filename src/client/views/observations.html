@@ -12,9 +12,9 @@
         <tbody>
         <tr ng-repeat="x in observationsList">
             <td>{{x["@iot.id"]}}</td>
-            <td>{{x["phenomenonTime"]}}</td>
+            <td>{{x["phenomenonTime"] | date:'yyyy-MM-dd HH:mm:ss'}}</td>
             <td>{{x["result"]}}</td>
-            <td>{{x["resultTime"]}}</td>
+            <td>{{x["resultTime" | date:'yyyy-MM-dd HH:mm:ss']}}</td>
             <td><div class="fa fa-remove delete-entity" ng-click="deleteObservationClicked(x)"></div></td>
         </tr>
         </tbody>
