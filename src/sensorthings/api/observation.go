@@ -89,7 +89,8 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	datastreamID := observation.Datastream.ID
 
 	if observation.FeatureOfInterest == nil || observation.FeatureOfInterest.ID == nil {
-		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, datastreamID.(string))
+		// foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, datastreamID.(string))
+		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
 
 		if err != nil {
 			return nil, []error{gostErrors.NewBadRequestError(errors.New("Unable to link or create FeatureOfInterest for Observation. The linked Thing should have a location or supply (deep insert) a new FeatureOfInterest or link to a known FeatureOfInterest by id \"FeatureOfInterest\":{\"@iot.id\":30198}"))}
