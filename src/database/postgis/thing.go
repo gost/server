@@ -167,18 +167,51 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 }
 
 // PatchThing receives a to be patched Thing entity and changes it in the database
-// returns the created Thing
+// returns the patched Thing
 func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
 	intID, _ := ToIntID(id)
-	// update field description for now, todo add other fields
-	sql := fmt.Sprintf("update %s.thing set description = $1 where id= $2", gdb.Schema)
-	_, err := gdb.Db.Exec(sql, thing.Description, intID)
-	if err != nil {
-		return nil, err
+
+	if len(thing.Description) > 0 {
+		// update field description for now, todo add other fields
+		sql := fmt.Sprintf("update %s.thing set description = $1 where id= $2", gdb.Schema)
+		_, err := gdb.Db.Exec(sql, thing.Description, intID)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	jsonProperties, _ := json.Marshal(thing.Properties)
+	if jsonProperties != nil {
+		sql := fmt.Sprintf("update %s.thing set properties  = $1 where id= $2", gdb.Schema)
+		_, err := gdb.Db.Exec(sql, jsonProperties, intID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if thing.Locations != nil {
+		if len(thing.Locations) > 0 {
+			for _, l := range thing.Locations {
+				// locationId := l.ID
+				location, _ := gdb.GetLocation(l.ID, nil)
+
+				// todo: check if location exist
+				if location != nil {
+					sql := fmt.Sprintf("update %s.thing_to_location set location_id  = $1 where thing_id= $2", gdb.Schema)
+					_, err := gdb.Db.Exec(sql, location.ID, intID)
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+	}
+
+	// do something with location if needed
+
 	// get the thing and return
 	var t *entities.Thing
-	t, err = gdb.GetThing(id, nil)
+	t, _ = gdb.GetThing(id, nil)
 	return t, nil
 }
 
