@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	net "net/http"
@@ -15,14 +16,15 @@ import (
 )
 
 func TestVersionHandler(t *testing.T) {
+	log.Println("do test")
 	//arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	// database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	database := postgis.NewDatabase("192.168.40.10", 5432, "postgres", "postgres", "gost", "v1", false, 50, 100)
 	api := api.NewAPI(database, cfg, mqttServer)
-	// a := *api
 
-	gostServer := http.CreateServer("http://localhost", 8088, &api)
+	gostServer := http.CreateServer("localhost", 8088, &api)
 	gostServer.Start()
 	versionUrl := fmt.Sprintf("%s/Version", "http://localhost:8088")
 
