@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	net "net/http"
+
 	"github.com/geodan/gost/src/configuration"
 	"github.com/geodan/gost/src/database/postgis"
 	"github.com/geodan/gost/src/http"
@@ -17,14 +19,16 @@ func TestVersionHandler(t *testing.T) {
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
 	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
-	a := api.NewAPI(database, cfg, mqttServer)
-	gostServer := http.CreateServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
+	api := api.NewAPI(database, cfg, mqttServer)
+	// a := *api
+
+	gostServer := http.CreateServer("http://localhost", 8088, &api)
 	gostServer.Start()
-	versionUrl := fmt.Sprintf("%s/Version", gostserver.URL)
+	versionUrl := fmt.Sprintf("%s/Version", "http://localhost:8088")
 
 	// act
-	request, err := net.http.NewRequest("GET", versionUrl, nil)
-	res, err := http.DefaultClient.Do(request)
+	request, _ := net.NewRequest("GET", versionUrl, nil)
+	res, _ := net.DefaultClient.Do(request)
 
 	//assert
 	assert.Equal(t, 200, res.StatusCode, "result should be http 200")
