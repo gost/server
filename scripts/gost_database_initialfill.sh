@@ -36,9 +36,9 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
     },
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "Thermometer readings",
-  "Thing": {"@iot.id": "1"},
-  "ObservedProperty": {"@iot.id": "1"},
-  "Sensor": {"@iot.id": "1"}
+  "Thing": {"@iot.id": 1},
+  "ObservedProperty": {"@iot.id": 1},
+  "Sensor": {"@iot.id": 1}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 
@@ -46,5 +46,5 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "phenomenonTime": "2016-05-09T11:04:15.790Z",
   "resultTime" : "2016-05-09T11:04:15.790Z",
   "result" : 38,
-  "Datastream":{"@iot.id":"1"}
+  "Datastream":{"@iot.id":1}
 }' "http://gost.geodan.nl/v1.0/Observations"
