@@ -198,9 +198,16 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 				// todo: check if location exist
 				if location != nil {
 					sql := fmt.Sprintf("update %s.thing_to_location set location_id  = $1 where thing_id= $2", gdb.Schema)
-					_, err := gdb.Db.Exec(sql, location.ID, intID)
+					res, err := gdb.Db.Exec(sql, location.ID, intID)
 					if err != nil {
 						return nil, err
+					}
+					if c, _ := res.RowsAffected(); c == 0 {
+						sqlInsert := fmt.Sprintf("insert into %s.thing_to_location (location_id,thing_id) values ($1, $2)", gdb.Schema)
+						_, err := gdb.Db.Exec(sqlInsert, location.ID, intID)
+						if err != nil {
+							return nil, err
+						}
 					}
 				}
 			}
