@@ -32,7 +32,7 @@ func TestEntityLinkStrings(t *testing.T) {
 	assert.Equal(t, "HistoricalLocations", EntityLinkHistoricalLocations.ToString())
 	assert.Equal(t, "Datastreams", EntityLinkDatastreams.ToString())
 	assert.Equal(t, "Sensors", EntityLinkSensors.ToString())
-	assert.Equal(t, "ObservedProperties", EntityLinkObservedPropertys.ToString())
+	assert.Equal(t, "ObservedProperties", EntityLinkObservedProperties.ToString())
 	assert.Equal(t, "Observations", EntityLinkObservations.ToString())
 	assert.Equal(t, "FeatureOfInterest", EntityLinkFeatureOfInterests.ToString())
 }

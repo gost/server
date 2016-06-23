@@ -38,7 +38,7 @@ const (
 	EntityLinkHistoricalLocations EntityLink = "HistoricalLocations"
 	EntityLinkDatastreams         EntityLink = "Datastreams"
 	EntityLinkSensors             EntityLink = "Sensors"
-	EntityLinkObservedPropertys   EntityLink = "ObservedProperties"
+	EntityLinkObservedProperties  EntityLink = "ObservedProperties"
 	EntityLinkObservations        EntityLink = "Observations"
 	EntityLinkFeatureOfInterests  EntityLink = "FeatureOfInterest"
 )

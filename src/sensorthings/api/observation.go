@@ -89,7 +89,6 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	datastreamID := observation.Datastream.ID
 
 	if observation.FeatureOfInterest == nil || observation.FeatureOfInterest.ID == nil {
-		// foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, datastreamID.(string))
 		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
 
 		if err != nil {

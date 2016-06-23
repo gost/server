@@ -3,6 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -60,12 +61,12 @@ func (o *ObservedProperty) SetAllLinks(externalURL string) {
 
 // SetSelfLink sets the self link for the entity
 func (o *ObservedProperty) SetSelfLink(externalURL string) {
-	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservedPropertys.ToString(), o.ID)
+	o.NavSelf = CreateEntitySelfLink(externalURL, EntityLinkObservedProperties.ToString(), o.ID)
 }
 
 // SetLinks sets the entity specific navigation links, empty string if linked(expanded) data is not nil
 func (o *ObservedProperty) SetLinks(externalURL string) {
-	o.NavDatastreams = CreateEntityLink(o.Datastreams == nil, externalURL, EntityLinkObservedPropertys.ToString(), EntityLinkDatastreams.ToString(), o.ID)
+	o.NavDatastreams = CreateEntityLink(o.Datastreams == nil, externalURL, EntityLinkObservedProperties.ToString(), EntityLinkDatastreams.ToString(), o.ID)
 }
 
 // GetSupportedEncoding returns the supported encoding tye for this entity

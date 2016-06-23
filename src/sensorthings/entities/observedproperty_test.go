@@ -76,8 +76,8 @@ func TestSetLinksSObservedProperty(t *testing.T) {
 	op.SetAllLinks(externalURL)
 
 	//assert
-	assert.Equal(t, op.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkObservedPropertys.ToString(), id), "ObservedProperty navself incorrect")
-	assert.Equal(t, op.NavDatastreams, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkObservedPropertys.ToString(), id, EntityLinkDatastreams.ToString()), "ObservedProperty NavDatastreams incorrect")
+	assert.Equal(t, op.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkObservedProperties.ToString(), id), "ObservedProperty navself incorrect")
+	assert.Equal(t, op.NavDatastreams, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkObservedProperties.ToString(), id, EntityLinkDatastreams.ToString()), "ObservedProperty NavDatastreams incorrect")
 }
 
 func TestGetSupportedEncodingObservedProperty(t *testing.T) {
