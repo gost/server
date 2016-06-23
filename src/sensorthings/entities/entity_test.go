@@ -2,8 +2,9 @@ package entities
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -33,7 +34,7 @@ func TestEntityLinkStrings(t *testing.T) {
 	assert.Equal(t, "Sensors", EntityLinkSensors.ToString())
 	assert.Equal(t, "ObservedProperties", EntityLinkObservedPropertys.ToString())
 	assert.Equal(t, "Observations", EntityLinkObservations.ToString())
-	assert.Equal(t, "FeatureOfInterests", EntityLinkFeatureOfInterests.ToString())
+	assert.Equal(t, "FeatureOfInterest", EntityLinkFeatureOfInterests.ToString())
 }
 
 func TestCreateEntitySelfLink(t *testing.T) {

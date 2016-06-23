@@ -3,6 +3,7 @@ package entities
 import (
 	"errors"
 	"fmt"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -39,7 +40,7 @@ const (
 	EntityLinkSensors             EntityLink = "Sensors"
 	EntityLinkObservedPropertys   EntityLink = "ObservedProperties"
 	EntityLinkObservations        EntityLink = "Observations"
-	EntityLinkFeatureOfInterests  EntityLink = "FeatureOfInterests"
+	EntityLinkFeatureOfInterests  EntityLink = "FeatureOfInterest"
 )
 
 // BaseEntity is the entry point for an entity
