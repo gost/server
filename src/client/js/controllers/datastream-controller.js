@@ -4,13 +4,14 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     $scope.Page.setHeaderIcon(iconDatastream);
 
     $scope.$on("$destroy", function () {
-        client.unsubscribe("$Datastreams(" + $scope.id + ")/Observations");
+        client.unsubscribe("Datastreams(" + $scope.id + ")/Observations");
     });
 
     labels = [];
     values = [];
 
-    client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
+    //client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
+    client = new Paho.MQTT.Client("gost.geodan.nl", Number(9001), guid());
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     client.connect({ onSuccess: onConnect });
