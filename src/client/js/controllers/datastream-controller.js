@@ -101,7 +101,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     };
 
     $scope.tabObservedPropertyClicked = function () {
-        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/ObservedProperties").then(function (response) {
+        $http.get(getUrl() + "/v1.0/Datastreams(" + $scope.id + ")/ObservedProperty").then(function (response) {
             $scope.observedPropertyId = response.data["@iot.id"];
             $scope.observedPropertyName = response.data["name"];
             $scope.observedPropertyDescription = response.data["description"];
