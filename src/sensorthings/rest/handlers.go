@@ -2,9 +2,9 @@ package rest
 
 import (
 	"encoding/json"
-	"net/http"
-
+	"errors"
 	"io/ioutil"
+	"net/http"
 
 	"bytes"
 	"fmt"
@@ -556,6 +556,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 
 // handleGetRequest is the default function to handle incoming GET requests
 func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions, path string) (interface{}, error)) {
+
 	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
 	if err != nil {
@@ -584,6 +585,10 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
 func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
+	if !checkContentType(w, r) {
+		return
+	}
+
 	byteData, _ := ioutil.ReadAll(r.Body)
 	err := entity.ParseEntity(byteData)
 	if err != nil {
@@ -615,6 +620,10 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 
 // handlePostRequest
 func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
+	if !checkContentType(w, r) {
+		return
+	}
+
 	byteData, _ := ioutil.ReadAll(r.Body)
 	err := entity.ParseEntity(byteData)
 	if err != nil {
@@ -632,6 +641,15 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 	w.Header().Add("Location", entity.GetSelfLink())
 
 	sendJSONResponse(w, http.StatusCreated, data, nil)
+}
+
+func checkContentType(w http.ResponseWriter, r *http.Request) bool {
+	if r.Header.Get("Content-Type") != "application/json" {
+		sendError(w, []error{gostErrors.NewBadRequestError(errors.New("Missing or wrong Content-Type, accepting: application/json"))})
+		return false
+	}
+
+	return true
 }
 
 // sendJSONResponse sends the desired message to the user
