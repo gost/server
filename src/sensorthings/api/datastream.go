@@ -106,54 +106,40 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 
 // PostDatastream todo
 func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
-	/*
-		_, err := thing.ContainsMandatoryParams()
-		if err != nil {
-			return nil, err
+	var postedObservedProperty *entities.ObservedProperty
+	var postedSensor *entities.Sensor
+
+	// Check if ObservedProperty is deep inserted
+	if datastream.ObservedProperty != nil && datastream.ObservedProperty.ID == nil {
+		if op, err := a.db.PostObservedProperty(datastream.ObservedProperty); err != nil {
+			a.revertPostDatastream(postedObservedProperty, postedSensor)
+			return nil, []error{err}
+		} else {
+			datastream.ObservedProperty = op
+			postedObservedProperty = op
 		}
+	}
 
-		nt, err2 := a.db.PostThing(thing)
-		if err2 != nil {
-			return nil, []error{err2}
+	// Check if Sensor is deep inserted
+	if datastream.Sensor != nil && datastream.Sensor.ID == nil {
+		if s, err := a.db.PostSensor(datastream.Sensor); err != nil {
+			a.revertPostDatastream(postedObservedProperty, postedSensor)
+			return nil, []error{err}
+		} else {
+			datastream.Sensor = s
+			postedSensor = s
 		}
-
-		// Handle locations
-		if thing.Locations != nil {
-			for _, l := range thing.Locations {
-				// New location posted
-				if len(l.ID) == 0 { //Id is null so a new location is posted
-					_, err3 := a.PostLocationByThing(nt.ID, l)
-					if err3 != nil {
-						return nil, err3
-					}
-				} else { // posted id: link
-					err4 := a.LinkLocation(nt.ID, l.ID)
-					if err4 != nil {
-						// todo: thing is posted, delete it
-						return nil, []error{err4}
-					}
-
-					err5 := a.PostHistoricalLocation(nt.ID, l.ID)
-					if err5 != nil {
-						// todo: things is posted, delete it
-						return nil, err5
-					}
-				}
-			}
-		}
-
-		nt.SetLinks(a.config.GetExternalServerURI())
-		//push to mqtt
-		return nt, nil
-	*/
+	}
 
 	_, err := datastream.ContainsMandatoryParams()
 	if err != nil {
+		a.revertPostDatastream(postedObservedProperty, postedSensor)
 		return nil, err
 	}
 
 	ns, err2 := a.db.PostDatastream(datastream)
 	if err2 != nil {
+		a.revertPostDatastream(postedObservedProperty, postedSensor)
 		return nil, []error{err2}
 	}
 
@@ -162,7 +148,17 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	return ns, nil
 }
 
-// PostDatastreamByThing todo
+func (a *APIv1) revertPostDatastream(op *entities.ObservedProperty, sensor *entities.Sensor) {
+	if op != nil {
+		a.DeleteObservedProperty(op)
+	}
+
+	if sensor != nil {
+		a.DeleteSensor(sensor)
+	}
+}
+
+// PostDatastreamByThing adds a new datastream by given thing ID
 func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.Datastream) (*entities.Datastream, []error) {
 	t := &entities.Thing{}
 	t.ID = thingID

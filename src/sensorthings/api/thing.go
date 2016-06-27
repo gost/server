@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -97,7 +99,9 @@ func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOpti
 // PostThing checks if a posted thing entity is valid and adds it to the database
 // a posted thing can also contain Locations and DataStreams
 func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
-	_, err := thing.ContainsMandatoryParams()
+	var err []error
+	var err2 error
+	_, err = thing.ContainsMandatoryParams()
 	if err != nil {
 		return nil, err
 	}
@@ -107,27 +111,54 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 		return nil, []error{err2}
 	}
 
-	// Handle locations
+	postedLocations := make([]*entities.Location, 0)
+	postedDatastreams := make([]*entities.Datastream, 0)
+
+	// Handle deep insert locations
 	if thing.Locations != nil {
 		for _, l := range thing.Locations {
 			// New location posted
 			if l.ID == nil { //Id is null so a new location is posted
-				_, err3 := a.PostLocationByThing(nt.ID, l)
-				if err3 != nil {
-					return nil, err3
+				if nl, err := a.PostLocationByThing(nt.ID, l); err != nil {
+					a.reverseInserts(nt, postedLocations, postedDatastreams)
+					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location deep inserted went wrong")))
+					return nil, err
+				} else {
+					postedLocations = append(postedLocations, nl)
 				}
 			} else { // posted id: link
-				err4 := a.LinkLocation(nt.ID, l.ID)
-				if err4 != nil {
-					// todo: thing is posted, delete it
-					return nil, []error{err4}
+				if err2 = a.LinkLocation(nt.ID, l.ID); err != nil {
+					a.reverseInserts(nt, postedLocations, postedDatastreams)
+					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location linking went wrong")))
+					err = append(err, err2)
+					return nil, err
 				}
 
-				err5 := a.PostHistoricalLocation(nt.ID, l.ID)
-				if err5 != nil {
-					// todo: things is posted, delete it
-					return nil, err5
+				if err = a.PostHistoricalLocation(nt.ID, l.ID); err != nil {
+					a.reverseInserts(nt, postedLocations, postedDatastreams)
+					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Historical Location went wrong")))
+					return nil, err
 				}
+			}
+		}
+	}
+
+	// Handle deep insert datastreams
+	if thing.Datastreams != nil {
+		for _, d := range thing.Datastreams {
+			// New location posted
+			if d.ID == nil { //Id is null so a new datastream is posted
+				if nd, err := a.PostDatastreamByThing(nt.ID, d); err != nil {
+					a.reverseInserts(nt, postedLocations, postedDatastreams)
+					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Datastrean went wrong")))
+					return nil, err
+				} else {
+					postedDatastreams = append(postedDatastreams, nd)
+				}
+			} else {
+				a.reverseInserts(nt, postedLocations, postedDatastreams)
+				err = append(err, gostErrors.NewConflictRequestError(errors.New("ID found for deep inserted datastream, linking to an existing Datastream is not allowed")))
+				return nil, err
 			}
 		}
 	}
@@ -135,6 +166,18 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	nt.SetAllLinks(a.config.GetExternalServerURI())
 	//push to mqtt
 	return nt, nil
+}
+
+func (a *APIv1) reverseInserts(thing *entities.Thing, locations []*entities.Location, datastreams []*entities.Datastream) {
+	for _, datastream := range datastreams {
+		a.DeleteDatastream(datastream.ID)
+	}
+
+	for _, location := range locations {
+		a.DeleteLocation(location.ID)
+	}
+
+	a.DeleteThing(thing.ID)
 }
 
 // DeleteThing deletes a given Thing from the database

@@ -30,6 +30,11 @@ func NewBadRequestError(err error) error {
 	return NewErrorWithStatusCode(err, http.StatusBadRequest)
 }
 
+// NewConflictRequestError creates an apiError with status code 409.
+func NewConflictRequestError(err error) error {
+	return NewErrorWithStatusCode(err, http.StatusConflict)
+}
+
 // NewRequestNotImplemented creates an apiError with status code 501.
 func NewRequestNotImplemented(err error) error {
 	return NewErrorWithStatusCode(err, http.StatusNotImplemented)
