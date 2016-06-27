@@ -160,6 +160,10 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	}
 
 	fID := o.FeatureOfInterest.ID
+	if fID == nil || len(fmt.Sprintf("%v", fID)) == 0 {
+		return nil, gostErrors.NewBadRequestError(errors.New("No FeatureOfInterest supplied or Location found on linked thing"))
+	}
+
 	json, _ := o.MarshalPostgresJSON()
 	obs := fmt.Sprintf("'%s'", string(json[:]))
 	sql := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)

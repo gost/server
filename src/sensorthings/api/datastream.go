@@ -150,11 +150,11 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 
 func (a *APIv1) revertPostDatastream(op *entities.ObservedProperty, sensor *entities.Sensor) {
 	if op != nil {
-		a.DeleteObservedProperty(op)
+		a.DeleteObservedProperty(op.ID)
 	}
 
 	if sensor != nil {
-		a.DeleteSensor(sensor)
+		a.DeleteSensor(sensor.ID)
 	}
 }
 

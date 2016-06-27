@@ -119,7 +119,7 @@ WITH (
 
 CREATE TABLE datastream
 (
-  id serial NOT NULL,
+  id bigserial NOT NULL,
   description character varying(500),
   unitofmeasurement jsonb,
   observationtype integer,
@@ -132,10 +132,10 @@ CREATE TABLE datastream
   CONSTRAINT datastream_pkey PRIMARY KEY (id),
   CONSTRAINT fk_observedproperty FOREIGN KEY (observedproperty_id)
       REFERENCES observedproperty (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE RESTRICT,
+      ON UPDATE NO ACTION ON DELETE CASCADE,
   CONSTRAINT fk_sensor FOREIGN KEY (sensor_id)
       REFERENCES sensor (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE RESTRICT,
+      ON UPDATE NO ACTION ON DELETE CASCADE,
   CONSTRAINT fk_thing FOREIGN KEY (thing_id)
       REFERENCES thing (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE
@@ -177,7 +177,7 @@ CREATE UNLOGGED TABLE observation
       ON UPDATE NO ACTION ON DELETE CASCADE,
   CONSTRAINT fk_featureofinterest FOREIGN KEY (featureofinterest_id)
       REFERENCES featureofinterest (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE RESTRICT
+      ON UPDATE NO ACTION ON DELETE CASCADE
 )
 WITH (
   OIDS=FALSE
