@@ -645,9 +645,12 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
-	if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
-		sendError(w, []error{gostErrors.NewBadRequestError(errors.New("Missing or wrong Content-Type, accepting: application/json"))})
-		return false
+	// maybe needs to add case-insentive check?
+	if len(r.Header.Get("Content-Type")) > 0 {
+		if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
+			sendError(w, []error{gostErrors.NewBadRequestError(errors.New("Missing or wrong Content-Type, accepting: application/json"))})
+			return false
+		}
 	}
 
 	return true
