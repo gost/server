@@ -8,12 +8,13 @@ import (
 
 	"bytes"
 	"fmt"
+	"strings"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
-	"strings"
 )
 
 // HandleAPIRoot will return a JSON array of the available SensorThings resource endpoints.
@@ -644,7 +645,7 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
-	if r.Header.Get("Content-Type") != "application/json" {
+	if !strings.Contains(r.Header.Get("Content-Type"), "application/json") {
 		sendError(w, []error{gostErrors.NewBadRequestError(errors.New("Missing or wrong Content-Type, accepting: application/json"))})
 		return false
 	}
