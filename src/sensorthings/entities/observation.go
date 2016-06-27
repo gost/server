@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"errors"
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"time"
 )
@@ -50,24 +51,31 @@ func (o *Observation) ParseEntity(data []byte) error {
 func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	// When a SensorThings service receives a POST Observations without phenonmenonTime, the service SHALL
 	// assign the current server time to the value of the phenomenonTime.
+	var errors []error
+
 	if len(o.PhenomenonTime) == 0 {
 		o.PhenomenonTime = time.Now().UTC().Format(time.RFC3339Nano)
+	} else {
+		if t, err := time.Parse(time.RFC3339Nano, o.PhenomenonTime); err != nil {
+			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid time")))
+		} else {
+			o.PhenomenonTime = t.Format("2006-01-02T15:04:05.000Z")
+		}
 	}
 
 	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
 	// null value to the resultTime.
 	if len(o.ResultTime) == 0 {
-		o.ResultTime = "NULL"
+		o.ResultTime = "null"
 	}
 
-	var err []error
-	CheckMandatoryParam(&err, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
-	CheckMandatoryParam(&err, o.Result, o.GetEntityType(), "result")
-	CheckMandatoryParam(&err, o.ResultTime, o.GetEntityType(), "resultTime")
-	CheckMandatoryParam(&err, o.Datastream, o.GetEntityType(), "Datastream")
+	CheckMandatoryParam(&errors, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
+	CheckMandatoryParam(&errors, o.Result, o.GetEntityType(), "result")
+	CheckMandatoryParam(&errors, o.ResultTime, o.GetEntityType(), "resultTime")
+	CheckMandatoryParam(&errors, o.Datastream, o.GetEntityType(), "Datastream")
 
-	if len(err) != 0 {
-		return false, err
+	if len(errors) != 0 {
+		return false, errors
 	}
 
 	return true, nil

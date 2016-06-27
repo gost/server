@@ -150,7 +150,7 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*ent
 	return observations, nil
 }
 
-// PostObservation todo
+// PostObservation adds an observation to the database
 func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Observation, error) {
 	var oID int
 
@@ -159,10 +159,11 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 		return nil, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 	}
 
-	fID := o.FeatureOfInterest.ID
-	if fID == nil || len(fmt.Sprintf("%v", fID)) == 0 {
+	if o.FeatureOfInterest == nil || len(fmt.Sprintf("%v", o.FeatureOfInterest.ID)) == 0 {
 		return nil, gostErrors.NewBadRequestError(errors.New("No FeatureOfInterest supplied or Location found on linked thing"))
 	}
+
+	fID := o.FeatureOfInterest.ID
 
 	json, _ := o.MarshalPostgresJSON()
 	obs := fmt.Sprintf("'%s'", string(json[:]))

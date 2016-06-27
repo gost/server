@@ -88,7 +88,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 	datastreamID := observation.Datastream.ID
 
-	if observation.FeatureOfInterest == nil || observation.FeatureOfInterest.ID == nil {
+	if observation.FeatureOfInterest == nil {
 		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
 
 		if err != nil {
@@ -97,9 +97,13 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 		observation.FeatureOfInterest = &entities.FeatureOfInterest{}
 		observation.FeatureOfInterest.ID = foiID
+	} else if observation.FeatureOfInterest != nil && observation.FeatureOfInterest.ID == nil {
+		if foi, err := a.PostFeatureOfInterest(observation.FeatureOfInterest); err != nil {
+			return nil, []error{gostErrors.NewConflictRequestError(errors.New("Unable to create deep inserted FeatureOfInterest"))}
+		} else {
+			observation.FeatureOfInterest = foi
+		}
 	}
-
-	//ToDo deep insert FeatureOfInterest if exist
 
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {

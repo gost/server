@@ -21,7 +21,7 @@ type Datastream struct {
 	NavObservedProperty string                 `json:"ObservedProperty@iot.navigationLink,omitempty"`
 	Thing               *Thing                 `json:"Thing,omitempty"`
 	Sensor              *Sensor                `json:"Sensor,omitempty"`
-	Observations        *[]Observation         `json:"Observations,omitempty"`
+	Observations        []*Observation         `json:"Observations,omitempty"`
 	ObservedProperty    *ObservedProperty      `json:"ObservedProperty,omitempty"`
 }
 

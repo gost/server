@@ -108,11 +108,12 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
 	var postedObservedProperty *entities.ObservedProperty
 	var postedSensor *entities.Sensor
+	postedObservations := make([]*entities.Observation, 0)
 
 	// Check if ObservedProperty is deep inserted
 	if datastream.ObservedProperty != nil && datastream.ObservedProperty.ID == nil {
 		if op, err := a.db.PostObservedProperty(datastream.ObservedProperty); err != nil {
-			a.revertPostDatastream(postedObservedProperty, postedSensor)
+			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 			return nil, []error{err}
 		} else {
 			datastream.ObservedProperty = op
@@ -123,7 +124,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	// Check if Sensor is deep inserted
 	if datastream.Sensor != nil && datastream.Sensor.ID == nil {
 		if s, err := a.db.PostSensor(datastream.Sensor); err != nil {
-			a.revertPostDatastream(postedObservedProperty, postedSensor)
+			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 			return nil, []error{err}
 		} else {
 			datastream.Sensor = s
@@ -133,14 +134,30 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 
 	_, err := datastream.ContainsMandatoryParams()
 	if err != nil {
-		a.revertPostDatastream(postedObservedProperty, postedSensor)
+		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 		return nil, err
 	}
 
 	ns, err2 := a.db.PostDatastream(datastream)
 	if err2 != nil {
-		a.revertPostDatastream(postedObservedProperty, postedSensor)
+		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 		return nil, []error{err2}
+	}
+
+	// Check if Observations are deep inserted
+	if datastream.Observations != nil {
+		for _, observation := range datastream.Observations {
+			ds := &entities.Datastream{}
+			ds.ID = datastream.ID
+			observation.Datastream = ds
+
+			if o, err := a.PostObservation(observation); err != nil {
+				a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+				return nil, err
+			} else {
+				postedObservations = append(postedObservations, o)
+			}
+		}
 	}
 
 	ns.SetAllLinks(a.config.GetExternalServerURI())
@@ -148,13 +165,17 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	return ns, nil
 }
 
-func (a *APIv1) revertPostDatastream(op *entities.ObservedProperty, sensor *entities.Sensor) {
+func (a *APIv1) revertPostDatastream(op *entities.ObservedProperty, sensor *entities.Sensor, observations []*entities.Observation) {
 	if op != nil {
 		a.DeleteObservedProperty(op.ID)
 	}
 
 	if sensor != nil {
 		a.DeleteSensor(sensor.ID)
+	}
+
+	for _, observation := range observations {
+		a.DeleteObservation(observation.ID)
 	}
 }
 
