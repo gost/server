@@ -98,7 +98,7 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 
 	var data interface{} = datastreams
 	return &models.ArrayResponse{
-		Count:    len(datastreams),
+		Count:    a.db.GetTotalDatastreams(),
 		NextLink: a.CreateNextLink(a.db.GetTotalDatastreams(), path, qo),
 		Data:     &data,
 	}, nil

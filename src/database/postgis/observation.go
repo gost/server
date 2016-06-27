@@ -170,6 +170,9 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 		if strings.Contains(errString, "violates foreign key constraint \"fk_datastream\"") {
 			return nil, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 		}
+		if strings.Contains(errString, "violates foreign key constraint \"fk_featureofinterest\"") {
+			return nil, gostErrors.NewBadRequestError(errors.New("FeatureOfInterest does not exist"))
+		}
 
 		return nil, err
 	}

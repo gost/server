@@ -60,7 +60,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*mod
 
 	var data interface{} = ops
 	response := models.ArrayResponse{
-		Count:    len(ops),
+		Count:    a.db.GetTotalObservedProperties(),
 		NextLink: a.CreateNextLink(a.db.GetTotalObservedProperties(), path, qo),
 		Data:     &data,
 	}

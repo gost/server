@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 # CREATE THINGS AND LOCATIONS
 
@@ -270,7 +271,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo humidity readings indoor",
+  "description": "Netatmo pressure readings indoor",
   "Thing": {"@iot.id": 2},
   "ObservedProperty": {"@iot.id": 3},
   "Sensor": {"@iot.id": 2}

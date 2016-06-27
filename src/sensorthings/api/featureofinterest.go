@@ -60,7 +60,7 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 
 	var data interface{} = fois
 	return &models.ArrayResponse{
-		Count:    len(fois),
+		Count:    a.db.GetTotalFeaturesOfInterest(),
 		NextLink: a.CreateNextLink(a.db.GetTotalFeaturesOfInterest(), path, qo),
 		Data:     &data,
 	}, nil

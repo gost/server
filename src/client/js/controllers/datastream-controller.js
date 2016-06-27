@@ -10,8 +10,7 @@ gostApp.controller('DatastreamCtrl', function ($scope, $http, $routeParams, Page
     labels = [];
     values = [];
 
-    //client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
-    client = new Paho.MQTT.Client("gost.geodan.nl", Number(9001), guid());
+    client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     client.connect({ onSuccess: onConnect });

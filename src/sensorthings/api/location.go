@@ -124,7 +124,7 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 
 	var data interface{} = locations
 	return &models.ArrayResponse{
-		Count:    len(locations),
+		Count:    a.db.GetTotalLocations(),
 		NextLink: a.CreateNextLink(a.db.GetTotalLocations(), path, qo),
 		Data:     &data,
 	}, nil
