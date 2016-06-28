@@ -2,11 +2,13 @@ package postgis
 
 import (
 	"fmt"
+
 	"github.com/geodan/gost/src/sensorthings/entities"
 
 	"database/sql"
 	"encoding/json"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
@@ -143,7 +145,7 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
-	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
 	err := gdb.Db.QueryRow(sql, location.Description, encoding.Code).Scan(&locationID)
 	if err != nil {
 		return nil, err

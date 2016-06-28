@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"database/sql"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -199,7 +200,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	geom := "NULL"
 	if len(d.ObservedArea) != 0 {
 		observedAreaBytes, _ := json.Marshal(d.ObservedArea)
-		geom = fmt.Sprintf("public.ST_GeomFromGeoJSON('%s')", string(observedAreaBytes[:]))
+		geom = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
 	}
 
 	// get the ObservationType id in the lookup table

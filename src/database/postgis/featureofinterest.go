@@ -57,7 +57,7 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	var fID int
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
-	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (description, encodingtype, feature) VALUES ($1, $2, public.ST_GeomFromGeoJSON('%s')) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (description, encodingtype, feature) VALUES ($1, $2, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
 	err := gdb.Db.QueryRow(sql, f.Description, encoding.Code).Scan(&fID)
 	if err != nil {
 		return nil, err

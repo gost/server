@@ -19,7 +19,7 @@ CREATE TABLE featureofinterest
   id bigserial NOT NULL,
   description character varying(500),
   encodingtype integer,
-  feature public.geometry,
+  feature public.geometry(geometry,4326),
   CONSTRAINT featureofinterest_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -42,7 +42,7 @@ CREATE TABLE location
   id bigserial NOT NULL,
   description character varying(500),
   encodingtype integer,
-  location public.geometry,
+  location public.geometry(geometry,4326),
   CONSTRAINT location_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -123,7 +123,7 @@ CREATE TABLE datastream
   description character varying(500),
   unitofmeasurement jsonb,
   observationtype integer,
-  observedarea public.geometry,
+  observedarea public.geometry(geometry,4326),
   phenomenontime tstzrange,
   resulttime tstzrange,
   thing_id bigint,

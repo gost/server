@@ -1,4 +1,4 @@
-curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
+﻿curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
     "description": "my thermometer",
     "properties": {
         "organisation": "My Organisation",
@@ -48,3 +48,13 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "result" : 38,
   "Datastream":{"@iot.id":1}
 }' "http://gost.geodan.nl/v1.0/Observations"
+
+
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "description": "Underground Air Quality in NYC train tunnels",
+    "encodingType": "application/vnd.geo+json",
+    "feature": {
+        "coordinates": [51.08386,-114.13036],
+        "type": "Point"
+      }
+}' "http://gost.geodan.nl/v1.0/FeaturesOfInterest"
