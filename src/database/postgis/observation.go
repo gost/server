@@ -12,19 +12,6 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalObservations int
-
-// GetTotalObservations returns the amount of observations in the database
-func (gdb *GostDatabase) GetTotalObservations() int {
-	return totalObservations
-}
-
-// InitObservations Initialises the datastream repository, setting totalObservations on startup
-func (gdb *GostDatabase) InitObservations() {
-	sql := fmt.Sprintf("SELECT Count(*) from %s.observation", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalObservations)
-}
-
 // GetObservation retrieves an observation by id from the database
 func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
 	intID, ok := ToIntID(id)
@@ -39,6 +26,15 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 	}
 
 	return observation, nil
+}
+
+// GetTotalObservations returns the amount of observations in the database
+// todo: add datastreamparameter
+func (gdb *GostDatabase) GetTotalObservations() int {
+	var count int
+	sql := fmt.Sprintf("SELECT Count(*) from %s.observation", gdb.Schema)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetObservations retrieves all datastreams
@@ -191,7 +187,6 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	o.Datastream = nil
 	o.FeatureOfInterest = nil
 
-	totalObservations++
 	return o, nil
 }
 
@@ -211,6 +206,5 @@ func (gdb *GostDatabase) DeleteObservation(id interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("Observation not found"))
 	}
 
-	totalObservations--
 	return nil
 }

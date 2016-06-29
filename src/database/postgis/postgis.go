@@ -7,12 +7,13 @@ import (
 	"log"
 
 	"encoding/json"
+	"strconv"
+	"strings"
+
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	_ "github.com/lib/pq" // postgres driver
-	"strconv"
-	"strings"
 )
 
 const (
@@ -77,14 +78,6 @@ func (gdb *GostDatabase) Start() {
 
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
 
-	gdb.InitDatastreams()
-	gdb.InitFeaturesOfInterest()
-	gdb.InitHistoricalLocations()
-	gdb.InitLocations()
-	gdb.InitObservations()
-	gdb.InitObservedProperties()
-	gdb.InitSensors()
-	gdb.InitThings()
 }
 
 // CreateSchema creates the needed schema in the database

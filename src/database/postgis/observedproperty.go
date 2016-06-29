@@ -2,25 +2,22 @@ package postgis
 
 import (
 	"fmt"
+
 	"github.com/geodan/gost/src/sensorthings/entities"
 
 	"database/sql"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalObservedProperties int
-
 // GetTotalObservedProperties returns the total ObservedProperties count in the database
 func (gdb *GostDatabase) GetTotalObservedProperties() int {
-	return totalObservedProperties
-}
-
-// InitObservedProperties Initialises the datastream repository, setting totalObservedProperties on startup
-func (gdb *GostDatabase) InitObservedProperties() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.observedproperty", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalObservedProperties)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetObservedProperty returns an ObservedProperty by id
@@ -140,7 +137,6 @@ func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*e
 	}
 
 	op.ID = opID
-	totalObservedProperties++
 	return op, nil
 }
 
@@ -171,7 +167,5 @@ func (gdb *GostDatabase) DeleteObservedProperty(id interface{}) error {
 	if c, _ := r.RowsAffected(); c == 0 {
 		return gostErrors.NewRequestNotFound(errors.New("ObservedProperty not found"))
 	}
-
-	totalObservedProperties--
 	return nil
 }

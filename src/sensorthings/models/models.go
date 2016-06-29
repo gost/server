@@ -99,7 +99,6 @@ type Database interface {
 	Start()
 	CreateSchema(location string) error
 
-	InitThings()
 	GetTotalThings() int
 	GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (t *entities.Thing, e error)
@@ -110,7 +109,6 @@ type Database interface {
 	PatchThing(interface{}, *entities.Thing) (*entities.Thing, error)
 	DeleteThing(id interface{}) error
 
-	InitLocations()
 	GetTotalLocations() int
 	GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error)
 	GetLocations(qo *odata.QueryOptions) (l []*entities.Location, e error)
@@ -120,7 +118,6 @@ type Database interface {
 	LinkLocation(id interface{}, locationID interface{}) error
 	DeleteLocation(id interface{}) error
 
-	InitObservedProperties()
 	GetTotalObservedProperties() int
 	GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
 	GetObservedPropertyByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
@@ -128,7 +125,6 @@ type Database interface {
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
 	DeleteObservedProperty(id interface{}) error
 
-	InitSensors()
 	GetTotalSensors() int
 	GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error)
 	GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error)
@@ -136,7 +132,6 @@ type Database interface {
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
 
-	InitDatastreams()
 	GetTotalDatastreams() int
 	GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error)
 	GetDatastreams(qo *odata.QueryOptions) (d []*entities.Datastream, e error)
@@ -147,7 +142,6 @@ type Database interface {
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
 	DeleteDatastream(id interface{}) error
 
-	InitFeaturesOfInterest()
 	GetTotalFeaturesOfInterest() int
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
@@ -155,7 +149,7 @@ type Database interface {
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	DeleteFeatureOfInterest(id interface{}) error
 
-	InitObservations()
+	// InitObservations()
 	GetTotalObservations() int
 	GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error)
 	GetObservations(qo *odata.QueryOptions) (o []*entities.Observation, e error)
@@ -164,7 +158,6 @@ type Database interface {
 	PostObservation(*entities.Observation) (*entities.Observation, error)
 	DeleteObservation(id interface{}) error
 
-	InitHistoricalLocations()
 	GetTotalHistoricalLocations() int
 	GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error)
 	GetHistoricalLocations(qo *odata.QueryOptions) (h []*entities.HistoricalLocation, e error)

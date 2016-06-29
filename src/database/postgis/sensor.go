@@ -10,17 +10,12 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalSensors int
-
 // GetTotalSensors returns the total sensors count in the database
 func (gdb *GostDatabase) GetTotalSensors() int {
-	return totalSensors
-}
-
-// InitSensors Initialises the datastream repository, setting totalSensors on startup
-func (gdb *GostDatabase) InitSensors() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.sensor", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalSensors)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetSensor todo
@@ -144,7 +139,6 @@ func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, 
 	}
 
 	sensor.ID = sensorID
-	totalSensors++
 	return sensor, nil
 }
 
@@ -176,6 +170,5 @@ func (gdb *GostDatabase) DeleteSensor(id interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("Sensor not found"))
 	}
 
-	totalSensors--
 	return nil
 }

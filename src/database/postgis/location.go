@@ -1,30 +1,26 @@
 package postgis
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/geodan/gost/src/sensorthings/entities"
 
 	"database/sql"
-	"encoding/json"
 	"errors"
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalLocations int
 var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
 
-// GetTotalLocations returns the amount of locations in the database
+// GetTotalLocations returns totalnumber of locations
 func (gdb *GostDatabase) GetTotalLocations() int {
-	return totalLocations
-}
-
-// InitLocations Initialises the datastream repository, setting totalLocations on startup
-func (gdb *GostDatabase) InitLocations() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.location", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalLocations)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetLocation retrieves the location for the given id from the database
@@ -145,6 +141,7 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	var locationID int
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
+
 	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
 	err := gdb.Db.QueryRow(sql, location.Description, encoding.Code).Scan(&locationID)
 	if err != nil {
@@ -152,7 +149,6 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	}
 
 	location.ID = locationID
-	totalLocations++
 	return location, nil
 }
 
@@ -184,8 +180,6 @@ func (gdb *GostDatabase) DeleteLocation(locationID interface{}) error {
 	if c, _ := r.RowsAffected(); c == 0 {
 		return gostErrors.NewRequestNotFound(errors.New("Location not found"))
 	}
-
-	totalLocations--
 	return nil
 }
 

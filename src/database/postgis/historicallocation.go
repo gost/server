@@ -11,18 +11,14 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalHistoricalLocations int
 var hlMapping = map[string]string{"time": fmt.Sprintf("to_char(time at time zone 'UTC', '%s') as time", TimeFormat)}
 
 // GetTotalHistoricalLocations returns the amount of HistoricalLocations in the database
 func (gdb *GostDatabase) GetTotalHistoricalLocations() int {
-	return totalHistoricalLocations
-}
-
-// InitHistoricalLocations Initialises the datastream repository, setting totalHistoricalLocations on startup
-func (gdb *GostDatabase) InitHistoricalLocations() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.historicallocation", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalHistoricalLocations)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetHistoricalLocation retireves a HistoricalLocation by id
@@ -143,7 +139,6 @@ func (gdb *GostDatabase) PostHistoricalLocation(thingID interface{}, locationID 
 		return err3
 	}
 
-	totalHistoricalLocations++
 	return nil
 }
 
@@ -163,6 +158,5 @@ func (gdb *GostDatabase) DeleteHistoricalLocation(id interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("HistoricalLocation not found"))
 	}
 
-	totalHistoricalLocations--
 	return nil
 }

@@ -13,17 +13,12 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalThings int
-
 // GetTotalThings returns the total things count in the database
 func (gdb *GostDatabase) GetTotalThings() int {
-	return totalThings
-}
-
-// InitThings Initialises the datastream repository, setting totalThings on startup
-func (gdb *GostDatabase) InitThings() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.thing", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalThings)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetThing returns a thing entity based on id and query
@@ -162,7 +157,6 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 	}
 
 	thing.ID = thingID
-	totalThings++
 	return thing, nil
 }
 
@@ -249,7 +243,5 @@ func (gdb *GostDatabase) DeleteThing(id interface{}) error {
 	if c, _ := r.RowsAffected(); c == 0 {
 		return gostErrors.NewRequestNotFound(errors.New("Thing not found"))
 	}
-
-	totalThings--
 	return nil
 }
