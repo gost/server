@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -76,19 +77,19 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayRes
 	return processThings(a, things, qo, path, err)
 }
 
-func processThings(a *APIv1, observations []*entities.Thing, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
 
-	for idx, item := range observations {
+	for idx, item := range things {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
-		observations[idx] = &i
+		things[idx] = &i
 	}
 
-	var data interface{} = observations
-	total := a.db.GetTotalThings()
+	var data interface{} = things
+	total := len(things)
 	return &models.ArrayResponse{
 		Count:    total,
 		NextLink: a.CreateNextLink(total, path, qo),

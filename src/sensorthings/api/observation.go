@@ -71,9 +71,11 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 		observations[idx] = &i
 	}
 
+	var numberOfObservations = len(observations)
+
 	var data interface{} = observations
 	return &models.ArrayResponse{
-		Count:    a.db.GetTotalObservations(),
+		Count:    numberOfObservations,
 		NextLink: a.CreateNextLink(a.db.GetTotalObservations(), path, qo),
 		Data:     &data,
 	}, nil

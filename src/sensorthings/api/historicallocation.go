@@ -66,7 +66,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 
 	var data interface{} = historicalLocations
 	return &models.ArrayResponse{
-		Count:    a.db.GetTotalHistoricalLocations(),
+		Count:    len(historicalLocations),
 		NextLink: a.CreateNextLink(a.db.GetTotalHistoricalLocations(), path, qo),
 		Data:     &data,
 	}, nil

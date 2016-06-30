@@ -2,11 +2,12 @@ package api
 
 import (
 	"errors"
+	"log"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"log"
 )
 
 // PostLocation tries to add a new location
@@ -124,7 +125,7 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 
 	var data interface{} = locations
 	return &models.ArrayResponse{
-		Count:    a.db.GetTotalLocations(),
+		Count:    len(locations),
 		NextLink: a.CreateNextLink(a.db.GetTotalLocations(), path, qo),
 		Data:     &data,
 	}, nil
