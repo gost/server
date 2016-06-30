@@ -616,7 +616,7 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 		return
 	}
 
-	sendJSONResponse(w, http.StatusOK, "null", nil)
+	sendJSONResponse(w, http.StatusOK, nil, nil)
 }
 
 // handlePostRequest
@@ -661,33 +661,37 @@ func checkContentType(w http.ResponseWriter, r *http.Request) bool {
 func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *odata.QueryOptions) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(status)
-	b, err := JSONMarshal(data, true)
-	if err != nil {
-		panic(err)
-	}
 
-	// $value is requested only send back the value, ToDo: move to API code?
-	if qo != nil && qo.QueryOptionValue {
-		errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.QuerySelect.Params[0])
-		var m map[string]json.RawMessage
-		err = json.Unmarshal(b, &m)
-		if err != nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+	if data != nil {
+		b, err := JSONMarshal(data, true)
+		if err != nil {
+			panic(err)
 		}
 
-		mVal, ok := m[qo.QuerySelect.Params[0]]
-		if !ok {
-			sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+		// $value is requested only send back the value, ToDo: move to API code?
+		if qo != nil && qo.QueryOptionValue {
+			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.QuerySelect.Params[0])
+			var m map[string]json.RawMessage
+			err = json.Unmarshal(b, &m)
+			if err != nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+			}
+
+			mVal, ok := m[qo.QuerySelect.Params[0]]
+			if !ok {
+				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+			}
+
+			value := string(mVal[:])
+			value = strings.TrimPrefix(value, "\"")
+			value = strings.TrimSuffix(value, "\"")
+
+			b = []byte(value)
 		}
 
-		value := string(mVal[:])
-		value = strings.TrimPrefix(value, "\"")
-		value = strings.TrimSuffix(value, "\"")
+		w.Write(b)
 
-		b = []byte(value)
 	}
-
-	w.Write(b)
 }
 
 //JSONMarshal converts the data and converts special characters such as &
