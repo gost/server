@@ -81,6 +81,38 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}, nil
 }
 
+// GetFoiIDByDatastreamID gets the location of the related lthing locatiob
+func GetFoiIDByDatastreamID(gdb *models.Database, datastreamID interface{}) (string, error) {
+	db := *gdb
+	dId := toStringID(datastreamID)
+	_, err := db.GetDatastream(dId, nil)
+	if err != nil {
+		return "", errors.New("Datastream not found")
+	}
+
+	thing, err := db.GetThingByDatastream(dId, nil)
+	if err != nil {
+		return "", errors.New("Thing by datastream not found")
+	}
+
+	l, err := db.GetLocationsByThing(thing.ID, nil)
+	if err != nil || len(l) == 0 {
+		return "", err
+	}
+
+	foi := &entities.FeatureOfInterest{}
+	foi.Description = l[0].Description
+	foi.EncodingType = l[0].EncodingType
+	foi.Feature = l[0].Location
+
+	nFoi, err := db.PostFeatureOfInterest(foi)
+	if err != nil {
+		return "", err
+	}
+
+	return toStringID(nFoi.ID), nil
+}
+
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
 func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
 	_, err := observation.ContainsMandatoryParams()
@@ -91,7 +123,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	datastreamID := observation.Datastream.ID
 
 	if observation.FeatureOfInterest == nil {
-		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
+		foiID, err := GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
 
 		if err != nil {
 			return nil, []error{gostErrors.NewBadRequestError(errors.New("Unable to link or create FeatureOfInterest for Observation. The linked Thing should have a location or supply (deep insert) a new FeatureOfInterest or link to a known FeatureOfInterest by id \"FeatureOfInterest\":{\"@iot.id\":30198}"))}
@@ -122,6 +154,10 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	a.mqtt.Publish("Observations", s, 0)
 
 	return no, nil
+}
+
+func toStringID(id interface{}) string {
+	return fmt.Sprintf("%v", id)
 }
 
 // PostObservationByDatastream creates an Observation with a linked datastream by given datastream id and calls PostObservation on the database
