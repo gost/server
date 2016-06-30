@@ -5,23 +5,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalFeaturesOfInterest int
 var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
 
 // GetTotalFeaturesOfInterest returns the amount of FeaturesOfInterest in the database
 func (gdb *GostDatabase) GetTotalFeaturesOfInterest() int {
-	return totalFeaturesOfInterest
-}
-
-// InitFeaturesOfInterest Initialises the datastream repository, setting totalFeaturesOfInterest on startup
-func (gdb *GostDatabase) InitFeaturesOfInterest() {
+	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.featureofinterest", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalFeaturesOfInterest)
+	gdb.Db.QueryRow(sql).Scan(&count)
+	return count
 }
 
 // GetFeatureOfInterest returns a feature of interest by id
@@ -136,7 +133,6 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 		featureOfInterests = append(featureOfInterests, &foi)
 	}
 
-	totalFeaturesOfInterest++
 	return featureOfInterests, nil
 }
 
@@ -156,7 +152,6 @@ func (gdb *GostDatabase) DeleteFeatureOfInterest(id interface{}) error {
 		return gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest not found"))
 	}
 
-	totalFeaturesOfInterest--
 	return nil
 }
 
