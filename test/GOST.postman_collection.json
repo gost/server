@@ -83,6 +83,7 @@
 			"name": "Observation",
 			"description": "",
 			"order": [
+				"ff22f2fc-4915-2da8-2353-e6a2f32d4d65",
 				"c2a45ef1-e40f-3566-7062-6c0f900ee232",
 				"1d630679-d38b-c108-1805-149703bd808b",
 				"e0dba992-9c88-2777-8fd2-a40651fed1f2",
@@ -91,7 +92,7 @@
 				"9f89116f-a9e9-28ad-b40b-1614f4c926bd"
 			],
 			"owner": 0,
-			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc"
+			"collectionId": "e2d62c74-8e73-b9a5-c87e-6b21214162d2"
 		},
 		{
 			"id": "242b183a-d341-6dfd-7b8f-febeadd46d90",
@@ -128,6 +129,7 @@
 				"bf5129de-0edf-5bb2-3e22-bc2a9de36fd5",
 				"5b05fa59-1df6-41d1-2323-e5d6398c248e",
 				"14ca6317-3df2-fe9d-85a1-6077d19ed72a",
+				"4ce1c548-2833-30b6-0b09-5207e4a57a81",
 				"af577ff8-6e25-f470-070b-8c06e8fb11e8",
 				"25c6790f-3a05-1ab8-45cc-536b742bb812",
 				"d4d7eb91-1337-42f6-2c4e-85805c8f1242",
@@ -443,6 +445,25 @@
 			"helperAttributes": "{}",
 			"responses": [],
 			"collectionId": "e2d62c74-8e73-b9a5-c87e-6b21214162d2"
+		},
+		{
+			"id": "4ce1c548-2833-30b6-0b09-5207e4a57a81",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Things(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1467287373666,
+			"name": "PATCH Thing",
+			"description": "PATCH thing",
+			"collectionId": "e2d62c74-8e73-b9a5-c87e-6b21214162d2",
+			"responses": [],
+			"rawModeData": "{\"Locations\":[{\"@iot.id\":1}]}"
 		},
 		{
 			"folder": "9a85b962-fdbb-93e7-9aef-ded7079d6785",
@@ -1203,6 +1224,26 @@
 			"helperAttributes": "{}",
 			"responses": [],
 			"collectionId": "e2d62c74-8e73-b9a5-c87e-6b21214162d2"
+		},
+		{
+			"id": "ff22f2fc-4915-2da8-2353-e6a2f32d4d65",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1467287129967,
+			"name": "POST Observation without FeatureOfInterest (Thing should have location)",
+			"description": "",
+			"collectionId": "e2d62c74-8e73-b9a5-c87e-6b21214162d2",
+			"responses": [],
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"1\"}\r\n}"
 		}
 	]
 }
