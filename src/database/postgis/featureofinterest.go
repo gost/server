@@ -13,7 +13,15 @@ import (
 
 var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
 
-// GetTotalFeaturesOfInterest returns the amount of FeaturesOfInterest in the database
+// GetFeatureOfInterestByLocationID returns the id of FeaturesOfInterest in the database
+// where original_location_id equals the given parameter
+func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {
+	intID, _ := ToIntID(id)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, nil, "", "", foiMapping)+" from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
+	return processFeatureOfInterest(gdb.Db, sql, nil)
+}
+
+// GetTotalFeaturesOfInterest returns the number of FeaturesOfInterest records in the database
 func (gdb *GostDatabase) GetTotalFeaturesOfInterest() int {
 	var count int
 	sql := fmt.Sprintf("SELECT Count(*) from %s.featureofinterest", gdb.Schema)
@@ -54,8 +62,8 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	var fID int
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
-	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (description, encodingtype, feature) VALUES ($1, $2, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql, f.Description, encoding.Code).Scan(&fID)
+	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (description, encodingtype, feature, original_location_id) VALUES ($1, $2, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $3) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql, f.Description, encoding.Code, f.OriginalLocationID).Scan(&fID)
 	if err != nil {
 		return nil, err
 	}

@@ -11,11 +11,12 @@ import (
 // can be the Location of the Sensor and therefore of the Observation. A FeatureOfInterest is linked to a single Observation
 type FeatureOfInterest struct {
 	BaseEntity
-	Description     string                 `json:"description,omitempty"`
-	EncodingType    string                 `json:"encodingType,omitempty"`
-	Feature         map[string]interface{} `json:"feature,omitempty"`
-	NavObservations string                 `json:"Observations@iot.navigationLink,omitempty"`
-	Observations    []*Observation         `json:"Observations,omitempty"`
+	Description        string                 `json:"description,omitempty"`
+	EncodingType       string                 `json:"encodingType,omitempty"`
+	Feature            map[string]interface{} `json:"feature,omitempty"`
+	NavObservations    string                 `json:"Observations@iot.navigationLink,omitempty"`
+	Observations       []*Observation         `json:"Observations,omitempty"`
+	OriginalLocationID interface{}            `json:"-"`
 }
 
 // GetEntityType returns the EntityType for FeatureOfInterest

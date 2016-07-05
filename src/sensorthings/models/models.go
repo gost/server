@@ -144,6 +144,7 @@ type Database interface {
 
 	GetTotalFeaturesOfInterest() int
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests(qo *odata.QueryOptions) (f []*entities.FeatureOfInterest, e error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)

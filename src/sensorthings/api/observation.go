@@ -85,13 +85,13 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 // todo: make 1 query instead of 3...
 func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (*entities.Location, error) {
 	db := *gdb
-	dId := toStringID(datastreamID)
-	_, err := db.GetDatastream(dId, nil)
+	dID := toStringID(datastreamID)
+	_, err := db.GetDatastream(dID, nil)
 	if err != nil {
 		return nil, errors.New("Datastream not found")
 	}
 
-	thing, err := db.GetThingByDatastream(dId, nil)
+	thing, err := db.GetThingByDatastream(dID, nil)
 	if err != nil {
 		return nil, errors.New("Thing by datastream not found")
 	}
@@ -111,25 +111,38 @@ func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 	foi.Description = l.Description
 	foi.EncodingType = l.EncodingType
 	foi.Feature = l.Location
+	foi.OriginalLocationID = l.ID
 	return foi
 }
 
-// GetFoiIDByDatastreamID gets the location of the related thing location
+// CopyLocationToFoi copies the location of the thing to the FeatureOfInterest table. If it already
+// exist, returns only the exisitng FeatureOfInterest ID
 func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, error) {
+	var result string
 	db := *gdb
 	l, err := GetLocationByDatastreamID(gdb, datastreamID)
 	if err != nil {
 		return "", err
 	}
 
-	foi := ConvertLocationToFoi(l)
+	// now check if the locationid already exists in featureofinterest.orginal_location id
+	featureOfInterest, _ := db.GetFeatureOfInterestByLocationID(l.ID)
 
-	nFoi, err := db.PostFeatureOfInterest(foi)
-	if err != nil {
-		return "", err
+	if featureOfInterest == nil {
+		// if the FeatureOfInterest does not exist already, create it now
+		NewFeatureOfInterest := ConvertLocationToFoi(l)
+
+		CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
+		if err != nil {
+			return "", err
+		}
+		result = toStringID(CreatedFeatureOfInterest.ID)
+	} else {
+		result = toStringID(featureOfInterest.ID)
 	}
 
-	return toStringID(nFoi.ID), nil
+	// return the existing FeatureOfInterest ID
+	return result, nil
 }
 
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
