@@ -16,33 +16,25 @@ import (
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
 // provider, config, endpoint information to setup te needed services
 type APIv1 struct {
-	db            models.Database
-	internalDB    *InternalDatabase
-	foiRepository *FoiRepository
-	config        configuration.Config
-	endPoints     []models.Endpoint
-	topics        []models.Topic
-	mqtt          models.MQTTClient
+	db        models.Database
+	config    configuration.Config
+	endPoints []models.Endpoint
+	topics    []models.Topic
+	mqtt      models.MQTTClient
 }
 
 // NewAPI Initialise a new SensorThings API
 func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTClient) models.API {
-	intDB := &InternalDatabase{}
-	fRepo := &FoiRepository{db: intDB}
 
 	return &APIv1{
-		db:            database,
-		internalDB:    intDB,
-		mqtt:          mqtt,
-		config:        config,
-		foiRepository: fRepo,
+		db:     database,
+		mqtt:   mqtt,
+		config: config,
 	}
 }
 
 // Start is used to set the initial state of the api such as loading of the foi states
 func (a *APIv1) Start() {
-	a.internalDB.Open()
-	a.foiRepository.LoadInMemory()
 }
 
 // GetConfig return the current configuration.Config set for the api

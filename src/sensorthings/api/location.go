@@ -59,7 +59,6 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 			return nil, []error{err2}
 		}
 
-		a.foiRepository.ThingLocationUpdated(toStringID(thingID))
 	}
 
 	l.SetAllLinks(a.config.GetExternalServerURI())
@@ -147,8 +146,5 @@ func (a *APIv1) LinkLocation(thingID interface{}, locationID interface{}) error 
 	if err3 != nil {
 		return gostErrors.NewBadRequestError(err3)
 	}
-
-	a.foiRepository.ThingLocationUpdated(toStringID(thingID))
-
 	return nil
 }

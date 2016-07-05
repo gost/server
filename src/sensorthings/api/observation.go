@@ -81,6 +81,57 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}, nil
 }
 
+// GetLocationByDatastreamID return Location object for Datastream
+// todo: make 1 query instead of 3...
+func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (*entities.Location, error) {
+	db := *gdb
+	dId := toStringID(datastreamID)
+	_, err := db.GetDatastream(dId, nil)
+	if err != nil {
+		return nil, errors.New("Datastream not found")
+	}
+
+	thing, err := db.GetThingByDatastream(dId, nil)
+	if err != nil {
+		return nil, errors.New("Thing by datastream not found")
+	}
+
+	l, err := db.GetLocationsByThing(thing.ID, nil)
+	if err != nil || len(l) == 0 {
+		return nil, err
+	}
+
+	// return the first location in the list
+	return l[0], nil
+}
+
+// ConvertLocationToFoi converts a location to FOI
+func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
+	foi := &entities.FeatureOfInterest{}
+	foi.Description = l.Description
+	foi.EncodingType = l.EncodingType
+	foi.Feature = l.Location
+	return foi
+}
+
+// GetFoiIDByDatastreamID gets the location of the related thing location
+func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, error) {
+	db := *gdb
+	l, err := GetLocationByDatastreamID(gdb, datastreamID)
+	if err != nil {
+		return "", err
+	}
+
+	foi := ConvertLocationToFoi(l)
+
+	nFoi, err := db.PostFeatureOfInterest(foi)
+	if err != nil {
+		return "", err
+	}
+
+	return toStringID(nFoi.ID), nil
+}
+
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
 func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
 	_, err := observation.ContainsMandatoryParams()
@@ -90,11 +141,13 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 	datastreamID := observation.Datastream.ID
 
+	// there is no foi posted: try to copy it from thing.location...
 	if observation.FeatureOfInterest == nil {
-		foiID, err := a.foiRepository.GetFoiIDByDatastreamID(&a.db, toStringID(datastreamID))
+		foiID, err := CopyLocationToFoi(&a.db, toStringID(datastreamID))
 
 		if err != nil {
-			return nil, []error{gostErrors.NewBadRequestError(errors.New("Unable to link or create FeatureOfInterest for Observation. The linked Thing should have a location or supply (deep insert) a new FeatureOfInterest or link to a known FeatureOfInterest by id \"FeatureOfInterest\":{\"@iot.id\":30198}"))}
+			errorMessage := "Unable to copy location of thing to featureofinterest."
+			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage))}
 		}
 
 		observation.FeatureOfInterest = &entities.FeatureOfInterest{}
@@ -122,6 +175,10 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	a.mqtt.Publish("Observations", s, 0)
 
 	return no, nil
+}
+
+func toStringID(id interface{}) string {
+	return fmt.Sprintf("%v", id)
 }
 
 // PostObservationByDatastream creates an Observation with a linked datastream by given datastream id and calls PostObservation on the database
