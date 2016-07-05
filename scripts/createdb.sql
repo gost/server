@@ -20,6 +20,7 @@ CREATE TABLE featureofinterest
   description character varying(500),
   encodingtype integer,
   feature public.geometry(geometry,4326),
+  original_location_id bigserial,
   CONSTRAINT featureofinterest_pkey PRIMARY KEY (id)
 )
 WITH (
