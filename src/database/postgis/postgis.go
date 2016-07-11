@@ -180,6 +180,30 @@ func ToIntID(id interface{}) (int, bool) {
 	return intID, true
 }
 
+func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]interface{}, entityId int) error {
+	columns := ""
+	prefix := ""
+	for k, v := range updates {
+		switch t := v.(type) {
+		case string:
+			v = fmt.Sprintf("'%s'", t)
+		}
+
+		columns += fmt.Sprintf("%s%s=%v", prefix, k, v)
+		if prefix != ", " {
+			prefix = ", "
+		}
+	}
+
+	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
+	_, err := gdb.Db.Exec(sql, entityId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateSelectString creates a select string based on available parameters and or QuerySelect option
 func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string, trail string, mapping map[string]string) string {
 	var properties []string

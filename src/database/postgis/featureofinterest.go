@@ -16,7 +16,11 @@ var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinte
 // GetFeatureOfInterestByLocationID returns the FeatureOfInterest in the database
 // where original_location_id equals the given parameter
 func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {
-	intID, _ := ToIntID(id)
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, nil, "", "", foiMapping)+" from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
 	return processFeatureOfInterest(gdb.Db, sql, nil)
 }
@@ -142,6 +146,11 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 	}
 
 	return featureOfInterests, nil
+}
+
+// PatchFeatureOfInterest updates a FeatureOfInterest in the database
+func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
 }
 
 // DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	gostErrors "github.com/geodan/gost/src/errors"
+	"time"
 )
 
 // HistoricalLocation in sensorthings represents the current and previous locations of a thing including time
@@ -40,8 +41,23 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for a HistoricalLocation are available before posting
 func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+
+	if len(h.Time) == 0 {
+		h.Time = time.Now().UTC().Format(time.RFC3339Nano)
+	}
+
 	CheckMandatoryParam(&err, h.Time, h.GetEntityType(), "time")
 	CheckMandatoryParam(&err, h.Thing, h.GetEntityType(), "Thing")
+	if h.Thing != nil {
+		CheckMandatoryParam(&err, h.Thing.ID, h.GetEntityType(), "Thing.ID")
+	}
+
+	CheckMandatoryParam(&err, h.Locations, h.GetEntityType(), "Location")
+	if len(h.Locations) == 0 {
+		err = append(err, gostErrors.NewBadRequestError(errors.New("Missing location")))
+	} else {
+		CheckMandatoryParam(&err, h.Locations[0].ID, h.GetEntityType(), "Location.ID")
+	}
 
 	if len(err) != 0 {
 		return false, err

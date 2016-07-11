@@ -116,33 +116,32 @@ func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 }
 
 // CopyLocationToFoi copies the location of the thing to the FeatureOfInterest table. If it already
-// exist, returns only the exisitng FeatureOfInterest ID
+// exist, returns only the existing FeatureOfInterest ID
 func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, error) {
 	var result string
 	db := *gdb
-	l, err := GetLocationByDatastreamID(gdb, datastreamID)
-	if err != nil {
-		return "", err
-	}
+	l, _ := GetLocationByDatastreamID(gdb, datastreamID)
 
-	// now check if the locationid already exists in featureofinterest.orginal_location id
-	featureOfInterest, _ := db.GetFeatureOfInterestByLocationID(l.ID)
-
-	if featureOfInterest == nil {
-		// if the FeatureOfInterest does not exist already, create it now
-		NewFeatureOfInterest := ConvertLocationToFoi(l)
-
-		CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
-		if err != nil {
-			return "", err
+	var featureOfInterest *entities.FeatureOfInterest
+	if l != nil {
+		// now check if the locationid already exists in featureofinterest.orginal_location id
+		featureOfInterest, _ = db.GetFeatureOfInterestByLocationID(l.ID)
+		if featureOfInterest == nil {
+			// if the FeatureOfInterest does not exist already, create it now
+			NewFeatureOfInterest := ConvertLocationToFoi(l)
+			CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
+			if err != nil {
+				return "", err
+			}
+			result = toStringID(CreatedFeatureOfInterest.ID)
+		} else {
+			result = toStringID(featureOfInterest.ID)
 		}
-		result = toStringID(CreatedFeatureOfInterest.ID)
-	} else {
-		result = toStringID(featureOfInterest.ID)
-	}
 
-	// return the existing FeatureOfInterest ID
-	return result, nil
+		return result, nil
+	} else {
+		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
+	}
 }
 
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
@@ -202,9 +201,9 @@ func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observatio
 	return a.PostObservation(observation)
 }
 
-// PatchObservation todo
+// PatchObservation updates the given observation in the database
 func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchObservation(id, observation)
 }
 
 // DeleteObservation deletes a given Observation from the database

@@ -10,10 +10,14 @@ func TestHistoricalLocationWithMandatoryParameters(t *testing.T) {
 	//arrange
 	historicalLocation := &HistoricalLocation{}
 	historicalLocation.Time = "testtime"
+	historicalLocation.Locations = []*Location{}
 	thing := Thing{}
-	thing.Description = "testdescription"
+	thing.ID = 1
 	historicalLocation.Thing = &thing
 
+	location := &Location{}
+	location.ID = 1
+	historicalLocation.Locations = append(historicalLocation.Locations, location)
 	//act
 	res, err := historicalLocation.ContainsMandatoryParams()
 
