@@ -650,6 +650,8 @@ func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reque
 		return
 	}
 
+	w.Header().Add("Location", entity.GetSelfLink())
+
 	sendJSONResponse(w, http.StatusOK, data, nil)
 }
 

@@ -239,7 +239,7 @@ func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observatio
 		observation.Parameters = o.Parameters
 	}
 
-	json, _ := o.MarshalPostgresJSON()
+	json, _ := observation.MarshalPostgresJSON()
 	updates["data"] = string(json[:])
 
 	if err = gdb.updateEntityColumns("observation", updates, intID); err != nil {
