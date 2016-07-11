@@ -6,7 +6,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-// GetFeatureOfInterest todo
+// GetFeatureOfInterest returns a FeatureOfInterest by id
 func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
@@ -22,7 +22,7 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, pat
 	return l, nil
 }
 
-// GetFeatureOfInterestByObservation todo
+// GetFeatureOfInterestByObservation retrieves a FeatureOfInterest by given Observation id
 func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
@@ -38,7 +38,7 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 	return l, nil
 }
 
-// GetFeatureOfInterests todo
+// GetFeatureOfInterests return FeaturesOfInterest based on the given QueryOptions
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
 	if err != nil {
@@ -87,6 +87,13 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 
 // PatchFeatureOfInterest updates the given FeatureOfInterest in the database
 func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	if len(foi.EncodingType) != 0 {
+		supported, err := entities.CheckEncodingSupported(foi, foi.EncodingType)
+		if !supported || err != nil {
+			return nil, err
+		}
+	}
+
 	return a.db.PatchFeatureOfInterest(id, foi)
 }
 

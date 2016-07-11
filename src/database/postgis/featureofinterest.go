@@ -150,7 +150,35 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 
 // PatchFeatureOfInterest updates a FeatureOfInterest in the database
 func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
+
+	if intID, ok = ToIntID(id); !ok || !gdb.FeatureOfInterestExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+	}
+
+	if len(foi.Description) > 0 {
+		updates["description"] = foi.Description
+	}
+
+	if len(foi.EncodingType) > 0 {
+		encoding, _ := entities.CreateEncodingType(foi.EncodingType)
+		updates["encodingtype"] = encoding.Code
+	}
+
+	if len(foi.Feature) > 0 {
+		locationBytes, _ := json.Marshal(foi.Feature)
+		updates["feature"] = fmt.Sprintf("ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
+	}
+
+	if err = gdb.updateEntityColumns("featureofinterest", updates, intID); err != nil {
+		return nil, err
+	}
+
+	nfoi, _ := gdb.GetFeatureOfInterest(intID, nil)
+	return nfoi, nil
 }
 
 // DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id
