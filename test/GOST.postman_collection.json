@@ -107,6 +107,7 @@
 				"62aa279b-bf45-875c-6a64-39974b5f9181",
 				"135a3554-b7c6-52d5-60d4-7c264445564d",
 				"164e572f-99dd-ee25-aed5-0587477eb5f8",
+				"7cd544a9-14ae-e100-078c-eab786cece0a",
 				"88c5565d-c66f-3546-f187-264872e6be0d"
 			],
 			"owner": 0,
@@ -120,6 +121,7 @@
 				"6e0cd107-c96d-6544-020a-d753a91214c7",
 				"45a0929e-0a95-2847-5eea-3a7cbbc01ebb",
 				"afef247c-6275-ce22-f3c6-119fcf819032",
+				"dd52da9f-1e8b-43f9-0ee6-36472cfb5a82",
 				"158adf46-ff31-e58b-1c58-b8b2b1d0a8e0"
 			],
 			"owner": 0,
@@ -876,6 +878,26 @@
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
+			"id": "7cd544a9-14ae-e100-078c-eab786cece0a",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/ObservedProperties(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468244886229,
+			"name": "PATCH ObservedProperty",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n  \"name\": \"ObservedPropertyUp Tempomatic Patched\",\r\n  \"description\": \"Patched\",\r\n  \"definition\": \"Patched\"\r\n}"
+		},
+		{
 			"id": "8863e229-37b6-d4e6-0987-73f38d17e60d",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
 			"url": "localhost:8080/v1.0/FeaturesOfInterest(1)",
@@ -1217,6 +1239,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"resultTime\": \"2015-04-13T00:00:05Z\",\r\n  \"result\": 38,\r\n  \"resultQuality\": \"heul goei\",\r\n  \"validTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"parameters\": {\"wie\": \"Barry\", \"waarom\": \"Zomaar\"},\r\n  \"Datastream\": {\"@iot.id\":\"1\"}\r\n}"
+		},
+		{
+			"id": "dd52da9f-1e8b-43f9-0ee6-36472cfb5a82",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Sensors(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468242500677,
+			"name": "PATCH Sensor",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{        \r\n    \"description\": \"SensorUp Tempomatic 2020\",\r\n    \"encodingType\": \"application/pdf\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2020\"\r\n}"
 		},
 		{
 			"id": "de307b55-ed6b-df6e-9120-df8e8a3a40f1",
