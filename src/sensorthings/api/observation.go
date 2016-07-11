@@ -201,9 +201,9 @@ func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observatio
 	return a.PostObservation(observation)
 }
 
-// PatchObservation todo
+// PatchObservation updates the given observation in the database
 func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchObservation(id, observation)
 }
 
 // DeleteObservation deletes a given Observation from the database

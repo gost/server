@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -85,9 +83,9 @@ func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.O
 	return nop, nil
 }
 
-// PatchObservedProperty todo
+// PatchObservedProperty patches a given ObservedProperty
 func (a *APIv1) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchObservedProperty(id, op)
 }
 
 // DeleteObservedProperty deletes a given ObservedProperty from the database

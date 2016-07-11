@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -87,9 +85,9 @@ func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entiti
 	return l, nil
 }
 
-// PatchHistoricalLocation todo
+// PatchHistoricalLocation updates the given HistoricalLocation in the database
 func (a *APIv1) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchHistoricalLocation(id, hl)
 }
 
 // DeleteHistoricalLocation deletes a given HistoricalLocation from the database

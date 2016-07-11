@@ -18,7 +18,7 @@ func (gdb *GostDatabase) GetTotalSensors() int {
 	return count
 }
 
-// GetSensor todo
+// GetSensor return a sensor by id
 func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -34,7 +34,7 @@ func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*ent
 	return sensor, nil
 }
 
-// GetSensorByDatastream todo
+// GetSensorByDatastream retrieves a sensor by given datastream
 func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
@@ -50,7 +50,7 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 	return sensor, nil
 }
 
-// GetSensors todo
+// GetSensors retrieves all sensors based on the QueryOptions
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
 	return processSensors(gdb.Db, sql, qo)
@@ -152,6 +152,11 @@ func (gdb *GostDatabase) SensorExists(thingID int) bool {
 	}
 
 	return result
+}
+
+// PatchSensor updates a sensor in the database
+func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entities.Sensor, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
 }
 
 // DeleteSensor tries to delete a Sensor by the given id

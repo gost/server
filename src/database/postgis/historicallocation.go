@@ -145,6 +145,11 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 	return hl, nil
 }
 
+// PatchHistoricalLocation updates a HistoricalLocation in the database
+func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id
 func (gdb *GostDatabase) DeleteHistoricalLocation(id interface{}) error {
 	intID, ok := ToIntID(id)

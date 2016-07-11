@@ -148,6 +148,11 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 	return featureOfInterests, nil
 }
 
+// PatchFeatureOfInterest updates a FeatureOfInterest in the database
+func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id
 func (gdb *GostDatabase) DeleteFeatureOfInterest(id interface{}) error {
 	intID, ok := ToIntID(id)

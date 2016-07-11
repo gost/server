@@ -152,6 +152,11 @@ func (gdb *GostDatabase) ObservedPropertyExists(thingID interface{}) bool {
 	return result
 }
 
+// PatchObservedProperty updates a ObservedProperty in the database
+func (gdb *GostDatabase) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteObservedProperty tries to delete a ObservedProperty by the given id
 func (gdb *GostDatabase) DeleteObservedProperty(id interface{}) error {
 	intID, ok := ToIntID(id)

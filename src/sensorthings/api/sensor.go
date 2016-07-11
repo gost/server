@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -90,7 +88,7 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 
 // PatchSensor updates a sensor in the database
 func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchSensor(id, sensor)
 }
 
 // DeleteSensor deletes a sensor from the database by given sensor id

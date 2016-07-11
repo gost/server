@@ -227,6 +227,11 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	return d, nil
 }
 
+// PatchDatastream updates a Datastream in the database
+func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream) (*entities.Datastream, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteDatastream tries to delete a Datastream by the given id
 func (gdb *GostDatabase) DeleteDatastream(id interface{}) error {
 	intID, ok := ToIntID(id)

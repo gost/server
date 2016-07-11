@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -187,9 +185,9 @@ func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.
 	return a.PostDatastream(datastream)
 }
 
-// PatchDatastream todo
+// PatchDatastream updates the given datastream in the database
 func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchDatastream(id, datastream)
 }
 
 // DeleteDatastream deletes a datastream from the database

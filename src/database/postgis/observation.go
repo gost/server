@@ -190,6 +190,11 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	return o, nil
 }
 
+// PatchObservation updates a Observation in the database
+func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observation) (*entities.Observation, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteObservation tries to delete a Observation by the given id
 func (gdb *GostDatabase) DeleteObservation(id interface{}) error {
 	intID, ok := ToIntID(id)

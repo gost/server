@@ -164,6 +164,11 @@ func (gdb *GostDatabase) LocationExists(locationID interface{}) bool {
 	return result
 }
 
+// PatchLocation updates a Location in the database
+func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*entities.Location, error) {
+	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+}
+
 // DeleteLocation removes a given location from the database
 func (gdb *GostDatabase) DeleteLocation(locationID interface{}) error {
 	intID, ok := ToIntID(locationID)

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"log"
 
 	gostErrors "github.com/geodan/gost/src/errors"
@@ -138,9 +137,9 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 	}, nil
 }
 
-// PatchLocation todo
+// PatchLocation updates the given location in the database
 func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchLocation(id, location)
 }
 
 // DeleteLocation deletes a given Location from the database

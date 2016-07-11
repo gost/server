@@ -1,8 +1,6 @@
 package api
 
 import (
-	"errors"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -87,9 +85,9 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 	return l, nil
 }
 
-// PatchFeatureOfInterest todo
+// PatchFeatureOfInterest updates the given FeatureOfInterest in the database
 func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("not implemented yet"))
+	return a.db.PatchFeatureOfInterest(id, foi)
 }
 
 // DeleteFeatureOfInterest deletes a given FeatureOfInterest from the database
