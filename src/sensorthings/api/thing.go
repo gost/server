@@ -135,7 +135,14 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 					return nil, err
 				}
 
-				if err = a.PostHistoricalLocation(nt.ID, l.ID); err != nil {
+				hl := &entities.HistoricalLocation{
+					Thing:     nt,
+					Locations: []*entities.Location{l},
+				}
+
+				hl.ContainsMandatoryParams()
+
+				if hl, err = a.PostHistoricalLocation(hl); err != nil {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Historical Location went wrong")))
 					return nil, err

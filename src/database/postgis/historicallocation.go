@@ -122,24 +122,27 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions) 
 // PostHistoricalLocation adds a historical location to the database
 // returns the created historical location including the generated id
 // fails when a thing or location cannot be found for the given id's
-func (gdb *GostDatabase) PostHistoricalLocation(thingID interface{}, locationID interface{}) error {
-	tid, ok := ToIntID(thingID)
+func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+	var hlID int
+	tid, ok := ToIntID(hl.Thing.ID)
 	if !ok || !gdb.ThingExists(tid) {
-		return gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	lid, ok := ToIntID(locationID)
+	lid, ok := ToIntID(hl.Locations[0].ID)
 	if !ok || !gdb.LocationExists(lid) {
-		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3)", gdb.Schema)
-	_, err3 := gdb.Db.Exec(sql, time.Now(), tid, lid)
+	sql := fmt.Sprintf("INSERT INTO %s.historicallocation (time, thing_id, location_id) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+	err3 := gdb.Db.QueryRow(sql, time.Now(), tid, lid).Scan(&hlID)
 	if err3 != nil {
-		return err3
+		return nil, err3
 	}
 
-	return nil
+	hl.ID = hlID
+
+	return hl, nil
 }
 
 // DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id

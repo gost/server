@@ -72,15 +72,19 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 	}, nil
 }
 
-// PostHistoricalLocation is triggered by code and cannot be used from any endpoint PostHistoricalLocation
-// adds a HistoricalLocation into the database
-func (a *APIv1) PostHistoricalLocation(thingID interface{}, locationID interface{}) []error {
-	err := a.db.PostHistoricalLocation(thingID, locationID)
+// PostHistoricalLocation adds a new HistoricalLocation to the database
+func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
+	_, err := hl.ContainsMandatoryParams()
 	if err != nil {
-		return []error{err}
+		return nil, err
 	}
 
-	return nil
+	l, err2 := a.db.PostHistoricalLocation(hl)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+	l.SetAllLinks(a.config.GetExternalServerURI())
+	return l, nil
 }
 
 // PatchHistoricalLocation todo

@@ -461,6 +461,7 @@ func createHistoricalLocations(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations{id}/{params}/$value", HandleGetHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/HistoricalLocations/{params}", HandleGetHistoricalLocations},
 
+			{models.HTTPOperationPost, "/v1.0/HistoricalLocations", HandlePostHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},
 
@@ -475,6 +476,7 @@ func createHistoricalLocations(externalURL string) *Endpoint {
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/HistoricalLocations{id}/{params}/$value", HandleGetHistoricalLocation},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/HistoricalLocations/{params}", HandleGetHistoricalLocations},
 
+			{models.HTTPOperationPost, "/v1.0/{c:.*}/HistoricalLocations", HandlePostHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/HistoricalLocations{id}", HandlePatchHistoricalLocations},
 		},

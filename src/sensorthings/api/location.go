@@ -49,7 +49,15 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 			return nil, []error{err2}
 		}
 
-		err = a.PostHistoricalLocation(thingID, l.ID)
+		hl := &entities.HistoricalLocation{
+			Thing:     &entities.Thing{},
+			Locations: []*entities.Location{l},
+		}
+
+		hl.Thing.ID = thingID
+		hl.ContainsMandatoryParams()
+
+		hl, err = a.PostHistoricalLocation(hl)
 		if err != nil {
 			err3 := a.DeleteHistoricalLocation(l.ID)
 			if err3 != nil {

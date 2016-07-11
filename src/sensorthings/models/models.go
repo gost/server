@@ -45,6 +45,7 @@ type API interface {
 	GetHistoricalLocations(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error)
 	PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id interface{}) error
 
@@ -88,8 +89,6 @@ type API interface {
 	PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error)
 	PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
-
-	PostHistoricalLocation(thingID interface{}, locationID interface{}) []error
 
 	LinkLocation(thingID interface{}, locationID interface{}) error
 }
@@ -164,7 +163,7 @@ type Database interface {
 	GetHistoricalLocations(qo *odata.QueryOptions) (h []*entities.HistoricalLocation, e error)
 	GetHistoricalLocationsByLocation(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, e error)
 	GetHistoricalLocationsByThing(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, e error)
-	PostHistoricalLocation(id interface{}, locationID interface{}) error
+	PostHistoricalLocation(*entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id interface{}) error
 
 	ThingExists(thingID interface{}) bool
