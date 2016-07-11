@@ -13,7 +13,7 @@ import (
 
 var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
 
-// GetFeatureOfInterestByLocationID returns the id of FeaturesOfInterest in the database
+// GetFeatureOfInterestByLocationID returns the FeatureOfInterest in the database
 // where original_location_id equals the given parameter
 func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {
 	intID, ok := ToIntID(id)

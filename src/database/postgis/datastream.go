@@ -20,12 +20,6 @@ func (gdb *GostDatabase) GetTotalDatastreams() int {
 	return totalDatastreams
 }
 
-// InitDatastreams Initialises the datastream repository, setting totalDatastreams on startup
-func (gdb *GostDatabase) InitDatastreams() {
-	sql := fmt.Sprintf("SELECT Count(*) from %s.datastream", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&totalDatastreams)
-}
-
 // GetDatastream retrieves a datastream by id
 func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	intID, ok := ToIntID(id)
