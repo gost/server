@@ -180,6 +180,16 @@ func ToIntID(id interface{}) (int, bool) {
 	return intID, true
 }
 
+func (gdb *GostDatabase) updateEntityColumn(table string, column string, value interface{}, entityId int) error {
+	sql := fmt.Sprintf("update %s.%s set %s = $1 where id = $2", gdb.Schema, table, column)
+	_, err := gdb.Db.Exec(sql, value, entityId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CreateSelectString creates a select string based on available parameters and or QuerySelect option
 func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string, trail string, mapping map[string]string) string {
 	var properties []string

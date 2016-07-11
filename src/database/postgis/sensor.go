@@ -156,7 +156,35 @@ func (gdb *GostDatabase) SensorExists(thingID int) bool {
 
 // PatchSensor updates a sensor in the database
 func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entities.Sensor, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+
+	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
+	}
+
+	if len(s.Description) > 0 {
+		if err = gdb.updateEntityColumn("sensor", "description", s.Description, intID); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(s.Metadata) > 0 {
+		if err = gdb.updateEntityColumn("sensor", "metadata", s.Metadata, intID); err != nil {
+			return nil, err
+		}
+	}
+
+	if len(s.EncodingType) > 0 {
+		encoding, _ := entities.CreateEncodingType(s.EncodingType)
+		if err = gdb.updateEntityColumn("sensor", "encodingtype", encoding.Code, intID); err != nil {
+			return nil, err
+		}
+	}
+
+	ns, _ := gdb.GetSensor(intID, nil)
+	return ns, nil
 }
 
 // DeleteSensor tries to delete a Sensor by the given id

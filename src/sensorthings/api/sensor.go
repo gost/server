@@ -88,6 +88,13 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 
 // PatchSensor updates a sensor in the database
 func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
+	if len(sensor.EncodingType) != 0 {
+		supported, err := entities.CheckEncodingSupported(sensor, sensor.EncodingType)
+		if !supported || err != nil {
+			return nil, err
+		}
+	}
+
 	return a.db.PatchSensor(id, sensor)
 }
 

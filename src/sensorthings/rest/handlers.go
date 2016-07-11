@@ -337,7 +337,7 @@ func HandleDeleteSensor(w http.ResponseWriter, r *http.Request, endpoint *models
 func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	sensor := &entities.Sensor{}
-	handle := func() (interface{}, error) { return a.PatchSensor(getEntityID(r), &entities.Sensor{}) }
+	handle := func() (interface{}, error) { return a.PatchSensor(getEntityID(r), sensor) }
 	handlePatchRequest(w, endpoint, r, sensor, &handle)
 }
 
@@ -593,29 +593,6 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 	sendJSONResponse(w, http.StatusOK, data, queryOptions)
 }
 
-// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
-func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
-	if !checkContentType(w, r) {
-		return
-	}
-
-	byteData, _ := ioutil.ReadAll(r.Body)
-	err := entity.ParseEntity(byteData)
-	if err != nil {
-		sendError(w, []error{err})
-		return
-	}
-
-	handle := *h
-	data, err2 := handle()
-	if err2 != nil {
-		sendError(w, []error{err2})
-		return
-	}
-
-	sendJSONResponse(w, http.StatusOK, data, nil)
-}
-
 // handlePostRequest
 func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func() error) {
 	handle := *h
@@ -651,6 +628,29 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 	w.Header().Add("Location", entity.GetSelfLink())
 
 	sendJSONResponse(w, http.StatusCreated, data, nil)
+}
+
+// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
+func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
+	if !checkContentType(w, r) {
+		return
+	}
+
+	byteData, _ := ioutil.ReadAll(r.Body)
+	err := entity.ParseEntity(byteData)
+	if err != nil {
+		sendError(w, []error{err})
+		return
+	}
+
+	handle := *h
+	data, err2 := handle()
+	if err2 != nil {
+		sendError(w, []error{err2})
+		return
+	}
+
+	sendJSONResponse(w, http.StatusOK, data, nil)
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
