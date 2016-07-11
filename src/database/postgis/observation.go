@@ -190,9 +190,63 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	return o, nil
 }
 
+// ObservationExists checks if an Observation is present in the database based on a given id.
+func (gdb *GostDatabase) ObservationExists(intID interface{}) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observation WHERE id = $1 LIMIT 1)", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, intID).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
+}
+
 // PatchObservation updates a Observation in the database
 func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observation) (*entities.Observation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
+
+	if intID, ok = ToIntID(id); !ok || !gdb.ObservationExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
+	}
+
+	observation, _ := gdb.GetObservation(intID, nil)
+
+	if len(o.PhenomenonTime) > 0 {
+		observation.PhenomenonTime = o.PhenomenonTime
+	}
+
+	if o.Result != nil {
+		observation.Result = o.Result
+	}
+
+	if len(o.ResultTime) > 0 {
+		observation.ResultTime = o.ResultTime
+	}
+
+	if len(o.ResultQuality) > 0 {
+		observation.ResultQuality = o.ResultQuality
+	}
+
+	if len(o.ValidTime) > 0 {
+		observation.ValidTime = o.ValidTime
+	}
+
+	if len(o.Parameters) > 0 {
+		observation.Parameters = o.Parameters
+	}
+
+	json, _ := o.MarshalPostgresJSON()
+	updates["data"] = string(json[:])
+
+	if err = gdb.updateEntityColumns("observation", updates, intID); err != nil {
+		return nil, err
+	}
+
+	return observation, nil
 }
 
 // DeleteObservation tries to delete a Observation by the given id

@@ -93,6 +93,7 @@
 				"5bec0b83-0594-c626-85b4-4351e16823d0",
 				"8e363ead-f670-8edb-ecbd-041408fbbfa4",
 				"fa3df67c-91f3-615d-a16b-ea0e029c6cfc",
+				"09933d69-7db0-cfb7-ccd5-d373f808b564",
 				"2df773c3-f027-3d44-4676-af4836c65086"
 			],
 			"owner": 0,
@@ -172,6 +173,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "09933d69-7db0-cfb7-ccd5-d373f808b564",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468245787167,
+			"name": "PATCH Observation",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"resultTime\": \"2015-04-13T00:00:05Z\",\r\n  \"result\": 1337,\r\n  \"resultQuality\": \"patched\",\r\n  \"validTime\": \"2015-04-13T00:00:00Z/2015-04-13T01:00:00Z\",\r\n  \"parameters\": {\"patched\": true}\r\n}"
 		},
 		{
 			"id": "09a3680c-fb84-61f6-881b-96f46596c753",
