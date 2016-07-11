@@ -16,7 +16,11 @@ var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinte
 // GetFeatureOfInterestByLocationID returns the id of FeaturesOfInterest in the database
 // where original_location_id equals the given parameter
 func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {
-	intID, _ := ToIntID(id)
+	intID, ok := ToIntID(id)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, nil, "", "", foiMapping)+" from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
 	return processFeatureOfInterest(gdb.Db, sql, nil)
 }
