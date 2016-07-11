@@ -186,7 +186,10 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 	for k, v := range updates {
 		switch t := v.(type) {
 		case string:
-			v = fmt.Sprintf("'%s'", t)
+			// do not format when value contains ST_ at the start
+			if !strings.HasPrefix(t, "ST_") {
+				v = fmt.Sprintf("'%s'", t)
+			}
 		}
 
 		columns += fmt.Sprintf("%s%s=%v", prefix, k, v)

@@ -62,6 +62,7 @@
 				"a24fba63-a07f-3f24-f46c-fd12b35130fb",
 				"0c22c04d-ec99-3bc4-8ba4-16afd723743f",
 				"09a3680c-fb84-61f6-881b-96f46596c753",
+				"69879c02-f838-4492-1e94-54252c6a5346",
 				"5ead3217-caad-e285-6622-ce8f4471a8b1"
 			],
 			"owner": 0,
@@ -187,7 +188,7 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468245787167,
+			"time": 1468245873980,
 			"name": "PATCH Observation",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
@@ -837,6 +838,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "69879c02-f838-4492-1e94-54252c6a5346",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Locations(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468247304695,
+			"name": "PATCH Location",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"my patched backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [0, 0]\r\n    }\r\n}"
 		},
 		{
 			"id": "6e0cd107-c96d-6544-020a-d753a91214c7",

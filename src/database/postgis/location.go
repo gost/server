@@ -166,7 +166,35 @@ func (gdb *GostDatabase) LocationExists(locationID interface{}) bool {
 
 // PatchLocation updates a Location in the database
 func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*entities.Location, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
+
+	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
+	if len(l.Description) > 0 {
+		updates["description"] = l.Description
+	}
+
+	if len(l.Location) > 0 {
+		locationBytes, _ := json.Marshal(l.Location)
+		updates["location"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
+	}
+
+	if len(l.EncodingType) > 0 {
+		encoding, _ := entities.CreateEncodingType(l.EncodingType)
+		updates["encodingtype"] = encoding.Code
+	}
+
+	if err = gdb.updateEntityColumns("location", updates, intID); err != nil {
+		return nil, err
+	}
+
+	ns, _ := gdb.GetLocation(intID, nil)
+	return ns, nil
 }
 
 // DeleteLocation removes a given location from the database

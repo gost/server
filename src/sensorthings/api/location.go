@@ -139,6 +139,13 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 
 // PatchLocation updates the given location in the database
 func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
+	if len(location.EncodingType) != 0 {
+		supported, err := entities.CheckEncodingSupported(location, location.EncodingType)
+		if !supported || err != nil {
+			return nil, err
+		}
+	}
+
 	return a.db.PatchLocation(id, location)
 }
 

@@ -210,7 +210,7 @@ func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observatio
 	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.ObservationExists(intID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
 	observation, _ := gdb.GetObservation(intID, nil)
