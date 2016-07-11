@@ -46,6 +46,7 @@
 				"0ac00e95-e625-9018-0e8b-9855ae6b8003",
 				"23a75794-1fc2-4aa1-9544-a18099d0f498",
 				"553b3f1e-0264-6420-7d48-2b6e2daed164",
+				"c1241851-adae-5af5-a8c9-1d3ab0e8bc51",
 				"de307b55-ed6b-df6e-9120-df8e8a3a40f1"
 			],
 			"owner": 0,
@@ -892,12 +893,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468227521960,
+			"time": 1468247784189,
 			"name": "POST HistoricalLocation",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
+			"rawModeData": "{\r\n    \"time\": \"2015-03-01T00:40:00.000Z\",\r\n    \"Thing\":{\"@iot.id\": 1 },\r\n    \"Locations\": [{\"@iot.id\": 1}]\r\n}"
 		},
 		{
 			"id": "773ac8e5-5ee9-c1f0-c825-4e587e53e869",
@@ -1199,6 +1200,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "c1241851-adae-5af5-a8c9-1d3ab0e8bc51",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/HistoricalLocations(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468247918949,
+			"name": "PATCH HistoricalLocation",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"time\": \"2012-12-12T12:12:12.000Z\"\r\n}"
 		},
 		{
 			"id": "c272ad40-8737-ca7a-dfd6-35a2b831e39c",

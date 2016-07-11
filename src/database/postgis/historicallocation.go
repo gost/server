@@ -145,9 +145,39 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 	return hl, nil
 }
 
+// HistoricalLocationExists checks if a HistoricalLocation is present in the database based on a given id
+func (gdb *GostDatabase) HistoricalLocationExists(locationID interface{}) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.historicallocation WHERE id = $1 LIMIT 1)", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
+}
+
 // PatchHistoricalLocation updates a HistoricalLocation in the database
 func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
+
+	if intID, ok = ToIntID(id); !ok || !gdb.HistoricalLocationExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
+	}
+
+	if len(hl.Time) > 0 {
+		updates["time"] = hl.Time
+	}
+
+	if err = gdb.updateEntityColumns("historicallocation", updates, intID); err != nil {
+		return nil, err
+	}
+
+	nhl, _ := gdb.GetHistoricalLocation(intID, nil)
+	return nhl, nil
 }
 
 // DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id
