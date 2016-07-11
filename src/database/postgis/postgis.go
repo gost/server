@@ -181,6 +181,10 @@ func ToIntID(id interface{}) (int, bool) {
 }
 
 func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]interface{}, entityId int) error {
+	if len(updates) == 0 {
+		return nil
+	}
+
 	columns := ""
 	prefix := ""
 	for k, v := range updates {

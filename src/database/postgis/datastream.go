@@ -223,7 +223,44 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 
 // PatchDatastream updates a Datastream in the database
 func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream) (*entities.Datastream, error) {
-	return nil, gostErrors.NewRequestNotImplemented(errors.New("Not implemented"))
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
+
+	if intID, ok = ToIntID(id); !ok || !gdb.DatastreamExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	}
+
+	if len(ds.Description) > 0 {
+		updates["description"] = ds.Description
+	}
+
+	if len(ds.ObservationType) > 0 {
+		observationType, err := entities.GetObservationTypeByValue(ds.ObservationType)
+		if err != nil {
+			return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
+		}
+
+		updates["observationtype"] = observationType.Code
+	}
+
+	if len(ds.UnitOfMeasurement) > 0 {
+		j, _ := json.Marshal(ds.UnitOfMeasurement)
+		updates["unitofmeasurement"] = string(j[:])
+	}
+
+	if len(ds.ObservedArea) > 0 {
+		observedAreaBytes, _ := json.Marshal(ds.ObservedArea)
+		updates["observedarea"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
+	}
+
+	if err = gdb.updateEntityColumns("datastream", updates, intID); err != nil {
+		return nil, err
+	}
+
+	nd, _ := gdb.GetDatastream(intID, nil)
+	return nd, nil
 }
 
 // DeleteDatastream tries to delete a Datastream by the given id

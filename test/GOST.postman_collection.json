@@ -17,6 +17,7 @@
 				"3addc6c7-5c34-9640-48a8-6d28a2870df8",
 				"e137d0a2-428f-b0a0-19a8-fc943739ee16",
 				"e3f64813-ed31-c0b6-4736-7a4fa6fd7312",
+				"e81982a8-c506-cade-4e86-231068b06b37",
 				"bbc3320b-5d4e-d8a6-5d94-2508382c63aa"
 			],
 			"owner": 0,
@@ -145,6 +146,7 @@
 				"2b51d097-55e0-0a3b-076c-d969523b2f13",
 				"17c03b32-6b4e-2624-7528-5b60d7ab2c36",
 				"d05847e4-ab79-db9c-9614-8c5dd0cc62a5",
+				"ab235dab-9604-fe26-2d84-5bccac5b7cbf",
 				"6336b41b-29ac-e8d1-19f7-532aea4ade36"
 			],
 			"owner": 0,
@@ -1062,6 +1064,26 @@
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
+			"id": "ab235dab-9604-fe26-2d84-5bccac5b7cbf",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Things(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468249643476,
+			"name": "PATCH Thing",
+			"description": "POST Sensor",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Patched description\",\r\n    \"properties\": {\r\n        \"owner\": \"Stefke\"\r\n    }\r\n}"
+		},
+		{
 			"id": "ab808268-e35f-4487-3b6c-92eb8c3d7196",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
 			"url": "localhost:8080/v1.0/Observations(1)/result/$value",
@@ -1403,6 +1425,26 @@
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
 			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "e81982a8-c506-cade-4e86-231068b06b37",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Datastreams(1)",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "PATCH",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468249584929,
+			"name": "PATCH Datastream",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"unitOfMeasurement\": {\r\n        \"symbol\": \"&\",\r\n        \"name\": \"Patched\",\r\n        \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Patched.html\"\r\n    },\r\n  \"observationType\":\"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n  \"description\": \"Patched measurement\",\r\n  \"observedarea\": { \"type\": \"Polygon\",\r\n    \"coordinates\": [\r\n      [ [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0] ]\r\n      ]\r\n   }\r\n}"
 		},
 		{
 			"id": "e97507d2-4e9a-710f-b425-c3442602d032",

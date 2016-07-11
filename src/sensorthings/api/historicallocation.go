@@ -4,6 +4,9 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
+
+	"errors"
+	gostErrors "github.com/geodan/gost/src/errors"
 )
 
 // GetHistoricalLocation retrieves a single HistoricalLocation by id
@@ -87,6 +90,10 @@ func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entiti
 
 // PatchHistoricalLocation updates the given HistoricalLocation in the database
 func (a *APIv1) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+	if hl.Locations != nil || hl.Thing != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch HistoricalLocation"))
+	}
+
 	return a.db.PatchHistoricalLocation(id, hl)
 }
 

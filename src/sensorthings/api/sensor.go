@@ -1,9 +1,12 @@
 package api
 
 import (
+	"errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
+
+	gostErrors "github.com/geodan/gost/src/errors"
 )
 
 // GetSensor retrieves a sensor by id and given query
@@ -88,6 +91,10 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 
 // PatchSensor updates a sensor in the database
 func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
+	if sensor.Datastreams != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch Sensor"))
+	}
+
 	if len(sensor.EncodingType) != 0 {
 		supported, err := entities.CheckEncodingSupported(sensor, sensor.EncodingType)
 		if !supported || err != nil {

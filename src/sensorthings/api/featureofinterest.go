@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -87,6 +89,10 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 
 // PatchFeatureOfInterest updates the given FeatureOfInterest in the database
 func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	if foi.Observations != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch FeatureOfInterest"))
+	}
+
 	if len(foi.EncodingType) != 0 {
 		supported, err := entities.CheckEncodingSupported(foi, foi.EncodingType)
 		if !supported || err != nil {

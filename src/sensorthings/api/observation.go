@@ -203,6 +203,10 @@ func (a *APIv1) PostObservationByDatastream(datastreamID interface{}, observatio
 
 // PatchObservation updates the given observation in the database
 func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error) {
+	if observation.Datastream != nil || observation.FeatureOfInterest != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch Observation"))
+	}
+
 	return a.db.PatchObservation(id, observation)
 }
 

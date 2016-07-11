@@ -163,30 +163,27 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 // PatchThing receives a to be patched Thing entity and changes it in the database
 // returns the patched Thing
 func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
-	intID, _ := ToIntID(id)
+	var err error
+	var ok bool
+	var intID int
+	updates := make(map[string]interface{})
 
-	if len(thing.Description) > 0 {
-		// update field description for now, todo add other fields
-		sql := fmt.Sprintf("update %s.thing set description = $1 where id= $2", gdb.Schema)
-		_, err := gdb.Db.Exec(sql, thing.Description, intID)
-		if err != nil {
-			return nil, err
-		}
+	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	jsonProperties, _ := json.Marshal(thing.Properties)
-	if jsonProperties != nil {
-		sql := fmt.Sprintf("update %s.thing set properties  = $1 where id= $2", gdb.Schema)
-		_, err := gdb.Db.Exec(sql, jsonProperties, intID)
-		if err != nil {
-			return nil, err
-		}
+	if len(thing.Description) > 0 {
+		updates["description"] = thing.Description
+	}
+
+	if len(thing.Properties) > 0 {
+		jsonProperties, _ := json.Marshal(thing.Properties)
+		updates["properties"] = string(jsonProperties[:])
 	}
 
 	if thing.Locations != nil {
 		if len(thing.Locations) > 0 {
 			for _, l := range thing.Locations {
-				// locationId := l.ID
 				location, _ := gdb.GetLocation(l.ID, nil)
 
 				// todo: check if location exist
@@ -208,12 +205,12 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 		}
 	}
 
-	// do something with location if needed
+	if err = gdb.updateEntityColumns("thing", updates, intID); err != nil {
+		return nil, err
+	}
 
-	// get the thing and return
-	var t *entities.Thing
-	t, _ = gdb.GetThing(id, nil)
-	return t, nil
+	nt, _ := gdb.GetThing(intID, nil)
+	return nt, nil
 }
 
 // ThingExists checks if a thing is present in the database based on a given id

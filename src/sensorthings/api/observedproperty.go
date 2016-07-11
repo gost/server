@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -85,6 +87,10 @@ func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.O
 
 // PatchObservedProperty patches a given ObservedProperty
 func (a *APIv1) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
+	if op.Datastreams != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch ObservedProperty"))
+	}
+
 	return a.db.PatchObservedProperty(id, op)
 }
 

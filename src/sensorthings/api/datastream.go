@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -187,6 +189,10 @@ func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.
 
 // PatchDatastream updates the given datastream in the database
 func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
+	if datastream.Observations != nil || datastream.Sensor != nil || datastream.ObservedProperty != nil || datastream.Thing != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch Datastream"))
+	}
+
 	return a.db.PatchDatastream(id, datastream)
 }
 

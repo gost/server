@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -193,8 +194,23 @@ func (a *APIv1) DeleteThing(id interface{}) error {
 	return a.db.DeleteThing(id)
 }
 
-// PatchThing todo
+// PatchThing updates the given thing in the database
 func (a *APIv1) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
-	nt, _ := a.db.PatchThing(id, thing)
-	return nt, nil
+	if thing.Datastreams != nil || thing.HistoricalLocations != nil || isDeepPatchLocations(thing.Locations) {
+		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch Thing"))
+	}
+
+	return a.db.PatchThing(id, thing)
+}
+
+func isDeepPatchLocations(locations []*entities.Location) bool {
+	if locations != nil {
+		for _, l := range locations {
+			if l.ID == nil || len(fmt.Sprintf("%v", l.ID)) == 0 {
+				return true
+			}
+		}
+	}
+
+	return false
 }
