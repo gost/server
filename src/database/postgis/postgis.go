@@ -180,9 +180,23 @@ func ToIntID(id interface{}) (int, bool) {
 	return intID, true
 }
 
-func (gdb *GostDatabase) updateEntityColumn(table string, column string, value interface{}, entityId int) error {
-	sql := fmt.Sprintf("update %s.%s set %s = $1 where id = $2", gdb.Schema, table, column)
-	_, err := gdb.Db.Exec(sql, value, entityId)
+func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]interface{}, entityId int) error {
+	columns := ""
+	prefix := ""
+	for k, v := range updates {
+		switch t := v.(type) {
+		case string:
+			v = fmt.Sprintf("'%s'", t)
+		}
+
+		columns += fmt.Sprintf("%s%s=%v", prefix, k, v)
+		if prefix != ", " {
+			prefix = ", "
+		}
+	}
+
+	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
+	_, err := gdb.Db.Exec(sql, entityId)
 	if err != nil {
 		return err
 	}

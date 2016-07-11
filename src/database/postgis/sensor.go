@@ -159,28 +159,27 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 	var err error
 	var ok bool
 	var intID int
+	updates := make(map[string]interface{})
 
 	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
 
 	if len(s.Description) > 0 {
-		if err = gdb.updateEntityColumn("sensor", "description", s.Description, intID); err != nil {
-			return nil, err
-		}
+		updates["description"] = s.Description
 	}
 
 	if len(s.Metadata) > 0 {
-		if err = gdb.updateEntityColumn("sensor", "metadata", s.Metadata, intID); err != nil {
-			return nil, err
-		}
+		updates["metadata"] = s.Metadata
 	}
 
 	if len(s.EncodingType) > 0 {
 		encoding, _ := entities.CreateEncodingType(s.EncodingType)
-		if err = gdb.updateEntityColumn("sensor", "encodingtype", encoding.Code, intID); err != nil {
-			return nil, err
-		}
+		updates["encodingtype"] = encoding.Code
+	}
+
+	if err = gdb.updateEntityColumns("sensor", updates, intID); err != nil {
+		return nil, err
 	}
 
 	ns, _ := gdb.GetSensor(intID, nil)
