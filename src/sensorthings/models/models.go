@@ -139,6 +139,7 @@ type Database interface {
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
 	PatchDatastream(interface{}, *entities.Datastream) (*entities.Datastream, error)
 	DeleteDatastream(id interface{}) error
+	DatastreamExists(int) bool
 
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error)

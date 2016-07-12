@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/geodan/gost/src/database/postgis"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -150,6 +151,13 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	}
 
 	datastreamID := observation.Datastream.ID
+
+	intID, _ := postgis.ToIntID(datastreamID)
+	exists := a.db.DatastreamExists(intID)
+	if !exists {
+		errorMessage := fmt.Sprintf("Datastream %d does not exist.", intID)
+		return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage))}
+	}
 
 	// there is no foi posted: try to copy it from thing.location...
 	if observation.FeatureOfInterest == nil {
