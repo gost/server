@@ -56,9 +56,10 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 }
 
 // GetFeatureOfInterests returns all feature of interests
-func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processFeatureOfInterests(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.featureofinterest", gdb.Schema)
+	return processFeatureOfInterests(gdb.Db, sql, qo, countSql)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
@@ -77,7 +78,7 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 }
 
 func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
-	locations, err := processFeatureOfInterests(db, sql, qo)
+	locations, _, err := processFeatureOfInterests(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +90,12 @@ func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*
 	return locations[0], nil
 }
 
-func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, error) {
+func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.FeatureOfInterest, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var featureOfInterests = []*entities.FeatureOfInterest{}
@@ -131,7 +132,7 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 
 		featureMap, err := JSONToMap(&feature)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		foi := entities.FeatureOfInterest{}
@@ -145,7 +146,12 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions) (
 		featureOfInterests = append(featureOfInterests, &foi)
 	}
 
-	return featureOfInterests, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return featureOfInterests, count, nil
 }
 
 // PatchFeatureOfInterest updates a FeatureOfInterest in the database

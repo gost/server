@@ -32,8 +32,8 @@ func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*mo
 		return nil, err
 	}
 
-	hl, err := a.db.GetHistoricalLocations(qo)
-	return processHistoricalLocations(a, hl, qo, path, err)
+	hl, count, err := a.db.GetHistoricalLocations(qo)
+	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
@@ -43,8 +43,8 @@ func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *oda
 		return nil, err
 	}
 
-	hl, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
-	return processHistoricalLocations(a, hl, qo, path, err)
+	hl, count, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
+	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
@@ -54,11 +54,11 @@ func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.Que
 		return nil, err
 	}
 
-	hl, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
-	return processHistoricalLocations(a, hl, qo, path, err)
+	hl, count, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
+	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
-func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range historicalLocations {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
@@ -67,8 +67,8 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 
 	var data interface{} = historicalLocations
 	return &models.ArrayResponse{
-		Count:    len(historicalLocations),
-		NextLink: a.CreateNextLink(a.db.GetTotalHistoricalLocations(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }

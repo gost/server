@@ -47,11 +47,11 @@ func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*mod
 		return nil, err
 	}
 
-	fois, err := a.db.GetFeatureOfInterests(qo)
-	return processFeatureOfInterest(a, fois, qo, path, err)
+	fois, count, err := a.db.GetFeatureOfInterests(qo)
+	return processFeatureOfInterest(a, fois, qo, path, count, err)
 }
 
-func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
@@ -60,8 +60,8 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 
 	var data interface{} = fois
 	return &models.ArrayResponse{
-		Count:    len(fois),
-		NextLink: a.CreateNextLink(a.db.GetTotalFeaturesOfInterest(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }

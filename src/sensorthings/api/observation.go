@@ -34,8 +34,8 @@ func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*models.Ar
 		return nil, err
 	}
 
-	observations, err := a.db.GetObservations(qo)
-	return processObservations(a, observations, qo, path, err)
+	observations, count, err := a.db.GetObservations(qo)
+	return processObservations(a, observations, qo, path, count, err)
 }
 
 // GetObservationsByFeatureOfInterest returns all observation by given FeatureOfInterest end QueryOptions
@@ -45,8 +45,8 @@ func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.
 		return nil, err
 	}
 
-	observations, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
-	return processObservations(a, observations, qo, path, err)
+	observations, count, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
+	return processObservations(a, observations, qo, path, count, err)
 }
 
 // GetObservationsByDatastream returns all observations by given Datastream and QueryOptions
@@ -56,11 +56,11 @@ func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.
 		return nil, err
 	}
 
-	observations, err := a.db.GetObservationsByDatastream(datastreamID, qo)
-	return processObservations(a, observations, qo, path, err)
+	observations, count, err := a.db.GetObservationsByDatastream(datastreamID, qo)
+	return processObservations(a, observations, qo, path, count, err)
 }
 
-func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -71,12 +71,10 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 		observations[idx] = &i
 	}
 
-	var numberOfObservations = len(observations)
-
 	var data interface{} = observations
 	return &models.ArrayResponse{
-		Count:    numberOfObservations,
-		NextLink: a.CreateNextLink(a.db.GetTotalObservations(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }
@@ -96,7 +94,7 @@ func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (
 		return nil, errors.New("Thing by datastream not found")
 	}
 
-	l, err := db.GetLocationsByThing(thing.ID, nil)
+	l, _, err := db.GetLocationsByThing(thing.ID, nil)
 	if err != nil || len(l) == 0 {
 		return nil, err
 	}

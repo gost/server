@@ -13,14 +13,6 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-// GetTotalThings returns the total things count in the database
-func (gdb *GostDatabase) GetTotalThings() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.thing", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
-}
-
 // GetThing returns a thing entity based on id and query
 func (gdb *GostDatabase) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	intID, ok := ToIntID(id)
@@ -49,14 +41,15 @@ func (gdb *GostDatabase) GetThingByDatastream(id interface{}, qo *odata.QueryOpt
 }
 
 //GetThingsByLocation retrieves the thing linked to a location
-func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, error) {
+func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, int, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "thing.", "", nil)+" from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, gdb.Schema, intID)
-	return processThings(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("SELECT Count(*) from %s.thing INNER JOIN %s.historicallocation ON historicallocation.thing_id = thing.id WHERE historicallocation.id = %v;", gdb.Schema, gdb.Schema, intID)
+	return processThings(gdb.Db, sql, qo, countSql)
 }
 
 //GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
@@ -71,13 +64,14 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 }
 
 // GetThings returns an array of things
-func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, error) {
+func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "", "", nil)+" FROM %s.thing order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processThings(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) as count FROM %s.thing", gdb.Schema)
+	return processThings(gdb.Db, sql, qo, countSql)
 }
 
 func processThing(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Thing, error) {
-	observations, err := processThings(db, sql, qo)
+	observations, _, err := processThings(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +83,12 @@ func processThing(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Thi
 	return observations[0], nil
 }
 
-func processThings(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Thing, error) {
+func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Thing, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var things = []*entities.Thing{}
@@ -126,12 +120,12 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.
 
 		err = rows.Scan(params...)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		propMap, err := JSONToMap(properties)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		thing := entities.Thing{}
@@ -142,7 +136,12 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.
 		things = append(things, &thing)
 	}
 
-	return things, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return things, count, nil
 }
 
 // PostThing receives a posted thing entity and adds it to the database

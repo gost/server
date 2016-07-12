@@ -35,35 +35,38 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 }
 
 // GetLocations retrieves all locations
-func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processLocations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.location", gdb.Schema)
+	return processLocations(gdb.Db, sql, qo, countSql)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
-func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, error) {
 	intID, ok := ToIntID(hlID)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v order by id desc limit 1", gdb.Schema, gdb.Schema, intID)
-	return processLocations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v", gdb.Schema, gdb.Schema, intID)
+	return processLocations(gdb.Db, sql, qo, countSql)
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
-func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, error) {
+func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, error) {
 	intID, ok := ToIntID(thingID)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = %v order by id desc limit 1", gdb.Schema, gdb.Schema, intID)
-	return processLocations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = %v", gdb.Schema, gdb.Schema, intID)
+	return processLocations(gdb.Db, sql, qo, countSql)
 }
 
 func processLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Location, error) {
-	locations, err := processLocations(db, sql, qo)
+	locations, _, err := processLocations(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +78,11 @@ func processLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.
 	return locations[0], nil
 }
 
-func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Location, error) {
+func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Location, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var locations = []*entities.Location{}
@@ -114,12 +117,12 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entiti
 
 		err = rows.Scan(params...)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		locationMap, err := JSONToMap(&location)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		l := entities.Location{}
@@ -132,7 +135,12 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entiti
 		locations = append(locations, &l)
 	}
 
-	return locations, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return locations, count, nil
 }
 
 // PostLocation receives a posted location entity and adds it to the database

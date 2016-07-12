@@ -49,8 +49,9 @@ func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path
 	if err != nil {
 		return nil, err
 	}
-	things, err := a.db.GetThingsByLocation(id, qo)
-	return processThings(a, things, qo, path, err)
+
+	things, count, err := a.db.GetThingsByLocation(id, qo)
+	return processThings(a, things, qo, path, count, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
@@ -74,11 +75,11 @@ func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayRes
 	if err != nil {
 		return nil, err
 	}
-	things, err := a.db.GetThings(qo)
-	return processThings(a, things, qo, path, err)
+	things, count, err := a.db.GetThings(qo)
+	return processThings(a, things, qo, path, count, err)
 }
 
-func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -90,10 +91,9 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 	}
 
 	var data interface{} = things
-	total := len(things)
 	return &models.ArrayResponse{
-		Count:    total,
-		NextLink: a.CreateNextLink(total, path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }

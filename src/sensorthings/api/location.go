@@ -97,8 +97,8 @@ func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*models.Array
 		return nil, err
 	}
 
-	locations, err := a.db.GetLocations(qo)
-	return processLocations(a, locations, qo, path, err)
+	locations, count, err := a.db.GetLocations(qo)
+	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
@@ -108,8 +108,8 @@ func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.Que
 		return nil, err
 	}
 
-	locations, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
-	return processLocations(a, locations, qo, path, err)
+	locations, count, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
+	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
@@ -119,11 +119,11 @@ func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions,
 		return nil, err
 	}
 
-	locations, err := a.db.GetLocationsByThing(thingID, qo)
-	return processLocations(a, locations, qo, path, err)
+	locations, count, err := a.db.GetLocationsByThing(thingID, qo)
+	return processLocations(a, locations, qo, path, count, err)
 }
 
-func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
 		a.ProcessGetRequest(&i, qo)
@@ -132,8 +132,8 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 
 	var data interface{} = locations
 	return &models.ArrayResponse{
-		Count:    len(locations),
-		NextLink: a.CreateNextLink(a.db.GetTotalLocations(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }

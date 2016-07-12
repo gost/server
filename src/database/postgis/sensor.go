@@ -51,13 +51,14 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 }
 
 // GetSensors retrieves all sensors based on the QueryOptions
-func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, error) {
+func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processSensors(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.sensor", gdb.Schema)
+	return processSensors(gdb.Db, sql, qo, countSql)
 }
 
 func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Sensor, error) {
-	sensors, err := processSensors(db, sql, qo)
+	sensors, _, err := processSensors(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -69,12 +70,12 @@ func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Se
 	return sensors[0], nil
 }
 
-func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Sensor, error) {
+func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Sensor, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	defer rows.Close()
@@ -111,7 +112,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities
 
 		err = rows.Scan(params...)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		sensor := entities.Sensor{}
@@ -125,7 +126,12 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities
 		sensors = append(sensors, &sensor)
 	}
 
-	return sensors, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return sensors, count, nil
 }
 
 // PostSensor posts a sensor to the database

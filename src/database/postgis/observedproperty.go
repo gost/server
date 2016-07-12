@@ -53,13 +53,14 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 }
 
 // GetObservedProperties returns all observed properties
-func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
+func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "", nil)+" FROM %s.observedproperty order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processObservedProperties(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observedproperty", gdb.Schema)
+	return processObservedProperties(gdb.Db, sql, qo, countSql)
 }
 
 func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
-	observedProperties, err := processObservedProperties(db, sql, qo)
+	observedProperties, _, err := processObservedProperties(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -71,10 +72,10 @@ func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*e
 	return observedProperties[0], nil
 }
 
-func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.ObservedProperty, error) {
+func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.ObservedProperty, int, error) {
 	rows, err := db.Query(sql)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	defer rows.Close()
@@ -113,7 +114,7 @@ func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions) (
 		err = rows.Scan(params...)
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		op := entities.ObservedProperty{}
 		op.ID = opID
@@ -124,7 +125,12 @@ func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions) (
 		observedProperties = append(observedProperties, &op)
 	}
 
-	return observedProperties, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return observedProperties, count, nil
 }
 
 // PostObservedProperty adds an ObservedProperty to the database

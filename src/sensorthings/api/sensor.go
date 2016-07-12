@@ -48,7 +48,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayRe
 		return nil, err
 	}
 
-	sensors, err := a.db.GetSensors(qo)
+	sensors, count, err := a.db.GetSensors(qo)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +61,8 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayRe
 
 	var data interface{} = sensors
 	return &models.ArrayResponse{
-		Count:    len(sensors),
-		NextLink: a.CreateNextLink(a.db.GetTotalSensors(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }

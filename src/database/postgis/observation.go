@@ -38,35 +38,38 @@ func (gdb *GostDatabase) GetTotalObservations() int {
 }
 
 // GetObservations retrieves all datastreams
-func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
 	sql := fmt.Sprintf("select id, data FROM %s.observation order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	return processObservations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation", gdb.Schema)
+	return processObservations(gdb.Db, sql, qo, countSql)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
-func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
 	intID, ok := ToIntID(foiID)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo, countSql)
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
-func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
 	intID, ok := ToIntID(dataStreamID)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo)
+	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation where stream_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo, countSql)
 }
 
 func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Observation, error) {
-	observations, err := processObservations(db, sql, qo)
+	observations, _, err := processObservations(db, sql, qo, "")
 	if err != nil {
 		return nil, err
 	}
@@ -78,12 +81,12 @@ func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entiti
 	return observations[0], nil
 }
 
-func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*entities.Observation, error) {
+func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Observation, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var observations = []*entities.Observation{}
@@ -93,7 +96,7 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*ent
 
 		err := rows.Scan(&id, &data)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		observation := entities.Observation{}
@@ -101,7 +104,7 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*ent
 		err = observation.ParseEntity([]byte(data))
 
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		if qo != nil && qo.QuerySelect != nil && len(qo.QuerySelect.Params) > 0 {
@@ -143,7 +146,12 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions) ([]*ent
 		observations = append(observations, &observation)
 	}
 
-	return observations, nil
+	var count int
+	if len(countSql) > 0 {
+		db.QueryRow(countSql).Scan(&count)
+	}
+
+	return observations, count, nil
 }
 
 // PostObservation adds an observation to the database

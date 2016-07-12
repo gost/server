@@ -595,6 +595,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 
 // handlePostRequest
 func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func() error) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	handle := *h
 	err := handle()
 	if err != nil {
@@ -607,6 +608,7 @@ func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Requ
 
 // handlePostRequest
 func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if !checkContentType(w, r) {
 		return
 	}
@@ -632,6 +634,7 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
 func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if !checkContentType(w, r) {
 		return
 	}

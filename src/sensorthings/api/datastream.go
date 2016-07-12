@@ -31,8 +31,8 @@ func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*models.Arr
 		return nil, err
 	}
 
-	datastreams, err := a.db.GetDatastreams(qo)
-	return processDatastreams(a, datastreams, qo, path, err)
+	datastreams, count, err := a.db.GetDatastreams(qo)
+	return processDatastreams(a, datastreams, qo, path, count, err)
 
 }
 
@@ -43,8 +43,8 @@ func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOption
 		return nil, err
 	}
 
-	datastreams, err := a.db.GetDatastreamsByThing(thingID, qo)
-	return processDatastreams(a, datastreams, qo, path, err)
+	datastreams, count, err := a.db.GetDatastreamsByThing(thingID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
@@ -70,8 +70,8 @@ func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOpti
 		return nil, err
 	}
 
-	datastreams, err := a.db.GetDatastreamsBySensor(sensorID, qo)
-	return processDatastreams(a, datastreams, qo, path, err)
+	datastreams, count, err := a.db.GetDatastreamsBySensor(sensorID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
@@ -81,11 +81,11 @@ func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.Quer
 		return nil, err
 	}
 
-	datastreams, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
-	return processDatastreams(a, datastreams, qo, path, err)
+	datastreams, count, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
-func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, err error) (*models.ArrayResponse, error) {
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,8 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 
 	var data interface{} = datastreams
 	return &models.ArrayResponse{
-		Count:    len(datastreams),
-		NextLink: a.CreateNextLink(a.db.GetTotalDatastreams(), path, qo),
+		Count:    count,
+		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}, nil
 }
