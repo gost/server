@@ -1,7 +1,6 @@
 package odata
 
 import (
-	"log"
 	"net/http"
 )
 
@@ -21,31 +20,7 @@ func (q *QueryFilter) Parse(value string) error {
 		return CreateQueryError(QueryfilterFormatInvalid, http.StatusBadRequest, value)
 	}
 
-	printTest(q.Predicate)
-
 	return nil
-}
-
-func printTest(p *Predicate) {
-	log.Printf("operator: %v\n", p.Operator.ToString())
-
-	switch v := p.Subject.(type) {
-	case *Predicate:
-		printTest(v)
-	case string:
-		log.Printf("subject: %v\n", v)
-	case float64:
-		log.Printf("subject: %v\n", v)
-	}
-
-	switch v := p.Value.(type) {
-	case *Predicate:
-		printTest(v)
-	case string:
-		log.Printf("value: %v\n", v)
-	case float64:
-		log.Printf("value: %v\n", v)
-	}
 }
 
 // GetQueryOptionType returns the QueryOptionType for QueryFilter

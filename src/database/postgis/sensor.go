@@ -53,8 +53,8 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 // GetSensors retrieves all sensors based on the QueryOptions
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.sensor", gdb.Schema)
-	return processSensors(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.sensor", gdb.Schema)
+	return processSensors(gdb.Db, sql, qo, countSQL)
 }
 
 func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Sensor, error) {
@@ -70,7 +70,7 @@ func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Se
 	return sensors[0], nil
 }
 
-func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Sensor, int, error) {
+func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Sensor, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -127,8 +127,8 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSql str
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return sensors, count, nil

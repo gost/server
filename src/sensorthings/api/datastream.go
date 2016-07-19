@@ -104,44 +104,48 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 	}, nil
 }
 
-// PostDatastream todo
+// PostDatastream adds a new datastream to the database
 func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
+	var errors []error
+	var err error
 	var postedObservedProperty *entities.ObservedProperty
 	var postedSensor *entities.Sensor
-	postedObservations := make([]*entities.Observation, 0)
+	var postedObservations []*entities.Observation
+
+	_, errors = datastream.ContainsMandatoryParams()
+	if len(errors) > 0 {
+		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
+		return nil, errors
+	}
 
 	// Check if ObservedProperty is deep inserted
 	if datastream.ObservedProperty != nil && datastream.ObservedProperty.ID == nil {
-		if op, err := a.db.PostObservedProperty(datastream.ObservedProperty); err != nil {
+		var op *entities.ObservedProperty
+		if op, err = a.db.PostObservedProperty(datastream.ObservedProperty); err != nil {
 			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 			return nil, []error{err}
-		} else {
-			datastream.ObservedProperty = op
-			postedObservedProperty = op
 		}
+
+		datastream.ObservedProperty = op
+		postedObservedProperty = op
 	}
 
 	// Check if Sensor is deep inserted
 	if datastream.Sensor != nil && datastream.Sensor.ID == nil {
-		if s, err := a.db.PostSensor(datastream.Sensor); err != nil {
+		var s *entities.Sensor
+		if s, err = a.db.PostSensor(datastream.Sensor); err != nil {
 			a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 			return nil, []error{err}
-		} else {
-			datastream.Sensor = s
-			postedSensor = s
 		}
+
+		datastream.Sensor = s
+		postedSensor = s
 	}
 
-	_, err := datastream.ContainsMandatoryParams()
+	ns, err := a.db.PostDatastream(datastream)
 	if err != nil {
 		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
-		return nil, err
-	}
-
-	ns, err2 := a.db.PostDatastream(datastream)
-	if err2 != nil {
-		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
-		return nil, []error{err2}
+		return nil, []error{err}
 	}
 
 	// Check if Observations are deep inserted
@@ -151,17 +155,17 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 			ds.ID = datastream.ID
 			observation.Datastream = ds
 
-			if o, err := a.PostObservation(observation); err != nil {
+			var o *entities.Observation
+			if o, errors = a.PostObservation(observation); len(errors) > 0 {
 				a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
-				return nil, err
-			} else {
-				postedObservations = append(postedObservations, o)
+				return nil, errors
 			}
+
+			postedObservations = append(postedObservations, o)
 		}
 	}
 
 	ns.SetAllLinks(a.config.GetExternalServerURI())
-
 	return ns, nil
 }
 

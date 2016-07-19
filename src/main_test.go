@@ -27,10 +27,10 @@ func TestVersionHandler(t *testing.T) {
 
 	gostServer := http.CreateServer(server, port, &api)
 	go gostServer.Start()
-	versionUrl := fmt.Sprintf("%s/Version", "http://"+server+":"+strconv.Itoa(port))
+	versionURL := fmt.Sprintf("%s/Version", "http://"+server+":"+strconv.Itoa(port))
 
 	// act
-	request, _ := net.NewRequest("GET", versionUrl, nil)
+	request, _ := net.NewRequest("GET", versionURL, nil)
 	res, _ := net.DefaultClient.Do(request)
 
 	//assert

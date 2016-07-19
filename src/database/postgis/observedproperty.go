@@ -55,8 +55,8 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "", nil)+" FROM %s.observedproperty order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observedproperty", gdb.Schema)
-	return processObservedProperties(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observedproperty", gdb.Schema)
+	return processObservedProperties(gdb.Db, sql, qo, countSQL)
 }
 
 func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
@@ -72,7 +72,7 @@ func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*e
 	return observedProperties[0], nil
 }
 
-func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.ObservedProperty, int, error) {
+func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.ObservedProperty, int, error) {
 	rows, err := db.Query(sql)
 	if err != nil {
 		return nil, 0, err
@@ -126,8 +126,8 @@ func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, c
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return observedProperties, count, nil

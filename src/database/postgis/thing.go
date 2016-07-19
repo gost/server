@@ -48,8 +48,8 @@ func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOpti
 	}
 
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "thing.", "", nil)+" from %s.thing INNER JOIN %s.thing_to_location ON thing.id = thing_to_location.thing_id INNER JOIN %s.location ON thing_to_location.location_id = location.id WHERE location.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, gdb.Schema, intID)
-	countSql := fmt.Sprintf("SELECT Count(*) from %s.thing INNER JOIN %s.historicallocation ON historicallocation.thing_id = thing.id WHERE historicallocation.id = %v;", gdb.Schema, gdb.Schema, intID)
-	return processThings(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("SELECT Count(*) from %s.thing INNER JOIN %s.historicallocation ON historicallocation.thing_id = thing.id WHERE historicallocation.id = %v;", gdb.Schema, gdb.Schema, intID)
+	return processThings(gdb.Db, sql, qo, countSQL)
 }
 
 //GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
@@ -66,8 +66,8 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 // GetThings returns an array of things
 func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Thing{}, qo, "", "", nil)+" FROM %s.thing order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) as count FROM %s.thing", gdb.Schema)
-	return processThings(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) as count FROM %s.thing", gdb.Schema)
+	return processThings(gdb.Db, sql, qo, countSQL)
 }
 
 func processThing(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Thing, error) {
@@ -83,7 +83,7 @@ func processThing(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Thi
 	return observations[0], nil
 }
 
-func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Thing, int, error) {
+func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Thing, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -137,8 +137,8 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSql stri
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return things, count, nil

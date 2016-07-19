@@ -8,45 +8,66 @@ import (
 	"strings"
 )
 
-// OdataOperator are the supporter ODATA operators
-type OdataOperator string
+// Operator are the supporter ODATA operators
+type Operator string
 
 // List of all ODATA Operators.
 const (
 	//logical
-	And OdataOperator = "and"
-	Or  OdataOperator = "or"
-	Not OdataOperator = "not"
+	And Operator = "and"
+	Or  Operator = "or"
+	Not Operator = "not"
 
 	//comparison
-	Equals              OdataOperator = "eq"
-	NotEquals           OdataOperator = "ne"
-	GreaterThan         OdataOperator = "qt"
-	GreaterThanOrEquals OdataOperator = "ge"
-	LessThan            OdataOperator = "lt"
-	LessThanOrEquals    OdataOperator = "le"
-	Like                OdataOperator = "like"
-	IsNull              OdataOperator = "is null"
+	Equals              Operator = "eq"
+	NotEquals           Operator = "ne"
+	GreaterThan         Operator = "gt"
+	GreaterThanOrEquals Operator = "ge"
+	LessThan            Operator = "lt"
+	LessThanOrEquals    Operator = "le"
+	Like                Operator = "like"
+	IsNull              Operator = "is null"
 
 	// arithmetic
-	Addition       OdataOperator = "add"
-	Subtraction    OdataOperator = "sub"
-	Multiplication OdataOperator = "mul"
-	Division       OdataOperator = "div"
-	Modulo         OdataOperator = "mod"
+	Addition       Operator = "add"
+	Subtraction    Operator = "sub"
+	Multiplication Operator = "mul"
+	Division       Operator = "div"
+	Modulo         Operator = "mod"
 )
 
+// IsLogical returns whether a defined operation is a logical operator or not.
+func (o Operator) IsLogical() bool {
+	if o == And || o == Or {
+		return true
+	}
+
+	return false
+}
+
+// IsUnary returns whether a defined operation is unary or binary.  Will return true
+// if the operation only supports a subject with no value.
+func (o Operator) IsUnary() bool {
+	if o == IsNull {
+		return true
+	}
+
+	return false
+}
+
 // ToString representation of the ComparisonOperator
-func (c OdataOperator) ToString() string {
-	return fmt.Sprintf("%s", c)
+func (o Operator) ToString() string {
+	return fmt.Sprintf("%s", o)
 }
 
 // ODATAOperators map, using: ODATAOperators["eq"]
-var ODATAOperators = map[string]OdataOperator{
+var ODATAOperators = map[string]Operator{
+	// logic
 	And.ToString(): And,
 	Or.ToString():  Or,
 	Not.ToString(): Not,
 
+	// comparison
 	Equals.ToString():              Equals,
 	NotEquals.ToString():           NotEquals,
 	GreaterThan.ToString():         GreaterThan,
@@ -56,6 +77,7 @@ var ODATAOperators = map[string]OdataOperator{
 	Like.ToString():                Like,
 	IsNull.ToString():              IsNull,
 
+	// arithmetic
 	Addition.ToString():       LessThanOrEquals,
 	Subtraction.ToString():    Subtraction,
 	Multiplication.ToString(): Multiplication,
@@ -65,12 +87,58 @@ var ODATAOperators = map[string]OdataOperator{
 
 // Predicate is the basic model construct of the odata expression
 type Predicate struct {
-	Subject  interface{}
-	Value    interface{}
-	Operator OdataOperator
+	Left     interface{}
+	Right    interface{}
+	Operator Operator
 }
 
-// ParseODATAFilter parses a filter string into a predicate
+// Split separates the left and right predicates when containing a *Predicate
+// and returns a slice of predicates without a predicate inside left or right,
+// the predicates can be coupled with the logical operators inside the OdataOperator slice
+//
+//  predicate := ParseODATAFilter("id ge 10 and id lt 100 or user eq 'tim' and status 'active'")
+//  ps, ops := predicate.Split()
+//  for i, p := range ps {
+//  	log.Printf("%v <- %v -> %v", p.Left, p.Operator, p.Right)
+//  	if len(ops)-1 >= i {
+//  		log.Printf("--%v--", ops[i])
+//  	}
+//  }
+//
+//  output = id <- ge -> 10 --and-- id <- lt -> 100 --or-- user <- eq -> 'tim' --and-- status <- eq -> 'active'
+func (p *Predicate) Split() ([]*Predicate, []Operator) {
+	var pr []*Predicate
+	predicates := &pr
+
+	var ops []Operator
+	operators := &ops
+
+	if p.Operator.IsLogical() {
+		internalSplit(p, predicates, operators)
+	} else {
+		*predicates = append(*predicates, p)
+	}
+
+	return pr, ops
+}
+
+func internalSplit(p *Predicate, result *[]*Predicate, ops *[]Operator) {
+	if p.Operator.IsLogical() {
+		*ops = append(*ops, p.Operator)
+		internalSplit(p.Left.(*Predicate), result, ops)
+		internalSplit(p.Right.(*Predicate), result, ops)
+	} else {
+		*result = append(*result, p)
+	}
+}
+
+// ParseODATAFilter parses a filter string into a predicate, simple implementation for now
+// ToDo: handle separators ( ) -> also in split function
+// ToDo: handle 'property/property' inside filter
+// ToDo: get the 'not' operator working
+// ToDo: check for valid operators -> return error
+// ToDo: handle arithmetic operators
+// ToDo: handle functions (string, date, math, geospatial, spatialRelationship)
 func ParseODATAFilter(filterStr string) (*Predicate, error) {
 	if len(filterStr) == 0 {
 		return nil, errorInvalidFilter
@@ -129,11 +197,11 @@ func parseFragment(filter string) (*Predicate, error) {
 					Operator: ODATAOperators[match[2]],
 				}
 
-				if predicate.Subject, err = parseFragment(match[1]); err != nil {
+				if predicate.Left, err = parseFragment(match[1]); err != nil {
 					return nil, errorInvalidFilter
 				}
 
-				if predicate.Value, err = parseFragment(match[3]); err != nil {
+				if predicate.Right, err = parseFragment(match[3]); err != nil {
 					return nil, errorInvalidFilter
 				}
 
@@ -154,9 +222,9 @@ func parseFragment(filter string) (*Predicate, error) {
 				}
 
 				predicate = &Predicate{
-					Subject:  match[1],
+					Left:     match[1],
 					Operator: ODATAOperators[match[2]],
-					Value:    val,
+					Right:    val,
 				}
 
 				/*if(predicate.Value.indexOf && predicate.Value.indexOf("datetimeoffset") == 0)
@@ -197,9 +265,9 @@ func buildLike(match []string, key string) (*Predicate, error) {
 	}
 
 	p := &Predicate{
-		Subject:  match[1],
+		Left:     match[1],
 		Operator: Like,
-		Value:    right,
+		Right:    right,
 	}
 
 	return p, nil

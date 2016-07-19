@@ -104,7 +104,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	var err []error
 	var err2 error
 	_, err = thing.ContainsMandatoryParams()
-	if err != nil {
+	if len(err) > 0 {
 		return nil, err
 	}
 
@@ -113,23 +113,23 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 		return nil, []error{err2}
 	}
 
-	postedLocations := make([]*entities.Location, 0)
-	postedDatastreams := make([]*entities.Datastream, 0)
+	var postedLocations []*entities.Location
+	var postedDatastreams []*entities.Datastream
 
 	// Handle deep insert locations
 	if thing.Locations != nil {
 		for _, l := range thing.Locations {
 			// New location posted
 			if l.ID == nil { //Id is null so a new location is posted
-				if nl, err := a.PostLocationByThing(nt.ID, l); err != nil {
+				var nl *entities.Location
+				if nl, err = a.PostLocationByThing(nt.ID, l); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
-					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location deep inserted went wrong")))
+					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location deep insert went wrong")))
 					return nil, err
-				} else {
-					postedLocations = append(postedLocations, nl)
 				}
+				postedLocations = append(postedLocations, nl)
 			} else { // posted id: link
-				if err2 = a.LinkLocation(nt.ID, l.ID); err != nil {
+				if err2 = a.LinkLocation(nt.ID, l.ID); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Location linking went wrong")))
 					err = append(err, err2)
@@ -143,7 +143,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 
 				hl.ContainsMandatoryParams()
 
-				if hl, err = a.PostHistoricalLocation(hl); err != nil {
+				if hl, err = a.PostHistoricalLocation(hl); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Historical Location went wrong")))
 					return nil, err
@@ -157,13 +157,13 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 		for _, d := range thing.Datastreams {
 			// New location posted
 			if d.ID == nil { //Id is null so a new datastream is posted
-				if nd, err := a.PostDatastreamByThing(nt.ID, d); err != nil {
+				var nd *entities.Datastream
+				if nd, err = a.PostDatastreamByThing(nt.ID, d); err != nil {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Datastrean went wrong")))
 					return nil, err
-				} else {
-					postedDatastreams = append(postedDatastreams, nd)
 				}
+				postedDatastreams = append(postedDatastreams, nd)
 			} else {
 				a.reverseInserts(nt, postedLocations, postedDatastreams)
 				err = append(err, gostErrors.NewConflictRequestError(errors.New("ID found for deep inserted datastream, linking to an existing Datastream is not allowed")))

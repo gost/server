@@ -10,7 +10,44 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"log"
 )
+
+// observationParamFactory is used to construct a WHERE clause from an ODATA $select string
+func observationParamFactory(key string, value interface{}) (string, string, error) {
+	val := fmt.Sprintf("%v", value)
+	jsonVal := convertSelectValueForJSON(val)
+	switch key {
+	case "id":
+		return "id", val, nil
+		break
+	case "phenomenonTime":
+		return "data ->> 'phenomenonTime'", jsonVal, nil
+		break
+	case "resultTime":
+		return "data ->> 'resultTime'", jsonVal, nil
+		break
+	case "result":
+		return "data ->> 'result'", jsonVal, nil
+		break
+	case "resultQuality":
+		return "data ->> 'resultQuality'", jsonVal, nil
+		break
+	case "parameters": //implement parameters/parameterName
+		return "data ->> 'parameters'", jsonVal, nil
+		break
+	}
+
+	return "", "", fmt.Errorf("Parameter %s not implemented", key)
+}
+
+func convertSelectValueForJSON(value string) string {
+	if strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'") {
+		return value
+	}
+
+	return fmt.Sprintf("'%v'", value)
+}
 
 // GetObservation retrieves an observation by id from the database
 func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
@@ -28,20 +65,17 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 	return observation, nil
 }
 
-// GetTotalObservations returns the amount of observations in the database
-// todo: add datastreamparameter
-func (gdb *GostDatabase) GetTotalObservations() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.observation", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
-}
-
 // GetObservations retrieves all datastreams
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
-	sql := fmt.Sprintf("select id, data FROM %s.observation order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation", gdb.Schema)
-	return processObservations(gdb.Db, sql, qo, countSql)
+	var queryString string
+	var err error
+	if queryString, err = CreateFilterQueryString(qo, observationParamFactory, "WHERE "); err != nil {
+		return nil, 0, gostErrors.NewBadRequestError(err)
+	}
+
+	sql := fmt.Sprintf("select id, data FROM %s.observation "+queryString+"order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation", gdb.Schema)
+	return processObservations(gdb.Db, sql, qo, countSQL)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
@@ -51,21 +85,31 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, q
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo, countSql)
+	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema, intID)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo, countSQL)
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
 func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
-	intID, ok := ToIntID(dataStreamID)
-	if !ok {
+	var intID int
+	var queryString string
+	var ok bool
+	var err error
+
+	if intID, ok = ToIntID(dataStreamID); !ok {
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.observation where stream_id = %v", gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo, countSql)
+	if queryString, err = CreateFilterQueryString(qo, observationParamFactory, " AND "); err != nil {
+		return nil, 0, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
+	}
+
+	log.Printf(queryString)
+
+	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v "+queryString+"order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema, intID)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation where stream_id = %v", gdb.Schema, intID)
+	return processObservations(gdb.Db, sql, qo, countSQL)
 }
 
 func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Observation, error) {
@@ -81,7 +125,7 @@ func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entiti
 	return observations[0], nil
 }
 
-func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.Observation, int, error) {
+func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Observation, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -147,8 +191,8 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSq
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return observations, count, nil

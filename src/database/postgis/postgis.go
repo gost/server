@@ -13,6 +13,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
+
 	_ "github.com/lib/pq" // postgres driver
 )
 
@@ -161,7 +162,6 @@ func TimeRangeToString(start, end *string) string {
 
 // ToIntID converts an interface to int id used for the id's in teh database
 func ToIntID(id interface{}) (int, bool) {
-
 	switch t := id.(type) {
 	case string:
 		intID, err := strconv.Atoi(t)
@@ -180,7 +180,7 @@ func ToIntID(id interface{}) (int, bool) {
 	return intID, true
 }
 
-func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]interface{}, entityId int) error {
+func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]interface{}, entityID int) error {
 	if len(updates) == 0 {
 		return nil
 	}
@@ -203,7 +203,7 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 	}
 
 	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
-	_, err := gdb.Db.Exec(sql, entityId)
+	_, err := gdb.Db.Exec(sql, entityID)
 	if err != nil {
 		return err
 	}
@@ -256,11 +256,81 @@ func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string
 func CreateTopSkipQueryString(qo *odata.QueryOptions) string {
 	q := ""
 	if qo != nil && !qo.QueryTop.IsNil() {
-		q += fmt.Sprintf("LIMIT %v", qo.QueryTop.Limit)
+		q += fmt.Sprintf(" LIMIT %v", qo.QueryTop.Limit)
 	}
 	if qo != nil && !qo.QuerySkip.IsNil() {
 		q += fmt.Sprintf(" OFFSET %v", qo.QuerySkip.Index)
 	}
 
 	return q
+}
+
+// CreateFilterQueryString converts an odata query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
+// ParamFactory is used for converting SensorThings parameter names to postgres field names
+// Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
+// false if parameter cannot be converted
+func CreateFilterQueryString(qo *odata.QueryOptions, paramFactory func(string, interface{}) (string, string, error), prefix string) (string, error) {
+	q := ""
+	if qo != nil && !qo.QueryFilter.IsNil() {
+		q += prefix
+		ps, ops := qo.QueryFilter.Predicate.Split()
+		for i, p := range ps {
+			var left, right, operator string
+			var err error
+
+			if left, right, err = paramFactory(fmt.Sprintf("%v", p.Left), p.Right); err != nil {
+				return "", err
+			}
+
+			if operator, err = OdataOperatorToPostreSQL(p.Operator); err != nil {
+				return "", err
+			}
+
+			q += fmt.Sprintf("%v %v %v", left, operator, right)
+			if len(ops)-1 >= i {
+				q += fmt.Sprintf(" %v ", ops[i])
+			}
+		}
+		q += " "
+	}
+
+	return q, nil
+}
+
+// OdataOperatorToPostreSQL converts an odata.OdataOperator to a PostgreSQL string representation
+func OdataOperatorToPostreSQL(o odata.Operator) (string, error) {
+	switch o {
+	case odata.And:
+		return "AND", nil
+		break
+	case odata.Or:
+		return "OR", nil
+		break
+	case odata.Not:
+		return "NOT", nil
+		break
+	case odata.Equals:
+		return "=", nil
+		break
+	case odata.NotEquals:
+		return "!=", nil
+		break
+	case odata.GreaterThan:
+		return ">", nil
+		break
+	case odata.GreaterThanOrEquals:
+		return ">=", nil
+		break
+	case odata.LessThan:
+		return "<", nil
+		break
+	case odata.LessThanOrEquals:
+		return "<=", nil
+		break
+	case odata.IsNull:
+		return "IS NULL", nil
+		break
+	}
+
+	return "", fmt.Errorf("Operator %v not implemented", o.ToString())
 }

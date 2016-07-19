@@ -58,8 +58,8 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 // GetFeatureOfInterests returns all feature of interests
 func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.featureofinterest", gdb.Schema)
-	return processFeatureOfInterests(gdb.Db, sql, qo, countSql)
+	countSSQL := fmt.Sprintf("select COUNT(*) FROM %s.featureofinterest", gdb.Schema)
+	return processFeatureOfInterests(gdb.Db, sql, qo, countSSQL)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
@@ -90,7 +90,7 @@ func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*
 	return locations[0], nil
 }
 
-func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.FeatureOfInterest, int, error) {
+func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.FeatureOfInterest, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -147,8 +147,8 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return featureOfInterests, count, nil

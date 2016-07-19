@@ -40,8 +40,8 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 // GetHistoricalLocations retrieves all historicallocations
 func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, error) {
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation", gdb.Schema)
-	return processHistoricalLocations(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation", gdb.Schema)
+	return processHistoricalLocations(gdb.Db, sql, qo, countSQL)
 }
 
 // GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
@@ -51,8 +51,8 @@ func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where location_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation where location_id = %v", gdb.Schema, intID)
-	return processHistoricalLocations(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation where location_id = %v", gdb.Schema, intID)
+	return processHistoricalLocations(gdb.Db, sql, qo, countSQL)
 }
 
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
@@ -62,8 +62,8 @@ func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 	sql := fmt.Sprintf("select "+CreateSelectString(&entities.HistoricalLocation{}, qo, "", "", hlMapping)+" FROM %s.historicallocation where thing_id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSql := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation where thing_id = %v", gdb.Schema, intID)
-	return processHistoricalLocations(gdb.Db, sql, qo, countSql)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.historicallocation where thing_id = %v", gdb.Schema, intID)
+	return processHistoricalLocations(gdb.Db, sql, qo, countSQL)
 }
 
 func processHistoricalLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.HistoricalLocation, error) {
@@ -79,7 +79,7 @@ func processHistoricalLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (
 	return hls[0], nil
 }
 
-func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSql string) ([]*entities.HistoricalLocation, int, error) {
+func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.HistoricalLocation, int, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -120,8 +120,8 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, 
 	}
 
 	var count int
-	if len(countSql) > 0 {
-		db.QueryRow(countSql).Scan(&count)
+	if len(countSQL) > 0 {
+		db.QueryRow(countSQL).Scan(&count)
 	}
 
 	return hls, count, nil

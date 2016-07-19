@@ -33,17 +33,19 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 // PostLocationByThing checks if the given location entity is valid and adds it to the database
 // the new location will be linked to a thing if needed
 func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error) {
+	var err []error
+	var err2 error
 	l, err := a.PostLocation(location)
-	if err != nil {
+	if len(err) > 0 {
 		return nil, err
 	}
 
 	if thingID != nil {
-		err2 := a.LinkLocation(thingID, l.ID)
+		err2 = a.LinkLocation(thingID, l.ID)
 		if err2 != nil {
-			err3 := a.DeleteLocation(l.ID)
-			if err3 != nil {
-				log.Printf("Error rolling back location %v", err3)
+			err2 := a.DeleteLocation(l.ID)
+			if err2 != nil {
+				log.Printf("Error rolling back location %v", err2)
 			}
 
 			return nil, []error{err2}
@@ -58,15 +60,14 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 		hl.ContainsMandatoryParams()
 
 		hl, err = a.PostHistoricalLocation(hl)
-		if err != nil {
-			err3 := a.DeleteHistoricalLocation(l.ID)
-			if err3 != nil {
-				log.Printf("Error rolling back location %v", err3)
+		if len(err) > 0 {
+			err2 := a.DeleteHistoricalLocation(l.ID)
+			if err2 != nil {
+				log.Printf("Error rolling back location %v", err2)
 			}
 
 			return nil, []error{err2}
 		}
-
 	}
 
 	l.SetAllLinks(a.config.GetExternalServerURI())
@@ -161,9 +162,9 @@ func (a *APIv1) DeleteLocation(id interface{}) error {
 
 // LinkLocation links a thing with a location in the database
 func (a *APIv1) LinkLocation(thingID interface{}, locationID interface{}) error {
-	err3 := a.db.LinkLocation(thingID, locationID)
-	if err3 != nil {
-		return gostErrors.NewBadRequestError(err3)
+	err := a.db.LinkLocation(thingID, locationID)
+	if err != nil {
+		return gostErrors.NewBadRequestError(err)
 	}
 	return nil
 }

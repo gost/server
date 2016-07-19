@@ -138,9 +138,9 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 		}
 
 		return result, nil
-	} else {
-		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 	}
+
+	return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 }
 
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
@@ -171,11 +171,11 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		observation.FeatureOfInterest = &entities.FeatureOfInterest{}
 		observation.FeatureOfInterest.ID = foiID
 	} else if observation.FeatureOfInterest != nil && observation.FeatureOfInterest.ID == nil {
-		if foi, err := a.PostFeatureOfInterest(observation.FeatureOfInterest); err != nil {
+		var foi *entities.FeatureOfInterest
+		if foi, err = a.PostFeatureOfInterest(observation.FeatureOfInterest); err != nil {
 			return nil, []error{gostErrors.NewConflictRequestError(errors.New("Unable to create deep inserted FeatureOfInterest"))}
-		} else {
-			observation.FeatureOfInterest = foi
 		}
+		observation.FeatureOfInterest = foi
 	}
 
 	no, err2 := a.db.PostObservation(observation)

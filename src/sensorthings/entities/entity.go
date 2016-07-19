@@ -142,7 +142,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 			}
 
 			if t == nil || (t.ID == nil && !contains) {
-
 				isNil = true
 			}
 			break
