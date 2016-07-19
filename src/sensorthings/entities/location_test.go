@@ -8,6 +8,7 @@ import (
 )
 
 var jsonLocation = `{
+    "name": "somewhere",
     "description": "my backyard",
     "encodingType": "application/vnd.geo+json",
     "location": {
@@ -33,13 +34,14 @@ func TestMissingMandatoryParametersLocation(t *testing.T) {
 	//assert
 	assert.NotNil(t, err, "Location mandatory param description not filled in should have returned error")
 	if len(err) > 0 {
-		assert.Contains(t, fmt.Sprintf("%v", err[0]), "description")
+		assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
 	}
 }
 
 func TestMandatoryParametersExistLocation(t *testing.T) {
 	//arrange
 	location := &Location{
+		Name:         "test",
 		Description:  "test",
 		EncodingType: "test",
 		Location:     map[string]interface{}{"test": "test"},

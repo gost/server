@@ -105,7 +105,7 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 	}
 
 	content := string(bytes[:])
-	formatted := fmt.Sprintf(content, schema, schema)
+	formatted := fmt.Sprintf(content, schema, schema, schema, schema)
 	return &formatted, nil
 }
 

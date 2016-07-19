@@ -17,6 +17,7 @@ import (
 // of the smart thermostat’s location should be the same as the content of the temperature readings’ feature of interest.
 type Location struct {
 	BaseEntity
+	Name                   string                 `json:"name,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	EncodingType           string                 `json:"encodingType,omitempty"`
 	Location               map[string]interface{} `json:"location,omitempty"`
@@ -33,7 +34,7 @@ func (l Location) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a Location
 func (l *Location) GetPropertyNames() []string {
-	return []string{"id", "description", "encodingType", "location"}
+	return []string{"id", "name", "description", "encodingType", "location"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -50,6 +51,7 @@ func (l *Location) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for Location are available before posting.
 func (l *Location) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+	CheckMandatoryParam(&err, l.Name, l.GetEntityType(), "name")
 	CheckMandatoryParam(&err, l.Description, l.GetEntityType(), "description")
 	CheckMandatoryParam(&err, l.EncodingType, l.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, l.Location, l.GetEntityType(), "location")

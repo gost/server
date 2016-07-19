@@ -6,7 +6,8 @@
 # Create NodeMCU Things(1) Locations(1)
 # ----------------------------------------
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
-    "description": "NodeMCU DEVKIT 0.9",
+    "name": "NodeMCU",
+    "description": "NodeMCU DEVKIT V 0.9",
     "properties": {
 		"id": "6BuE6ZSQ",
         "chip": "ESP2866",
@@ -14,7 +15,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  
     },
 	"Locations": [
 		{
-			"description": "Geodan PK",
+		    "name": "Geodan PK",
+			"description": "2nd floor Geodan PK, inside Aquarium",
 			"encodingType": "application/vnd.geo+json",
 			"location": {
 				"type": "Point",
@@ -28,7 +30,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  
 # Create Netatmo Things(2) Locations(2)
 # ----------------------------------------
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
-    "description": "Netatmo Weatherstation VZ",
+    "name": "Netatmo Weatherstation PK",
+    "description": "A Netatmo Weatherstation",
     "properties": {
         "outside_sn": "h035d52",
 		"inside_mac": "70:ee:50:03:65:d4",
@@ -36,7 +39,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  
     },
 	"Locations": [
 		{
-			"description": "Geodan VZ - 2nd",
+		    "name": "Geodan PK",
+			"description": "2nd floor Geodan PK, behind StevenB",
 			"encodingType": "application/vnd.geo+json",
 			"location": {
 				"type": "Point",
@@ -50,13 +54,15 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  
 # Berts racing bike Things(3) Locations(3)
 # ----------------------------------------
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
-    "description": "Racing bike Bert",
+    "name": "Racing bike Bert",
+    "description": "Cycling sensor, used for demo purpose",
     "properties": {
         "owner": "Bert Temme"
     },
 	"Locations": [
 		{
-			 "description": "Its Everywhere",
+		    "name": "Nobody knows",
+			"description": "Its Everywhere",
 			"encodingType": "application/vnd.geo+json",
 			"location": {
 				"type": "Point",
@@ -70,13 +76,15 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  
 # SF BeeClear Things(4) Locations(4)
 # ----------------------------------------
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
-    "description": "BeeClear SF",
+    "name": "BeeClear SF",
+    "description": "BeeClear connected to Stevens smart meter at home",
     "properties": {
-        "owner": "Steven"
+        "owner": "StevenF"
     },
 	"Locations": [
 		{
-			"description": "Kombuis",
+		    "name": "Kombuis",
+			"description": "StevenF house",
 			"encodingType": "application/vnd.geo+json",
 			"location": {
 				"type": "Point",
@@ -160,8 +168,9 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 # ----------------------------------------
 # HTU21D Sensors(1)
 # ----------------------------------------
-curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
-    "description": "HTU21D",
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "name": "HTU21D",
+    "description": "HTU21D for sensing temperature and humidity",
     "encodingType": "application/pdf",
     "metadata": "https://cdn-shop.adafruit.com/datasheets/1899_HTU21D.pdf"
 }' "http://gost.geodan.nl/v1.0/Sensors"
@@ -169,8 +178,9 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 # ----------------------------------------
 # Netatmo Sensors(2)
 # ----------------------------------------
-curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
-    "description": "Netatmo",
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "name": "Netatmo",
+    "description": "Netatmo Weatherstation",
     "encodingType": "application/pdf",
     "metadata": "https://www.netatmo.com/product/station"
 }' "http://gost.geodan.nl/v1.0/Sensors"
@@ -178,8 +188,9 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 # ----------------------------------------
 # Garmin speed sensor Sensors(3)
 # ----------------------------------------
-curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
-    "description": "Garmin Speed Sensor",
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "name": "Garmin Speed Sensor",
+    "description": "Cadanssensor",
     "encodingType": "application/pdf",
     "metadata": "https://www8.garmin.com/manuals/webhelp/edge520/EN-US/GUID-E7E492A5-5342-4B27-875B-0C7B5D5F14E7.html"
 }' "http://gost.geodan.nl/v1.0/Sensors"
@@ -187,7 +198,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 # ----------------------------------------
 # Slimme meter P1 (BeeClear) Sensors(4)
 # ----------------------------------------
-curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
+curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
+    "name": "BeeClear",
     "description": "BeeClear Energiemanager V2",
     "encodingType": "application/pdf",
     "metadata": "https://beeclear.nl/docs/handleiding.pdf"
@@ -206,6 +218,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "degree Celsius",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
+  "name": "NodeMCU Temperature PK Aquarium",
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "NodeMCU Temperature readings indoor",
   "Thing": {"@iot.id": 1},
@@ -222,11 +235,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "humidity",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "NodeMCU humidity readings indoor",
-  "Thing": {"@iot.id": 1},
-  "ObservedProperty": {"@iot.id": 2},
-  "Sensor": {"@iot.id": 1}
+    "name": "NodeMCU Humidity PK Aquarium",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "NodeMCU humidity readings indoor",
+    "Thing": {"@iot.id": 1},
+    "ObservedProperty": {"@iot.id": 2},
+    "Sensor": {"@iot.id": 1}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -238,11 +252,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "degree Celsius",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo temperature readings indoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 1},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo temperature PK 2nd floor",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo temperature readings indoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 1},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -254,11 +269,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "humidity",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo humidity readings indoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 2},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo humidity PK 2nd floor",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo humidity readings indoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 2},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -270,11 +286,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "bar",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo pressure readings indoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 3},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo pressure PK 2nd floor",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo pressure readings indoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 3},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -286,11 +303,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "parts per million",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo CO2 readings indoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 4},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo CO2 PK 2nd floor",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo CO2 readings indoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 4},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -302,11 +320,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "decibel",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo sound readings indoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 5},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo sound PK 2nd floor",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo sound readings indoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 5},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -318,11 +337,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "degree Celsius",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo temperature readings outdoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 1},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo temperature outside PK",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo temperature readings outdoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 1},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -334,11 +354,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "humidity",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Netatmo humidity readings outdoor",
-  "Thing": {"@iot.id": 2},
-  "ObservedProperty": {"@iot.id": 2},
-  "Sensor": {"@iot.id": 2}
+    "name": "Netatmo humidity outside PK",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Netatmo humidity readings outdoor",
+    "Thing": {"@iot.id": 2},
+    "ObservedProperty": {"@iot.id": 2},
+    "Sensor": {"@iot.id": 2}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -350,11 +371,12 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "kilometers per hour",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Speed measurements Berts racing bike",
-  "Thing": {"@iot.id": 3},
-  "ObservedProperty": {"@iot.id": 6},
-  "Sensor": {"@iot.id": 3}
+    "name": "Berts racing bike measurements",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Speed measurements Berts racing bike",
+    "Thing": {"@iot.id": 3},
+    "ObservedProperty": {"@iot.id": 6},
+    "Sensor": {"@iot.id": 3}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 
 # ----------------------------------------
@@ -366,10 +388,11 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "name": "Kilo Watt",
         "definition": "http://unitsofmeasure.org/ucum.html#para-30"
     },
-  "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-  "description": "Energy usage measurements SF",
-  "Thing": {"@iot.id": 4},
-  "ObservedProperty": {"@iot.id": 7},
-  "Sensor": {"@iot.id": 4}
+    "name": "Energy usage SF",
+    "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+    "description": "Energy usage measurements SF from BeeClear",
+    "Thing": {"@iot.id": 4},
+    "ObservedProperty": {"@iot.id": 7},
+    "Sensor": {"@iot.id": 4}
 }' "http://gost.geodan.nl/v1.0/Datastreams"
 

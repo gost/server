@@ -11,6 +11,7 @@ import (
 // it to an electrical impulse and be converted to a empirical value to represent a measurement value of the physical property
 type Sensor struct {
 	BaseEntity
+	Name           string        `json:"name,omitempty"`
 	Description    string        `json:"description,omitempty"`
 	EncodingType   string        `json:"encodingType,omitempty"`
 	Metadata       string        `json:"metadata,omitempty"`
@@ -25,7 +26,7 @@ func (s Sensor) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a Sensor
 func (s *Sensor) GetPropertyNames() []string {
-	return []string{"id", "description", "encodingType", "metadata"}
+	return []string{"id", "name", "description", "encodingType", "metadata"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -42,6 +43,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for Sensor are available before posting.
 func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+	CheckMandatoryParam(&err, s.Name, s.GetEntityType(), "name")
 	CheckMandatoryParam(&err, s.Description, s.GetEntityType(), "description")
 	CheckMandatoryParam(&err, s.EncodingType, s.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, s.Metadata, s.GetEntityType(), "metadata")

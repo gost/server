@@ -11,6 +11,7 @@ import (
 // can be the Location of the Sensor and therefore of the Observation. A FeatureOfInterest is linked to a single Observation
 type FeatureOfInterest struct {
 	BaseEntity
+	Name               string                 `json:"name,omitempty"`
 	Description        string                 `json:"description,omitempty"`
 	EncodingType       string                 `json:"encodingType,omitempty"`
 	Feature            map[string]interface{} `json:"feature,omitempty"`
@@ -26,7 +27,7 @@ func (f FeatureOfInterest) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a FeatureOfInterest
 func (f *FeatureOfInterest) GetPropertyNames() []string {
-	return []string{"id", "description", "encodingType", "feature"}
+	return []string{"id", "name", "description", "encodingType", "feature"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -43,6 +44,7 @@ func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for a FeatureOfInterest are available before posting
 func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+	CheckMandatoryParam(&err, f.Name, f.GetEntityType(), "name")
 	CheckMandatoryParam(&err, f.Description, f.GetEntityType(), "description")
 	CheckMandatoryParam(&err, f.EncodingType, f.GetEntityType(), "encodingType")
 	CheckMandatoryParam(&err, f.Feature, f.GetEntityType(), "feature")

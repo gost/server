@@ -3,10 +3,10 @@ BEGIN
      IF EXISTS(
         SELECT schema_name
           FROM information_schema.schemata
-          WHERE schema_name = 'v1'
+          WHERE schema_name = '%s'
       )
     THEN
-      EXECUTE 'drop schema v1 cascade';
+      EXECUTE 'drop schema %s cascade';
     END IF;
 END
 $$;
@@ -17,6 +17,7 @@ SET search_path = %s;
 CREATE TABLE featureofinterest
 (
   id bigserial NOT NULL,
+  name character varying(255),
   description character varying(500),
   encodingtype integer,
   feature public.geometry(geometry,4326),
@@ -30,6 +31,7 @@ WITH (
 CREATE TABLE thing
 (
   id bigserial NOT NULL,
+  name character varying(255),
   description character varying(500),
   properties jsonb,
   CONSTRAINT thing_pkey PRIMARY KEY (id)
@@ -41,6 +43,7 @@ WITH (
 CREATE TABLE location
 (
   id bigserial NOT NULL,
+  name character varying(255),
   description character varying(500),
   encodingtype integer,
   location public.geometry(geometry,4326),
@@ -96,6 +99,7 @@ WITH (
 CREATE TABLE sensor
 (
   id bigserial NOT NULL,
+  name character varying(255),
   description character varying(500),
   encodingtype integer,
   metadata character varying(255),
@@ -121,6 +125,7 @@ WITH (
 CREATE TABLE datastream
 (
   id bigserial NOT NULL,
+  name character varying(255),
   description character varying(500),
   unitofmeasurement jsonb,
   observationtype integer,

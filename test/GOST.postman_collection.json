@@ -81,7 +81,8 @@
 				"c272ad40-8737-ca7a-dfd6-35a2b831e39c",
 				"2111fda5-e1ab-177d-2072-ba9b0bdd1a7c",
 				"b82f187e-ae32-8e6b-b52f-8ee333e756cf",
-				"ab808268-e35f-4487-3b6c-92eb8c3d7196"
+				"ab808268-e35f-4487-3b6c-92eb8c3d7196",
+				"3e620b96-2632-7fb7-f91c-8192a3eff3b4"
 			],
 			"owner": 0,
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc"
@@ -473,12 +474,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1462735543745,
+			"time": 1468924831679,
 			"name": "POST Location by thing",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Somewhere\",\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
 		},
 		{
 			"id": "2b51d097-55e0-0a3b-076c-d969523b2f13",
@@ -573,12 +574,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1467021799154,
+			"time": 1468924908535,
 			"name": "POST Datastream deep insert",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"description\": \"SensorUp Tempomatic 1000-b\",\r\n            \"encodingType\": \"http://schema.org/description\",\r\n            \"metadata\": \"Calibration date:  Jan 11, 2015\"\r\n        },\r\n         \"Thing\": {\"@iot.id\": \"15\"}\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"DS3\",\r\n    \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"name\": \"My Sensor\",\r\n            \"description\": \"SensorUp Tempomatic 1000-b\",\r\n            \"encodingType\": \"http://schema.org/description\",\r\n            \"metadata\": \"Calibration date:  Jan 11, 2015\"\r\n        },\r\n         \"Thing\": {\"@iot.id\": \"15\"}\r\n}"
 		},
 		{
 			"id": "3addc6c7-5c34-9640-48a8-6d28a2870df8",
@@ -595,6 +596,26 @@
 			"helperAttributes": {},
 			"time": 1462731145512,
 			"name": "GET Datastreams by thing",
+			"description": "",
+			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
+			"responses": [],
+			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+		},
+		{
+			"id": "3e620b96-2632-7fb7-f91c-8192a3eff3b4",
+			"headers": "Accept: application/json\nContent-Type: application/json\n",
+			"url": "localhost:8080/v1.0/Observations?$filter=result gt 17 and id eq 229",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1468823245237,
+			"name": "GET Observations $filter",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
@@ -633,12 +654,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1467020835159,
+			"time": 1468924942497,
 			"name": "POST Datastream linked",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"unitOfMeasurement\": {\r\n        \"symbol\": \"%\",\r\n        \"name\": \"Percentage\",\r\n        \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html\"\r\n    },\r\n  \"observationType\":\"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n  \"description\": \"Temperature measurement\",\r\n  \"observedarea\": { \"type\": \"Polygon\",\r\n    \"coordinates\": [\r\n      [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ]\r\n      ]\r\n   },\r\n  \"Thing\": {\"@iot.id\": \"1\"},\r\n  \"ObservedProperty\": {\"@iot.id\": \"1\"},\r\n  \"Sensor\": {\"@iot.id\": \"1\"}\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"DS2\",\r\n    \"unitOfMeasurement\": {\r\n        \"symbol\": \"%\",\r\n        \"name\": \"Percentage\",\r\n        \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html\"\r\n    },\r\n  \"observationType\":\"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n  \"description\": \"Temperature measurement\",\r\n  \"observedarea\": { \"type\": \"Polygon\",\r\n    \"coordinates\": [\r\n      [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ]\r\n      ]\r\n   },\r\n  \"Thing\": {\"@iot.id\": \"1\"},\r\n  \"ObservedProperty\": {\"@iot.id\": \"1\"},\r\n  \"Sensor\": {\"@iot.id\": \"1\"}\r\n}"
 		},
 		{
 			"id": "45a0929e-0a95-2847-5eea-3a7cbbc01ebb",
@@ -694,13 +715,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1461485662127,
+			"time": 1468924519820,
 			"name": "POST Thing",
 			"description": "POST Sensor",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"folder": "4c14dc23-c5b4-6ef4-4f32-11b785931bf0",
-			"rawModeData": "{\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Netatmo 1\",\r\n    \"description\": \"Netatmo VZ\",\r\n    \"properties\": {\r\n        \"organisation\": \"Geodan\",\r\n        \"owner\": \"Tim\"\r\n    }\r\n}"
 		},
 		{
 			"id": "553b3f1e-0264-6420-7d48-2b6e2daed164",
@@ -735,12 +755,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1462435093179,
+			"time": 1468924525228,
 			"name": "POST Observation",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"1\"}\r\n}"
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"234\"}\r\n}"
 		},
 		{
 			"id": "5bec0b83-0594-c626-85b4-4351e16823d0",
@@ -795,12 +815,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468228637844,
+			"time": 1468924646159,
 			"name": "POST Thing with location and datastream",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [{\r\n        \"description\": \"my backyard\",\r\n        \"encodingType\": \"application/vnd.geo+json\",\r\n        \"location\": {\r\n            \"type\": \"Point\",\r\n            \"coordinates\": [-117.123,\r\n            54.123]\r\n        }\r\n    }],\r\n    \"Datastreams\": [{\r\n        \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"description\": \"SensorUp Tempomatic 1000-b\",\r\n            \"encodingType\": \"http://schema.org/description\",\r\n            \"metadata\": \"Calibration date:  Jan 11, 2015\"\r\n        },\r\n        \"Observations\": [\r\n                {\r\n                  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n                  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n                  \"result\" : 38\r\n                }\r\n            ]\r\n    }]\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"lantern\",\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [{\r\n        \"name\": \"bla\",\r\n        \"description\": \"my backyard\",\r\n        \"encodingType\": \"application/vnd.geo+json\",\r\n        \"location\": {\r\n            \"type\": \"Point\",\r\n            \"coordinates\": [-117.123,\r\n            54.123]\r\n        }\r\n    }],\r\n    \"Datastreams\": [{\r\n        \"name\": \"DS1\",\r\n        \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"name\": \"This is a name\",\r\n            \"description\": \"SensorUp Tempomatic 2000\",\r\n            \"encodingType\": \"application/pdf\",\r\n            \"metadata\": \"Calibration date:  Jan 1, 2014\"\r\n        },\r\n        \"Observations\": [\r\n                {\r\n                  \"phenomenonTime\": \"2015-04-13T00:00:00Z\",\r\n                  \"resultTime\" : \"2015-04-13T00:00:05Z\",\r\n                  \"result\" : 38\r\n                }\r\n            ]\r\n    }]\r\n}"
 		},
 		{
 			"id": "61ad512e-b9f0-84e4-161b-d03569142630",
@@ -815,12 +835,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468248424001,
+			"time": 1468924872390,
 			"name": "PATCH FeaturesOfInterest",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"Patched description, null island\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"feature\": {\r\n        \"coordinates\": [0,0],\r\n        \"type\": \"Point\"\r\n      }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Awesome FOI (Patched)\",\r\n    \"description\": \"Patched description, null island\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"feature\": {\r\n        \"coordinates\": [0,0],\r\n        \"type\": \"Point\"\r\n      }\r\n}"
 		},
 		{
 			"id": "62aa279b-bf45-875c-6a64-39974b5f9181",
@@ -876,12 +896,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468247304695,
+			"time": 1468924839173,
 			"name": "PATCH Location",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"my patched backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [0, 0]\r\n    }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Somewhere (Patched)\",\r\n    \"description\": \"my patched backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [0, 0]\r\n    }\r\n}"
 		},
 		{
 			"id": "6e0cd107-c96d-6544-020a-d753a91214c7",
@@ -896,12 +916,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1463556627364,
+			"time": 1468924719476,
 			"name": "POST Sensor",
 			"description": "POST Sensors",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{        \r\n    \"description\": \"SensorUp Tempomatic 2000\",\r\n    \"encodingType\": \"application/pdf\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2014\"\r\n}"
+			"rawModeData": "{   \r\n    \"name\": \"My Sensor\",\r\n    \"description\": \"SensorUp Tempomatic 2000\",\r\n    \"encodingType\": \"application/pdf\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2014\"\r\n}"
 		},
 		{
 			"id": "74b3eec2-e373-1edc-e36e-b0a4c4c371f9",
@@ -1036,12 +1056,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1463556731758,
+			"time": 1468924857006,
 			"name": "POST FeaturesOfInterest",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"Underground Air Quality in NYC train tunnels\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"feature\": {\r\n        \"coordinates\": [51.08386,-114.13036],\r\n        \"type\": \"Point\"\r\n      }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Awesome FOI\",\r\n    \"description\": \"Underground Air Quality in NYC train tunnels\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"feature\": {\r\n        \"coordinates\": [51.08386,-114.13036],\r\n        \"type\": \"Point\"\r\n      }\r\n}"
 		},
 		{
 			"id": "a24fba63-a07f-3f24-f46c-fd12b35130fb",
@@ -1076,12 +1096,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468249643476,
+			"time": 1468924675448,
 			"name": "PATCH Thing",
 			"description": "POST Sensor",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"Patched description\",\r\n    \"properties\": {\r\n        \"owner\": \"Stefke\"\r\n    }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"Netatmo 1 patched\",\r\n    \"description\": \"Patched description\",\r\n    \"properties\": {\r\n        \"owner\": \"Stefke\"\r\n    }\r\n}"
 		},
 		{
 			"id": "ab808268-e35f-4487-3b6c-92eb8c3d7196",
@@ -1116,12 +1136,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1464093735845,
+			"time": 1468924515220,
 			"name": "POST Thing with new location",
 			"description": "POST Sensor",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [\r\n        {\r\n            \"description\": \"my backyard\",\r\n            \"encodingType\": \"application/vnd.geo+json\",\r\n            \"location\": {\r\n                \"type\": \"Point\",\r\n                \"coordinates\": [-117.123,\r\n                54.123]\r\n            }\r\n        }\r\n    ]\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"lantern\",\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [\r\n        {\r\n            \"name\": \"why o why does a location need a name....\",\r\n            \"description\": \"my backyard\",\r\n            \"encodingType\": \"application/vnd.geo+json\",\r\n            \"location\": {\r\n                \"type\": \"Point\",\r\n                \"coordinates\": [-117.123,\r\n                54.123]\r\n            }\r\n        }\r\n    ]\r\n}"
 		},
 		{
 			"id": "afef247c-6275-ce22-f3c6-119fcf819032",
@@ -1196,13 +1216,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1462308068787,
+			"time": 1468924810589,
 			"name": "POST Location",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}",
-			"folder": "ff811a98-694a-5639-09c9-5095e365d3cc"
+			"rawModeData": "{\r\n    \"name\": \"Somewhere\",\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
 		},
 		{
 			"id": "b82f187e-ae32-8e6b-b52f-8ee333e756cf",
@@ -1359,12 +1378,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468242500677,
+			"time": 1468924759196,
 			"name": "PATCH Sensor",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{        \r\n    \"description\": \"SensorUp Tempomatic 2020\",\r\n    \"encodingType\": \"application/pdf\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2020\"\r\n}"
+			"rawModeData": "{   \r\n    \"name\": \"My Sensor (Patched)\",\r\n    \"description\": \"SensorUp Tempomatic 2020\",\r\n    \"encodingType\": \"application/pdf\",\r\n    \"metadata\": \"Calibration date:  Jan 1, 2020\"\r\n}"
 		},
 		{
 			"id": "de307b55-ed6b-df6e-9120-df8e8a3a40f1",
@@ -1439,12 +1458,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468249584929,
+			"time": 1468924931512,
 			"name": "PATCH Datastream",
 			"description": "",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"unitOfMeasurement\": {\r\n        \"symbol\": \"&\",\r\n        \"name\": \"Patched\",\r\n        \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Patched.html\"\r\n    },\r\n  \"observationType\":\"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n  \"description\": \"Patched measurement\",\r\n  \"observedarea\": { \"type\": \"Polygon\",\r\n    \"coordinates\": [\r\n      [ [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0] ]\r\n      ]\r\n   }\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"DS1 (Patched)\",\r\n    \"unitOfMeasurement\": {\r\n        \"symbol\": \"&\",\r\n        \"name\": \"Patched\",\r\n        \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Patched.html\"\r\n    },\r\n  \"observationType\":\"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n  \"description\": \"Patched measurement\",\r\n  \"observedarea\": { \"type\": \"Polygon\",\r\n    \"coordinates\": [\r\n      [ [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0], [0.0, 0.0] ]\r\n      ]\r\n   }\r\n}"
 		},
 		{
 			"id": "e97507d2-4e9a-710f-b425-c3442602d032",
@@ -1479,12 +1498,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1464249363029,
+			"time": 1468924558500,
 			"name": "POST Thing with existing location",
 			"description": "POST Sensor",
 			"collectionId": "977de4ea-b3bb-e4bc-2754-52dd5f86d5dc",
 			"responses": [],
-			"rawModeData": "{\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [ \r\n        {\"@iot.id\":\"1\"}\r\n    ]\r\n}"
+			"rawModeData": "{\r\n    \"name\": \"lantern\",\r\n    \"description\": \"camping lantern\",\r\n    \"properties\": {\r\n        \"property1\": \"it’s waterproof\",\r\n        \"property2\": \"it glows in the dark\",\r\n        \"property3\": \"it repels insects\"\r\n    },\r\n    \"Locations\": [ \r\n        {\"@iot.id\":\"1\"}\r\n    ]\r\n}"
 		},
 		{
 			"id": "fa3df67c-91f3-615d-a16b-ea0e029c6cfc",

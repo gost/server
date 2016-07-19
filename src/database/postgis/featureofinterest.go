@@ -67,8 +67,8 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	var fID int
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
-	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (description, encodingtype, feature, original_location_id) VALUES ($1, $2, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $3) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql, f.Description, encoding.Code, f.OriginalLocationID).Scan(&fID)
+	sql := fmt.Sprintf("INSERT INTO %s.featureofinterest (name, description, encodingtype, feature, original_location_id) VALUES ($1, $2, $3, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $4) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql, f.Name, f.Description, encoding.Code, f.OriginalLocationID).Scan(&fID)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 	for rows.Next() {
 		var ID interface{}
 		var encodingType int
-		var description, feature string
+		var name, description, feature string
 
 		var params []interface{}
 		var qp []string
@@ -119,6 +119,9 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 			}
 			if p == "encodingType" {
 				params = append(params, &encodingType)
+			}
+			if p == "name" {
+				params = append(params, &name)
 			}
 			if p == "description" {
 				params = append(params, &description)
@@ -137,6 +140,7 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 
 		foi := entities.FeatureOfInterest{}
 		foi.ID = ID
+		foi.Name = name
 		foi.Description = description
 		foi.Feature = featureMap
 		if encodingType != 0 {
@@ -163,6 +167,10 @@ func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.Fe
 
 	if intID, ok = ToIntID(id); !ok || !gdb.FeatureOfInterestExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+	}
+
+	if len(foi.Name) > 0 {
+		updates["name"] = foi.Name
 	}
 
 	if len(foi.Description) > 0 {

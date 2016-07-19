@@ -10,7 +10,6 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"log"
 )
 
 // observationParamFactory is used to construct a WHERE clause from an ODATA $select string
@@ -104,8 +103,6 @@ func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, q
 	if queryString, err = CreateFilterQueryString(qo, observationParamFactory, " AND "); err != nil {
 		return nil, 0, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 	}
-
-	log.Printf(queryString)
 
 	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v "+queryString+"order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema, intID)
 	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation where stream_id = %v", gdb.Schema, intID)

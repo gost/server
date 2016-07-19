@@ -94,7 +94,7 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL stri
 	var things = []*entities.Thing{}
 	for rows.Next() {
 		var thingID interface{}
-		var description string
+		var name, description string
 		var properties *string
 
 		var params []interface{}
@@ -109,6 +109,9 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL stri
 		for _, p := range qp {
 			if p == "id" {
 				params = append(params, &thingID)
+			}
+			if p == "name" {
+				params = append(params, &name)
 			}
 			if p == "description" {
 				params = append(params, &description)
@@ -130,6 +133,7 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL stri
 
 		thing := entities.Thing{}
 		thing.ID = thingID
+		thing.Name = name
 		thing.Description = description
 		thing.Properties = propMap
 
@@ -149,8 +153,8 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL stri
 func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, error) {
 	jsonProperties, _ := json.Marshal(thing.Properties)
 	var thingID int
-	sql := fmt.Sprintf("INSERT INTO %s.thing (description, properties) VALUES ($1, $2) RETURNING id", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, thing.Description, jsonProperties).Scan(&thingID)
+	sql := fmt.Sprintf("INSERT INTO %s.thing (name, description, properties) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, thing.Name, thing.Description, jsonProperties).Scan(&thingID)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +173,10 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 
 	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+	}
+
+	if len(thing.Name) > 0 {
+		updates["name"] = thing.Name
 	}
 
 	if len(thing.Description) > 0 {

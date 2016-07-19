@@ -8,6 +8,7 @@ import (
 )
 
 var jsonSensor = `{
+    "name": "MySensor",
     "description": "SensorUp Tempomatic 2000",
     "encodingType": "http://schema.org/description",
     "metadata": "Calibration date:  Jan 1, 2014"
@@ -27,13 +28,14 @@ func TestMissingMandatoryParametersSensor(t *testing.T) {
 	//assert
 	assert.NotNil(t, err, "Sensor mandatory param description not filled in should have returned error")
 	if len(err) > 0 {
-		assert.Contains(t, fmt.Sprintf("%v", err[0]), "description")
+		assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
 	}
 }
 
 func TestMandatoryParametersExistSensor(t *testing.T) {
 	//arrange
 	sensor := &Sensor{
+		Name:         "test",
 		Description:  "test",
 		EncodingType: "test",
 		Metadata:     "test",

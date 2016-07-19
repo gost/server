@@ -107,6 +107,7 @@ func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (
 // ConvertLocationToFoi converts a location to FOI
 func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 	foi := &entities.FeatureOfInterest{}
+	foi.Name = l.Name
 	foi.Description = l.Description
 	foi.EncodingType = l.EncodingType
 	foi.Feature = l.Location

@@ -12,6 +12,7 @@ import (
 // and there are options to create a Things with a nested linked Location and Datastream.
 type Thing struct {
 	BaseEntity
+	Name                   string                 `json:"name,omitempty"`
 	Description            string                 `json:"description,omitempty"`
 	Properties             map[string]interface{} `json:"properties,omitempty"`
 	NavLocations           string                 `json:"Locations@iot.navigationLink,omitempty"`
@@ -29,7 +30,7 @@ func (t Thing) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a Thing
 func (t *Thing) GetPropertyNames() []string {
-	return []string{"id", "description", "properties"}
+	return []string{"id", "name", "description", "properties"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -46,6 +47,7 @@ func (t *Thing) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for Thing are available before posting.
 func (t *Thing) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+	CheckMandatoryParam(&err, t.Name, t.GetEntityType(), "name")
 	CheckMandatoryParam(&err, t.Description, t.GetEntityType(), "description")
 
 	if len(err) != 0 {

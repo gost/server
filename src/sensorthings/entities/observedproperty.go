@@ -8,11 +8,11 @@ import (
 )
 
 // ObservedProperty in SensorThings represents the physical phenomenon being observed by the Sensor. An ObserveProperty is
-// linked to a Datatream which can only have one ObserveProperty
+// linked to a Datastream which can only have one ObserveProperty
 type ObservedProperty struct {
 	BaseEntity
-	Description    string        `json:"description,omitempty"`
 	Name           string        `json:"name,omitempty"`
+	Description    string        `json:"description,omitempty"`
 	Definition     string        `json:"definition,omitempty"`
 	NavDatastreams string        `json:"Datastreams@iot.navigationLink,omitempty"`
 	Datastreams    []*Datastream `json:"Datastreams,omitempty"`
@@ -25,7 +25,7 @@ func (o ObservedProperty) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a ObservedProperty
 func (o *ObservedProperty) GetPropertyNames() []string {
-	return []string{"id", "description", "name", "definition"}
+	return []string{"id", "name", "description", "definition"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity

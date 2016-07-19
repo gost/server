@@ -84,7 +84,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 	for rows.Next() {
 		var id interface{}
 		var encodingType int
-		var description, metadata string
+		var name, description, metadata string
 
 		var params []interface{}
 		var qp []string
@@ -98,6 +98,9 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 		for _, p := range qp {
 			if p == "id" {
 				params = append(params, &id)
+			}
+			if p == "name" {
+				params = append(params, &name)
 			}
 			if p == "encodingType" {
 				params = append(params, &encodingType)
@@ -117,6 +120,7 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 
 		sensor := entities.Sensor{}
 		sensor.ID = id
+		sensor.Name = name
 		sensor.Description = description
 		sensor.Metadata = metadata
 		if encodingType != 0 {
@@ -138,8 +142,8 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
 	encoding, _ := entities.CreateEncodingType(sensor.EncodingType)
-	sql := fmt.Sprintf("INSERT INTO %s.sensor (description, encodingtype, metadata) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
+	sql := fmt.Sprintf("INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4) RETURNING id", gdb.Schema)
+	err := gdb.Db.QueryRow(sql, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
 	if err != nil {
 		return nil, err
 	}
@@ -169,6 +173,10 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 
 	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
+	}
+
+	if len(s.Name) > 0 {
+		updates["name"] = s.Name
 	}
 
 	if len(s.Description) > 0 {

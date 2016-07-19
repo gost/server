@@ -7,6 +7,7 @@ import (
 )
 
 var jsonThing = `{
+		"name": "thingy",
 		"description": "camping lantern",
 		"properties": {
 		"property1": "it’s waterproof"
@@ -27,13 +28,13 @@ func TestMissingMandatoryParametersThing(t *testing.T) {
 	//assert
 	assert.NotNil(t, err, "Thing mandatory param description not filled in should have returned error")
 	if len(err) > 0 {
-		assert.Contains(t, fmt.Sprintf("%v", err[0]), "description")
+		assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
 	}
 }
 
 func TestMandatoryParametersExistThing(t *testing.T) {
 	//arrange
-	thing := &Thing{Description: "test"}
+	thing := &Thing{Description: "test", Name: "thingy"}
 
 	//act
 	_, err := thing.ContainsMandatoryParams()

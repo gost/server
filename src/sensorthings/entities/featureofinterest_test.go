@@ -16,6 +16,6 @@ func TestMissingMandatoryParametersFeatureOfInterest(t *testing.T) {
 	//assert
 	assert.NotNil(t, err, "FeatureOfInterest mandatory param description not filled in should have returned error")
 	if len(err) > 0 {
-		assert.Contains(t, fmt.Sprintf("%v", err[0]), "description")
+		assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
 	}
 }

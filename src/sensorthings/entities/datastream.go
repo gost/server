@@ -11,6 +11,7 @@ import (
 // sense one ObservedProperty.
 type Datastream struct {
 	BaseEntity
+	Name                string                 `json:"name,omitempty"`
 	Description         string                 `json:"description,omitempty"`
 	UnitOfMeasurement   map[string]interface{} `json:"unitOfMeasurement,omitempty"`
 	ObservationType     string                 `json:"observationType,omitempty"`
@@ -32,7 +33,7 @@ func (d Datastream) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a Datastream
 func (d *Datastream) GetPropertyNames() []string {
-	return []string{"id", "description", "unitOfMeasurement", "observationType", "observedArea"}
+	return []string{"id", "name", "description", "unitOfMeasurement", "observationType", "observedArea"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
@@ -49,6 +50,7 @@ func (d *Datastream) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for a Datastream are available before posting
 func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+	CheckMandatoryParam(&err, d.Name, d.GetEntityType(), "name")
 	CheckMandatoryParam(&err, d.Description, d.GetEntityType(), "description")
 	CheckMandatoryParam(&err, d.UnitOfMeasurement, d.GetEntityType(), "unitOfMeasurement")
 	CheckMandatoryParam(&err, d.ObservationType, d.GetEntityType(), "observationType")

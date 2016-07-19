@@ -114,7 +114,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 	var datastreams = []*entities.Datastream{}
 	for rows.Next() {
 		var id interface{}
-		var description, unitofmeasurement string
+		var name, description, unitofmeasurement string
 		var observedarea *string
 		var ot int
 
@@ -130,6 +130,9 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 		for _, p := range qp {
 			if p == "id" {
 				params = append(params, &id)
+			}
+			if p == "name" {
+				params = append(params, &name)
 			}
 			if p == "description" {
 				params = append(params, &description)
@@ -159,6 +162,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 
 		datastream := entities.Datastream{}
 		datastream.ID = id
+		datastream.Name = name
 		datastream.Description = description
 		datastream.UnitOfMeasurement = unitOfMeasurementMap
 		datastream.ObservedArea = observedAreaMap
@@ -211,8 +215,8 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype) VALUES ($1, $2, %s, $3, $4, $5, $6) RETURNING id", gdb.Schema, geom)
-	err = gdb.Db.QueryRow(sql, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype) VALUES ($1, $2, $3, %s, $4, $5, $6, $7) RETURNING id", gdb.Schema, geom)
+	err = gdb.Db.QueryRow(sql, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
 	if err != nil {
 		return nil, err
 	}
@@ -237,6 +241,10 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 
 	if intID, ok = ToIntID(id); !ok || !gdb.DatastreamExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	}
+
+	if len(ds.Name) > 0 {
+		updates["name"] = ds.Name
 	}
 
 	if len(ds.Description) > 0 {

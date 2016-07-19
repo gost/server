@@ -15,14 +15,6 @@ import (
 
 var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
 
-// GetTotalLocations returns totalnumber of locations
-func (gdb *GostDatabase) GetTotalLocations() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.location", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
-}
-
 // GetLocation retrieves the location for the given id from the database
 func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(id)
@@ -89,7 +81,7 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL s
 	for rows.Next() {
 		var sensorID interface{}
 		var encodingType int
-		var description, location string
+		var name, description, location string
 
 		var params []interface{}
 		var qp []string
@@ -106,6 +98,9 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL s
 			}
 			if p == "encodingType" {
 				params = append(params, &encodingType)
+			}
+			if p == "name" {
+				params = append(params, &name)
 			}
 			if p == "description" {
 				params = append(params, &description)
@@ -127,6 +122,7 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL s
 
 		l := entities.Location{}
 		l.ID = sensorID
+		l.Name = name
 		l.Description = description
 		l.Location = locationMap
 		if encodingType != 0 {
@@ -150,8 +146,8 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
 
-	sql := fmt.Sprintf("INSERT INTO %s.location (description, encodingtype, location) VALUES ($1, $2, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql, location.Description, encoding.Code).Scan(&locationID)
+	sql := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, location) VALUES ($1, $2, $3, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql, location.Name, location.Description, encoding.Code).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +177,10 @@ func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*e
 
 	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
+	if len(l.Name) > 0 {
+		updates["name"] = l.Name
 	}
 
 	if len(l.Description) > 0 {
