@@ -9,7 +9,6 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"log"
 )
 
 // GetObservation returns an observation by id
