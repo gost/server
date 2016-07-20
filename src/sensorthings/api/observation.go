@@ -9,6 +9,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"log"
 )
 
 // GetObservation returns an observation by id
@@ -79,33 +80,6 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}, nil
 }
 
-/*
-// GetLocationByDatastreamID return Location object for Datastream
-// todo: make 1 query instead of 3...
-func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (*entities.Location, error) {
-	db := *gdb
-	dID := toStringID(datastreamID)
-	return GetLocationByDatastreamID
-	_, err := db.GetDatastream(dID, nil)
-	if err != nil {
-		return nil, errors.New("Datastream not found")
-	}
-
-	thing, err := db.GetThingByDatastream(dID, nil)
-	if err != nil {
-		return nil, errors.New("Thing by datastream not found")
-	}
-
-	l, _, err := db.GetLocationsByThing(thing.ID, nil)
-	if err != nil || len(l) == 0 {
-		return nil, err
-	}
-
-	// return the first location in the list
-	return l[0], nil
-}
-*/
-
 // ConvertLocationToFoi converts a location to FOI
 func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 	foi := &entities.FeatureOfInterest{}
@@ -175,8 +149,6 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		}
 		observation.FeatureOfInterest = foi
 	}
-
-	return observation, nil
 
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {

@@ -45,7 +45,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 	return processLocations(gdb.Db, sql, qo, countSQL)
 }
 
-// GetLocationByObservation returns a location linked to an observation
+// GetLocationByDatastreamID returns a location linked to an observation
 func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}) (*entities.Location, error) {
 	intID, ok := ToIntID(datastreamID)
 	if !ok {
