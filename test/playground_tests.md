@@ -17,6 +17,7 @@ Request:
 ```sh
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json"  -d '{
     "description": "my thermometer",
+    "name":"BertThermometer",
     "properties": {
         "organisation": "Geodan",
         "owner": "Bert"
@@ -32,6 +33,7 @@ Response:
    "@iot.id": "5",
    "@iot.selfLink": "http://localhost:8080/v1.0/Things(5)",
    "description": "my thermometer",
+   "name":"BertThermometer",
    "properties": {
       "organisation": "Geodan",
       "owner": "Bert"
@@ -51,6 +53,7 @@ Request:
 ```sh
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{
     "description": "my backyard",
+    "name": "my backyard",
     "encodingType": "application/vnd.geo+json",
     "location": {
         "type": "Point",
@@ -68,6 +71,7 @@ Response:
 {
   "@iot.id": "1",
   "@iot.selfLink": "http://localhost:8080/v1.0/Locations(1)",
+  "name": "my backyard",
   "description": "my backyard",
   "encodingType": "application/vnd.geo+json",
   "location": {
@@ -122,6 +126,7 @@ Request:
 ```sh
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{        
     "description": "Thermometer",
+    "name": "thermometer",
     "encodingType": "application/pdf",
     "metadata": "https://en.wikipedia.org/wiki/Thermometer"
 }' "http://localhost:8080/v1.0/Sensors"
@@ -136,6 +141,7 @@ Response:
    "@iot.id": "1",
    "@iot.selfLink": "http://localhost:8080/v1.0/Sensors(1)",
    "description": "Thermometer",
+   "name": "thermometer",
    "encodingType": "application/pdf",
    "metadata": "https://en.wikipedia.org/wiki/Thermometer"
 }
@@ -156,6 +162,7 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
     },
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "Thermometer readings",
+  "name": "Thermometer_readings",
   "Thing": {"@iot.id": {Thing.@iot.id}},
   "ObservedProperty": {"@iot.id": {ObservedProperty.@iot.id}},
   "Sensor": {"@iot.id": {Sensor.@iot.id}}
@@ -171,6 +178,7 @@ Response:
    "@iot.id": "8",
    "@iot.selfLink": "http://localhost:8080/v1.0/Datastreams(8)",
    "description": "Thermometer readings",
+   "name": "Thermometer_readings",
    "unitOfMeasurement": {
       "definition": "http://unitsofmeasure.org/ucum.html#para-30",
       "name": "degree Celsius",
