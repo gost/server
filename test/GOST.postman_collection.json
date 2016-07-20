@@ -175,13 +175,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468924908535,
+			"time": 1469016482550,
 			"name": "POST Datastream deep insert",
 			"description": "",
 			"collectionId": "9f793bdb-1801-6cd2-ea41-5b8442e12469",
 			"responses": [],
-			"rawModeData": "{\r\n    \"name\": \"DS3\",\r\n    \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"name\": \"My Sensor\",\r\n            \"description\": \"SensorUp Tempomatic 1000-b\",\r\n            \"encodingType\": \"http://schema.org/description\",\r\n            \"metadata\": \"Calibration date:  Jan 11, 2015\"\r\n        },\r\n         \"Thing\": {\"@iot.id\": \"15\"}\r\n}",
-			"folder": "e2d931c8-b2bd-189b-beb1-4f1abe42c69d"
+			"rawModeData": "{\r\n    \"name\": \"DS3\",\r\n    \"unitOfMeasurement\": {\r\n            \"name\": \"Celsius\",\r\n            \"symbol\": \"C\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html#Celsius\"\r\n        },\r\n        \"description\": \"Temperature measurement\",\r\n        \"observationType\": \"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement\",\r\n        \"ObservedProperty\": {\r\n            \"name\": \"Temperature\",\r\n            \"definition\": \"http://www.qudt.org/qudt/owl/1.0.0/quantity/Instances.html#Temperature\",\r\n            \"description\": \"Temperature of the camping site\"\r\n        },\r\n        \"Sensor\": {\r\n            \"name\": \"My Sensor\",\r\n            \"description\": \"SensorUp Tempomatic 1000-b\",\r\n            \"encodingType\": \"http://schema.org/description\",\r\n            \"metadata\": \"Calibration date:  Jan 11, 2015\"\r\n        },\r\n         \"Thing\": {\"@iot.id\": \"4\"}\r\n}"
 		},
 		{
 			"id": "03d2b9d3-e09e-adab-1c0c-d8b117d87acc",
@@ -533,13 +532,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468924525228,
+			"time": 1469016469420,
 			"name": "POST Observation",
 			"description": "",
 			"collectionId": "9f793bdb-1801-6cd2-ea41-5b8442e12469",
 			"responses": [],
-			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"234\"}\r\n}",
-			"folder": "da433139-0bd9-e140-82da-fbc5748ed000"
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"2\"}\r\n}"
 		},
 		{
 			"id": "513fa8c9-5d62-dff9-d0e0-0d04994283c9",
@@ -617,13 +615,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468924525228,
+			"time": 1469016458967,
 			"name": "POST Observation with FeatureOfInterest ",
 			"description": "",
 			"collectionId": "9f793bdb-1801-6cd2-ea41-5b8442e12469",
 			"responses": [],
-			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"234\"}\r\n}",
-			"folder": "da433139-0bd9-e140-82da-fbc5748ed000"
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"2\"},\r\n  \"FeatureOfInterest\": {\r\n    \"name\": \"Awesome FOI\",\r\n    \"description\": \"Underground Air Quality in NYC train tunnels\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"feature\": {\r\n        \"coordinates\": [51.08386,-114.13036],\r\n        \"type\": \"Point\"\r\n      }\r\n  }\r\n}"
 		},
 		{
 			"id": "661c4349-162b-8d0b-668b-e90c8bc3d94c",
@@ -680,13 +677,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468924525228,
+			"time": 1469016485422,
 			"name": "POST Observation with FeatureOfInterest id",
 			"description": "",
 			"collectionId": "9f793bdb-1801-6cd2-ea41-5b8442e12469",
 			"responses": [],
-			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"234\"}\r\n}",
-			"folder": "da433139-0bd9-e140-82da-fbc5748ed000"
+			"rawModeData": "{\r\n  \"phenomenonTime\": \"2015-04-13T00:00:00+02:00\",\r\n  \"result\" : 38,\r\n  \"Datastream\":{\"@iot.id\":\"234\"}\r\n  \"FeatureOfInterest\":{\"@iot.id\":\"2\"}\r\n}"
 		},
 		{
 			"id": "69e3201d-95d1-60f5-4fe2-e57a7bec963d",
@@ -1594,7 +1590,7 @@
 		{
 			"id": "f1152305-fa74-5c54-7349-77954288fff9",
 			"headers": "Accept: application/json\nContent-Type: application/json\n",
-			"url": "localhost:8080/v1.0/Things(1)/Locations",
+			"url": "localhost:8080/v1.0/Things(4)/Locations",
 			"preRequestScript": null,
 			"pathVariables": {},
 			"method": "POST",
@@ -1604,13 +1600,12 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1468924831679,
+			"time": 1469016476609,
 			"name": "POST Location by thing",
 			"description": "",
 			"collectionId": "9f793bdb-1801-6cd2-ea41-5b8442e12469",
 			"responses": [],
-			"rawModeData": "{\r\n    \"name\": \"Somewhere\",\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}",
-			"folder": "84044347-1599-f4a9-a9c7-867208a9eb4c"
+			"rawModeData": "{\r\n    \"name\": \"Somewhere\",\r\n    \"description\": \"my backyard\",\r\n    \"encodingType\": \"application/vnd.geo+json\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [-117.123,\r\n        54.123]\r\n    }\r\n}"
 		},
 		{
 			"id": "fe347ec7-e4bb-e08f-e0f8-dc78bbc6433e",
