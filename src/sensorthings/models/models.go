@@ -111,6 +111,7 @@ type Database interface {
 	GetLocations(qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
 	GetLocationsByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
 	GetLocationsByThing(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
+	GetLocationByDatastreamID(id interface{}) (*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
 	LinkLocation(id interface{}, locationID interface{}) error
 	PatchLocation(interface{}, *entities.Location) (*entities.Location, error)

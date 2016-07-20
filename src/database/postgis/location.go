@@ -45,6 +45,17 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 	return processLocations(gdb.Db, sql, qo, countSQL)
 }
 
+// GetLocationByObservation returns a location linked to an observation
+func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}) (*entities.Location, error) {
+	intID, ok := ToIntID(datastreamID)
+	if !ok {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	}
+
+	sql := fmt.Sprintf("SELECT "+CreateSelectString(&entities.Location{}, nil, "location.", "", lMapping)+" FROM %s.location INNER JOIN %s.thing_to_location on location.id = thing_to_location.location_id INNER JOIN %s.datastream on thing_to_location.thing_id = datastream.thing_id WHERE datastream.id = %v ORDER BY location.id DESC LIMIT 1", gdb.Schema, gdb.Schema, gdb.Schema, intID)
+	return processLocation(gdb.Db, sql, nil)
+}
+
 // GetLocationsByThing retrieves all locations linked to the given thing
 func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, error) {
 	intID, ok := ToIntID(thingID)

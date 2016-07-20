@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/geodan/gost/src/database/postgis"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -80,11 +79,13 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}, nil
 }
 
+/*
 // GetLocationByDatastreamID return Location object for Datastream
 // todo: make 1 query instead of 3...
 func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (*entities.Location, error) {
 	db := *gdb
 	dID := toStringID(datastreamID)
+	return GetLocationByDatastreamID
 	_, err := db.GetDatastream(dID, nil)
 	if err != nil {
 		return nil, errors.New("Datastream not found")
@@ -103,6 +104,7 @@ func GetLocationByDatastreamID(gdb *models.Database, datastreamID interface{}) (
 	// return the first location in the list
 	return l[0], nil
 }
+*/
 
 // ConvertLocationToFoi converts a location to FOI
 func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
@@ -118,30 +120,32 @@ func ConvertLocationToFoi(l *entities.Location) *entities.FeatureOfInterest {
 // CopyLocationToFoi copies the location of the thing to the FeatureOfInterest table. If it already
 // exist, returns only the existing FeatureOfInterest ID
 func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, error) {
-	var result string
 	db := *gdb
-	l, _ := GetLocationByDatastreamID(gdb, datastreamID)
+	var result string
+	var l *entities.Location
+	var err error
 
-	var featureOfInterest *entities.FeatureOfInterest
-	if l != nil {
-		// now check if the locationid already exists in featureofinterest.orginal_location id
-		featureOfInterest, _ = db.GetFeatureOfInterestByLocationID(l.ID)
-		if featureOfInterest == nil {
-			// if the FeatureOfInterest does not exist already, create it now
-			NewFeatureOfInterest := ConvertLocationToFoi(l)
-			CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
-			if err != nil {
-				return "", err
-			}
-			result = toStringID(CreatedFeatureOfInterest.ID)
-		} else {
-			result = toStringID(featureOfInterest.ID)
-		}
-
-		return result, nil
+	if l, err = db.GetLocationByDatastreamID(datastreamID); err != nil {
+		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 	}
 
-	return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
+	var featureOfInterest *entities.FeatureOfInterest
+
+	// now check if the locationid already exists in featureofinterest.orginal_location id
+	featureOfInterest, _ = db.GetFeatureOfInterestByLocationID(l.ID)
+	if featureOfInterest == nil {
+		// if the FeatureOfInterest does not exist already, create it now
+		NewFeatureOfInterest := ConvertLocationToFoi(l)
+		CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
+		if err != nil {
+			return "", err
+		}
+		result = toStringID(CreatedFeatureOfInterest.ID)
+	} else {
+		result = toStringID(featureOfInterest.ID)
+	}
+
+	return result, nil
 }
 
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
@@ -153,16 +157,9 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 	datastreamID := observation.Datastream.ID
 
-	intID, _ := postgis.ToIntID(datastreamID)
-	exists := a.db.DatastreamExists(intID)
-	if !exists {
-		errorMessage := fmt.Sprintf("Datastream %d does not exist.", intID)
-		return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage))}
-	}
-
 	// there is no foi posted: try to copy it from thing.location...
 	if observation.FeatureOfInterest == nil {
-		foiID, err := CopyLocationToFoi(&a.db, toStringID(datastreamID))
+		foiID, err := CopyLocationToFoi(&a.db, datastreamID)
 
 		if err != nil {
 			errorMessage := "Unable to copy location of thing to featureofinterest."
@@ -178,6 +175,8 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		}
 		observation.FeatureOfInterest = foi
 	}
+
+	return observation, nil
 
 	no, err2 := a.db.PostObservation(observation)
 	if err2 != nil {
