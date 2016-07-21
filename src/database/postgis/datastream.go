@@ -20,6 +20,30 @@ func (gdb *GostDatabase) GetTotalDatastreams() int {
 	return totalDatastreams
 }
 
+// GetObservedArea returns the observed area of all observations of datastream
+func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
+
+	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
+	sql := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
+	rows, err := gdb.Db.Query(sql)
+	var geom string
+	var propMap map[string]interface{}
+	defer rows.Close()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		err := rows.Scan(&geom)
+
+		if err == nil {
+			propMap, _ = JSONToMap(&geom)
+		}
+	}
+	return propMap, err
+}
+
 // GetDatastream retrieves a datastream by id
 func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
 	intID, ok := ToIntID(id)
@@ -32,6 +56,8 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 	if err != nil {
 		return nil, err
 	}
+	observedArea, _ := gdb.GetObservedArea(intID)
+	datastream.ObservedArea = observedArea
 
 	return datastream, nil
 }
