@@ -160,7 +160,7 @@ func TimeRangeToString(start, end *string) string {
 	return ""
 }
 
-// ToIntID converts an interface to int id used for the id's in teh database
+// ToIntID converts an interface to int id used for the id's in the database
 func ToIntID(id interface{}) (int, bool) {
 	switch t := id.(type) {
 	case string:
@@ -265,7 +265,7 @@ func CreateTopSkipQueryString(qo *odata.QueryOptions) string {
 	return q
 }
 
-// CreateFilterQueryString converts an odata query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
+// CreateFilterQueryString converts an OData query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
 // ParamFactory is used for converting SensorThings parameter names to postgres field names
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
@@ -282,7 +282,7 @@ func CreateFilterQueryString(qo *odata.QueryOptions, paramFactory func(string, i
 				return "", err
 			}
 
-			if operator, err = OdataOperatorToPostreSQL(p.Operator); err != nil {
+			if operator, err = OdataOperatorToPostgreSQL(p.Operator); err != nil {
 				return "", err
 			}
 
@@ -297,39 +297,29 @@ func CreateFilterQueryString(qo *odata.QueryOptions, paramFactory func(string, i
 	return q, nil
 }
 
-// OdataOperatorToPostreSQL converts an odata.OdataOperator to a PostgreSQL string representation
-func OdataOperatorToPostreSQL(o odata.Operator) (string, error) {
+// OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
+func OdataOperatorToPostgreSQL(o odata.Operator) (string, error) {
 	switch o {
 	case odata.And:
 		return "AND", nil
-		break
 	case odata.Or:
 		return "OR", nil
-		break
 	case odata.Not:
 		return "NOT", nil
-		break
 	case odata.Equals:
 		return "=", nil
-		break
 	case odata.NotEquals:
 		return "!=", nil
-		break
 	case odata.GreaterThan:
 		return ">", nil
-		break
 	case odata.GreaterThanOrEquals:
 		return ">=", nil
-		break
 	case odata.LessThan:
 		return "<", nil
-		break
 	case odata.LessThanOrEquals:
 		return "<=", nil
-		break
 	case odata.IsNull:
 		return "IS NULL", nil
-		break
 	}
 
 	return "", fmt.Errorf("Operator %v not implemented", o.ToString())
