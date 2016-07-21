@@ -109,6 +109,16 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 	return &formatted, nil
 }
 
+// Contains checks a string array
+func Contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 // JSONToMap converts a string of json into a map
 func JSONToMap(data *string) (map[string]interface{}, error) {
 	var p map[string]interface{}

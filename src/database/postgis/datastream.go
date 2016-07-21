@@ -58,9 +58,14 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 	}
 
 	// calculate observedarea on the fly when not present in database
-	if datastream.ObservedArea == nil {
-		observedArea, _ := gdb.GetObservedArea(intID)
-		datastream.ObservedArea = observedArea
+	if qo.QuerySelect != nil {
+		contains := Contains(qo.QuerySelect.Params, "observedArea")
+		if contains {
+			if datastream.ObservedArea == nil {
+				observedArea, _ := gdb.GetObservedArea(intID)
+				datastream.ObservedArea = observedArea
+			}
+		}
 	}
 
 	return datastream, nil
