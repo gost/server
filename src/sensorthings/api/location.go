@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -43,8 +44,8 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 	if thingID != nil {
 		err2 = a.LinkLocation(thingID, l.ID)
 		if err2 != nil {
-			err2 := a.DeleteLocation(l.ID)
-			if err2 != nil {
+			err3 := a.DeleteLocation(l.ID)
+			if err3 != nil {
 				log.Printf("Error rolling back location %v", err2)
 			}
 
