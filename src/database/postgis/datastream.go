@@ -12,13 +12,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
-var totalDatastreams int
 var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
-
-// GetTotalDatastreams returns the amount of datastreams in the database
-func (gdb *GostDatabase) GetTotalDatastreams() int {
-	return totalDatastreams
-}
 
 // GetObservedArea returns the observed area of all observations of datastream
 func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
@@ -266,7 +260,6 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 	d.Sensor = nil
 	d.ObservedProperty = nil
 
-	totalDatastreams++
 	return d, nil
 }
 
@@ -318,22 +311,7 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 
 // DeleteDatastream tries to delete a Datastream by the given id
 func (gdb *GostDatabase) DeleteDatastream(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.datastream WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("Datastream not found"))
-	}
-
-	totalDatastreams--
-	return nil
+	return DeleteEntity(gdb, id, "datastream")
 }
 
 // DatastreamExists checks if a Datastream is present in the database based on a given id

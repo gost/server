@@ -2,6 +2,7 @@ package postgis
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,10 +11,10 @@ import (
 	"strconv"
 	"strings"
 
+	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
-
 	_ "github.com/lib/pq" // postgres driver
 )
 
@@ -117,6 +118,26 @@ func Contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// DeleteEntity deletes a record from database for entity
+func DeleteEntity(gdb *GostDatabase, id interface{}, entityName string) error {
+	intID, ok := ToIntID(id)
+	if !ok {
+		errorMessage := fmt.Sprintf("%s does not exist", entityName)
+		return gostErrors.NewRequestNotFound(errors.New(errorMessage))
+	}
+
+	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.%s WHERE id = $1", gdb.Schema, entityName), intID)
+	if err != nil {
+		return err
+	}
+
+	if c, _ := r.RowsAffected(); c == 0 {
+		errorMessage := fmt.Sprintf("%s not found", entityName)
+		return gostErrors.NewRequestNotFound(errors.New(errorMessage))
+	}
+	return nil
 }
 
 // JSONToMap converts a string of json into a map

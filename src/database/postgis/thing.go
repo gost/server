@@ -234,18 +234,5 @@ func (gdb *GostDatabase) ThingExists(thingID interface{}) bool {
 
 // DeleteThing tries to delete a Thing by the given id
 func (gdb *GostDatabase) DeleteThing(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.thing WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("Thing not found"))
-	}
-	return nil
+	return DeleteEntity(gdb, id, "thing")
 }

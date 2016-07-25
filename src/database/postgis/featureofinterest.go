@@ -197,21 +197,7 @@ func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.Fe
 
 // DeleteFeatureOfInterest tries to delete a FeatureOfInterest by the given id
 func (gdb *GostDatabase) DeleteFeatureOfInterest(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.featureofinterest WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest not found"))
-	}
-
-	return nil
+	return DeleteEntity(gdb, id, "featureofinterest")
 }
 
 // FeatureOfInterestExists checks if a FeatureOfInterest is present in the database based on a given id.

@@ -217,22 +217,8 @@ func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*e
 }
 
 // DeleteLocation removes a given location from the database
-func (gdb *GostDatabase) DeleteLocation(locationID interface{}) error {
-	intID, ok := ToIntID(locationID)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
-	}
-
-	sql := fmt.Sprintf("DELETE FROM %s.location WHERE id = $1", gdb.Schema)
-	r, err := gdb.Db.Exec(sql, intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("Location not found"))
-	}
-	return nil
+func (gdb *GostDatabase) DeleteLocation(id interface{}) error {
+	return DeleteEntity(gdb, id, "location")
 }
 
 // LinkLocation links a thing with a location

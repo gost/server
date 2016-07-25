@@ -300,19 +300,5 @@ func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observatio
 
 // DeleteObservation tries to delete a Observation by the given id
 func (gdb *GostDatabase) DeleteObservation(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.observation WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("Observation not found"))
-	}
-
-	return nil
+	return DeleteEntity(gdb, id, "observation")
 }

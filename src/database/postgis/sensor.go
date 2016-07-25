@@ -202,19 +202,5 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 
 // DeleteSensor tries to delete a Sensor by the given id
 func (gdb *GostDatabase) DeleteSensor(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.sensor WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("Sensor not found"))
-	}
-
-	return nil
+	return DeleteEntity(gdb, id, "sensor")
 }

@@ -190,19 +190,5 @@ func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.Hi
 
 // DeleteHistoricalLocation tries to delete a HistoricalLocation by the given id
 func (gdb *GostDatabase) DeleteHistoricalLocation(id interface{}) error {
-	intID, ok := ToIntID(id)
-	if !ok {
-		return gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
-	}
-
-	r, err := gdb.Db.Exec(fmt.Sprintf("DELETE FROM %s.historicallocation WHERE id = $1", gdb.Schema), intID)
-	if err != nil {
-		return err
-	}
-
-	if c, _ := r.RowsAffected(); c == 0 {
-		return gostErrors.NewRequestNotFound(errors.New("HistoricalLocation not found"))
-	}
-
-	return nil
+	return DeleteEntity(gdb, id, "historicallocation")
 }
