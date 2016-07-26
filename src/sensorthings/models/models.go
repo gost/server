@@ -30,6 +30,7 @@ type API interface {
 	GetThings(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	PostThing(thing *entities.Thing) (*entities.Thing, []error)
 	PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error)
+	PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, []error)
 	DeleteThing(id interface{}) error
 
 	GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error)
@@ -105,6 +106,7 @@ type Database interface {
 	GetThings(qo *odata.QueryOptions) (t []*entities.Thing, count int, e error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
 	PatchThing(interface{}, *entities.Thing) (*entities.Thing, error)
+	PutThing(interface{}, *entities.Thing) (*entities.Thing, error)
 	DeleteThing(id interface{}) error
 
 	GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error)

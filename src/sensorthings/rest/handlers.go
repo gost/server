@@ -97,6 +97,14 @@ func HandlePatchThing(w http.ResponseWriter, r *http.Request, endpoint *models.E
 	handlePatchRequest(w, endpoint, r, thing, &handle)
 }
 
+// HandlePutThing patches a thing by given id
+func HandlePutThing(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	thing := &entities.Thing{}
+	handle := func() (interface{}, []error) { return a.PutThing(getEntityID(r), thing) }
+	handlePutRequest(w, endpoint, r, thing, &handle)
+}
+
 // HandleGetObservedProperty retrieves an ObservedProperty by id
 func HandleGetObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
@@ -630,6 +638,31 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 	w.Header().Add("Location", entity.GetSelfLink())
 
 	sendJSONResponse(w, http.StatusCreated, data, nil)
+}
+
+// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
+func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	if !checkContentType(w, r) {
+		return
+	}
+
+	byteData, _ := ioutil.ReadAll(r.Body)
+	err := entity.ParseEntity(byteData)
+	if err != nil {
+		sendError(w, []error{err})
+		return
+	}
+
+	handle := *h
+	data, err2 := handle()
+	if err2 != nil {
+		sendError(w, err2)
+		return
+	}
+
+	w.Header().Add("Location", entity.GetSelfLink())
+	sendJSONResponse(w, http.StatusOK, data, nil)
 }
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this

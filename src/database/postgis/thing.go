@@ -163,6 +163,26 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 	return thing, nil
 }
 
+// PutThing receives a Thing entity and changes it in the database
+// returns the adapted Thing
+func (gdb *GostDatabase) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
+	var intID int
+	var ok bool
+	jsonProperties, _ := json.Marshal(thing.Properties)
+	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+	}
+
+	sql := fmt.Sprintf("update %s.thing set name=$1, description=$2, properties = $3 where id = $4", gdb.Schema)
+	_, err := gdb.Db.Exec(sql, thing.Name, thing.Description, jsonProperties, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	nt, _ := gdb.GetThing(intID, nil)
+	return nt, nil
+}
+
 // PatchThing receives a to be patched Thing entity and changes it in the database
 // returns the patched Thing
 func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {

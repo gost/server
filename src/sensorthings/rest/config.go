@@ -87,7 +87,7 @@ func createThings(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/Things", HandlePostThing},
 			{models.HTTPOperationDelete, "/v1.0/Things{id}", HandleDeleteThing},
 			{models.HTTPOperationPatch, "/v1.0/Things{id}", HandlePatchThing},
-			{models.HTTPOperationPut, "/v1.0/Things{id}", HandlePatchThing},
+			{models.HTTPOperationPut, "/v1.0/Things{id}", HandlePutThing},
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Things", HandleGetThings},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Things{id}", HandleGetThing},
@@ -104,7 +104,7 @@ func createThings(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/Things", HandlePostThing},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/Things{id}", HandleDeleteThing},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/Things{id}", HandlePatchThing},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/Things{id}", HandlePatchThing},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/Things{id}", HandlePutThing},
 		},
 	}
 }
