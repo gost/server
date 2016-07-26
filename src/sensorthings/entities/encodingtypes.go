@@ -32,6 +32,15 @@ var EncodingValues = []EncodingType{
 	EncodingTypeDescription,
 }
 
+//GetSupportedEncodings returns a list of supported encodings
+func GetSupportedEncodings() string {
+	var supportedEncodings string
+	for _, k := range EncodingValues {
+		supportedEncodings += k.Value + ", "
+	}
+	return supportedEncodings
+}
+
 // CreateEncodingType returns the int representation for a given encoding, returns an error when encoding is not supported
 func CreateEncodingType(encoding string) (EncodingType, error) {
 	for _, k := range EncodingValues {
@@ -39,6 +48,6 @@ func CreateEncodingType(encoding string) (EncodingType, error) {
 			return k, nil
 		}
 	}
-
-	return EncodingUnknown, errors.New("Encoding not supported")
+	supportedEncodings := GetSupportedEncodings()
+	return EncodingUnknown, errors.New("Encoding not supported. Supported encodings:" + supportedEncodings)
 }

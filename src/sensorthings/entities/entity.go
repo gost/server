@@ -1,7 +1,6 @@
 package entities
 
 import (
-	"errors"
 	"fmt"
 
 	gostErrors "github.com/geodan/gost/src/errors"
@@ -180,19 +179,11 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 
 // CheckEncodingSupported returns true of the Location entity supports the given encoding type
 func CheckEncodingSupported(entity Entity, encodingType string) (bool, error) {
-	notSupported := gostErrors.NewBadRequestError(errors.New("encodingType not supported"))
-	encoding, err := CreateEncodingType(encodingType)
+	_, err := CreateEncodingType(encodingType)
 	if err != nil {
-		return false, notSupported
+		return false, err
 	}
-
-	supportedEncodings := entity.GetSupportedEncoding()
-	_, ok := supportedEncodings[encoding.Code]
-	if ok {
-		return true, nil
-	}
-
-	return false, notSupported
+	return true, nil
 }
 
 // CreateEntitySelfLink formats the given parameters into an external navigationlink to the entity

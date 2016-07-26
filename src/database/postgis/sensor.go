@@ -141,11 +141,15 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 // PostSensor posts a sensor to the database
 func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, error) {
 	var sensorID int
-	encoding, _ := entities.CreateEncodingType(sensor.EncodingType)
+	encoding, err1 := entities.CreateEncodingType(sensor.EncodingType)
+	if err1 != nil {
+		return nil, err1
+	}
+
 	sql := fmt.Sprintf("INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4) RETURNING id", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
-	if err != nil {
-		return nil, err
+	err2 := gdb.Db.QueryRow(sql, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
+	if err2 != nil {
+		return nil, err2
 	}
 
 	sensor.ID = sensorID
