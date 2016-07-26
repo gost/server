@@ -155,42 +155,6 @@ func JSONToMap(data *string) (map[string]interface{}, error) {
 	return p, nil
 }
 
-// ConvertNullString converts a scanned value from ro into a usable string
-func ConvertNullString(value *string) string {
-	if value == nil {
-		return ""
-	}
-
-	return fmt.Sprintf("%s", *value)
-}
-
-// PrepareTimeRangeForPostgres splits an incoming timerange by the / delimiter and returns the start
-// and end value, if it can't be splitted the function will return the start value also as end
-func PrepareTimeRangeForPostgres(timeRange string) string {
-	if len(timeRange) == 0 {
-		return "NULL"
-	}
-
-	s := strings.Split(timeRange, "/")
-	if len(s) == 1 {
-		return fmt.Sprintf("tstzrange('%s', NULL)", s[0])
-	}
-
-	return fmt.Sprintf("tstzrange('%s','%s')", s[0], s[1])
-}
-
-// TimeRangeToString converts a start and end datetime string into a string valid time string (SensorThings spec)
-func TimeRangeToString(start, end *string) string {
-	if start != nil && end == nil {
-		return fmt.Sprintf("%s", *start)
-	}
-	if start != nil && end != nil {
-		return fmt.Sprintf("%s/%s", *start, *end)
-	}
-
-	return ""
-}
-
 // ToIntID converts an interface to int id used for the id's in the database
 func ToIntID(id interface{}) (int, bool) {
 	switch t := id.(type) {

@@ -149,8 +149,8 @@ func ParseODATAFilter(filterStr string) (*Predicate, error) {
 		return nil, errorInvalidFilter
 	}
 
-	fragment, error := parseFragment(filter)
-	return fragment, error
+	fragment, err := parseFragment(filter)
+	return fragment, err
 }
 
 var odataRegex = map[string]string{
