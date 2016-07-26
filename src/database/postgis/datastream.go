@@ -315,13 +315,6 @@ func (gdb *GostDatabase) DeleteDatastream(id interface{}) error {
 }
 
 // DatastreamExists checks if a Datastream is present in the database based on a given id
-func (gdb *GostDatabase) DatastreamExists(databaseID int) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.datastream WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, databaseID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) DatastreamExists(id int) bool {
+	return EntityExists(gdb, id, "datastream")
 }

@@ -168,15 +168,8 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 }
 
 // LocationExists checks if a location is present in the database based on a given id
-func (gdb *GostDatabase) LocationExists(locationID interface{}) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.location WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) LocationExists(id interface{}) bool {
+	return EntityExists(gdb, id, "location")
 }
 
 // PatchLocation updates a Location in the database

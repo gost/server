@@ -147,15 +147,8 @@ func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*e
 }
 
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
-func (gdb *GostDatabase) ObservedPropertyExists(thingID interface{}) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observedproperty WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) ObservedPropertyExists(id interface{}) bool {
+	return EntityExists(gdb, id, "observedproperty")
 }
 
 // PatchObservedProperty updates a ObservedProperty in the database

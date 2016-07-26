@@ -153,15 +153,8 @@ func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, 
 }
 
 // SensorExists checks if a sensor is present in the database based on a given id
-func (gdb *GostDatabase) SensorExists(thingID int) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.sensor WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) SensorExists(id int) bool {
+	return EntityExists(gdb, id, "sensor")
 }
 
 // PatchSensor updates a sensor in the database

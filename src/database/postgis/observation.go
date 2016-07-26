@@ -240,15 +240,8 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 }
 
 // ObservationExists checks if an Observation is present in the database based on a given id.
-func (gdb *GostDatabase) ObservationExists(intID interface{}) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.observation WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, intID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) ObservationExists(id interface{}) bool {
+	return EntityExists(gdb, id, "observation")
 }
 
 // PatchObservation updates a Observation in the database

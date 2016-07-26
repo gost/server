@@ -120,6 +120,18 @@ func Contains(s []string, e string) bool {
 	return false
 }
 
+// EntityExists checks if entity exists in database
+func EntityExists(gdb *GostDatabase, id interface{}, entityName string) bool {
+	var result bool
+	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.%s WHERE id = $1 LIMIT 1)", gdb.Schema, entityName)
+	err := gdb.Db.QueryRow(sql, id).Scan(&result)
+	if err != nil {
+		return false
+	}
+
+	return result
+}
+
 // DeleteEntity deletes a record from database for entity
 func DeleteEntity(gdb *GostDatabase, id interface{}, entityName string) error {
 	intID, ok := ToIntID(id)

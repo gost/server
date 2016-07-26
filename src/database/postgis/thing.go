@@ -221,15 +221,8 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 }
 
 // ThingExists checks if a thing is present in the database based on a given id
-func (gdb *GostDatabase) ThingExists(thingID interface{}) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM %s.thing WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, thingID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) ThingExists(id interface{}) bool {
+	return EntityExists(gdb, id, "thing")
 }
 
 // DeleteThing tries to delete a Thing by the given id

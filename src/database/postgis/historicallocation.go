@@ -154,15 +154,8 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 }
 
 // HistoricalLocationExists checks if a HistoricalLocation is present in the database based on a given id
-func (gdb *GostDatabase) HistoricalLocationExists(locationID interface{}) bool {
-	var result bool
-	sql := fmt.Sprintf("SELECT exists (SELECT 1 FROM  %s.historicallocation WHERE id = $1 LIMIT 1)", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, locationID).Scan(&result)
-	if err != nil {
-		return false
-	}
-
-	return result
+func (gdb *GostDatabase) HistoricalLocationExists(id interface{}) bool {
+	return EntityExists(gdb, id, "historicallocation")
 }
 
 // PatchHistoricalLocation updates a HistoricalLocation in the database
