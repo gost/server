@@ -3,7 +3,6 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"net/http"
 
 	"bytes"
@@ -569,126 +568,6 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 
 	qo, e := odata.CreateQueryOptions(query)
 	return qo, e
-}
-
-// handleGetRequest is the default function to handle incoming GET requests
-func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions, path string) (interface{}, error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-
-	// Parse query options from request
-	queryOptions, err := getQueryOptions(r)
-	if err != nil {
-		sendError(w, err)
-		return
-	}
-
-	// Check if the requested endpoints supports the parsed queries
-	endpoint := *e
-	_, err = endpoint.AreQueryOptionsSupported(queryOptions)
-	if err != nil {
-		sendError(w, err)
-		return
-	}
-
-	// Run the handler func such as Api.GetThingById
-	handler := *h
-	data, err2 := handler(queryOptions, fmt.Sprintf(r.Host+r.URL.Path))
-	if err2 != nil {
-		sendError(w, []error{err2})
-		return
-	}
-
-	sendJSONResponse(w, http.StatusOK, data, queryOptions)
-}
-
-// handlePostRequest
-func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func() error) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	handle := *h
-	err := handle()
-	if err != nil {
-		sendError(w, []error{err})
-		return
-	}
-
-	sendJSONResponse(w, http.StatusOK, nil, nil)
-}
-
-// handlePostRequest
-func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	if !checkContentType(w, r) {
-		return
-	}
-
-	byteData, _ := ioutil.ReadAll(r.Body)
-	err := entity.ParseEntity(byteData)
-	if err != nil {
-		sendError(w, []error{err})
-		return
-	}
-
-	handle := *h
-	data, err2 := handle()
-	if err2 != nil {
-		sendError(w, err2)
-		return
-	}
-
-	w.Header().Add("Location", entity.GetSelfLink())
-
-	sendJSONResponse(w, http.StatusCreated, data, nil)
-}
-
-// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
-func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	if !checkContentType(w, r) {
-		return
-	}
-
-	byteData, _ := ioutil.ReadAll(r.Body)
-	err := entity.ParseEntity(byteData)
-	if err != nil {
-		sendError(w, []error{err})
-		return
-	}
-
-	handle := *h
-	data, err2 := handle()
-	if err2 != nil {
-		sendError(w, err2)
-		return
-	}
-
-	w.Header().Add("Location", entity.GetSelfLink())
-	sendJSONResponse(w, http.StatusOK, data, nil)
-}
-
-// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
-func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
-	if !checkContentType(w, r) {
-		return
-	}
-
-	byteData, _ := ioutil.ReadAll(r.Body)
-	err := entity.ParseEntity(byteData)
-	if err != nil {
-		sendError(w, []error{err})
-		return
-	}
-
-	handle := *h
-	data, err2 := handle()
-	if err2 != nil {
-		sendError(w, []error{err2})
-		return
-	}
-
-	w.Header().Add("Location", entity.GetSelfLink())
-
-	sendJSONResponse(w, http.StatusOK, data, nil)
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
