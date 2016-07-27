@@ -55,3 +55,11 @@ func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *models.
 	handle := func() (interface{}, error) { return a.PatchSensor(getEntityID(r), sensor) }
 	handlePatchRequest(w, endpoint, r, sensor, &handle)
 }
+
+// HandlePatchSensor ...
+func HandlePutSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	sensor := &entities.Sensor{}
+	handle := func() (interface{}, []error) { return a.PutSensor(getEntityID(r), sensor) }
+	handlePutRequest(w, endpoint, r, sensor, &handle)
+}

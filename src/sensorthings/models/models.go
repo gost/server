@@ -92,6 +92,7 @@ type API interface {
 	PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error)
 	PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
+	PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error)
 
 	LinkLocation(thingID interface{}, locationID interface{}) error
 }
@@ -134,6 +135,7 @@ type Database interface {
 	GetSensors(qo *odata.QueryOptions) (s []*entities.Sensor, count int, e error)
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
 	PatchSensor(interface{}, *entities.Sensor) (*entities.Sensor, error)
+	PutSensor(interface{}, *entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
 
 	GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
@@ -103,6 +104,23 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 	}
 
 	return a.db.PatchSensor(id, sensor)
+}
+
+// PutSensor updates the given thing in the database
+func (a *APIv1) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error) {
+	var err []error
+	_, err = sensor.ContainsMandatoryParams()
+	if len(err) > 0 {
+		return nil, err
+	}
+	var err2 error
+	putsensor, err2 := a.db.PutSensor(id, sensor)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	putsensor.SetAllLinks(a.config.GetExternalServerURI())
+	return putsensor, nil
 }
 
 // DeleteSensor deletes a sensor from the database by given sensor id

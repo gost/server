@@ -324,7 +324,7 @@ func createSensors(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/Sensors", HandlePostSensors},
 			{models.HTTPOperationDelete, "/v1.0/Sensors{id}", HandleDeleteSensor},
 			{models.HTTPOperationPatch, "/v1.0/Sensors{id}", HandlePatchSensor},
-			{models.HTTPOperationPut, "/v1.0/Sensors{id}", HandlePatchSensor},
+			{models.HTTPOperationPut, "/v1.0/Sensors{id}", HandlePutSensor},
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Sensors", HandleGetSensors},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Sensors{id}", HandleGetSensor},
@@ -337,7 +337,7 @@ func createSensors(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/Sensors", HandlePostSensors},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/Sensors{id}", HandleDeleteSensor},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/Sensors{id}", HandlePatchSensor},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/Sensors{id}", HandlePatchSensor},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/Sensors{id}", HandlePutSensor},
 		},
 	}
 }
