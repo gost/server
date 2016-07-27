@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -194,10 +195,27 @@ func (a *APIv1) PostDatastreamByThing(thingID interface{}, datastream *entities.
 // PatchDatastream updates the given datastream in the database
 func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
 	if datastream.Observations != nil || datastream.Sensor != nil || datastream.ObservedProperty != nil || datastream.Thing != nil {
-		return nil, gostErrors.NewBadRequestError(errors.New("Unable to deep patch Datastream"))
+		return nil, gostErrors.NewBadRequestError(errors.New("Deep patch datastream not supported."))
 	}
 
 	return a.db.PatchDatastream(id, datastream)
+}
+
+// PutDatastream updates the given thing in the database
+func (a *APIv1) PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, []error) {
+	var err []error
+	_, err = datastream.ContainsMandatoryParams()
+	if len(err) > 0 {
+		return nil, err
+	}
+	var err2 error
+	putdatastream, err2 := a.db.PutDatastream(id, datastream)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	// putdatastream.SetAllLinks(a.config.GetExternalServerURI())
+	return putdatastream, nil
 }
 
 // DeleteDatastream deletes a datastream from the database

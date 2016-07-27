@@ -90,3 +90,11 @@ func HandlePatchDatastream(w http.ResponseWriter, r *http.Request, endpoint *mod
 	handle := func() (interface{}, error) { return a.PatchDatastream(getEntityID(r), ds) }
 	handlePatchRequest(w, endpoint, r, ds, &handle)
 }
+
+// HandlePutDatastream ...
+func HandlePutDatastream(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ds := &entities.Datastream{}
+	handle := func() (interface{}, []error) { return a.PutDatastream(getEntityID(r), ds) }
+	handlePutRequest(w, endpoint, r, ds, &handle)
+}

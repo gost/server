@@ -60,6 +60,7 @@ type API interface {
 	PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error)
 	PostDatastreamByThing(thingID interface{}, datastream *entities.Datastream) (*entities.Datastream, []error)
 	PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error)
+	PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, []error)
 	DeleteDatastream(id interface{}) error
 
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error)
@@ -145,6 +146,7 @@ type Database interface {
 	PatchDatastream(interface{}, *entities.Datastream) (*entities.Datastream, error)
 	DeleteDatastream(id interface{}) error
 	DatastreamExists(int) bool
+	PutDatastream(interface{}, *entities.Datastream) (*entities.Datastream, error)
 
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error)

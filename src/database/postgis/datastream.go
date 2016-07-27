@@ -214,24 +214,37 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 	return datastreams, count, nil
 }
 
+// CheckDatastreamRelationsExist check if the related entities exist
+func CheckDatastreamRelationsExist(gdb *GostDatabase, d *entities.Datastream) error {
+	var tID, sID, oID int
+	var ok bool
+
+	if tID, ok = ToIntID(d.Thing.ID); !ok || !gdb.ThingExists(tID) {
+		return gostErrors.NewBadRequestError(errors.New("Thing does not exist"))
+	}
+
+	if sID, ok = ToIntID(d.Sensor.ID); !ok || !gdb.SensorExists(sID) {
+		return gostErrors.NewBadRequestError(errors.New("Sensor does not exist"))
+	}
+
+	if oID, ok = ToIntID(d.ObservedProperty.ID); !ok || !gdb.ObservedPropertyExists(oID) {
+		return gostErrors.NewBadRequestError(errors.New("ObservedProperty does not exist"))
+	}
+	return nil
+}
+
 // PostDatastream todo
 // TODO: !!!!ADD phenomenonTime SUPPORT!!!!
 // TODO: !!!!ADD resulttime SUPPORT!!!!
 func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datastream, error) {
-	var dsID, tID, sID, oID int
-	var ok bool
-
-	if tID, ok = ToIntID(d.Thing.ID); !ok || !gdb.ThingExists(tID) {
-		return nil, gostErrors.NewBadRequestError(errors.New("Thing does not exist"))
+	err := CheckDatastreamRelationsExist(gdb, d)
+	if err != nil {
+		return nil, err
 	}
-
-	if sID, ok = ToIntID(d.Sensor.ID); !ok || !gdb.SensorExists(sID) {
-		return nil, gostErrors.NewBadRequestError(errors.New("Sensor does not exist"))
-	}
-
-	if oID, ok = ToIntID(d.ObservedProperty.ID); !ok || !gdb.ObservedPropertyExists(oID) {
-		return nil, gostErrors.NewBadRequestError(errors.New("ObservedProperty does not exist"))
-	}
+	tID, _ := ToIntID(d.Thing.ID)
+	sID, _ := ToIntID(d.Sensor.ID)
+	oID, _ := ToIntID(d.ObservedProperty.ID)
+	var dsID int
 
 	unitOfMeasurement, _ := json.Marshal(d.UnitOfMeasurement)
 	geom := "NULL"
@@ -307,6 +320,52 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 
 	nd, _ := gdb.GetDatastream(intID, nil)
 	return nd, nil
+}
+
+// PutDatastream receives a Datastream entity and changes it in the database
+// returns the adapted Datastream
+func (gdb *GostDatabase) PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
+	err := CheckDatastreamRelationsExist(gdb, datastream)
+	if err != nil {
+		return nil, err
+	}
+	tID, _ := ToIntID(datastream.Thing.ID)
+	sID, _ := ToIntID(datastream.Sensor.ID)
+	oID, _ := ToIntID(datastream.ObservedProperty.ID)
+
+	var intID int
+	var ok bool
+	if intID, ok = ToIntID(id); !ok || !gdb.DatastreamExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	}
+
+	unitOfMeasurement, _ := json.Marshal(datastream.UnitOfMeasurement)
+	geom := "NULL"
+	if len(datastream.ObservedArea) != 0 {
+		observedAreaBytes, _ := json.Marshal(datastream.ObservedArea)
+		geom = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
+	}
+
+	// get the ObservationType id in the lookup table
+	observationType, err := entities.GetObservationTypeByValue(datastream.ObservationType)
+
+	if err != nil {
+		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
+	}
+
+	sql := fmt.Sprintf("update %s.datastream set name=$1, description=$2, unitofmeasurement=$3, observedarea=%s, thing_id=$4, sensor_id=$5, observedproperty_id=$6, observationtype=$7 where id = $8", gdb.Schema, geom)
+	_, err2 := gdb.Db.Exec(sql, datastream.Name, datastream.Description, unitOfMeasurement, tID, sID, oID, observationType.Code, intID)
+	if err2 != nil {
+		return nil, err
+	}
+	datastream.ID = intID
+
+	// clear inner entities to serves links upon response
+	datastream.Thing = nil
+	datastream.Sensor = nil
+	datastream.ObservedProperty = nil
+
+	return datastream, nil
 }
 
 // DeleteDatastream tries to delete a Datastream by the given id
