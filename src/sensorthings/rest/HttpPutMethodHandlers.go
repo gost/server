@@ -8,7 +8,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 )
 
-// handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
+// handlePutRequest todo: currently almost same as handlePostRequest, merge if it stays like this
 func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
 	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if !checkContentType(w, r) {
@@ -28,7 +28,7 @@ func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		sendError(w, err2)
 		return
 	}
-
-	w.Header().Add("Location", entity.GetSelfLink())
+	selfLink := entity.GetSelfLink()
+	w.Header().Add("Location", selfLink)
 	sendJSONResponse(w, http.StatusOK, data, nil)
 }

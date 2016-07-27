@@ -72,3 +72,11 @@ func HandlePatchLocation(w http.ResponseWriter, r *http.Request, endpoint *model
 	handle := func() (interface{}, error) { return a.PatchLocation(getEntityID(r), loc) }
 	handlePatchRequest(w, endpoint, r, loc, &handle)
 }
+
+// HandlePutLocation patches a location by given id
+func HandlePutLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	loc := &entities.Location{}
+	handle := func() (interface{}, []error) { return a.PutLocation(getEntityID(r), loc) }
+	handlePutRequest(w, endpoint, r, loc, &handle)
+}

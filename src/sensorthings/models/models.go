@@ -40,6 +40,7 @@ type API interface {
 	PostLocation(location *entities.Location) (*entities.Location, []error)
 	PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error)
 	PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error)
+	PutLocation(id interface{}, location *entities.Location) (*entities.Location, []error)
 	DeleteLocation(id interface{}) error
 
 	GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.HistoricalLocation, error)
@@ -118,6 +119,7 @@ type Database interface {
 	LinkLocation(id interface{}, locationID interface{}) error
 	PatchLocation(interface{}, *entities.Location) (*entities.Location, error)
 	DeleteLocation(id interface{}) error
+	PutLocation(interface{}, *entities.Location) (*entities.Location, error)
 
 	GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
 	GetObservedPropertyByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)

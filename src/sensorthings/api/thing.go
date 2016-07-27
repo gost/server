@@ -217,6 +217,7 @@ func (a *APIv1) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing
 		return nil, []error{err2}
 	}
 
+	putthing.SetAllLinks(a.config.GetExternalServerURI())
 	return putthing, nil
 }
 

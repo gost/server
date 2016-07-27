@@ -289,7 +289,7 @@ func createLocations(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/Things{id}/Locations", HandlePostLocationByThing},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/Locations{id}", HandleDeleteLocation},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/Locations{id}", HandlePatchLocation},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/Locations{id}", HandlePatchLocation},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/Locations{id}", HandlePutLocation},
 		},
 	}
 }

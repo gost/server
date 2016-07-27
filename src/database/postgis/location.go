@@ -214,6 +214,28 @@ func (gdb *GostDatabase) DeleteLocation(id interface{}) error {
 	return DeleteEntity(gdb, id, "location")
 }
 
+// PutLocation receives a Location entity and changes it in the database
+// returns the adapted Location
+func (gdb *GostDatabase) PutLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
+	var intID int
+	var ok bool
+	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
+	locationBytes, _ := json.Marshal(location.Location)
+	encoding, _ := entities.CreateEncodingType(location.EncodingType)
+
+	sql := fmt.Sprintf("update %s.location set name=$1, description=$2, encodingtype=$3, location=ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326) where id = $4", gdb.Schema, string(locationBytes[:]))
+	_, err := gdb.Db.Exec(sql, location.Name, location.Description, encoding.Code, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	nt, _ := gdb.GetLocation(intID, nil)
+	return nt, nil
+}
+
 // LinkLocation links a thing with a location
 // fails when a thing or location cannot be found for the given id's
 func (gdb *GostDatabase) LinkLocation(thingID interface{}, locationID interface{}) error {
