@@ -51,17 +51,19 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 		return nil, err
 	}
 
-	hasSelectQuery := (qo.QuerySelect != nil)
-	var contains = true
-	if hasSelectQuery {
-		contains = Contains(qo.QuerySelect.Params, "observedArea")
-	}
+	if qo != nil {
+		hasSelectQuery := (qo.QuerySelect != nil)
+		var containsObservedArea = true
+		if hasSelectQuery {
+			containsObservedArea = Contains(qo.QuerySelect.Params, "observedArea")
+		}
 
-	// calculate observedarea on the fly when not present in database
-	if contains {
-		if datastream.ObservedArea == nil {
-			observedArea, _ := gdb.GetObservedArea(intID)
-			datastream.ObservedArea = observedArea
+		// calculate observedarea on the fly when not present in database
+		if containsObservedArea {
+			if datastream.ObservedArea == nil {
+				observedArea, _ := gdb.GetObservedArea(intID)
+				datastream.ObservedArea = observedArea
+			}
 		}
 	}
 
