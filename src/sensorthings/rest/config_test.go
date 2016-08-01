@@ -1,10 +1,11 @@
 package rest
 
 import (
-	"github.com/geodan/gost/src/sensorthings/models"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/geodan/gost/src/sensorthings/models"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateEndPoints(t *testing.T) {
@@ -17,7 +18,7 @@ func TestCreateEndPoints(t *testing.T) {
 
 func TestCreateEndPointVersion(t *testing.T) {
 	//arrange
-	ve := createVersion("http://test.com")
+	ve := createVersionEndpoint("http://test.com")
 
 	//assert
 	containsVersionPath := containsEndpoint("Version", ve.Operations)
