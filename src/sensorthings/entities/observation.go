@@ -5,8 +5,9 @@ import (
 
 	"errors"
 	"fmt"
-	gostErrors "github.com/geodan/gost/src/errors"
 	"time"
+
+	gostErrors "github.com/geodan/gost/src/errors"
 )
 
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends

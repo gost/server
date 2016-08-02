@@ -176,8 +176,11 @@ func (gdb *GostDatabase) PutHistoricalLocation(id interface{}, hl *entities.Hist
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
+	t, _ := time.Parse(time.RFC3339Nano, hl.Time)
+	utcT := t.UTC().Format("2006-01-02T15:04:05.000Z")
+
 	sql := fmt.Sprintf("UPDATE %s.historicallocation set time=$1, thing_id=$2, location_id=$3 where id = $4", gdb.Schema)
-	_, err := gdb.Db.Exec(sql, time.Now(), tid, lid, intID)
+	_, err := gdb.Db.Exec(sql, utcT, tid, lid, intID)
 	if err != nil {
 		return nil, err
 	}
