@@ -48,6 +48,7 @@ type API interface {
 	GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error)
+	PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error)
 	PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id interface{}) error
 
@@ -175,6 +176,7 @@ type Database interface {
 	GetHistoricalLocationsByLocation(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, e error)
 	GetHistoricalLocationsByThing(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, e error)
 	PostHistoricalLocation(*entities.HistoricalLocation) (*entities.HistoricalLocation, error)
+	PutHistoricalLocation(interface{}, *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	PatchHistoricalLocation(interface{}, *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id interface{}) error
 

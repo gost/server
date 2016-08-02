@@ -38,7 +38,7 @@ func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/HistoricalLocations", HandlePostHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},
-			{models.HTTPOperationPut, "/v1.0/HistoricalLocations{id}", HandlePatchHistoricalLocations},
+			{models.HTTPOperationPut, "/v1.0/HistoricalLocations{id}", HandlePutHistoricalLocation},
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/HistoricalLocations", HandleGetHistoricalLocations},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/HistoricalLocations{id}", HandleGetHistoricalLocation},
@@ -54,7 +54,7 @@ func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/HistoricalLocations", HandlePostHistoricalLocation},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/HistoricalLocations{id}", HandleDeleteHistoricalLocations},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/HistoricalLocations{id}", HandlePatchHistoricalLocations},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/HistoricalLocations{id}", HandlePatchHistoricalLocations},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/HistoricalLocations{id}", HandlePutHistoricalLocation},
 		},
 	}
 }

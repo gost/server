@@ -158,6 +158,35 @@ func (gdb *GostDatabase) HistoricalLocationExists(id interface{}) bool {
 	return EntityExists(gdb, id, "historicallocation")
 }
 
+// PutHistoricalLocation updates a HistoricalLocation in the database
+func (gdb *GostDatabase) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
+	var ok bool
+	var intID int
+	if intID, ok = ToIntID(id); !ok || !gdb.HistoricalLocationExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
+	}
+
+	tid, ok := ToIntID(hl.Thing.ID)
+	if !ok || !gdb.ThingExists(tid) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+	}
+
+	lid, ok := ToIntID(hl.Locations[0].ID)
+	if !ok || !gdb.LocationExists(lid) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+
+	sql := fmt.Sprintf("UPDATE %s.historicallocation set time=$1, thing_id=$2, location_id=$3 where id = $4", gdb.Schema)
+	_, err := gdb.Db.Exec(sql, time.Now(), tid, lid, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	hl.ID = intID
+
+	return hl, nil
+}
+
 // PatchHistoricalLocation updates a HistoricalLocation in the database
 func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	var err error

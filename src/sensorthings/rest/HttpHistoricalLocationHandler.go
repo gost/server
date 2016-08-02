@@ -53,6 +53,14 @@ func HandlePostHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoi
 	handlePostRequest(w, endpoint, r, hl, &handle)
 }
 
+// HandlePutHistoricalLocation ...
+func HandlePutHistoricalLocation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	hl := &entities.HistoricalLocation{}
+	handle := func() (interface{}, []error) { return a.PutHistoricalLocation(getEntityID(r), hl) }
+	handlePutRequest(w, endpoint, r, hl, &handle)
+}
+
 // HandleDeleteHistoricalLocations ...
 func HandleDeleteHistoricalLocations(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api

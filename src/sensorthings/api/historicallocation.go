@@ -6,6 +6,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -81,6 +82,21 @@ func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entiti
 	}
 
 	l, err2 := a.db.PostHistoricalLocation(hl)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+	l.SetAllLinks(a.config.GetExternalServerURI())
+	return l, nil
+}
+
+// PutHistoricalLocation adds a new HistoricalLocation to the database
+func (a *APIv1) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
+	_, err := hl.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	l, err2 := a.db.PutHistoricalLocation(id, hl)
 	if err2 != nil {
 		return nil, []error{err2}
 	}
