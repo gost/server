@@ -77,6 +77,21 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	return f, nil
 }
 
+// PutFeatureOfInterest inserts a new FeatureOfInterest into the database
+func (gdb *GostDatabase) PutFeatureOfInterest(id interface{}, f *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
+	locationBytes, _ := json.Marshal(f.Feature)
+	intID, _ := ToIntID(id)
+	encoding, _ := entities.CreateEncodingType(f.EncodingType)
+	sql := fmt.Sprintf("update %s.featureofinterest set name=$1, description=$2, encodingtype=$3, feature= ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), original_location_id=$4 where id=$5", gdb.Schema, string(locationBytes[:]))
+	_, err := gdb.Db.Exec(sql, f.Name, f.Description, encoding.Code, f.OriginalLocationID, intID)
+	if err != nil {
+		return nil, err
+	}
+
+	f.ID = intID
+	return f, nil
+}
+
 func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
 	locations, _, err := processFeatureOfInterests(db, sql, qo, "")
 	if err != nil {

@@ -68,6 +68,7 @@ type API interface {
 	GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
 	PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
+	PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	DeleteFeatureOfInterest(id interface{}) error
 
 	GetObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Observation, error)
@@ -155,6 +156,7 @@ type Database interface {
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests(qo *odata.QueryOptions) (f []*entities.FeatureOfInterest, count int, e error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
+	PutFeatureOfInterest(interface{}, *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	PatchFeatureOfInterest(interface{}, *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	DeleteFeatureOfInterest(id interface{}) error
 

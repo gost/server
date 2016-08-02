@@ -37,7 +37,7 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/FeaturesOfInterest", HandlePostFeatureOfInterest},
 			{models.HTTPOperationDelete, "/v1.0/FeaturesOfInterest{id}", HandleDeleteFeatureOfInterest},
 			{models.HTTPOperationPatch, "/v1.0/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
-			{models.HTTPOperationPut, "/v1.0/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
+			{models.HTTPOperationPut, "/v1.0/FeaturesOfInterest{id}", HandlePutFeatureOfInterest},
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/FeaturesOfInterest", HandleGetFeatureOfInterests},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/FeaturesOfInterest{id}", HandleGetFeatureOfInterest},
@@ -50,7 +50,7 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/FeaturesOfInterest", HandlePostFeatureOfInterest},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/FeaturesOfInterest{id}", HandleDeleteFeatureOfInterest},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/FeaturesOfInterest{id}", HandlePatchFeatureOfInterest},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/FeaturesOfInterest{id}", HandlePutFeatureOfInterest},
 		},
 	}
 }

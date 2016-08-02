@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -79,6 +80,27 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 	}
 
 	l, err2 := a.db.PostFeatureOfInterest(foi)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	l.SetAllLinks(a.config.GetExternalServerURI())
+	return l, nil
+}
+
+// PutFeatureOfInterest adds a FeatureOfInterest to the database
+func (a *APIv1) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
+	_, err := foi.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	supported, err2 := entities.CheckEncodingSupported(foi, foi.EncodingType)
+	if !supported || err2 != nil {
+		return nil, []error{err2}
+	}
+
+	l, err2 := a.db.PutFeatureOfInterest(id, foi)
 	if err2 != nil {
 		return nil, []error{err2}
 	}

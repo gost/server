@@ -55,3 +55,11 @@ func HandlePatchFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoi
 	handle := func() (interface{}, error) { return a.PatchFeatureOfInterest(getEntityID(r), foi) }
 	handlePatchRequest(w, endpoint, r, foi, &handle)
 }
+
+// HandlePutFeatureOfInterest ...
+func HandlePutFeatureOfInterest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	foi := &entities.FeatureOfInterest{}
+	handle := func() (interface{}, []error) { return a.PutFeatureOfInterest(getEntityID(r), foi) }
+	handlePutRequest(w, endpoint, r, foi, &handle)
+}
