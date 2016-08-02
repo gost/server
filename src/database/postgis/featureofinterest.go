@@ -82,6 +82,11 @@ func (gdb *GostDatabase) PutFeatureOfInterest(id interface{}, f *entities.Featur
 	locationBytes, _ := json.Marshal(f.Feature)
 	intID, _ := ToIntID(id)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
+
+	if !gdb.FeatureOfInterestExists(intID) {
+		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+	}
+
 	sql := fmt.Sprintf("update %s.featureofinterest set name=$1, description=$2, encodingtype=$3, feature= ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), original_location_id=$4 where id=$5", gdb.Schema, string(locationBytes[:]))
 	_, err := gdb.Db.Exec(sql, f.Name, f.Description, encoding.Code, f.OriginalLocationID, intID)
 	if err != nil {
