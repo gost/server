@@ -187,6 +187,20 @@ func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observati
 	return a.db.PatchObservation(id, observation)
 }
 
+// PutObservation updates the given observation in the database
+func (a *APIv1) PutObservation(id interface{}, observation *entities.Observation) (*entities.Observation, []error) {
+	_, err := observation.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	obs, err2 := a.db.PutObservation(id, observation)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+	return obs, nil
+}
+
 // DeleteObservation deletes a given Observation from the database
 func (a *APIv1) DeleteObservation(id interface{}) error {
 	return a.db.DeleteObservation(id)

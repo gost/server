@@ -79,6 +79,7 @@ type API interface {
 	PostObservation(observation *entities.Observation) (*entities.Observation, []error)
 	PostObservationByDatastream(datastreamID interface{}, observation *entities.Observation) (*entities.Observation, []error)
 	PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error)
+	PutObservation(id interface{}, observation *entities.Observation) (*entities.Observation, []error)
 	DeleteObservation(id interface{}) error
 
 	GetObservedProperty(id interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error)
@@ -169,6 +170,7 @@ type Database interface {
 	GetObservationsByFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (o []*entities.Observation, count int, e error)
 	PostObservation(*entities.Observation) (*entities.Observation, error)
 	PatchObservation(interface{}, *entities.Observation) (*entities.Observation, error)
+	PutObservation(interface{}, *entities.Observation) (*entities.Observation, error)
 	DeleteObservation(id interface{}) error
 
 	GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error)

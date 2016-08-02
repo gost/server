@@ -43,7 +43,7 @@ func createObservationsEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/Datastreams{id}/Observations", HandlePostObservationByDatastream},
 			{models.HTTPOperationDelete, "/v1.0/Observations{id}", HandleDeleteObservation},
 			{models.HTTPOperationPatch, "/v1.0/Observations{id}", HandlePatchObservation},
-			{models.HTTPOperationPut, "/v1.0/Observations{id}", HandlePatchObservation},
+			{models.HTTPOperationPut, "/v1.0/Observations{id}", HandlePutObservation},
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Observations", HandleGetObservations},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/Observations{id}", HandleGetObservation},
@@ -61,7 +61,7 @@ func createObservationsEndpoint(externalURL string) *Endpoint {
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/Datastreams{id}/Observations", HandlePostObservationByDatastream},
 			{models.HTTPOperationDelete, "/v1.0/{c:.*}/Observations{id}", HandleDeleteObservation},
 			{models.HTTPOperationPatch, "/v1.0/{c:.*}/Observations{id}", HandlePatchObservation},
-			{models.HTTPOperationPut, "/v1.0/{c:.*}/Observations{id}", HandlePatchObservation},
+			{models.HTTPOperationPut, "/v1.0/{c:.*}/Observations{id}", HandlePutObservation},
 		},
 	}
 }

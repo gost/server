@@ -72,3 +72,11 @@ func HandlePatchObservation(w http.ResponseWriter, r *http.Request, endpoint *mo
 	handle := func() (interface{}, error) { return a.PatchObservation(getEntityID(r), ob) }
 	handlePatchRequest(w, endpoint, r, ob, &handle)
 }
+
+// HandlePutObservation ...
+func HandlePutObservation(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	ob := &entities.Observation{}
+	handle := func() (interface{}, []error) { return a.PutObservation(getEntityID(r), ob) }
+	handlePutRequest(w, endpoint, r, ob, &handle)
+}
