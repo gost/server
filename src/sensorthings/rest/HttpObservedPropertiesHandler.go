@@ -55,3 +55,11 @@ func HandlePatchObservedProperty(w http.ResponseWriter, r *http.Request, endpoin
 	handle := func() (interface{}, error) { return a.PatchObservedProperty(getEntityID(r), op) }
 	handlePatchRequest(w, endpoint, r, op, &handle)
 }
+
+// HandlePutObservedProperty posts a new ObservedProperty
+func HandlePutObservedProperty(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
+	a := *api
+	op := &entities.ObservedProperty{}
+	handle := func() (interface{}, []error) { return a.PutObservedProperty(getEntityID(r), op) }
+	handlePutRequest(w, endpoint, r, op, &handle)
+}

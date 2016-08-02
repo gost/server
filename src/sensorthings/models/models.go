@@ -85,6 +85,7 @@ type API interface {
 	GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error)
 	PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, []error)
 	PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error)
+	PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, []error)
 	DeleteObservedProperty(id interface{}) error
 
 	GetSensor(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error)
@@ -129,6 +130,7 @@ type Database interface {
 	GetObservedProperties(qo *odata.QueryOptions) (o []*entities.ObservedProperty, count int, e error)
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
 	PatchObservedProperty(interface{}, *entities.ObservedProperty) (*entities.ObservedProperty, error)
+	PutObservedProperty(interface{}, *entities.ObservedProperty) (*entities.ObservedProperty, error)
 	DeleteObservedProperty(id interface{}) error
 
 	GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error)

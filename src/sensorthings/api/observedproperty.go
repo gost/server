@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
@@ -92,6 +93,23 @@ func (a *APIv1) PatchObservedProperty(id interface{}, op *entities.ObservedPrope
 	}
 
 	return a.db.PatchObservedProperty(id, op)
+}
+
+// PutObservedProperty patches a given ObservedProperty
+func (a *APIv1) PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
+	_, err := op.ContainsMandatoryParams()
+	if err != nil {
+		return nil, err
+	}
+
+	nop, err2 := a.db.PutObservedProperty(id, op)
+	if err2 != nil {
+		return nil, []error{err2}
+	}
+
+	nop.SetAllLinks(a.config.GetExternalServerURI())
+
+	return nop, nil
 }
 
 // DeleteObservedProperty deletes a given ObservedProperty from the database
