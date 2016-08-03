@@ -150,6 +150,8 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 		var id interface{}
 		var name, description, unitofmeasurement string
 		var observedarea *string
+		var phenomenonTime string
+		var resultTime string
 		var ot int
 
 		var params []interface{}
@@ -180,6 +182,12 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 			if p == "observedArea" {
 				params = append(params, &observedarea)
 			}
+			if p == "phenomenonTime" {
+				params = append(params, &phenomenonTime)
+			}
+			if p == "resultTime" {
+				params = append(params, &resultTime)
+			}
 		}
 
 		err = rows.Scan(params...)
@@ -199,6 +207,8 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 		datastream.Name = name
 		datastream.Description = description
 		datastream.UnitOfMeasurement = unitOfMeasurementMap
+		datastream.PhenomenonTime = phenomenonTime
+		datastream.ResultTime = resultTime
 		datastream.ObservedArea = observedAreaMap
 		if ot != 0 {
 			obs, _ := entities.GetObservationTypeByID(ot)

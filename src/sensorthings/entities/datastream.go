@@ -3,6 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"errors"
+
 	gostErrors "github.com/geodan/gost/src/errors"
 )
 
@@ -24,7 +25,11 @@ type Datastream struct {
 	Sensor              *Sensor                `json:"Sensor,omitempty"`
 	Observations        []*Observation         `json:"Observations,omitempty"`
 	ObservedProperty    *ObservedProperty      `json:"ObservedProperty,omitempty"`
+	PhenomenonTime      string                 `json:"phenomenonTime,omitempty"`
+	ResultTime          string                 `json:"resultTime,omitempty"`
 }
+
+// "phenomenonTime"
 
 // GetEntityType returns the EntityType for Datastream
 func (d Datastream) GetEntityType() EntityType {
@@ -33,7 +38,7 @@ func (d Datastream) GetEntityType() EntityType {
 
 // GetPropertyNames returns the available properties for a Datastream
 func (d *Datastream) GetPropertyNames() []string {
-	return []string{"id", "name", "description", "unitOfMeasurement", "observationType", "observedArea"}
+	return []string{"id", "name", "description", "unitOfMeasurement", "observationType", "observedArea", "phenomenonTime", "resultTime"}
 }
 
 // ParseEntity tries to parse the given json byte array into the current entity
