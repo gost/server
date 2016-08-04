@@ -265,6 +265,11 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		geom = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
 	}
 
+	phenomenonTime := "NULL"
+	if len(d.PhenomenonTime) != 0 {
+		period := ParseTMPeriod(d.PhenomenonTime)
+		phenomenonTime = "'" + ToPostgresPeriodFormat(period) + "'"
+	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
 
@@ -272,7 +277,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype) VALUES ($1, $2, $3, %s, $4, $5, $6, $7) RETURNING id", gdb.Schema, geom)
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s) RETURNING id", gdb.Schema, geom, phenomenonTime)
 	err = gdb.Db.QueryRow(sql, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
 	if err != nil {
 		return nil, err
