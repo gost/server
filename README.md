@@ -36,7 +36,7 @@ Gost Compliance Testing Status:
 |---------------------------------------|-----------|-----------------------|--------------------------| 
 | Sensing Core                          | A.1       | alpha                 | 6 passed, 0 failed       |
 | Filtering Extension                   | A.2       | alpha                 | Testing not started      |
-| Create-Update-Delete                  | A.3       | alpha                 | 8 passed, 1 failed       |
+| Create-Update-Delete                  | A.3       | alpha                 | 9 passed, 0 failed       |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
 | Sensing Data Array Extension          | A.6       | -                     | Tests not implemented    |
