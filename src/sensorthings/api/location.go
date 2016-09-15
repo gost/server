@@ -2,7 +2,7 @@ package api
 
 import (
 	"log"
-
+	"time"
 	"errors"
 
 	gostErrors "github.com/geodan/gost/src/errors"
@@ -58,6 +58,7 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 		}
 
 		hl.Thing.ID = thingID
+		hl.Time = time.Now().UTC().Format(time.RFC3339Nano)
 		hl.ContainsMandatoryParams()
 
 		hl, err = a.PostHistoricalLocation(hl)
