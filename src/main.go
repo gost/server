@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	log.Println("Starting GOST...")
+	log.Println("Starting GOST....")
 	cfgFlag := flag.String("config", "config.yaml", "path of the config file")
 	installFlag := flag.String("install", "", "path to the database creation file")
 	flag.Parse()
