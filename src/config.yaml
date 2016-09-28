@@ -1,6 +1,6 @@
 server: 
     name: GOST Server
-    host: localhost
+    host: 
     port: 8080
     externalUri: http://localhost:8080/
     clientContent: ./client/
