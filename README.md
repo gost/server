@@ -22,6 +22,10 @@ Release 0.2: 2016-06-10
 
 Binaries are build for Windows, Ubuntu and OSX.
 
+## Docker support
+
+See [GOST and Docker](docs/gost_docker.md)
+
 ## News
 
 2016-05-30: Testing started against the OGC SensorThings API Test Suite 
