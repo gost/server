@@ -1,6 +1,7 @@
 ## Docker support
 
-Work has started on Docker support for GOST
+Work has started on Docker support for GOST. The GOST Docker image is available at
+[https://hub.docker.com/r/geodan/gost/] and is automatic rebuild after a Github commit. 
 
 # Building GOST Docker image
 
