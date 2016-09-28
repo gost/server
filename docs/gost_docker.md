@@ -12,7 +12,7 @@ Work has started on Docker support for GOST
 
 # Running GOST in Docker
 
-$ docker run -p 5001:8080 -t geodan/gost:latest
+$ docker run -p 8080:8080 -t geodan/gost:latest
 
 Site should run on port 8080
 
