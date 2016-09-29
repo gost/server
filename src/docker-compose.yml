@@ -5,20 +5,17 @@ services:
         ports:
             - "1883:1883"
             - "9001:9001" 
+    postgis1:
+        build: ./docker/postgis
+        ports:
+            - "5432:5432"
+        environment: 
+            POSTGRES_DB: gost            
     web_app:
         build: .
         ports:
             - "8080:8080"
         depends_on:
-            - postgis
-    datastore:
-        image: mdillon/postgis
-        volumes:
-            - /var/lib/postgresql/data
-        command: "true"
-    postgis:
-        image: mdillon/postgis
-        ports:
-            - "5432:5432"
-        volumes_from:
-            - datastore            
+            - mosquitto
+        links:
+            - postgis1

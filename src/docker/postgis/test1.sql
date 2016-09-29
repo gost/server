@@ -1,18 +1,5 @@
-DO $$
-BEGIN
-     IF EXISTS(
-        SELECT schema_name
-          FROM information_schema.schemata
-          WHERE schema_name = '%s'
-      )
-    THEN
-      EXECUTE 'drop schema %s cascade';
-    END IF;
-END
-$$;
-
-CREATE SCHEMA %s;
-SET search_path = %s;
+CREATE SCHEMA v1;
+SET search_path = v1;
 
 CREATE TABLE featureofinterest
 (

@@ -73,10 +73,10 @@ func (gdb *GostDatabase) Start() {
 	}
 
 	gdb.Db = db
-	err2 := gdb.Db.Ping()
-	if err2 != nil {
-		log.Fatal("Unable to connect to database, check your network connection.")
-	}
+	// err2 := gdb.Db.Ping()
+	// if err2 != nil {
+	// 	log.Fatal("Unable to connect to database, check your network connection.")
+	// }
 
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
 
