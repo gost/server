@@ -1,0 +1,24 @@
+version: '2'
+services:
+    mosquitto:
+        image: toke/mosquitto
+        ports:
+            - "1883:1883"
+            - "9001:9001" 
+    web_app:
+        build: .
+        ports:
+            - "8080:8080"
+        depends_on:
+            - postgis
+    datastore:
+        image: mdillon/postgis
+        volumes:
+            - /var/lib/postgresql/data
+        command: "true"
+    postgis:
+        image: mdillon/postgis
+        ports:
+            - "5432:5432"
+        volumes_from:
+            - datastore            
