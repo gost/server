@@ -58,7 +58,7 @@ GOST Compliance Testing Status:
 HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 
 For a complete collection of working requests install Postman and import the [Postman file](test/GOST.json.postman_collection) 
 
-MQTT: For getting started with Gost and MQTT for publishing/receiving data see [Gost and MQTT - Getting started](docs/gost_mqtt_getting_started.md)
+MQTT: For getting started with Gost and MQTT for publishing/receiving data see [GOST and MQTT - Getting started](docs/gost_mqtt_getting_started.md)
 
 ## Dependencies
 
