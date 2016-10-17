@@ -60,10 +60,10 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
         "coordinates": [-117.123,
         54.123]
     }
-}' "http://localhost:8080/v1.0/Things({Thing.@iot.id})/Locations"
+}' "http://localhost:8080/v1.0/Things(${Thing.@iot.id})/Locations"
 ```
 
-Parameters: {Thing.@iot.id} in the url path
+Parameters: ${Thing.@iot.id} in the url path
 
 Response:
 
@@ -163,13 +163,13 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "observationType":"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
   "description": "Thermometer readings",
   "name": "Thermometer_readings",
-  "Thing": {"@iot.id": {Thing.@iot.id}},
-  "ObservedProperty": {"@iot.id": {ObservedProperty.@iot.id}},
-  "Sensor": {"@iot.id": {Sensor.@iot.id}}
+  "Thing": {"@iot.id": ${Thing.@iot.id}},
+  "ObservedProperty": {"@iot.id": ${ObservedProperty.@iot.id}},
+  "Sensor": {"@iot.id": ${Sensor.@iot.id}}
 }' "http://localhost:8080/v1.0/Datastreams"
 ```
 
-Parameters: {Sensor.@iot.id}, {ObservedProperty.@iot.id}, {Thing.@iot.id}
+Parameters: ${Sensor.@iot.id}, ${ObservedProperty.@iot.id}, ${Thing.@iot.id}
 
 Response:
 
@@ -197,11 +197,11 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
   "phenomenonTime": "2016-05-09T11:04:15.790Z",
   "resultTime" : "2016-05-09T11:04:15.790Z",
   "result" : 38,
-  "Datastream":{"@iot.id":{Datastream.@iot.id}}
+  "Datastream":{"@iot.id":${Datastream.@iot.id}}
 }' "http://localhost:8080/v1.0/Observations"
 ```
 
-Parameters: {Datastream.@iot.id}
+Parameters: ${Datastream.@iot.id}
 
 Response:
 
