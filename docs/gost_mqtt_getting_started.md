@@ -67,7 +67,7 @@ mosquitto_pub -h gost.geodan.nl -t "GOST/Datastreams(1)/Observations" -m '{"resu
 ```
 . MQTT.fx
 
-<img src="images/mqtt__out.png">
+<img src="images/mqtt_out.png">
 
 . Node-RED
 
@@ -84,6 +84,7 @@ todo
 . Javascript
 
 todo
+
 
 
 
