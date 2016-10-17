@@ -54,9 +54,11 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 
 ## 2] Publishing MQTT data
 
+Hint: For publishing to MQTT GOST add a prefix 'GOST' to the topic
+
 . Mosquitto
 
-todo 
+mosquitto_pub -h gost.geodan.nl -t "GOST/Datastreams(1)/Observations" -m '{"result" : 38}'
 
 . MQTT.fx
 
