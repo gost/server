@@ -67,11 +67,12 @@ mosquitto_pub -h gost.geodan.nl -t "GOST/Datastreams(1)/Observations" -m '{"resu
 ```
 . MQTT.fx
 
-<img src="images/mqtt_out.png">
+<img src="images/mqttfx_pub.png">
+
 
 . Node-RED
 
-<img src="images/mqttfx_pub.png">
+<img src="images/mqtt_out.png">
 
 . .NET
 
