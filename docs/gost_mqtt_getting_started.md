@@ -58,8 +58,9 @@ Hint: For publishing to MQTT GOST add a prefix 'GOST' to the topic
 
 . Mosquitto
 
+```sh
 mosquitto_pub -h gost.geodan.nl -t "GOST/Datastreams(1)/Observations" -m '{"result" : 38}'
-
+```
 . MQTT.fx
 
 todo
