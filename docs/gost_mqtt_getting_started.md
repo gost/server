@@ -43,7 +43,24 @@ todo
 
 . Javascript
 
-todo
+Use Paho library http://www.eclipse.org/paho/
+
+Code sample:
+
+```sh
+client = new Paho.MQTT.Client(location.hostname, Number(9001), guid());
+client.onConnectionLost = onConnectionLost;
+client.onMessageArrived = onMessageArrived;
+client.connect({ onSuccess: onConnect });
+
+function onConnect() {
+    client.subscribe("GOST/Datastreams(1)/Observations");
+}
+
+ // called when a message arrives
+function onMessageArrived(message) {
+}
+```
 
 testcase: publish an observation using the following HTTP Request and check if information is received:
 
