@@ -54,7 +54,7 @@ client.onMessageArrived = onMessageArrived;
 client.connect({ onSuccess: onConnect });
 
 function onConnect() {
-    client.subscribe("GOST/Datastreams(1)/Observations");
+    client.subscribe("Datastreams(1)/Observations");
 }
 
  // called when a message arrives
