@@ -26,6 +26,14 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 See [GOST and Docker](docs/gost_docker.md)
 
+TL;DR:
+
+```
+$ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
+
+$ docker-compose up
+```
+
 ## News
 
 2016-05-30: Testing started against the OGC SensorThings API Test Suite 
