@@ -1,7 +1,12 @@
-## Docker support
+## GOST Docker support
 
-Work has started on Docker support for GOST. The GOST Docker image is available at
-[https://hub.docker.com/r/geodan/gost/] and is automatic rebuild after a Github commit.
+For getting GOST to work in Docker there are two images available on Docker Hub:
+
+For service and dashboard: [https://hub.docker.com/r/geodan/gost/]
+
+For database: [https://hub.docker.com/r/geodan/gost-db/]
+
+The docker images can run separately, or running in a combined way using the Dockercompose file. 
 
 # Running GOST with Docker-compose
 
