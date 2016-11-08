@@ -5,17 +5,18 @@ services:
         ports:
             - "1883:1883"
             - "9001:9001" 
-    postgis1:
-        build: ./docker/postgis
+    gost-db:
+        image: geodan/gost-db
         ports:
             - "5432:5432"
-        environment: 
-            POSTGRES_DB: gost            
     web_app:
-        build: .
+        image: geodan/gost
         ports:
             - "8080:8080"
         depends_on:
             - mosquitto
+            - gost-db
         links:
-            - postgis1
+            - gost-db
+        environment: 
+            gost_db_host: gost-db            
