@@ -1,5 +1,9 @@
 version: '2'
 services:
+    node-red:
+        image: nodered/node-red-docker
+        ports:
+            - "1880:1880"
     mosquitto:
         image: toke/mosquitto
         ports:
