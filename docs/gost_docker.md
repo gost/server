@@ -3,6 +3,12 @@
 Work has started on Docker support for GOST. The GOST Docker image is available at
 [https://hub.docker.com/r/geodan/gost/] and is automatic rebuild after a Github commit.
 
+# Running GOST with Docker-compose
+
+. $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
+
+. $ docker-compose up
+
 # Running GOST database
 
 . $ docker run -p 5432:5432 --name gost-db -d geodan/gost-db
@@ -22,14 +28,6 @@ For making connection to external database use environmental variables gost_db_h
 For example: 
 
 docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gost geodan/gost
-
-# Running GOST with Docker-compose
-
-. Clone the repository
-
-. $ cd src/github.com/geodan/gost/src
-
-. $ docker-compose up
 
 # Building GOST service and dashboard image
 
