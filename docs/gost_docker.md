@@ -5,7 +5,7 @@ Work has started on Docker support for GOST. The GOST Docker image is available 
 
 # Running GOST database
 
-. $ docker run -p 5432:5432 -d geodan/gost-db
+. $ docker run -p 5432:5432 --name gost-db -d geodan/gost-db
 
 Connect in pgadmin with localhost:5432 postgres/postgres
 
@@ -13,11 +13,11 @@ GOST schema is in schema postgres.v1
 
 # Running GOST service and dashboard
 
-$ docker run -p 8080:8080 -t geodan/gost
+$ docker run -p 8080:8080 --link gost-db:gost-db -e gost_db_host=gost-db geodan/gost
 
 GOST is available at http://localhost:8080 
 
-Make connection to external database use environmental variables gost_db_host, gost_db_port, gost_db_user, gost_db_password:
+For making connection to external database use environmental variables gost_db_host, gost_db_port, gost_db_user, gost_db_password:
 
 For example: 
 
