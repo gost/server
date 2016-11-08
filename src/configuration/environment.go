@@ -46,6 +46,10 @@ func SetEnvironmentVariables(conf *Config) {
 	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
 	}
+	gostDbDatabase := os.Getenv("gost_db_database")
+	if gostDbDatabase != "" {
+		conf.Database.Database = gostDbDatabase
+	}
 
 	gostDbPort := os.Getenv("gost_db_port")
 	if gostDbPort != "" {
