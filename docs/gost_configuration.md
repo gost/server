@@ -1,4 +1,4 @@
-## Gost Configuration
+## GOST Configuration
 
 Default configuration file: config.yaml
 
@@ -26,19 +26,19 @@ mqtt:<br />
 The following configuration parameters can be overruled 
 from the following environment variables:
 
-db: gost_db_host, gost_db_port, gost_db_user, gost_db_password. 
+db: gost_db_host, gost_db_database, gost_db_port, gost_db_user, gost_db_password. 
 
 mqtt: gost_mqtt_host, gost_mqtt_port
 
 server: gost_server_host, gost_server_port, gost_server_external_uri, gost_client_content
 
-Example setting Gost environment variable on Windows:
+Example setting GOST environment variable on Windows:
 
 ```sh
 set gost_db_host=192.168.40.10
 ```
 
-Example setting Gost environment variable on Mac/Linux:
+Example setting GOST environment variable on Mac/Linux:
 
 ```sh
 export gost_db_host=192.168.40.10
