@@ -10,9 +10,11 @@ The docker images can run separately, or running in a combined way using the Doc
 
 # Running GOST with Docker-compose
 
-. $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
+```
+$ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
 
-. $ docker-compose up
+$ docker-compose up
+```
 
 # Running GOST database
 
