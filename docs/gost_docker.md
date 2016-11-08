@@ -17,7 +17,11 @@ $ docker run -p 8080:8080 -t geodan/gost
 
 GOST is available at http://localhost:8080 
 
-TODO: describe connection to database
+Make connection to external database use environmental variables gost_db_host, gost_db_port, gost_db_user, gost_db_password:
+
+For example: 
+
+docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gost geodan/gost
 
 # Running GOST with Docker-compose
 
