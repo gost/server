@@ -8,11 +8,15 @@ services:
         image: toke/mosquitto
         ports:
             - "1883:1883"
-            - "9001:9001" 
+            - "9001:9001"
     gost-db:
         image: geodan/gost-db
+        volumes_from:
+            - pg_data        
         ports:
             - "5432:5432"
+        environment:
+            PGDATA : /var/lib/postgresql/data/pgdata
     web_app:
         image: geodan/gost
         ports:
@@ -24,3 +28,9 @@ services:
             - gost-db
         environment: 
             gost_db_host: gost-db            
+    pg_data:
+        restart: always
+        image: alpine
+        volumes: 
+            - /var/lib/postgresql/data/pgdata
+        command: "true"
