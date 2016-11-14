@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"fmt"
-
 	"github.com/geodan/gost/src/sensorthings/models"
 )
 
@@ -56,13 +54,22 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 	api := *s.api
 
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(strings.ToLower(r.URL.Path), "dashboard") {
+			h.ServeHTTP(w, r)
+			return
+		}
+
 		lowerCasePath := strings.ToLower(r.URL.Path)
 		split := strings.Split(lowerCasePath, "/")
 
-		for _, split := range split {
+		for _, s := range split {
+			if len(s) == 0 {
+				continue
+			}
+
 			found := false
 			for _, a := range api.GetAcceptedPaths() {
-				if strings.HasPrefix(split, a) {
+				if strings.HasPrefix(s, a) {
 					found = true
 				}
 			}
@@ -76,7 +83,6 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 		}
 
 		r.URL.Path = lowerCasePath
-		fmt.Println(r.URL.Path)
 		h.ServeHTTP(w, r)
 	}
 

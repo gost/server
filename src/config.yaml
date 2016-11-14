@@ -1,6 +1,6 @@
 server: 
     name: GOST Server
-    host: 
+    host:
     port: 8080
     externalUri: http://localhost:8080/
     clientContent: ./client/
@@ -18,5 +18,5 @@ database:
     maxOpenConns: 100
 mqtt:
     enabled: true
-    host: 127.0.0.1
+    host: localhost
     port: 1883
