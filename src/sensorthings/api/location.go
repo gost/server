@@ -1,9 +1,9 @@
 package api
 
 import (
+	"errors"
 	"log"
 	"time"
-	"errors"
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"

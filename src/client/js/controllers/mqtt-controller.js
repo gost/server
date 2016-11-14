@@ -1,8 +1,8 @@
-gostApp.controller('MqttCtrl', function ($scope) {
+gostApp.controller('MqttCtrl', function($scope) {
     $scope.Page.setTitle('MQTT');
     $scope.Page.setHeaderIcon('fa-envelope');
 
-    $scope.$on("$destroy", function () {
+    $scope.$on("$destroy", function() {
         client.unsubscribe("$SYS/broker/#");
     });
 

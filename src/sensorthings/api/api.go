@@ -16,11 +16,12 @@ import (
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
 // provider, config, endpoint information to setup te needed services
 type APIv1 struct {
-	db        models.Database
-	config    configuration.Config
-	endPoints []models.Endpoint
-	topics    []models.Topic
-	mqtt      models.MQTTClient
+	db            models.Database
+	config        configuration.Config
+	endPoints     []models.Endpoint
+	topics        []models.Topic
+	mqtt          models.MQTTClient
+	acceptedPaths []string
 }
 
 // NewAPI Initialise a new SensorThings API
@@ -30,6 +31,27 @@ func NewAPI(database models.Database, config configuration.Config, mqtt models.M
 		db:     database,
 		mqtt:   mqtt,
 		config: config,
+		acceptedPaths: []string{
+			"v1.0",
+			"thing",
+			"things",
+			"datastream",
+			"datastreams",
+			"location",
+			"locations",
+			"historicallocation",
+			"historicallocations",
+			"sensor",
+			"sensors",
+			"observation",
+			"observations",
+			"observedproperty",
+			"observedproperties",
+			"featureofinterest",
+			"featurseofinterest",
+			"$value",
+			"dashboard",
+		},
 	}
 }
 
@@ -40,6 +62,11 @@ func (a *APIv1) Start() {
 // GetConfig return the current configuration.Config set for the api
 func (a *APIv1) GetConfig() *configuration.Config {
 	return &a.config
+}
+
+// GetAcceptedPaths returns an array of accepted endpoint paths
+func (a *APIv1) GetAcceptedPaths() []string {
+	return a.acceptedPaths
 }
 
 // GetVersionInfo retrieves the version info of the current supported SensorThings API Version and running server version

@@ -18,6 +18,7 @@ type API interface {
 	Start()
 	GetConfig() *configuration.Config
 
+	GetAcceptedPaths() []string
 	GetVersionInfo() *VersionInfo
 	GetBasePathInfo() *ArrayResponse
 	GetEndpoints() *[]Endpoint
