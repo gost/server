@@ -26,7 +26,6 @@ type APIv1 struct {
 
 // NewAPI Initialise a new SensorThings API
 func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTClient) models.API {
-
 	return &APIv1{
 		db:     database,
 		mqtt:   mqtt,

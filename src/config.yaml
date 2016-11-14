@@ -11,7 +11,7 @@ database:
     port: 5432
     user: postgres
     password: postgres
-    database: postgres
+    database: gost
     schema: v1
     ssl: false
     maxIdleConns: 30

@@ -61,7 +61,7 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 
 		for _, split := range split {
 			found := false
-			for _, a := range api.acceptedPaths {
+			for _, a := range api.GetAcceptedPaths() {
 				if strings.HasPrefix(split, a) {
 					found = true
 				}
@@ -70,7 +70,7 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 			if !found {
 				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 				w.WriteHeader(http.StatusNotFound)
-				w.Write(byte[0])
+				w.Write([]byte(""))
 				return
 			}
 		}
