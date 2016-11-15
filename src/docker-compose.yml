@@ -24,7 +24,7 @@ services:
             POSTGRES_DB: gost
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
-    web_app:
+    gost:
         image: geodan/gost
         ports:
             - "8080:8080"
