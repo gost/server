@@ -38,16 +38,25 @@ docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gos
 
 # Building GOST service and dashboard image
 
-. Clone the repository
+```
+. $ git close https://github.com/Geodan/gost.git
 
 . $ cd src/github.com/geodan/gost/src
 
 . $ docker build -t geodan/gost:latest .
 
+. $ docker push geodan/gost
+
+```
+
 # Building GOST-db image
 
-. Clone the repository
+```
+. $ git close https://github.com/Geodan/gost.git
 
 . $ cd src/github.com/geodan/gost/src/docker/postgis
 
 . $ docker build -t geodan/gost-db .
+
+. $ docker push geodan/gost-db
+```
