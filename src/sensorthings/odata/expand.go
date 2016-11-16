@@ -9,20 +9,20 @@ import (
 // Expand retrieves the specified named property and represents it inline to the base entity.
 type QueryExpand struct {
 	QueryBase
-	params []string
+	Params []string
 }
 
 // Parse splits the given values by the , delimiter and stores the params, if the delimiter is not
 // a comma the IsValid will filter it out later on
 func (q *QueryExpand) Parse(value string) error {
 	q.RawQuery = value
-	q.params = strings.Split(value, ",")
+	q.Params = strings.Split(value, ",")
 	return nil
 }
 
 // IsValid checks if the endpoint supports the expand params given by the user
 func (q *QueryExpand) IsValid(values []string, endpointName string) (bool, error) {
-	for _, value := range q.params {
+	for _, value := range q.Params {
 		found := false
 		for _, param := range values {
 			if param == value {
