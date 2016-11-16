@@ -23,7 +23,7 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 
 	// as a start read only first expand parameter named
 	// ObservedProperty and add it to datastream
-	if qo.QueryExpand != nil {
+	if !qo.QueryExpand.IsNil() {
 		if qo.QueryExpand.Params[0] == "ObservedProperty" {
 			observedproperty, _ := a.db.GetObservedPropertyByDatastream(id, nil)
 			ds.ObservedProperty = observedproperty
