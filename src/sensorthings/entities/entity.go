@@ -22,6 +22,8 @@ const (
 	EntityTypeUnknown            EntityType = "Unknown"
 )
 
+var EntityTypeList = []EntityType{EntityTypeThing, EntityTypeLocation, EntityTypeHistoricalLocation, EntityTypeDatastream, EntityTypeSensor, EntityTypeObservedProperty, EntityTypeObservation, EntityTypeFeatureOfInterest, EntityTypeUnknown}
+
 // ToString return the string representation of the EntityType.
 func (e EntityType) ToString() string {
 	return fmt.Sprintf("%s", e)

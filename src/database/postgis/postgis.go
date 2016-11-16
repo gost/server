@@ -230,6 +230,17 @@ func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string
 
 	s := ""
 	for _, p := range properties {
+		skip := false
+		for _, e := range entities.EntityTypeList {
+			if p == e.ToString() {
+				skip = true
+				break
+			}
+		}
+		if skip {
+			continue
+		}
+
 		up := p
 
 		if len(prefix) > 0 {
