@@ -18,24 +18,26 @@ $ docker-compose up
 
 # Running GOST database
 
-. $ docker run -p 5432:5432 --name gost-db -d geodan/gost-db
+```
+. $ docker run -p 5432:5432 --name -e POSTGRES_DB=gost geodan/gost-db
+```
 
 Connect in pgadmin with localhost:5432 postgres/postgres
 
 GOST schema is in schema postgres.v1
 
 # Running GOST service and dashboard
-
+```
 $ docker run -p 8080:8080 --link gost-db:gost-db -e gost_db_host=gost-db geodan/gost
-
+```
 GOST is available at http://localhost:8080 
 
 For making connection to external database use environmental variables gost_db_host, gost_db_port, gost_db_user, gost_db_password:
 
 For example: 
-
+```
 docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gost geodan/gost
-
+```
 # Building GOST service and dashboard image
 
 ```
