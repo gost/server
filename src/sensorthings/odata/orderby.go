@@ -30,9 +30,15 @@ func (q *QueryOrderBy) Parse(value string) error {
 
 // IsValid checks if the given property value in the request is valid for the
 // used endpoint, returns an error if not supported
+// values = available properties of an entity
 func (q *QueryOrderBy) IsValid(values []string) (bool, error) {
-	//ToDo: implement check property to order by (is property supported on endpoint)
-	return true, nil
+	for _, s := range values {
+		if q.property == s {
+			return true, nil
+		}
+	}
+
+	return false, CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, q.property)
 }
 
 // GetQueryOptionType returns the QueryOptionType for QueryOrderBy

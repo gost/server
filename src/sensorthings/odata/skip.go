@@ -25,6 +25,11 @@ func (q *QuerySkip) Parse(value string) error {
 	return nil
 }
 
+// IsValid always returns true, errors are already filtered out by parse
+func (q *QuerySkip) IsValid() (bool, error) {
+	return true, nil
+}
+
 // GetQueryOptionType returns the QueryOptionType for QuerySkip
 func (q *QuerySkip) GetQueryOptionType() QueryOptionType {
 	return QueryOptionSkip

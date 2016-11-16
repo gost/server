@@ -28,9 +28,8 @@ func createObservedPropertiesEndpoint(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/observedproperties", HandleGetObservedProperties},
 			{models.HTTPOperationGet, "/v1.0/observedproperties{id}", HandleGetObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/observedproperties{id}/datastreams", HandleGetDatastreamsByObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/observedproperties{id}/datastreams/{params}", HandleGetDatastreamsByObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/observedproperties{id}/datastreams/{params}/$value", HandleGetDatastreamsByObservedProperty},
+			{models.HTTPOperationGet, "/v1.0/datastreams{id}/observedproperty", HandleGetObservedPropertyByDatastream},
+			{models.HTTPOperationGet, "/v1.0/datastreams{id}/observedproperty/{params}", HandleGetObservedPropertyByDatastream},
 			{models.HTTPOperationGet, "/v1.0/observedproperties{id}/{params}", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/observedproperties{id}/{params}/$value", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/observedproperties/{params}", HandleGetObservedProperties},
@@ -43,9 +42,8 @@ func createObservedPropertiesEndpoint(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties", HandleGetObservedProperties},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}", HandleGetObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}/datastreams", HandleGetDatastreamsByObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}/datastreams/{params}", HandleGetDatastreamsByObservedProperty},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}/datastreams/{params}/$value", HandleGetDatastreamsByObservedProperty},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/datastreams{id}/observedproperty", HandleGetObservedPropertyByDatastream},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/datastreams{id}/observedproperty/{params}", HandleGetObservedPropertyByDatastream},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}/{params}", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties{id}/{params}/$value", HandleGetObservedProperty},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observedproperties/{params}", HandleGetObservedProperties},

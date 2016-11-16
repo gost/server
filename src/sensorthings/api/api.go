@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/geodan/gost/src/configuration"
-	gostErrors "github.com/geodan/gost/src/errors"
+	//gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/mqtt"
@@ -120,12 +120,12 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 		return true, nil
 	}
 
-	if qo.QuerySelect != nil {
+	/*if qo.QuerySelect != nil {
 		s, err := qo.QuerySelect.IsValid(entity.GetPropertyNames())
 		if !s {
 			return false, gostErrors.NewBadRequestError(err)
 		}
-	}
+	}*/
 
 	return true, nil
 }

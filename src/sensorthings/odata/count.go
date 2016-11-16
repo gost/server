@@ -30,6 +30,11 @@ func (q *QueryCount) Parse(value string) error {
 	return nil
 }
 
+// IsValid always returns true, errors are already filtered out by parse
+func (q *QueryCount) IsValid() (bool, error) {
+	return true, nil
+}
+
 // IsNil checks if *QueryCount is nil
 func (q *QueryCount) IsNil() bool {
 	if q == nil {

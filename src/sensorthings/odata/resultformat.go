@@ -22,6 +22,11 @@ func (q *QueryResultFormat) Parse(value string) error {
 	return nil
 }
 
+// IsValid always returns true, errors are already filtered out by parse
+func (q *QueryResultFormat) IsValid() (bool, error) {
+	return true, nil
+}
+
 // GetQueryOptionType returns the QueryOptionType for QueryResultFormat
 func (q *QueryResultFormat) GetQueryOptionType() QueryOptionType {
 	return QueryOptionResultFormat

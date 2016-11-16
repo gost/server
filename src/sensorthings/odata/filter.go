@@ -23,6 +23,11 @@ func (q *QueryFilter) Parse(value string) error {
 	return nil
 }
 
+// IsValid always returns true, errors are already filtered out by parse
+func (q *QueryFilter) IsValid() (bool, error) {
+	return true, nil
+}
+
 // GetQueryOptionType returns the QueryOptionType for QueryFilter
 func (q *QueryFilter) GetQueryOptionType() QueryOptionType {
 	return QueryOptionFilter

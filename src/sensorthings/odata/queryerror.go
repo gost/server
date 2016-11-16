@@ -24,7 +24,7 @@ const (
 // CreateQueryError formats a query error, adding a value into the defined message
 // for example the QueryErrorMessage "The value %v for $top is invalid, please provide a non-negative integer"
 // will be formatted into "The value -1 for $top is invalid, please provide a non-negative integer"
-func CreateQueryError(msg QueryErrorMessage, status int, value ...string) error {
+func CreateQueryError(msg QueryErrorMessage, status int, value ...interface{}) error {
 	m := fmt.Sprintf("%s", msg)
-	return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value), status)
+	return gostErrors.NewErrorWithStatusCode(fmt.Errorf(m, value...), status)
 }

@@ -20,6 +20,7 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 			"Datastream",
 		},
 		SupportedSelectParams: []string{
+			"name",
 			"description",
 			"encodingType",
 			"metadata",
@@ -28,8 +29,9 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/sensors", HandleGetSensors},
 			{models.HTTPOperationGet, "/v1.0/sensors{id}", HandleGetSensor},
-			{models.HTTPOperationGet, "/v1.0/sensors{id}/datastreams", HandleGetDatastreamsBySensor},
-			{models.HTTPOperationGet, "/v1.0/sensors{id}/datastreams/{params}", HandleGetDatastreamsBySensor},
+			{models.HTTPOperationGet, "/v1.0/datastreams{id}/sensor", HandleGetSensorByDatastream},
+			{models.HTTPOperationGet, "/v1.0/datastreams{id}/sensor/{params}", HandleGetSensorByDatastream},
+			{models.HTTPOperationGet, "/v1.0/datastreams{id}/sensor/{params}/$value", HandleGetSensorByDatastream},
 			{models.HTTPOperationGet, "/v1.0/sensors{id}/{params}", HandleGetSensor},
 			{models.HTTPOperationGet, "/v1.0/sensors{id}/{params}/$value", HandleGetSensor},
 			{models.HTTPOperationGet, "/v1.0/sensors/{params}", HandleGetSensors},
@@ -41,8 +43,9 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors", HandleGetSensors},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors{id}", HandleGetSensor},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors{id}/datastreams", HandleGetDatastreamsBySensor},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors{id}/datastreams/{params}", HandleGetDatastreamsBySensor},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/datastreams{id}/sensor", HandleGetSensorByDatastream},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/datastreams{id}/sensor/{params}", HandleGetSensorByDatastream},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/datastreams{id}/sensor/{params}/$value", HandleGetSensorByDatastream},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors{id}/{params}", HandleGetSensor},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors{id}/{params}/$value", HandleGetSensor},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/sensors/{params}", HandleGetSensors},

@@ -66,7 +66,7 @@ func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (b
 	qo := *queryOptions
 	checkQueryOptionSupported(e, qo.QueryTop, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryTop.GetQueryOptionType().String(), e.Name))
 	checkQueryOptionSupported(e, qo.QuerySkip, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QuerySkip.GetQueryOptionType().String(), e.Name))
-	checkQueryOptionSupported(e, qo.QuerySelect, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QuerySkip.GetQueryOptionType().String(), e.Name))
+	checkQueryOptionSupported(e, qo.QuerySelect, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QuerySelect.GetQueryOptionType().String(), e.Name))
 	checkQueryOptionSupported(e, qo.QueryExpand, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryExpand.GetQueryOptionType().String(), e.Name))
 	checkQueryOptionSupported(e, qo.QueryOrderBy, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryOrderBy.GetQueryOptionType().String(), e.Name))
 	checkQueryOptionSupported(e, qo.QueryCount, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryCount.GetQueryOptionType().String(), e.Name))
@@ -90,6 +90,42 @@ func checkQueryOptionSupported(e *Endpoint, q odata.QueryOption, errorList *[]er
 	errors := *errorList
 	if !e.SupportsQueryOptionType(q.GetQueryOptionType()) {
 		*errorList = append(errors, err)
+	}
+
+	// check if query is valid for endpoint
+	switch v := q.(type) {
+	case *odata.QueryExpand:
+		if _, err = v.IsValid(e.SupportedExpandParams, e.Name); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QuerySelect:
+		if _, err = v.IsValid(e.SupportedSelectParams); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QueryOrderBy:
+		//ToDo
+	case *odata.QueryTop:
+		if _, err = v.IsValid(); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QuerySkip:
+		if _, err = v.IsValid(); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QueryCount:
+		if _, err = v.IsValid(); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QueryFilter:
+		if _, err = v.IsValid(); err != nil {
+			*errorList = append(errors, err)
+		}
+	case *odata.QueryResultFormat:
+		if _, err = v.IsValid(); err != nil {
+			*errorList = append(errors, err)
+		}
+	default:
+		//set error, unknown
 	}
 }
 

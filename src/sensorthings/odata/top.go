@@ -27,6 +27,11 @@ func (q *QueryTop) Parse(value string) error {
 	return nil
 }
 
+// IsValid always returns true, errors are already filtered out by parse
+func (q *QueryTop) IsValid() (bool, error) {
+	return true, nil
+}
+
 // GetQueryOptionType returns the QueryOptionType for QueryTop
 func (q *QueryTop) GetQueryOptionType() QueryOptionType {
 	return QueryOptionTop

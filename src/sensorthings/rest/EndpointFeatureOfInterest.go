@@ -20,6 +20,7 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 			"Observation",
 		},
 		SupportedSelectParams: []string{
+			"name",
 			"description",
 			"encodingType",
 			"feature",
@@ -28,14 +29,12 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/featuresofinterest", HandleGetFeatureOfInterests},
 			{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}", HandleGetFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/featureofinterest{id}/observations", HandleGetObservationsByFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}/observations", HandleGetObservationsByFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/featureofinterest{id}/observations/{params}", HandleGetObservationsByFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}/observations/{params}", HandleGetObservationsByFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}/{params}", HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}/{params}/$value", HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/featuresofinterest/{params}", HandleGetFeatureOfInterests},
-
+			{models.HTTPOperationGet, "/v1.0/observations{id}/featureofinterest", HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/observations{id}/featureofinterest/{params}", HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/observations{id}/featureofinterest/{params}/$value", HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationPost, "/v1.0/featuresofinterest", HandlePostFeatureOfInterest},
 			{models.HTTPOperationDelete, "/v1.0/featuresofinterest{id}", HandleDeleteFeatureOfInterest},
 			{models.HTTPOperationPatch, "/v1.0/featuresofinterest{id}", HandlePatchFeatureOfInterest},
@@ -43,10 +42,11 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest", HandleGetFeatureOfInterests},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}", HandleGetFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/observations", HandleGetObservationsByFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/observations/{params}", HandleGetObservationsByFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/{params}", HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/{params}/$value", HandleGetFeatureOfInterest},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofInterest", HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofinterest/{params}", HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofinterest/{params}/$value", HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest/{params}", HandleGetFeatureOfInterests},
 
 			{models.HTTPOperationPost, "/v1.0/{c:.*}/featuresofinterest", HandlePostFeatureOfInterest},
