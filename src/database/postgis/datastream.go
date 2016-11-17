@@ -10,6 +10,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
@@ -54,7 +55,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 		hasSelectQuery := (qo.QuerySelect != nil)
 		var containsObservedArea = true
 		if hasSelectQuery {
-			containsObservedArea = Contains(qo.QuerySelect.Params, "observedArea")
+			containsObservedArea = ContainsToLower(qo.QuerySelect.Params, "observedArea")
 		}
 
 		// calculate observedarea on the fly when not present in database
@@ -163,6 +164,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &id)
 			}
@@ -172,19 +174,19 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 			if p == "description" {
 				params = append(params, &description)
 			}
-			if p == "unitOfMeasurement" {
+			if p == "unitofmeasurement" {
 				params = append(params, &unitofmeasurement)
 			}
-			if p == "observationType" {
+			if p == "observationtype" {
 				params = append(params, &ot)
 			}
-			if p == "observedArea" {
+			if p == "observedarea" {
 				params = append(params, &observedarea)
 			}
-			if p == "phenomenonTime" {
+			if p == "phenomenontime" {
 				params = append(params, &phenomenonTime)
 			}
-			if p == "resultTime" {
+			if p == "resulttime" {
 				params = append(params, &resultTime)
 			}
 		}

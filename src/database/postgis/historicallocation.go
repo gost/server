@@ -9,6 +9,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 var hlMapping = map[string]string{"time": fmt.Sprintf("to_char(time at time zone 'UTC', '%s') as time", TimeFormat)}
@@ -102,6 +103,7 @@ func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, 
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &id)
 			}

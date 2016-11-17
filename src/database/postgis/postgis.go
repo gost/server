@@ -120,6 +120,16 @@ func Contains(s []string, e string) bool {
 	return false
 }
 
+// Contains checks a string array, array and given string are set to lower-case
+func ContainsToLower(s []string, e string) bool {
+	for _, a := range s {
+		if strings.ToLower(a) == strings.ToLower(e) {
+			return true
+		}
+	}
+	return false
+}
+
 // EntityExists checks if entity exists in database
 func EntityExists(gdb *GostDatabase, id interface{}, entityName string) bool {
 	var result bool
@@ -225,7 +235,13 @@ func CreateSelectString(e entities.Entity, qo *odata.QueryOptions, prefix string
 	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
 		properties = e.GetPropertyNames()
 	} else {
-		properties = qo.QuerySelect.Params
+		for _, p := range qo.QuerySelect.Params {
+			for _, pn := range e.GetPropertyNames() {
+				if strings.ToLower(p) == strings.ToLower(pn) {
+					properties = append(properties, pn)
+				}
+			}
+		}
 	}
 
 	s := ""

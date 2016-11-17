@@ -8,6 +8,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 // GetTotalSensors returns the total sensors count in the database
@@ -96,13 +97,14 @@ func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL str
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &id)
 			}
 			if p == "name" {
 				params = append(params, &name)
 			}
-			if p == "encodingType" {
+			if p == "encodingtype" {
 				params = append(params, &encodingType)
 			}
 			if p == "description" {

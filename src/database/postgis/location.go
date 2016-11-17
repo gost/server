@@ -11,6 +11,7 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
@@ -104,10 +105,11 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL s
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &sensorID)
 			}
-			if p == "encodingType" {
+			if p == "encodingtype" {
 				params = append(params, &encodingType)
 			}
 			if p == "name" {

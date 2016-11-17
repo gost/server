@@ -9,6 +9,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
@@ -134,10 +135,11 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &ID)
 			}
-			if p == "encodingType" {
+			if p == "encodingtype" {
 				params = append(params, &encodingType)
 			}
 			if p == "name" {

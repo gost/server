@@ -151,14 +151,14 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQ
 		if qo != nil && qo.QuerySelect != nil && len(qo.QuerySelect.Params) > 0 {
 			set := make(map[string]bool)
 			for _, v := range qo.QuerySelect.Params {
-				set[v] = true
+				set[strings.ToLower(v)] = true
 			}
 
 			_, ok := set["id"]
 			if !ok {
 				observation.ID = nil
 			}
-			_, ok = set["phenomenonTime"]
+			_, ok = set["phenomenontime"]
 			if !ok {
 				observation.PhenomenonTime = ""
 			}
@@ -166,15 +166,15 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQ
 			if !ok {
 				observation.Result = nil
 			}
-			_, ok = set["resultTime"]
+			_, ok = set["resulttime"]
 			if !ok {
 				observation.ResultTime = ""
 			}
-			_, ok = set["resultQuality"]
+			_, ok = set["resultquality"]
 			if !ok {
 				observation.ResultQuality = ""
 			}
-			_, ok = set["validTime"]
+			_, ok = set["validtime"]
 			if !ok {
 				observation.ValidTime = ""
 			}

@@ -11,6 +11,7 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strings"
 )
 
 // GetThing returns a thing entity based on id and query
@@ -107,6 +108,7 @@ func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL stri
 		}
 
 		for _, p := range qp {
+			p = strings.ToLower(p)
 			if p == "id" {
 				params = append(params, &thingID)
 			}

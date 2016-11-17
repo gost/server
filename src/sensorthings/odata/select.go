@@ -28,7 +28,7 @@ func (q *QuerySelect) IsValid(values []string) (bool, error) {
 	for _, rp := range q.Params {
 		found := false
 		for _, hp := range values {
-			if rp == strings.ToLower(hp) {
+			if strings.ToLower(rp) == strings.ToLower(hp) {
 				found = true
 			}
 		}
