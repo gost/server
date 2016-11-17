@@ -24,7 +24,7 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 			"description",
 			"encodingType",
 			"metadata",
-			"Datastreams",
+			"Datastream",
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/sensors", HandleGetSensors},

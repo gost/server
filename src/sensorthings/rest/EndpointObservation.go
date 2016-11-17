@@ -21,10 +21,14 @@ func createObservationsEndpoint(externalURL string) *Endpoint {
 			"FeatureOfInterest",
 		},
 		SupportedSelectParams: []string{
-			"description",
-			"encodingType",
-			"feature",
-			"Observations",
+			"result",
+			"phenomenonTime",
+			"resultTime",
+			"resultQuality",
+			"validTime",
+			"parameters",
+			"Datastream",
+			"FeatureOfInterest",
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/observations", HandleGetObservations},

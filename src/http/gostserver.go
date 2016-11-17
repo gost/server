@@ -62,8 +62,8 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 		lowerCasePath := strings.ToLower(r.URL.Path)
 		split := strings.Split(lowerCasePath, "/")
 
-		for _, s := range split {
-			if len(s) == 0 {
+		for i, s := range split {
+			if len(s) == 0 || i+1 == len(split) {
 				continue
 			}
 

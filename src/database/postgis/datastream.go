@@ -16,7 +16,6 @@ var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastrea
 
 // GetObservedArea returns the observed area of all observations of datastream
 func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
-
 	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
 	sql := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
 	rows, err := gdb.Db.Query(sql)
