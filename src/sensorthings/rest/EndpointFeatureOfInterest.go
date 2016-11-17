@@ -20,6 +20,7 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 			"Observation",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"name",
 			"description",
 			"encodingType",

@@ -21,6 +21,7 @@ func createObservationsEndpoint(externalURL string) *Endpoint {
 			"FeatureOfInterest",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"result",
 			"phenomenonTime",
 			"resultTime",

@@ -22,6 +22,7 @@ func createThingsEndpoint(externalURL string) *Endpoint {
 			"HistoricalLocations",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"name",
 			"properties",
 			"description",

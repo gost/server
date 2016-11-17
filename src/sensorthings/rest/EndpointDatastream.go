@@ -23,6 +23,7 @@ func createDatastreamsEndpoint(externalURL string) *Endpoint {
 			"Observations",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"name",
 			"description",
 			"unitOfMeasurement",

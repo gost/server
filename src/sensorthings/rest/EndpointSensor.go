@@ -20,6 +20,7 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 			"Datastream",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"name",
 			"description",
 			"encodingType",

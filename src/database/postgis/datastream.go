@@ -58,7 +58,7 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 			containsObservedArea = ContainsToLower(qo.QuerySelect.Params, "observedArea")
 		}
 
-		// calculate observedarea on the fly when not present in database
+		// calculate observedArea on the fly when not present in database
 		if containsObservedArea {
 			if datastream.ObservedArea == nil {
 				observedArea, _ := gdb.GetObservedArea(intID)
@@ -76,6 +76,8 @@ func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Dat
 	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.datastream", gdb.Schema)
 	return processDatastreams(gdb.Db, sql, qo, countSQL)
 }
+
+// expand
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
 func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {

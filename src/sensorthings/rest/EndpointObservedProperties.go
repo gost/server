@@ -20,6 +20,7 @@ func createObservedPropertiesEndpoint(externalURL string) *Endpoint {
 			"Datastreams",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"name",
 			"definition",
 			"description",

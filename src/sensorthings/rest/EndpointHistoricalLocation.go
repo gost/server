@@ -21,6 +21,7 @@ func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
 			"thing",
 		},
 		SupportedSelectParams: []string{
+			"id",
 			"time",
 		},
 		Operations: []models.EndpointOperation{
