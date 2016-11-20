@@ -51,8 +51,6 @@ func (s *GostServer) Stop() {
 
 // LowerCaseURI is a middleware function that lower cases the url path
 func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
-	api := *s.api
-
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(strings.ToLower(r.URL.Path), "dashboard") {
 			h.ServeHTTP(w, r)
@@ -60,27 +58,30 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 		}
 
 		lowerCasePath := strings.ToLower(r.URL.Path)
-		split := strings.Split(lowerCasePath, "/")
+		// temporarily disabled checking on paths due to problems in serving with /$value
+		/*
+			api := *s.api
+			split := strings.Split(lowerCasePath, "/")
+			for i, s := range split {
+				if len(s) == 0 || i+1 == len(split) {
+					continue
+				}
 
-		for i, s := range split {
-			if len(s) == 0 || i+1 == len(split) {
-				continue
-			}
+				found := false
+				for _, a := range api.GetAcceptedPaths() {
+					if strings.HasPrefix(s, a) {
+						found = true
+					}
+				}
 
-			found := false
-			for _, a := range api.GetAcceptedPaths() {
-				if strings.HasPrefix(s, a) {
-					found = true
+				if !found {
+					w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+					w.WriteHeader(http.StatusNotFound)
+					w.Write([]byte(""))
+					return
 				}
 			}
-
-			if !found {
-				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-				w.WriteHeader(http.StatusNotFound)
-				w.Write([]byte(""))
-				return
-			}
-		}
+		*/
 
 		r.URL.Path = lowerCasePath
 		h.ServeHTTP(w, r)

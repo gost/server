@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
@@ -24,35 +25,44 @@ func getEntityID(r *http.Request) string {
 // went wrong with parsing the query into QueryOptions and will contain information
 // on what went wrong
 func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
-	query := r.URL.Query()
+	query := make(map[string]string)
+	if strings.Contains(r.URL.String(), "?") {
+		splitQuery := strings.Split(r.URL.RawQuery, "&")
+		for _, sq := range splitQuery {
+			splitIndex := strings.Index(sq, "=")
+			if splitIndex == -1 {
+				return nil, []error{fmt.Errorf("Incorrect request: %s", r.URL.RawQuery)}
+			}
+
+			query[sq[:splitIndex]] = sq[splitIndex+1:]
+		}
+	}
 
 	//If request contains parameters from route wildcard convert it to a select query
 	vars := mux.Vars(r)
-	value := []string{vars["params"]}
+	value := vars["params"]
 
 	if len(vars["params"]) > 0 {
 		//If $ref found create select query with id
 		if vars["params"] == "$ref" {
-			value = []string{"id"}
-			query["$ref"] = []string{"true"}
+			value = "id"
+			query["$ref"] = "true"
 		}
 
 		query["$select"] = value
 	}
 
 	if strings.HasSuffix(r.URL.Path, "$value") {
-		query["$value"] = []string{"true"}
+		query["$value"] = "true"
 	}
 
 	// if $top is not found, retrieve max 200
-	_, ok := query["$top"]
-	if !ok {
-		query["$top"] = []string{"200"}
+	if _, ok := query["$top"]; !ok {
+		query["$top"] = "200"
 	}
 
-	_, ok = query["$skip"]
-	if !ok {
-		query["$skip"] = []string{"0"}
+	if _, ok := query["$skip"]; !ok {
+		query["$skip"] = "0"
 	}
 
 	qo, e := odata.CreateQueryOptions(query)

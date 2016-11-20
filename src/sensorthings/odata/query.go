@@ -1,9 +1,6 @@
 package odata
 
 import (
-	"net/url"
-	"strings"
-
 	"net/http"
 )
 
@@ -73,15 +70,13 @@ type QueryOptions struct {
 
 // CreateQueryOptions parses the requested request parameters into usable Query options
 // and filters out invalid requests
-func CreateQueryOptions(queryParams url.Values) (*QueryOptions, []error) {
+func CreateQueryOptions(queryParams map[string]string) (*QueryOptions, []error) {
 	qo := &QueryOptions{}
 
 	var errorList []error
 	err := &errorList
 
-	for key, values := range queryParams {
-		value := strings.Join(values, " ")
-
+	for key, value := range queryParams {
 		switch key {
 		case QueryOptionExpand.String():
 			qo.QueryExpand = &QueryExpand{}
