@@ -8,6 +8,8 @@ For database: [https://hub.docker.com/r/geodan/gost-db/]
 
 The docker images can run separately, or running in a combined way using the Dockercompose file. 
 
+If you want to use the latest (unstable) build of GOST, you can use the automated builds found here: [https://hub.docker.com/r/geodan/gost-nightly/] and here: [https://hub.docker.com/r/geodan/gost-db-nightly/] there is no guarantee these images will run correctly. 
+
 # Running GOST with Docker-compose
 
 ```
