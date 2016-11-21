@@ -21,19 +21,19 @@ func observationParamFactory(key string, value interface{}) (string, string, err
 		return "id", val, nil
 		break
 	case "phenomenonTime":
-		return "data ->> 'phenomenonTime'", jsonVal, nil
+		return "data -> 'phenomenonTime'", jsonVal, nil
 		break
 	case "resultTime":
-		return "data ->> 'resultTime'", jsonVal, nil
+		return "data -> 'resultTime'", jsonVal, nil
 		break
 	case "result":
-		return "data ->> 'result'", jsonVal, nil
+		return "data -> 'result'", jsonVal, nil
 		break
 	case "resultQuality":
-		return "data ->> 'resultQuality'", jsonVal, nil
+		return "data -> 'resultQuality'", jsonVal, nil
 		break
 	case "parameters": //implement parameters/parameterName
-		return "data ->> 'parameters'", jsonVal, nil
+		return "data -> 'parameters'", jsonVal, nil
 		break
 	}
 

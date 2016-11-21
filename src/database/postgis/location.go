@@ -138,7 +138,10 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL s
 		l.Name = name
 		l.Description = description
 		l.Location = locationMap
-		l.EncodingType = entities.EncodingValues[encodingType].Value
+		if encodingType != 0 {
+			l.EncodingType = entities.EncodingValues[encodingType].Value
+		}
+
 		locations = append(locations, &l)
 	}
 

@@ -9,6 +9,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
+	"net/url"
 )
 
 // getEntityID retrieves the id from the request, for example
@@ -27,7 +28,8 @@ func getEntityID(r *http.Request) string {
 func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 	query := make(map[string]string)
 	if strings.Contains(r.URL.String(), "?") {
-		splitQuery := strings.Split(r.URL.RawQuery, "&")
+		unescapedQuery, _ := url.QueryUnescape(r.URL.RawQuery)
+		splitQuery := strings.Split(unescapedQuery, "&")
 		for _, sq := range splitQuery {
 			splitIndex := strings.Index(sq, "=")
 			if splitIndex == -1 {
