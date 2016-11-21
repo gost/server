@@ -21,7 +21,7 @@ $ docker-compose up
 # Running GOST database
 
 ```
-. $ docker run -p 5432:5432 --name -e POSTGRES_DB=gost geodan/gost-db
+. $ docker run -p 5432:5432 -e POSTGRES_DB=gost geodan/gost-db
 ```
 
 Connect in pgadmin with localhost:5432 postgres/postgres
