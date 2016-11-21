@@ -33,8 +33,14 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
 			}
 
-			mVal, ok := m[qo.QuerySelect.Params[0]]
-			if !ok {
+			mVal := []byte{}
+			for k, v := range m {
+				if strings.ToLower(k) == qo.QuerySelect.Params[0] {
+					mVal = v
+				}
+			}
+
+			if len(mVal) == 0 {
 				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
 			}
 
@@ -46,7 +52,6 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 		}
 
 		w.Write(b)
-
 	}
 }
 
