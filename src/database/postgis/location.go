@@ -41,7 +41,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v order by id desc limit 1", gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v", gdb.Schema, gdb.Schema, intID)
 	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v", gdb.Schema, gdb.Schema, intID)
 	return processLocations(gdb.Db, sql, qo, countSQL)
 }
