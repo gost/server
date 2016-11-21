@@ -14,7 +14,7 @@ func TestExpandParserShouldFillParams(t *testing.T) {
 
 	//assert
 	assert.Nil(t, res, "Parse result should be nil")
-	assert.True(t, len(expand.params) > 0, "Expand params should be filled")
+	assert.True(t, len(expand.Params) > 0, "Expand params should be filled")
 }
 
 func TestExpandIsValidShouldReturnTrueWhenValid(t *testing.T) {
