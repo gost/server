@@ -27,12 +27,30 @@ func (a HttpEndpoints) Less(i, j int) bool {
 	firstDynamic := isDynamic(a[i].Operation.Path)
 	secondDynamic := isDynamic(a[j].Operation.Path)
 
+	if strings.Contains(a[i].Operation.Path, "{c:.*}") && !strings.Contains(a[j].Operation.Path, "{c:.*}") {
+		return false
+	}
+
+	if !strings.Contains(a[i].Operation.Path, "{c:.*}") && strings.Contains(a[j].Operation.Path, "{c:.*}") {
+		return true
+	}
+
 	if firstDynamic && !secondDynamic {
 		return false
 	}
 
 	if !firstDynamic && secondDynamic {
 		return true
+	}
+
+	if firstDynamic && secondDynamic {
+		dynamicI := strings.Count(a[i].Operation.Path, "{")
+		dynamicJ := strings.Count(a[j].Operation.Path, "{")
+		if dynamicI == dynamicJ {
+			return len(a[i].Operation.Path) > len(a[j].Operation.Path)
+		} else {
+			return strings.Count(a[i].Operation.Path, "{") < strings.Count(a[j].Operation.Path, "{")
+		}
 	}
 
 	if len(a[i].Operation.Path) != len(a[j].Operation.Path) {

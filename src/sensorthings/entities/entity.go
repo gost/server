@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	gostErrors "github.com/geodan/gost/src/errors"
+	"strings"
 )
 
 // EntityType holds the name and type of a SensorThings entity.
@@ -11,22 +12,46 @@ type EntityType string
 
 // List of all EntityTypes.
 const (
-	EntityTypeThing              EntityType = "Thing"
-	EntityTypeLocation           EntityType = "Location"
-	EntityTypeHistoricalLocation EntityType = "HistoricalLocation"
-	EntityTypeDatastream         EntityType = "Datastream"
-	EntityTypeSensor             EntityType = "Sensor"
-	EntityTypeObservedProperty   EntityType = "ObservedProperty"
-	EntityTypeObservation        EntityType = "Observation"
-	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
-	EntityTypeUnknown            EntityType = "Unknown"
+	EntityTypeThing               EntityType = "Thing"
+	EntityTypeThings              EntityType = "Things"
+	EntityTypeLocation            EntityType = "Location"
+	EntityTypeLocations           EntityType = "Locations"
+	EntityTypeHistoricalLocation  EntityType = "HistoricalLocation"
+	EntityTypeHistoricalLocations EntityType = "HistoricalLocations"
+	EntityTypeDatastream          EntityType = "Datastream"
+	EntityTypeDatastreams         EntityType = "Datastreams"
+	EntityTypeSensor              EntityType = "Sensor"
+	EntityTypeSensors             EntityType = "Sensors"
+	EntityTypeObservedProperty    EntityType = "ObservedProperty"
+	EntityTypeObservedProperties  EntityType = "ObservedProperties"
+	EntityTypeObservation         EntityType = "Observation"
+	EntityTypeObservations        EntityType = "Observations"
+	EntityTypeFeatureOfInterest   EntityType = "FeatureOfInterest"
+	EntityTypeFeaturesOfInterest  EntityType = "FeaturesOfInterest"
+	EntityTypeUnknown             EntityType = "Unknown"
 )
 
-var EntityTypeList = []EntityType{EntityTypeThing, EntityTypeLocation, EntityTypeHistoricalLocation, EntityTypeDatastream, EntityTypeSensor, EntityTypeObservedProperty, EntityTypeObservation, EntityTypeFeatureOfInterest, EntityTypeUnknown}
+var EntityTypeList = []EntityType{EntityTypeThing, EntityTypeThings,
+	EntityTypeLocation, EntityTypeLocations, EntityTypeHistoricalLocation, EntityTypeHistoricalLocations,
+	EntityTypeDatastream, EntityTypeDatastreams, EntityTypeSensor, EntityTypeSensors,
+	EntityTypeObservedProperty, EntityTypeObservedProperties, EntityTypeObservations,
+	EntityTypeObservation, EntityTypeFeatureOfInterest, EntityTypeFeaturesOfInterest, EntityTypeUnknown}
 
 // ToString return the string representation of the EntityType.
 func (e EntityType) ToString() string {
 	return fmt.Sprintf("%s", e)
+}
+
+// EntityTypeFromString returns the EntityType for a given string
+// function is case-insensitive
+func EntityTypeFromString(e string) (*EntityType, error) {
+	for _, et := range EntityTypeList {
+		if strings.ToLower(e) == strings.ToLower(et.ToString()) {
+			return &et, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Unknown entity %s", e)
 }
 
 // EntityLink holds the name and type of a SensorThings entity link.
