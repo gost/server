@@ -10,7 +10,7 @@ func TestExpandParserShouldFillParams(t *testing.T) {
 	expand := QueryExpand{}
 
 	//act
-	res := expand.Parse("fld1,fld2")
+	res := expand.Parse("Thing,Location")
 
 	//assert
 	assert.Nil(t, res, "Parse result should be nil")
@@ -20,8 +20,8 @@ func TestExpandParserShouldFillParams(t *testing.T) {
 func TestExpandIsValidShouldReturnTrueWhenValid(t *testing.T) {
 	//arrange
 	expand := QueryExpand{}
-	expand.Parse("fld1,fld2")
-	var vals = []string{"fld1", "fld2"}
+	expand.Parse("Thing,Location")
+	var vals = []string{"Thing", "Location"}
 
 	//act
 	bln, _ := expand.IsValid(vals, "haha")
