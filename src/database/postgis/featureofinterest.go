@@ -165,7 +165,9 @@ func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, c
 		foi.Name = name
 		foi.Description = description
 		foi.Feature = featureMap
-		foi.EncodingType = entities.EncodingValues[encodingType].Value
+		if encodingType != 0 {
+			foi.EncodingType = entities.EncodingValues[encodingType].Value
+		}
 
 		featureOfInterests = append(featureOfInterests, &foi)
 	}
