@@ -35,6 +35,7 @@ type GostDatabase struct {
 	MaxIdeConns  int
 	MaxOpenConns int
 	Db           *sql.DB
+	QueryBuilder *queryBuilder
 }
 
 // NewDatabase initialises the PostgreSQL database
@@ -43,7 +44,7 @@ type GostDatabase struct {
 //	password = database password
 //	database = name of database
 //	ssl = Whether to use secure TCP/IP connections (TLS).
-func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool, maxIdeConns int, maxOpenConns int) models.Database {
+func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool, maxIdeConns int, maxOpenConns int, maxTop int) models.Database {
 	return &GostDatabase{
 		Host:         host,
 		Port:         port,
@@ -54,11 +55,13 @@ func NewDatabase(host string, port int, user string, password string, database s
 		Ssl:          ssl,
 		MaxIdeConns:  maxIdeConns,
 		MaxOpenConns: maxOpenConns,
+		QueryBuilder: CreateQueryBuilder(schema, maxTop),
 	}
 }
 
 // Start the database
 func (gdb *GostDatabase) Start() {
+	gdb.QueryBuilder.Test()
 	//ToDo: implement SSL
 	log.Println("Creating database connection...")
 	log.Printf("Database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
@@ -73,13 +76,7 @@ func (gdb *GostDatabase) Start() {
 	}
 
 	gdb.Db = db
-	// err2 := gdb.Db.Ping()
-	// if err2 != nil {
-	// 	log.Fatal("Unable to connect to database, check your network connection.")
-	// }
-
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
-
 }
 
 // CreateSchema creates the needed schema in the database

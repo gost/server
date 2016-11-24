@@ -9,7 +9,7 @@ import (
 
 // work in progress
 type ExpandOperation struct {
-	Entity          *entities.EntityType
+	Entity          entities.Entity
 	QueryOptions    *QueryOptions
 	ExpandOperation *ExpandOperation
 }
@@ -32,7 +32,7 @@ func (e *ExpandOperation) Create(eo string) []error {
 		fp = fp[:queryIndexStart]
 	}
 
-	if et, err := entities.EntityTypeFromString(fp); err != nil {
+	if et, err := entities.EntityFromString(fp); err != nil {
 		return []error{fmt.Errorf("Unable to create expand query, unknown entity %s", fp)}
 	} else {
 		e.Entity = et
@@ -45,7 +45,7 @@ func (e *ExpandOperation) Create(eo string) []error {
 		for _, q := range splitQuery {
 			kvp := strings.Split(q, "=")
 			if len(kvp) != 2 {
-				return []error{fmt.Errorf("Invalid query (%s) inside $expand %s", queryString, e.Entity.ToString())}
+				return []error{fmt.Errorf("Invalid query (%s) inside $expand %s", queryString, e.Entity.GetEntityType().ToString())}
 			}
 			values[kvp[0]] = kvp[1]
 		}
@@ -92,16 +92,16 @@ func (q *QueryExpand) Parse(value string) error {
 	}
 
 	// debug print
-	//for _, test := range q.Operations {
-	//	displayExpandOperation(test)
-	//}
+	/*for _, test := range q.Operations {
+		displayExpandOperation(test)
+	}*/
 
 	return nil
 }
 
 // debug
 func displayExpandOperation(e ExpandOperation) {
-	fmt.Println("====== top level expand: " + *e.Entity + " ======")
+	fmt.Println("====== top level expand: " + e.Entity.GetEntityType().ToString() + " ======")
 	printQueries(e.QueryOptions)
 	if e.ExpandOperation != nil {
 		displayExpandOperationLower(e.ExpandOperation, 1)
@@ -109,7 +109,7 @@ func displayExpandOperation(e ExpandOperation) {
 }
 
 func displayExpandOperationLower(e *ExpandOperation, level int) {
-	fmt.Printf("--- sub expand %v: %s ---\n", level, *e.Entity)
+	fmt.Printf("--- sub expand %v: %s ---\n", level, e.Entity.GetEntityType().ToString())
 	printQueries(e.QueryOptions)
 }
 
@@ -117,7 +117,7 @@ func printQueries(qo *QueryOptions) {
 	if qo != nil {
 		fmt.Println(" Queries:")
 		test2 := *qo.QuerySelect
-		fmt.Println("    HIEP HOI " + test2.RawQuery)
+		fmt.Println("    " + test2.RawQuery)
 	} else {
 		fmt.Println(" No queries defined")
 	}

@@ -12,46 +12,85 @@ type EntityType string
 
 // List of all EntityTypes.
 const (
-	EntityTypeThing               EntityType = "Thing"
-	EntityTypeThings              EntityType = "Things"
-	EntityTypeLocation            EntityType = "Location"
-	EntityTypeLocations           EntityType = "Locations"
-	EntityTypeHistoricalLocation  EntityType = "HistoricalLocation"
-	EntityTypeHistoricalLocations EntityType = "HistoricalLocations"
-	EntityTypeDatastream          EntityType = "Datastream"
-	EntityTypeDatastreams         EntityType = "Datastreams"
-	EntityTypeSensor              EntityType = "Sensor"
-	EntityTypeSensors             EntityType = "Sensors"
-	EntityTypeObservedProperty    EntityType = "ObservedProperty"
-	EntityTypeObservedProperties  EntityType = "ObservedProperties"
-	EntityTypeObservation         EntityType = "Observation"
-	EntityTypeObservations        EntityType = "Observations"
-	EntityTypeFeatureOfInterest   EntityType = "FeatureOfInterest"
-	EntityTypeFeaturesOfInterest  EntityType = "FeaturesOfInterest"
-	EntityTypeUnknown             EntityType = "Unknown"
+	EntityTypeThing              EntityType = "Thing"
+	EntityTypeLocation           EntityType = "Location"
+	EntityTypeHistoricalLocation EntityType = "HistoricalLocation"
+	EntityTypeDatastream         EntityType = "Datastream"
+	EntityTypeSensor             EntityType = "Sensor"
+	EntityTypeObservedProperty   EntityType = "ObservedProperty"
+	EntityTypeObservation        EntityType = "Observation"
+	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
+	EntityTypeUnknown            EntityType = "Unknown"
 )
 
-var EntityTypeList = []EntityType{EntityTypeThing, EntityTypeThings,
-	EntityTypeLocation, EntityTypeLocations, EntityTypeHistoricalLocation, EntityTypeHistoricalLocations,
-	EntityTypeDatastream, EntityTypeDatastreams, EntityTypeSensor, EntityTypeSensors,
-	EntityTypeObservedProperty, EntityTypeObservedProperties, EntityTypeObservations,
-	EntityTypeObservation, EntityTypeFeatureOfInterest, EntityTypeFeaturesOfInterest, EntityTypeUnknown}
+// EntityTypeList is a list for all known entity types
+var EntityTypeList = []EntityType{EntityTypeThing,
+	EntityTypeLocation, EntityTypeHistoricalLocation,
+	EntityTypeDatastream, EntityTypeSensor,
+	EntityTypeObservedProperty, EntityTypeObservation,
+	EntityTypeFeatureOfInterest, EntityTypeUnknown,
+}
+
+// Map of strings that map a string to an EntityType
+var StringEntityMap = map[string]EntityType{
+	"thing": EntityTypeThing, "things": EntityTypeThing,
+	"location": EntityTypeLocation, "locations": EntityTypeLocation,
+	"historicallocation": EntityTypeHistoricalLocation, "historicallocations": EntityTypeHistoricalLocation,
+	"datastream": EntityTypeDatastream, "datastreams": EntityTypeDatastream,
+	"sensor": EntityTypeSensor, "sensors": EntityTypeSensor,
+	"observedproperty": EntityTypeObservedProperty, "observedproperties": EntityTypeObservedProperty,
+	"observation": EntityTypeObservation, "observations": EntityTypeObservation,
+	"featureofinterest": EntityTypeFeatureOfInterest, "featuresofinterest": EntityTypeFeatureOfInterest,
+}
 
 // ToString return the string representation of the EntityType.
 func (e EntityType) ToString() string {
 	return fmt.Sprintf("%s", e)
 }
 
-// EntityTypeFromString returns the EntityType for a given string
-// function is case-insensitive
-func EntityTypeFromString(e string) (*EntityType, error) {
-	for _, et := range EntityTypeList {
-		if strings.ToLower(e) == strings.ToLower(et.ToString()) {
-			return &et, nil
-		}
+// EntityFromType returns an empty entity belonging to the type
+// returns nil if type cannot be mapped to an entity
+func EntityFromType(e EntityType) Entity {
+	switch e {
+	case EntityTypeThing:
+		return &Thing{}
+	case EntityTypeLocation:
+		return &Location{}
+	case EntityTypeHistoricalLocation:
+		return &HistoricalLocation{}
+	case EntityTypeDatastream:
+		return &Datastream{}
+	case EntityTypeSensor:
+		return &Sensor{}
+	case EntityTypeObservedProperty:
+		return &ObservedProperty{}
+	case EntityTypeObservation:
+		return &Observation{}
+	case EntityTypeFeatureOfInterest:
+		return &FeatureOfInterest{}
 	}
 
-	return nil, fmt.Errorf("Unknown entity %s", e)
+	return nil
+}
+
+// EntityFromString returns an empty entity based on a string, returns error
+// if string cannot be mapped to an entity
+func EntityFromString(e string) (Entity, error) {
+	if e, err := EntityTypeFromString(e); err != nil {
+		return nil, err
+	} else {
+		return EntityFromType(e), nil
+	}
+}
+
+// EntityTypeFromString returns the EntityType for a given string
+// function is case-insensitive
+func EntityTypeFromString(e string) (EntityType, error) {
+	if val, ok := StringEntityMap[strings.ToLower(e)]; !ok {
+		return EntityTypeUnknown, fmt.Errorf("Unknown entity %s", e)
+	} else {
+		return val, nil
+	}
 }
 
 // EntityLink holds the name and type of a SensorThings entity link.

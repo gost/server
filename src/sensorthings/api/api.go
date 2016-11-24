@@ -120,13 +120,6 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 		return true, nil
 	}
 
-	/*if qo.QuerySelect != nil {
-		s, err := qo.QuerySelect.IsValid(entity.GetPropertyNames())
-		if !s {
-			return false, gostErrors.NewBadRequestError(err)
-		}
-	}*/
-
 	return true, nil
 }
 

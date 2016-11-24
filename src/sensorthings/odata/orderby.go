@@ -9,8 +9,8 @@ import (
 // orderby Is used to specify which properties are used to order the collection of entities identified by the resource path.
 type QueryOrderBy struct {
 	QueryBase
-	suffix   string
-	property string
+	Suffix   string
+	Property string
 }
 
 // Parse tries to parse the OrderBy query into a suffix and property value
@@ -19,12 +19,12 @@ type QueryOrderBy struct {
 func (q *QueryOrderBy) Parse(value string) error {
 	q.RawQuery = value
 	ob := strings.Split(value, " ")
-	if len(ob) != 2 || (ob[1] != "asc" && ob[1] != "desc") || len(ob[0]) < 1 {
+	if len(ob) != 2 || (strings.ToLower(ob[1]) != "asc" && strings.ToLower(ob[1]) != "desc") || len(ob[0]) < 1 {
 		return CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, value)
 	}
 
-	q.property = ob[0]
-	q.suffix = ob[1]
+	q.Property = ob[0]
+	q.Suffix = ob[1]
 	return nil
 }
 
@@ -33,12 +33,12 @@ func (q *QueryOrderBy) Parse(value string) error {
 // values = available properties of an entity
 func (q *QueryOrderBy) IsValid(values []string) (bool, error) {
 	for _, s := range values {
-		if q.property == s {
+		if q.Property == s {
 			return true, nil
 		}
 	}
 
-	return false, CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, q.property)
+	return false, CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, q.Property)
 }
 
 // GetQueryOptionType returns the QueryOptionType for QueryOrderBy

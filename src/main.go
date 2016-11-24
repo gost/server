@@ -27,7 +27,7 @@ func main() {
 
 	configuration.SetEnvironmentVariables(&conf)
 
-	database := postgis.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL, conf.Database.MaxIdleConns, conf.Database.MaxOpenConns)
+	database := postgis.NewDatabase(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Password, conf.Database.Database, conf.Database.Schema, conf.Database.SSL, conf.Database.MaxIdleConns, conf.Database.MaxOpenConns, conf.Server.MaxEntityResponse)
 	database.Start()
 
 	// if install is supplied create database and close, if not start server
