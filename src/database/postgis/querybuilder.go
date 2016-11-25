@@ -7,64 +7,6 @@ import (
 	"strings"
 )
 
-// tables as defined in postgis
-var (
-	thingTable              = "thing"
-	locationTable           = "location"
-	historicalLocationTable = "historicallocation"
-	sensorTable             = "sensor"
-	observedPropertyTable   = "observedproperty"
-	datastreamTable         = "datastream"
-	observationTable        = "observation"
-	featureOfInterestTable  = "featureofinterest"
-)
-
-// thing fields
-var (
-	thingID          = fmt.Sprintf("%s.id", thingTable)
-	thingName        = fmt.Sprintf("%s.name", thingTable)
-	thingDescription = fmt.Sprintf("%s.description", thingTable)
-	thingProperties  = fmt.Sprintf("%s.properties", thingTable)
-)
-
-// datastream fields
-var (
-	datastreamID                 = fmt.Sprintf("%s.id", datastreamTable)
-	datastreamName               = fmt.Sprintf("%s.name", datastreamTable)
-	datastreamDescription        = fmt.Sprintf("%s.description", datastreamTable)
-	datastreamUnitOfMeasurement  = fmt.Sprintf("%s.unitofmeasurement", datastreamTable)
-	datastreamObservationType    = fmt.Sprintf("%s.observationtype", datastreamTable)
-	datastreamObservedArea       = fmt.Sprintf("%s.observedarea", datastreamTable)
-	datastreamPhenomenonTime     = fmt.Sprintf("%s.phenomenontime", datastreamTable)
-	datastreamResultTime         = fmt.Sprintf("%s.resulttime", datastreamTable)
-	datastreamThingID            = fmt.Sprintf("%s.thing_id", datastreamTable)
-	datastreamSensorID           = fmt.Sprintf("%s.sensor_id", datastreamTable)
-	datastreamObservedPropertyID = fmt.Sprintf("%s.observedproperty_id", datastreamTable)
-)
-
-// maps an entity property name to the right field
-var selectMapping = map[entities.EntityType]map[string]string{
-	entities.EntityTypeThing: {
-		"id":          thingID,
-		"name":        thingName,
-		"description": thingDescription,
-		"properties":  thingProperties,
-	},
-	entities.EntityTypeDatastream: {
-		"id":                  datastreamID,
-		"name":                datastreamName,
-		"description":         datastreamDescription,
-		"unitofmeasurement":   datastreamUnitOfMeasurement,
-		"observationtype":     datastreamObservationType,
-		"observedarea":        fmt.Sprintf("public.ST_AsGeoJSON(%s)", datastreamObservedArea),
-		"phenomenontime":      datastreamPhenomenonTime,
-		"resulttime":          datastreamResultTime,
-		"thing_id":            datastreamThingID,
-		"sensor_id":           datastreamSensorID,
-		"observedproperty_id": datastreamObservedPropertyID,
-	},
-}
-
 type queryBuilder struct {
 	maxTop int
 	schema string
@@ -79,48 +21,27 @@ func CreateQueryBuilder(schema string, maxTop int) *queryBuilder {
 	qb := &queryBuilder{
 		schema: schema,
 		maxTop: maxTop,
-		tables: createEntityTableMap(schema),
-		joins:  createJoinMapping(),
+		tables: createTableMappings(schema),
 	}
+
+	qb.joins = createJoinMappings(qb.tables)
 
 	return qb
 }
 
-func createEntityTableMap(schema string) map[entities.EntityType]string {
-	if len(schema) > 0 && !strings.Contains(schema, ".") {
-		schema = fmt.Sprintf("%s.", schema)
-	}
-
-	entityTypeTableMap := map[entities.EntityType]string{
-		entities.EntityTypeThing:              fmt.Sprintf("%s%s", schema, thingTable),
-		entities.EntityTypeLocation:           fmt.Sprintf("%s%s", schema, locationTable),
-		entities.EntityTypeHistoricalLocation: fmt.Sprintf("%s%s", schema, historicalLocationTable),
-		entities.EntityTypeSensor:             fmt.Sprintf("%s%s", schema, sensorTable),
-		entities.EntityTypeObservedProperty:   fmt.Sprintf("%s%s", schema, observedPropertyTable),
-		entities.EntityTypeDatastream:         fmt.Sprintf("%s%s", schema, datastreamTable),
-		entities.EntityTypeObservation:        fmt.Sprintf("%s%s", schema, observationTable),
-		entities.EntityTypeFeatureOfInterest:  fmt.Sprintf("%s%s", schema, featureOfInterestTable),
-	}
-
-	return entityTypeTableMap
-}
-
-func createJoinMapping() map[entities.EntityType]map[entities.EntityType]string {
-	joinMap := map[entities.EntityType]map[entities.EntityType]string{
-		entities.EntityTypeDatastream: {
-			entities.EntityTypeThing: fmt.Sprintf("%s = %s", datastreamThingID, thingID),
-		},
-		entities.EntityTypeThing: {
-			entities.EntityTypeDatastream: fmt.Sprintf("%s = %s", thingID, datastreamThingID),
-		},
-	}
-
-	return joinMap
-}
-
 // toAs returns the AS name for a field
 func (qb *queryBuilder) toAs(field string) string {
-	return strings.Replace(field, ".", "_", -1)
+	as := strings.Replace(field, ".", "_", -1)
+	if i := strings.Index(field, "("); i != -1 { //remove methods such as public.ST_AsGeoJSON()
+		as = as[i+1 : len(field)-1]
+	}
+	if strings.Contains(as, "'") { //remove json selector ... -> 'field'
+		i1 := strings.Index(as, "'")
+		i2 := strings.LastIndex(as, "'")
+		as = as[i1+1 : i2]
+	}
+
+	return strings.ToLower(as)
 }
 
 // removeSchema removes the prefix in front of a table
@@ -157,10 +78,10 @@ func (qb *queryBuilder) getOffset(qo *odata.QueryOptions) string {
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
 func (qb *queryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
 	if qo != nil && !qo.QueryOrderBy.IsNil() {
-		return fmt.Sprintf("%v %v", selectMapping[et][qo.QueryOrderBy.Property], strings.ToUpper(qo.QueryOrderBy.Suffix))
+		return fmt.Sprintf("%v %v", selectMappings[et][strings.ToLower(qo.QueryOrderBy.Property)], strings.ToUpper(qo.QueryOrderBy.Suffix))
 	}
 
-	return fmt.Sprintf("%s DESC", selectMapping[et]["id"])
+	return fmt.Sprintf("%s DESC", selectMappings[et]["id"])
 }
 
 // ToDo: implement filter
@@ -205,13 +126,12 @@ func (qb *queryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 			toAdd += ", "
 		}
 
-		field := selectMapping[et.GetEntityType()][p]
+		field := selectMappings[et.GetEntityType()][strings.ToLower(p)]
 		if addAs {
 			selectString += fmt.Sprintf("%s%s as %s", toAdd, field, qb.toAs(field))
 		} else {
 			selectString += fmt.Sprintf("%s%s", toAdd, field)
 		}
-
 	}
 
 	if qo != nil && !qo.QueryExpand.IsNil() {
@@ -223,25 +143,32 @@ func (qb *queryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 	return selectString
 }
 
-func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, qo *odata.QueryOptions, joinString string) string {
+func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, joinString string) string {
 	if e2 != nil {
+		nqo := qo
+		if !isExpand {
+			nqo = &odata.QueryOptions{
+				QuerySelect: &odata.QuerySelect{Params: []string{"id"}},
+			}
+		}
+
 		et2 := e2.GetEntityType()
-		joinString = fmt.Sprintf("%s "+
+		joinString = fmt.Sprintf("%s"+
 			"INNER JOIN LATERAL ("+
-			"SELECT %s FROM %s WHERE %s "+
+			"SELECT %s FROM %s %s "+
 			"ORDER BY %s "+
 			"LIMIT %s OFFSET %s) as %s on true", joinString,
-			qb.getSelect(e2, qo, true, false, ""),
+			qb.getSelect(e2, nqo, true, false, ""),
 			qb.tables[et2],
 			qb.joins[e1.GetEntityType()][et2],
-			qb.getOrderBy(et2, qo),
-			qb.getLimit(qo),
-			qb.getOffset(qo),
+			qb.getOrderBy(et2, nqo),
+			qb.getLimit(nqo),
+			qb.getOffset(nqo),
 			qb.removeSchema(qb.tables[et2]))
 	} else {
 		if qo != nil && !qo.QueryExpand.IsNil() {
 			for _, qe := range qo.QueryExpand.Operations {
-				joinString = qb.createLateralJoin(e1, qe.Entity, qe.QueryOptions, joinString)
+				joinString = qb.createLateralJoin(e1, qe.Entity, true, qe.QueryOptions, joinString)
 			}
 		}
 	}
@@ -257,13 +184,13 @@ func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 func (qb *queryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
-	if e2 != nil {
+	if e2 != nil { // 2nd entity is given, this means get e1 by e2
 		et2 = e2.GetEntityType()
 	}
 
-	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, false, true, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, qo, ""))
+	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, false, true, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, false, qo, ""))
 	if id != nil {
-		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMapping[et2]["id"], id)
+		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2]["id"], id)
 	}
 
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
@@ -272,17 +199,18 @@ func (qb *queryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 }
 
 func (qb *queryBuilder) Test() {
+	fmt.Println("------------GET THINGS------------")
 	sql1, _ := qb.CreateQuery(&entities.Thing{}, nil, nil, nil)
 	fmt.Println(sql1)
-	fmt.Println("------------------------")
 
+	fmt.Println("------------GET THING WITH SELECT BY DATASTREAM------------")
 	qo2 := &odata.QueryOptions{}
 	qo2.QuerySelect = &odata.QuerySelect{}
 	qo2.QuerySelect.Parse("name,description")
 	sql2, _ := qb.CreateQuery(&entities.Thing{}, &entities.Datastream{}, 1, qo2)
 	fmt.Println(sql2)
-	fmt.Println("------------------------")
 
+	fmt.Println("------------GET DATASTREAMS WITH SELECT, EXPAND THING WITH SELECT------------")
 	qo31 := &odata.QueryOptions{}
 	qo31.QuerySelect = &odata.QuerySelect{}
 	qo31.QuerySelect.Parse("name,description")
@@ -290,5 +218,24 @@ func (qb *queryBuilder) Test() {
 	qo31.QueryExpand.Parse("Thing($select=name)")
 	sql3, _ := qb.CreateQuery(&entities.Datastream{}, nil, nil, qo31)
 	fmt.Println(sql3)
-	fmt.Println("------------------------")
+
+	fmt.Println("------------GET THING BY LOCATION------------")
+	sql4, _ := qb.CreateQuery(&entities.Thing{}, &entities.Location{}, 1, nil)
+	fmt.Println(sql4)
+
+	fmt.Println("------------GET HISTORICAL LOCATION BY THING ------------")
+	sql5, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, 1, nil)
+	fmt.Println(sql5)
+
+	fmt.Println("------------GET LOCATION BY THING ------------")
+	sql6, _ := qb.CreateQuery(&entities.Location{}, &entities.Thing{}, 1, nil)
+	fmt.Println(sql6)
+
+	fmt.Println("------------GET HISTORICAL LOCATION BY LOCATION ------------")
+	sql7, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, 1, nil)
+	fmt.Println(sql7)
+
+	fmt.Println("------------GET OBSERVATIONS------------")
+	sql8, _ := qb.CreateQuery(&entities.Observation{}, nil, nil, nil)
+	fmt.Println(sql8)
 }

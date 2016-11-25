@@ -20,6 +20,7 @@ const (
 	EntityTypeObservedProperty   EntityType = "ObservedProperty"
 	EntityTypeObservation        EntityType = "Observation"
 	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
+	EntityTypeThingToLocation    EntityType = "ThingToLocation"
 	EntityTypeUnknown            EntityType = "Unknown"
 )
 

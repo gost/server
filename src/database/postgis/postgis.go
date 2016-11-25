@@ -61,7 +61,8 @@ func NewDatabase(host string, port int, user string, password string, database s
 
 // Start the database
 func (gdb *GostDatabase) Start() {
-	gdb.QueryBuilder.Test()
+	//gdb.QueryBuilder.Test()
+
 	//ToDo: implement SSL
 	log.Println("Creating database connection...")
 	log.Printf("Database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
