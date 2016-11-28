@@ -55,6 +55,8 @@ GOST Compliance Testing Status:
 | MQTT Extension for Create and Update  | A.7       | alpha                 | Tests not implemented    |
 | MQTT Extension for Receiving Updates  | A.8       | alpha                 | Tests not implemented    |
 
+Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/details/?pid=1419](http://www.opengeospatial.org/resource/products/details/?pid=1419)
+
 ## Installation and configuration
 
 [GOST installation](docs/gost_installation.md)
