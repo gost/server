@@ -159,11 +159,6 @@ func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*ent
 
 // PutThing updates the given thing in the database
 func (a *APIv1) PutLocation(id interface{}, location *entities.Location) (*entities.Location, []error) {
-	var err []error
-	_, err = location.ContainsMandatoryParams()
-	if len(err) > 0 {
-		return nil, err
-	}
 	var err2 error
 	putlocation, err2 := a.db.PutLocation(id, location)
 	if err2 != nil {

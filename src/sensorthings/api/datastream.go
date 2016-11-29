@@ -212,11 +212,6 @@ func (a *APIv1) PatchDatastream(id interface{}, datastream *entities.Datastream)
 
 // PutDatastream updates the given thing in the database
 func (a *APIv1) PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, []error) {
-	var err []error
-	_, err = datastream.ContainsMandatoryParams()
-	if len(err) > 0 {
-		return nil, err
-	}
 	var err2 error
 	putdatastream, err2 := a.db.PutDatastream(id, datastream)
 	if err2 != nil {

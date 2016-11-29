@@ -345,7 +345,9 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 // PutDatastream receives a Datastream entity and changes it in the database
 // returns the adapted Datastream
 func (gdb *GostDatabase) PutDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error) {
-	err := CheckDatastreamRelationsExist(gdb, datastream)
+	return gdb.PatchDatastream(id, datastream)
+
+	/*err := CheckDatastreamRelationsExist(gdb, datastream)
 	if err != nil {
 		return nil, err
 	}
@@ -385,7 +387,7 @@ func (gdb *GostDatabase) PutDatastream(id interface{}, datastream *entities.Data
 	datastream.Sensor = nil
 	datastream.ObservedProperty = nil
 
-	return datastream, nil
+	return datastream, nil*/
 }
 
 // DeleteDatastream tries to delete a Datastream by the given id

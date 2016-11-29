@@ -168,7 +168,8 @@ func (gdb *GostDatabase) PostThing(thing *entities.Thing) (*entities.Thing, erro
 // PutThing receives a Thing entity and changes it in the database
 // returns the adapted Thing
 func (gdb *GostDatabase) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
-	var intID int
+	return gdb.PatchThing(id, thing)
+	/*var intID int
 	var ok bool
 	jsonProperties, _ := json.Marshal(thing.Properties)
 	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
@@ -182,7 +183,7 @@ func (gdb *GostDatabase) PutThing(id interface{}, thing *entities.Thing) (*entit
 	}
 
 	nt, _ := gdb.GetThing(intID, nil)
-	return nt, nil
+	return nt, nil*/
 }
 
 // PatchThing receives a to be patched Thing entity and changes it in the database

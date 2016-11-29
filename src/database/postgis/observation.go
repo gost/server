@@ -197,7 +197,8 @@ func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQ
 
 // PutObservation replaces an observation to the database
 func (gdb *GostDatabase) PutObservation(id interface{}, o *entities.Observation) (*entities.Observation, error) {
-	var err error
+	return gdb.PatchObservation(id, o)
+	/*var err error
 	var ok bool
 	var intID, dID, fID int
 
@@ -224,7 +225,7 @@ func (gdb *GostDatabase) PutObservation(id interface{}, o *entities.Observation)
 
 	o.ID = intID
 	return o, nil
-
+	*/
 }
 
 // PostObservation adds an observation to the database

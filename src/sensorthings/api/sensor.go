@@ -108,15 +108,10 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 
 // PutSensor updates the given thing in the database
 func (a *APIv1) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error) {
-	var err []error
-	_, err = sensor.ContainsMandatoryParams()
-	if len(err) > 0 {
-		return nil, err
-	}
-	var err2 error
-	putsensor, err2 := a.db.PutSensor(id, sensor)
-	if err2 != nil {
-		return nil, []error{err2}
+	var err error
+	putsensor, err := a.db.PutSensor(id, sensor)
+	if err != nil {
+		return nil, []error{err}
 	}
 
 	putsensor.SetAllLinks(a.config.GetExternalServerURI())

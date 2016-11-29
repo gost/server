@@ -69,12 +69,8 @@ CREATE TABLE historicallocation
 (
   id bigserial NOT NULL,
   thing_id bigint,
-  location_id bigint,
   "time" timestamp with time zone,
   CONSTRAINT historicallocation_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_location FOREIGN KEY (location_id)
-      REFERENCES location (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE CASCADE,
   CONSTRAINT fk_thing_hl FOREIGN KEY (thing_id)
       REFERENCES thing (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE
@@ -82,6 +78,44 @@ CREATE TABLE historicallocation
 WITH (
   OIDS=FALSE
 );
+
+CREATE TABLE location_to_historicallocation
+(
+  location_id bigint,
+  historicallocation_id bigint,
+  CONSTRAINT fk_location_2 FOREIGN KEY (location_id)
+      REFERENCES location (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE,
+  CONSTRAINT fk_historicallocation_1 FOREIGN KEY (historicallocation_id)
+      REFERENCES historicallocation (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE
+)
+WITH (
+  OIDS=FALSE
+);
+
+CREATE INDEX fki_location_2
+  ON location_to_historicallocation
+  USING btree
+  (location_id);
+
+CREATE INDEX fki_historicallocation_1
+  ON location_to_historicallocation
+  USING btree
+  (historicallocation_id);
+
+CREATE FUNCTION delete_coupled_historicallocation()
+RETURNS trigger AS '
+BEGIN
+ DELETE FROM v1.historicallocation WHERE id = OLD.historicallocation_id;
+ RETURN NEW;
+END' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER location_deleted
+  AFTER DELETE
+  ON location_to_historicallocation
+  FOR EACH ROW
+  EXECUTE PROCEDURE delete_coupled_historicallocation();
 
 CREATE TABLE sensor
 (
@@ -185,11 +219,6 @@ CREATE INDEX fki_featureofinterest
   ON observation
   USING btree
   (featureofinterest_id);
-
-CREATE INDEX fki_location
-  ON historicallocation
-  USING btree
-  (location_id);
 
 CREATE INDEX fki_thing_hl
   ON historicallocation

@@ -30,15 +30,22 @@ func CreateQueryBuilder(schema string, maxTop int) *queryBuilder {
 }
 
 // toAs returns the AS name for a field
-func (qb *queryBuilder) toAs(field string) string {
+func (qb *queryBuilder) toAs(e entities.Entity, field string) string {
 	as := strings.Replace(field, ".", "_", -1)
 	if i := strings.Index(field, "("); i != -1 { //remove methods such as public.ST_AsGeoJSON()
 		as = as[i+1 : len(field)-1]
 	}
+
 	if strings.Contains(as, "'") { //remove json selector ... -> 'field'
 		i1 := strings.Index(as, "'")
 		i2 := strings.LastIndex(as, "'")
 		as = as[i1+1 : i2]
+	}
+
+	et := e.GetEntityType()
+	if !strings.Contains(as, strings.ToLower(et.ToString())) {
+		table := qb.removeSchema(qb.tables[et])
+		as = fmt.Sprintf("%s_%s", table, as)
 	}
 
 	return strings.ToLower(as)
@@ -84,17 +91,6 @@ func (qb *queryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 	return fmt.Sprintf("%s DESC", selectMappings[et]["id"])
 }
 
-// ToDo: implement filter
-// getFilter returns a string that can be placed after WHERE, the filter is set by
-// ODATA's $filter and can be found in qo.QueryFilter
-func (qb *queryBuilder) getFilter(et entities.EntityType, qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryFilter.IsNil() {
-		return fmt.Sprintf("%v", "")
-	}
-
-	return ""
-}
-
 // getSelect return the select string that needs to be placed after SELECT in the query
 // select is set by ODATA's $select, if not set get all properties for the given entity (return all)
 // addID to true if it needs to be added and isn't in QuerySelect.Params, addAs to true if a field needs to be
@@ -128,7 +124,7 @@ func (qb *queryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 
 		field := selectMappings[et.GetEntityType()][strings.ToLower(p)]
 		if addAs {
-			selectString += fmt.Sprintf("%s%s as %s", toAdd, field, qb.toAs(field))
+			selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, qb.toAs(et, field))
 		} else {
 			selectString += fmt.Sprintf("%s%s", toAdd, field)
 		}
@@ -156,11 +152,13 @@ func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 		joinString = fmt.Sprintf("%s"+
 			"INNER JOIN LATERAL ("+
 			"SELECT %s FROM %s %s "+
+			"%s"+
 			"ORDER BY %s "+
-			"LIMIT %s OFFSET %s) as %s on true", joinString,
+			"LIMIT %s OFFSET %s) AS %s on true", joinString,
 			qb.getSelect(e2, nqo, true, false, ""),
 			qb.tables[et2],
 			qb.joins[e1.GetEntityType()][et2],
+			qb.getFilterQueryString(et2, nqo, true),
 			qb.getOrderBy(et2, nqo),
 			qb.getLimit(nqo),
 			qb.getOffset(nqo),
@@ -174,6 +172,58 @@ func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 	}
 
 	return joinString
+}
+
+// createFilterQueryString converts an OData query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
+// ParamFactory is used for converting SensorThings parameter names to postgres field names
+// Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
+// false if parameter cannot be converted
+func (qb *queryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, addWhere bool) string {
+	q := ""
+	if qo != nil && !qo.QueryFilter.IsNil() {
+		if addWhere {
+			q += " WHERE "
+		}
+		ps, ops := qo.QueryFilter.Predicate.Split()
+		for i, p := range ps {
+			operator, _ := qb.odataOperatorToPostgreSQL(p.Operator)
+			q += fmt.Sprintf("%v %v %v", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p.Left))], operator, p.Right)
+			if len(ops)-1 >= i {
+				q += fmt.Sprintf(" %v ", ops[i])
+			}
+		}
+		q += " "
+	}
+
+	return q
+}
+
+// OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
+func (qb *queryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, error) {
+	switch o {
+	case odata.And:
+		return "AND", nil
+	case odata.Or:
+		return "OR", nil
+	case odata.Not:
+		return "NOT", nil
+	case odata.Equals:
+		return "=", nil
+	case odata.NotEquals:
+		return "!=", nil
+	case odata.GreaterThan:
+		return ">", nil
+	case odata.GreaterThanOrEquals:
+		return ">=", nil
+	case odata.LessThan:
+		return "<", nil
+	case odata.LessThanOrEquals:
+		return "<=", nil
+	case odata.IsNull:
+		return "IS NULL", nil
+	}
+
+	return "", fmt.Errorf("Operator %v not implemented", o.ToString())
 }
 
 // CreateQuery creates a new query based on given input
@@ -191,6 +241,14 @@ func (qb *queryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, false, true, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, false, qo, ""))
 	if id != nil {
 		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2]["id"], id)
+	}
+
+	if qo != nil && !qo.QueryFilter.IsNil() {
+		if id != nil {
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, false))
+		} else {
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, true))
+		}
 	}
 
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))

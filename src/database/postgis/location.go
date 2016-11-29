@@ -41,8 +41,8 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v", gdb.Schema, gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.historicallocation on historicallocation.location_id = location.id where historicallocation.id = %v", gdb.Schema, gdb.Schema, intID)
+	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.location_to_historicallocation on location_to_historicallocation.location_id = location.id where location_to_historicallocation.historicallocation_id = %v", gdb.Schema, gdb.Schema, intID)
+	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.location_to_historicallocation on location_to_historicallocation.location_id = location.id where location_to_historicallocation.historicallocation_id = %v", gdb.Schema, gdb.Schema, intID)
 	return processLocations(gdb.Db, sql, qo, countSQL)
 }
 
@@ -220,7 +220,8 @@ func (gdb *GostDatabase) DeleteLocation(id interface{}) error {
 // PutLocation receives a Location entity and changes it in the database
 // returns the adapted Location
 func (gdb *GostDatabase) PutLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
-	var intID int
+	return gdb.PatchLocation(id, location)
+	/*var intID int
 	var ok bool
 	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
@@ -236,7 +237,7 @@ func (gdb *GostDatabase) PutLocation(id interface{}, location *entities.Location
 	}
 
 	nt, _ := gdb.GetLocation(intID, nil)
-	return nt, nil
+	return nt, nil*/
 }
 
 // LinkLocation links a thing with a location

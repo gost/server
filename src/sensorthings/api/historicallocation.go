@@ -91,11 +91,6 @@ func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entiti
 
 // PutHistoricalLocation adds a new HistoricalLocation to the database
 func (a *APIv1) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
-	_, err := hl.ContainsMandatoryParams()
-	if err != nil {
-		return nil, err
-	}
-
 	l, err2 := a.db.PutHistoricalLocation(id, hl)
 	if err2 != nil {
 		return nil, []error{err2}

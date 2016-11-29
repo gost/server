@@ -206,15 +206,10 @@ func (a *APIv1) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thi
 
 // PutThing updates the given thing in the database
 func (a *APIv1) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, []error) {
-	var err []error
-	_, err = thing.ContainsMandatoryParams()
-	if len(err) > 0 {
-		return nil, err
-	}
-	var err2 error
-	putthing, err2 := a.db.PutThing(id, thing)
-	if err2 != nil {
-		return nil, []error{err2}
+	var err error
+	putthing, err := a.db.PutThing(id, thing)
+	if err != nil {
+		return nil, []error{err}
 	}
 
 	putthing.SetAllLinks(a.config.GetExternalServerURI())

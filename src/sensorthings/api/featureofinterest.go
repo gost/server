@@ -90,11 +90,6 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 
 // PutFeatureOfInterest adds a FeatureOfInterest to the database
 func (a *APIv1) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
-	_, err := foi.ContainsMandatoryParams()
-	if err != nil {
-		return nil, err
-	}
-
 	supported, err2 := entities.CheckEncodingSupported(foi, foi.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}

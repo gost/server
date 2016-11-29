@@ -202,7 +202,8 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 // PutSensor receives a Sensor entity and changes it in the database
 // returns the Sensor
 func (gdb *GostDatabase) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
-	var intID int
+	return gdb.PatchSensor(id, sensor)
+	/*var intID int
 	var ok bool
 
 	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
@@ -221,7 +222,7 @@ func (gdb *GostDatabase) PutSensor(id interface{}, sensor *entities.Sensor) (*en
 	}
 
 	ns, _ := gdb.GetSensor(intID, nil)
-	return ns, nil
+	return ns, nil*/
 }
 
 // DeleteSensor tries to delete a Sensor by the given id

@@ -189,11 +189,6 @@ func (a *APIv1) PatchObservation(id interface{}, observation *entities.Observati
 
 // PutObservation updates the given observation in the database
 func (a *APIv1) PutObservation(id interface{}, observation *entities.Observation) (*entities.Observation, []error) {
-	_, err := observation.ContainsMandatoryParams()
-	if err != nil {
-		return nil, err
-	}
-
 	obs, err2 := a.db.PutObservation(id, observation)
 	if err2 != nil {
 		return nil, []error{err2}

@@ -97,11 +97,6 @@ func (a *APIv1) PatchObservedProperty(id interface{}, op *entities.ObservedPrope
 
 // PutObservedProperty patches a given ObservedProperty
 func (a *APIv1) PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
-	_, err := op.ContainsMandatoryParams()
-	if err != nil {
-		return nil, err
-	}
-
 	nop, err2 := a.db.PutObservedProperty(id, op)
 	if err2 != nil {
 		return nil, []error{err2}
