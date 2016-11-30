@@ -15,7 +15,7 @@ services:
             - "1883:1883"
             - "9001:9001"
     gost-db:
-        image: geodan/gost-db
+        image: geodan/gost-db:0.3
         volumes:
             - postgis:/var/lib/postgresql/data
         ports:
@@ -25,7 +25,7 @@ services:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
     gost:
-        image: geodan/gost
+        image: geodan/gost:0.3
         ports:
             - "8080:8080"
         depends_on:
