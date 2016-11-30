@@ -72,8 +72,9 @@ java -jar ets-sta10-0.8-SNAPSHOT-aio.jar ../src/main/config/test-run-props.xml
 
 Specify in file 'test-run-props.xml' the server to be tested and the conformance level (1/2/3) 
 
+Results are by default written in: C:\Users\{user}\testng\
 
-GOST Compliance Testing Status:
+## GOST Compliance Testing Status
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
