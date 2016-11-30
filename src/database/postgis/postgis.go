@@ -35,7 +35,7 @@ type GostDatabase struct {
 	MaxIdeConns  int
 	MaxOpenConns int
 	Db           *sql.DB
-	QueryBuilder *queryBuilder
+	QueryBuilder *QueryBuilder
 }
 
 // NewDatabase initialises the PostgreSQL database
@@ -122,7 +122,7 @@ func Contains(s []string, e string) bool {
 	return false
 }
 
-// Contains checks a string array, array and given string are set to lower-case
+// ContainsToLower checks a string array, array and given string are set to lower-case
 func ContainsToLower(s []string, e string) bool {
 	for _, a := range s {
 		if strings.ToLower(a) == strings.ToLower(e) {

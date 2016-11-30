@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-type queryBuilder struct {
+// QueryBuilder can construct queries based on entities and QueryOptions
+type QueryBuilder struct {
 	maxTop int
 	schema string
 	tables map[entities.EntityType]string
@@ -17,20 +18,19 @@ type queryBuilder struct {
 // CreateQueryBuilder instantiates a new queryBuilder, the queryBuilder is used to create
 // select queries based on the given entities, id en QueryOptions (ODATA)
 // schema is the used database schema can be empty, maxTop is the maximum top the query should return
-func CreateQueryBuilder(schema string, maxTop int) *queryBuilder {
-	qb := &queryBuilder{
+func CreateQueryBuilder(schema string, maxTop int) *QueryBuilder {
+	qb := &QueryBuilder{
 		schema: schema,
 		maxTop: maxTop,
 		tables: createTableMappings(schema),
 	}
 
 	qb.joins = createJoinMappings(qb.tables)
-
 	return qb
 }
 
 // toAs returns the AS name for a field
-func (qb *queryBuilder) toAs(e entities.Entity, field string) string {
+func (qb *QueryBuilder) toAs(e entities.Entity, field string) string {
 	as := strings.Replace(field, ".", "_", -1)
 	if i := strings.Index(field, "("); i != -1 { //remove methods such as public.ST_AsGeoJSON()
 		as = as[i+1 : len(field)-1]
@@ -52,38 +52,35 @@ func (qb *queryBuilder) toAs(e entities.Entity, field string) string {
 }
 
 // removeSchema removes the prefix in front of a table
-func (qb *queryBuilder) removeSchema(table string) string {
+func (qb *QueryBuilder) removeSchema(table string) string {
 	i := strings.Index(table, ".")
 	if i == -1 {
 		return table
 	}
-
 	return table[i+1:]
 }
 
 // getLimit returns the max entities to retrieve, this number is set by ODATA's
 // $top, if not provided use the global value
-func (qb *queryBuilder) getLimit(qo *odata.QueryOptions) string {
+func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions) string {
 	if qo != nil && !qo.QueryTop.IsNil() {
 		return fmt.Sprintf("%v", qo.QueryTop.Limit)
-	} else {
-		return fmt.Sprintf("%v", qb.maxTop)
 	}
+	return fmt.Sprintf("%v", qb.maxTop)
 }
 
 // getOffset returns the offset, this number is set by ODATA's
 // $skip, if not provided do not skip anything = return "0"
-func (qb *queryBuilder) getOffset(qo *odata.QueryOptions) string {
+func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 	if qo != nil && !qo.QueryTop.IsNil() {
 		return fmt.Sprintf("%v", qo.QueryTop.Limit)
-	} else {
-		return "0"
 	}
+	return "0"
 }
 
 // getOrderBy returns the string that needs to be placed after ORDER BY, this is set using
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
-func (qb *queryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
+func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
 	if qo != nil && !qo.QueryOrderBy.IsNil() {
 		return fmt.Sprintf("%v %v", selectMappings[et][strings.ToLower(qo.QueryOrderBy.Property)], strings.ToUpper(qo.QueryOrderBy.Suffix))
 	}
@@ -95,7 +92,7 @@ func (qb *queryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 // select is set by ODATA's $select, if not set get all properties for the given entity (return all)
 // addID to true if it needs to be added and isn't in QuerySelect.Params, addAs to true if a field needs to be
 // outputted with AS [name]
-func (qb *queryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, addID bool, addAs bool, selectString string) string {
+func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, addID bool, addAs bool, selectString string) string {
 	var properties []string
 	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
 		properties = et.GetPropertyNames()
@@ -139,7 +136,7 @@ func (qb *queryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 	return selectString
 }
 
-func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, joinString string) string {
+func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, joinString string) string {
 	if e2 != nil {
 		nqo := qo
 		if !isExpand {
@@ -178,7 +175,7 @@ func (qb *queryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 // ParamFactory is used for converting SensorThings parameter names to postgres field names
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
-func (qb *queryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, addWhere bool) string {
+func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, addWhere bool) string {
 	q := ""
 	if qo != nil && !qo.QueryFilter.IsNil() {
 		if addWhere {
@@ -199,7 +196,7 @@ func (qb *queryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 }
 
 // OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
-func (qb *queryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, error) {
+func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, error) {
 	switch o {
 	case odata.And:
 		return "AND", nil
@@ -231,7 +228,7 @@ func (qb *queryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, err
 //   e2 = from entity
 //   id = where e2
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
-func (qb *queryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
+func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
@@ -256,7 +253,8 @@ func (qb *queryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	return queryString, nil
 }
 
-func (qb *queryBuilder) Test() {
+// Test is a temporarily test function while developing
+func (qb *QueryBuilder) Test() {
 	fmt.Println("------------GET THINGS------------")
 	sql1, _ := qb.CreateQuery(&entities.Thing{}, nil, nil, nil)
 	fmt.Println(sql1)

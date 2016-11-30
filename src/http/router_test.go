@@ -14,7 +14,7 @@ func TestCreateRouter(t *testing.T) {
 	// arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
 	a := api.NewAPI(database, cfg, mqttServer)
 
 	// act
@@ -28,7 +28,7 @@ func TestDashboardRedirects(t *testing.T) {
 	// arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
 	a := api.NewAPI(database, cfg, mqttServer)
 	router := CreateRouter(&a)
 

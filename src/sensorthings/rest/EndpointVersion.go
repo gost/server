@@ -12,7 +12,7 @@ func createVersionEndpoint(externalURL string) *Endpoint {
 		OutputInfo: false,
 		URL:        fmt.Sprintf("%s/%s", externalURL, "Version"),
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/Version", HandleVersion},
+			{models.HTTPOperationGet, "/version", HandleVersion},
 		},
 	}
 }

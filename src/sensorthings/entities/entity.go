@@ -32,7 +32,7 @@ var EntityTypeList = []EntityType{EntityTypeThing,
 	EntityTypeFeatureOfInterest, EntityTypeUnknown,
 }
 
-// Map of strings that map a string to an EntityType
+// StringEntityMap is a map of strings that map a string to an EntityType
 var StringEntityMap = map[string]EntityType{
 	"thing": EntityTypeThing, "things": EntityTypeThing,
 	"location": EntityTypeLocation, "locations": EntityTypeLocation,
@@ -77,21 +77,22 @@ func EntityFromType(e EntityType) Entity {
 // EntityFromString returns an empty entity based on a string, returns error
 // if string cannot be mapped to an entity
 func EntityFromString(e string) (Entity, error) {
-	if e, err := EntityTypeFromString(e); err != nil {
+	et, err := EntityTypeFromString(e)
+	if err != nil {
 		return nil, err
-	} else {
-		return EntityFromType(e), nil
 	}
+	return EntityFromType(et), nil
 }
 
 // EntityTypeFromString returns the EntityType for a given string
 // function is case-insensitive
 func EntityTypeFromString(e string) (EntityType, error) {
-	if val, ok := StringEntityMap[strings.ToLower(e)]; !ok {
+	val, ok := StringEntityMap[strings.ToLower(e)]
+	if !ok {
 		return EntityTypeUnknown, fmt.Errorf("Unknown entity %s", e)
-	} else {
-		return val, nil
 	}
+
+	return val, nil
 }
 
 // EntityLink holds the name and type of a SensorThings entity link.

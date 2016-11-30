@@ -5,25 +5,25 @@ import (
 	"strings"
 )
 
-// HttpEndpoints is a slice of *HttpEndpoint's, it implements some functions to be able to
+// Endpoints is a slice of *HttpEndpoint's, it implements some functions to be able to
 // sort the slice
-type HttpEndpoints []*HttpEndpoint
+type Endpoints []*Endpoint
 
-// HttpEndpoint combines a SensorThings endpoint and operation in preparation to add
+// Endpoint combines a SensorThings endpoint and operation in preparation to add
 // it to the router
-type HttpEndpoint struct {
+type Endpoint struct {
 	Endpoint  models.Endpoint
 	Operation models.EndpointOperation
 }
 
 // Len returns the number of elements in the collection
-func (a HttpEndpoints) Len() int { return len(a) }
+func (a Endpoints) Len() int { return len(a) }
 
 // Swap swaps the elements
-func (a HttpEndpoints) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a Endpoints) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // Less holds the custom sorting logic
-func (a HttpEndpoints) Less(i, j int) bool {
+func (a Endpoints) Less(i, j int) bool {
 	firstDynamic := isDynamic(a[i].Operation.Path)
 	secondDynamic := isDynamic(a[j].Operation.Path)
 
@@ -48,9 +48,8 @@ func (a HttpEndpoints) Less(i, j int) bool {
 		dynamicJ := strings.Count(a[j].Operation.Path, "{")
 		if dynamicI == dynamicJ {
 			return len(a[i].Operation.Path) > len(a[j].Operation.Path)
-		} else {
-			return strings.Count(a[i].Operation.Path, "{") < strings.Count(a[j].Operation.Path, "{")
 		}
+		return strings.Count(a[i].Operation.Path, "{") < strings.Count(a[j].Operation.Path, "{")
 	}
 
 	if len(a[i].Operation.Path) != len(a[j].Operation.Path) {
