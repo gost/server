@@ -26,7 +26,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 ## Roadmap
 
 | Date        | Version | Features                       |
-|---------------------------------------------------------
+|--------------------------------------------------------|
 | 2016-12-05  | 0.3     | OGC Test level 1,2 compliant   |
 |             |         | Docker support                 |
 |             |         | Basic filtering                |
