@@ -25,19 +25,15 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## Roadmap
 
-2016-12-05: release 0.3
-
-. OGC Test level 1,2 compliant
-
-. Docker support
-
-. Basic filtering support
-
-2017-02-06: release 0.4
-
-OGC Test level 3 compliant? 
-
-2017-03-06: release 0.5
+|---------------------------------------------------------
+| Date        | Version | Features                       |
+|---------------------------------------------------------
+| 2016-12-05  | 0.3     | OGC Test level 1,2 compliant   |
+|             |         | Docker support                 |
+|             |         | Basic filtering                |
+| 2017-02-06  | 0.4     | OGC Test level 3 compliant     |
+| 2017-03-06  | 0.5     | TBD                            | 
+|---------------------------------------------------------
 
 
 ## Docker support
@@ -79,7 +75,7 @@ Results are by default written in: C:\Users\{user}\testng\
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
 | Sensing Core                          | A.1       | beta                  | 6 passed, 0 failed       |
-| Filtering Extension                   | A.2       | alpa                  | Testing not started      |
+| Filtering Extension                   | A.2       | alpha                 | Testing not started      |
 | Create-Update-Delete                  | A.3       | beta                  | 9 passed, 0 failed       |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
@@ -109,7 +105,7 @@ MQTT: For getting started with Gost and MQTT for publishing/receiving data see [
 [mux](https://github.com/gorilla/mux)<br />
 [Paho](https://github.com/eclipse/paho.mqtt.golang)<br />
 
-## Roadmap
+## Goals
 
 - Complete implementation of the OGC SensorThings spec
 - Test coverage!
