@@ -20,6 +20,23 @@ Release 0.2: 2016-06-10
 
 [https://github.com/Geodan/gost/releases/tag/0.2] (https://github.com/Geodan/gost/releases/tag/0.2)
 
+## Roadmap
+
+2016-12-05: release 0.3
+
+. OGC Test level 1,2 compliant
+
+. Docker support
+
+. Basic filtering support
+
+2017-02-06: release 0.4
+
+OGC Test level 3 compliant? 
+
+2017-03-06: release 0.5
+
+
 Binaries are build for Windows, Ubuntu and OSX.
 
 ## Docker support
