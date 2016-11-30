@@ -4,6 +4,7 @@ import (
 	"database/sql"
 )
 
+// ExecuteSelect executes the select query and creates the retrieved entities
 func ExecuteSelect(db *sql.DB, sql string) (interface{}, error) {
 	/*rows, err := db.Query(sql)
 	defer rows.Close()

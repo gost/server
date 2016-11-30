@@ -17,10 +17,10 @@ func CreateRouter(api *models.API) *mux.Router {
 
 	// get all endpoints into HttpEndpoints to be able to sort them so they can be added
 	// to the routes in the right order else requests will be picked up by the wrong handlers
-	eps := HttpEndpoints{}
+	eps := Endpoints{}
 	for _, endpoint := range *a.GetEndpoints() {
 		for _, op := range endpoint.GetOperations() {
-			e := &HttpEndpoint{Endpoint: endpoint, Operation: op}
+			e := &Endpoint{Endpoint: endpoint, Operation: op}
 			eps = append(eps, e)
 		}
 	}

@@ -21,13 +21,13 @@ func TestCreateEndPointVersion(t *testing.T) {
 	ve := createVersionEndpoint("http://test.com")
 
 	//assert
-	containsVersionPath := containsEndpoint("Version", ve.Operations)
+	containsVersionPath := containsEndpoint("version", ve.Operations)
 	assert.Equal(t, true, containsVersionPath, "Version endpoint needs to contain an endpoint containing the path Version")
 }
 
 func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
 	for _, o := range eps {
-		if strings.Contains(o.Path, "Version") {
+		if strings.Contains(o.Path, epName) {
 			return true
 		}
 	}

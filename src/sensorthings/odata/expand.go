@@ -7,13 +7,14 @@ import (
 	"strings"
 )
 
-// work in progress
+// ExpandOperation holds information on a received $expand query
 type ExpandOperation struct {
 	Entity          entities.Entity
 	QueryOptions    *QueryOptions
 	ExpandOperation *ExpandOperation
 }
 
+// Create tries to construct the ExpandOperation from given query string
 func (e *ExpandOperation) Create(eo string) []error {
 	slashIndex := strings.Index(eo, "/")
 	var fp, trail string
@@ -32,11 +33,12 @@ func (e *ExpandOperation) Create(eo string) []error {
 		fp = fp[:queryIndexStart]
 	}
 
-	if et, err := entities.EntityFromString(fp); err != nil {
+	et, err := entities.EntityFromString(fp)
+	if err != nil {
 		return []error{fmt.Errorf("Unable to create expand query, unknown entity %s", fp)}
-	} else {
-		e.Entity = et
 	}
+
+	e.Entity = et
 
 	if len(queryString) > 0 {
 		splitQuery := strings.Split(queryString, ";")
@@ -50,11 +52,11 @@ func (e *ExpandOperation) Create(eo string) []error {
 			values[kvp[0]] = kvp[1]
 		}
 
-		if qo, err := CreateQueryOptions(values); err != nil {
+		qo, err := CreateQueryOptions(values)
+		if err != nil {
 			return err
-		} else {
-			e.QueryOptions = qo
 		}
+		e.QueryOptions = qo
 	}
 
 	if len(trail) > 0 {
@@ -86,9 +88,9 @@ func (q *QueryExpand) Parse(value string) error {
 		eo := ExpandOperation{}
 		if err := eo.Create(sl1); err != nil {
 			return err[0]
-		} else {
-			q.Operations = append(q.Operations, eo)
 		}
+
+		q.Operations = append(q.Operations, eo)
 	}
 
 	// debug print

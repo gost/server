@@ -22,13 +22,15 @@ func TestVersionHandler(t *testing.T) {
 
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100)
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
 	api := api.NewAPI(database, cfg, mqttServer)
+	api.Start()
 
 	gostServer := http.CreateServer(server, port, &api)
 	go gostServer.Start()
 	versionURL := fmt.Sprintf("%s/Version", "http://"+server+":"+strconv.Itoa(port))
 
+	fmt.Println(versionURL)
 	// act
 	request, _ := net.NewRequest("GET", versionURL, nil)
 	res, _ := net.DefaultClient.Do(request)

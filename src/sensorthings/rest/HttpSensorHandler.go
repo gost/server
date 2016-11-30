@@ -56,7 +56,7 @@ func HandlePatchSensor(w http.ResponseWriter, r *http.Request, endpoint *models.
 	handlePatchRequest(w, endpoint, r, sensor, &handle)
 }
 
-// HandlePatchSensor ...
+// HandlePutSensor ...
 func HandlePutSensor(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	sensor := &entities.Sensor{}
