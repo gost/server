@@ -22,6 +22,16 @@ Release 0.2: 2016-06-10
 
 Binaries are build for Windows, Ubuntu and OSX.
 
+
+## Roadmap
+
+| Date       	|             Version 	| Features                                                        	|
+|------------	|---------------------	|-----------------------------------------------------------------	|
+| 2016-12-05 	| 0.3                 	| OGC Test level 1,2 compliant,  Docker support,  Basic filtering 	|
+| 2017-02-06 	| 0.4                 	| OGC Test level 3 compliant                                      	|
+| 2017-03-06 	| 0.5                 	| TBD                                                             	|
+
+
 ## Docker support
 
 See [GOST and Docker](docs/gost_docker.md)
@@ -42,13 +52,27 @@ $ docker-compose up
 
 GOST is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
 
-GOST Compliance Testing Status:
+To run the Test Suite from command line:
+
+```
+git clone https://github.com/opengeospatial/ets-sta10.git
+cd ets-sta10
+mvn package 
+cd target
+java -jar ets-sta10-0.8-SNAPSHOT-aio.jar ../src/main/config/test-run-props.xml
+```
+
+Specify in file 'test-run-props.xml' the server to be tested and the conformance level (1/2/3) 
+
+Results are by default written in: C:\Users\{user}\testng\
+
+## GOST Compliance Testing Status
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
-| Sensing Core                          | A.1       | alpha                 | 6 passed, 0 failed       |
+| Sensing Core                          | A.1       | beta                  | 6 passed, 0 failed       |
 | Filtering Extension                   | A.2       | alpha                 | Testing not started      |
-| Create-Update-Delete                  | A.3       | alpha                 | 9 passed, 0 failed       |
+| Create-Update-Delete                  | A.3       | beta                  | 9 passed, 0 failed       |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
 | Sensing Data Array Extension          | A.6       | -                     | Tests not implemented    |
@@ -77,7 +101,7 @@ MQTT: For getting started with Gost and MQTT for publishing/receiving data see [
 [mux](https://github.com/gorilla/mux)<br />
 [Paho](https://github.com/eclipse/paho.mqtt.golang)<br />
 
-## Roadmap
+## Goals
 
 - Complete implementation of the OGC SensorThings spec
 - Test coverage!
