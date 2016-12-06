@@ -10,6 +10,8 @@ GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements 
 
 Implementation of the Tasking profile (part 2) and Rules Engine profile (part 3) of the OGC SensorThings API is planned as a future work activity.
 
+The GOST website and blog can be found at [www.gostserver.xyz](https://www.gostserver.xyz).
+
 ## Disclaimer
 
 GOST is alpha software and is not (yet) considered appropriate for customer use. Feel free to help development :-)
