@@ -18,7 +18,7 @@ In browser open http://localhost:8080/v1.0 to test if the server is running
 
 1) Windows
 
-This sample using 7zip as unzip tool
+This sample is using some tools: 7zip as unzip tool, wget as download tool and docker as container environment.
 
 ```sh
 docker run -p 5432:5432 -e POSTGRES_DB=gost -d geodan/gost-db
