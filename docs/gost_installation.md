@@ -24,7 +24,7 @@ See https://github.com/Geodan/gost/wiki/Mosquitto-with-websockets
 
 In browser open http://localhost:8080/v1.0 to test if the server is running
 
-In browser op http://localhost:8080 to test if the dashbaord is working
+In browser op http://localhost:8080 to test if the dashboard is working
 
 ## Install from Binaries
 
