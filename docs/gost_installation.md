@@ -19,10 +19,11 @@ go get github.com/lib/pq
 go get github.com/eclipse/paho.mqtt.golang
 ```
 5) Edit config.yaml or set environment settings to change connection to database<br />
+
 6) Create GOST schema
-```sh
-go run main.go -install ../scripts/createdb.sql
-```
+
+See [https://github.com/Geodan/gost-db/blob/master/gost_init_db.sql](https://github.com/Geodan/gost-db/blob/master/gost_init_db.sql) for GOST schema sql script. 
+
 7) Start
 ```sh
 go run main.go
