@@ -5,11 +5,11 @@
 
 1) Install GoLang
 
-See (https://golang.org/)
+See https://golang.org/
 
 2) Install PostgreSQL (http://www.postgresql.org/) with PostGIS and GOST database
 
-See (https://github.com/Geodan/gost-db/blob/master/README.md)
+See https://github.com/Geodan/gost-db/blob/master/README.md
 
 ## Install from binaries
 
