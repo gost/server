@@ -10,7 +10,17 @@ Installation from source code (requires some Golang knowledge), installing with 
 
 See https://github.com/Geodan/gost-db/blob/master/README.md for various options
 
-Testcase after installation: 
+2) Install Mosquitto
+
+Without websockets support:
+
+apt-get install mosquitto
+
+With Websockets support: 
+
+See https://github.com/Geodan/gost/wiki/Mosquitto-with-websockets
+
+Gost testcase after installation: 
 
 In browser open http://localhost:8080/v1.0 to test if the server is running
 
