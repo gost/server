@@ -16,6 +16,24 @@ In browser open http://localhost:8080/v1.0 to test if the server is running
 
 ## Install from Binaries
 
+1) Windows
+
+This sample using 7zip as unzip tool
+
+```sh
+docker run -p 5432:5432 -e POSTGRES_DB=gost -d geodan/gost-db
+wget https://github.com/Geodan/gost/releases/download/0.3/gost_windows_x64.zip
+7z x gost_windows_x64.zip -od:\aaa\gost
+cd d:\aaa\gost\win64
+gost.exe
+```
+
+2) Mac
+
+todo
+
+3) Linux
+
 todo
 
 ## Install from Source
@@ -47,6 +65,7 @@ go run main.go
 
 ### Install with Docker
 
+In the GOST docker-compose file all the necessary parts of GOST are downloaded and linked together.
 ```
 $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
 
