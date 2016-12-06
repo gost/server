@@ -2,7 +2,7 @@
 ### Gost installation 
 
 In this document 4 ways to install GOST server are described: Installation from pre-build binaries (for Linux/Windows/Mac), 
-Installation from source code (requires some Golang knowledge), installing with Docker amd complete GOST installation from script. 
+Installation from source code (requires some Golang knowledge), installing with Docker and complete GOST installation from script. 
 
 ## Prerequisites
 
