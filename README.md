@@ -50,25 +50,9 @@ $ docker-compose up
 
 2016-05-30: Testing started against the OGC SensorThings API Test Suite 
 
-## OGC Compliance testing
+## OGC Compliance testing status
 
 GOST is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
-
-To run the Test Suite from command line:
-
-```
-git clone https://github.com/opengeospatial/ets-sta10.git
-cd ets-sta10
-mvn package 
-cd target
-java -jar ets-sta10-0.8-SNAPSHOT-aio.jar ../src/main/config/test-run-props.xml
-```
-
-Specify in file 'test-run-props.xml' the server to be tested and the conformance level (1/2/3) 
-
-Results are by default written in: C:\Users\{user}\testng\
-
-## GOST Compliance Testing Status
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
