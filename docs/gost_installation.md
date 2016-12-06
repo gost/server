@@ -20,7 +20,7 @@ With Websockets support:
 
 See https://github.com/Geodan/gost/wiki/Mosquitto-with-websockets
 
-GOST testcase after installation: 
+## GOST testcase after installation: 
 
 In browser open http://localhost:8080/v1.0 to test if the server is running
 
