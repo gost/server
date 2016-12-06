@@ -6,9 +6,9 @@ For service and dashboard: [https://hub.docker.com/r/geodan/gost/]
 
 For database: [https://hub.docker.com/r/geodan/gost-db/]
 
-The docker images can run separately, or running in a combined way using the Dockercompose file. 
+The docker images can run separately, or running in a combined way using the Dockercompose file.
 
-If you want to use the latest (unstable) build of GOST, you can use the automated builds found here: [https://hub.docker.com/r/geodan/gost-nightly/] and here: [https://hub.docker.com/r/geodan/gost-db-nightly/] there is no guarantee these images will run correctly. 
+Tags: Use the tag latest for the latest development version, otherwise use a tag like '0.3' for more stable versions.
 
 # Running GOST with Docker-compose
 
@@ -53,14 +53,3 @@ docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gos
 
 ```
 
-# Building GOST-db image
-
-```
-. $ git clone https://github.com/Geodan/gost.git
-
-. $ cd src/github.com/geodan/gost/src/docker/postgis
-
-. $ docker build -t geodan/gost-db .
-
-. $ docker push geodan/gost-db
-```
