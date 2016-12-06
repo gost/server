@@ -20,7 +20,7 @@ With Websockets support:
 
 See https://github.com/Geodan/gost/wiki/Mosquitto-with-websockets
 
-Gost testcase after installation: 
+GOST testcase after installation: 
 
 In browser open http://localhost:8080/v1.0 to test if the server is running
 
@@ -47,6 +47,8 @@ unzip gost_osx_x64.zip
 cd darwin64
 gost
 ```
+
+Issue: no dashboard available at http://localhost:8080 ?
 
 3) Linux
 
