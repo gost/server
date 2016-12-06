@@ -48,11 +48,16 @@ cd darwin64
 gost
 ```
 
-issue: dashboard does not load? at http://localhost:8080
-
 3) Linux
 
-todo
+```sh
+docker run -p 5432:5432 -e POSTGRES_DB=gost -d geodan/gost-db
+wget https://github.com/Geodan/gost/releases/download/0.3/gost_ubuntu_x64.zip
+unzip gost_ubuntu_x64.zip
+cd linux64
+gost
+```
+
 
 ## Install from Source
 
