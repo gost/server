@@ -75,13 +75,6 @@ For a complete collection of working requests install Postman and import the [Po
 
 MQTT: For getting started with Gost and MQTT for publishing/receiving data see [GOST and MQTT - Getting started](docs/gost_mqtt_getting_started.md)
 
-## Dependencies
-
-[yaml v2](https://github.com/go-yaml/yaml)<br />
-[pq](https://github.com/lib/pq)<br />
-[mux](https://github.com/gorilla/mux)<br />
-[Paho](https://github.com/eclipse/paho.mqtt.golang)<br />
-
 ## Goals
 
 - Complete implementation of the OGC SensorThings spec
