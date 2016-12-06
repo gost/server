@@ -2,7 +2,7 @@
 ### GOST installation 
 
 In this document 4 ways to install GOST server are described: Installation from pre-build binaries (for Linux/Windows/Mac), 
-Installation from source code (requires some Golang knowledge), installing with Docker and complete GOST installation from script. 
+Installation from source code (requires some Golang knowledge), installing with Docker (requires some Docker knowledge) and for advanced cases a complete GOST installation from script. 
 
 ## Prerequisites
 
@@ -23,6 +23,8 @@ See https://github.com/Geodan/gost/wiki/Mosquitto-with-websockets
 GOST testcase after installation: 
 
 In browser open http://localhost:8080/v1.0 to test if the server is running
+
+In browser op http://localhost:8080 to test if the dashbaord is working
 
 ## Install from Binaries
 
@@ -105,7 +107,7 @@ For a complete GOST server installation from script there are various parts to i
 
 Run script at https://github.com/Geodan/gost-db/blob/master/gost-db-install.sh for installing Postgres + Postgis + GOST database
 
-2) Install Goland
+2) Install Golang
 
 // todo
 
