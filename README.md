@@ -46,10 +46,6 @@ $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.y
 $ docker-compose up
 ```
 
-## News
-
-2016-05-30: Testing started against the OGC SensorThings API Test Suite 
-
 ## OGC Compliance testing status
 
 GOST is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
