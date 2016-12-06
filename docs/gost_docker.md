@@ -6,6 +6,8 @@ For service and dashboard: [https://hub.docker.com/r/geodan/gost/]
 
 For database: [https://hub.docker.com/r/geodan/gost-db/]
 
+For more information about the Docker gost-db image, see [https://github.com/Geodan/gost-db]
+
 The docker images can run separately, or running in a combined way using the Dockercompose file.
 
 Tags: Use the tag latest for the latest development version, otherwise use a tag like '0.3' for more stable versions.
@@ -17,16 +19,6 @@ $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.y
 
 $ docker-compose up
 ```
-
-# Running GOST database
-
-```
-. $ docker run -p 5432:5432 -e POSTGRES_DB=gost geodan/gost-db
-```
-
-Connect in pgadmin with localhost:5432 postgres/postgres
-
-GOST schema is in schema postgres.v1
 
 # Running GOST service and dashboard
 ```
