@@ -18,9 +18,9 @@ GOST is alpha software and is not (yet) considered appropriate for customer use.
 
 ## Binaries
 
-Release 0.2: 2016-06-10
+Current release 0.3: 2016-12-06
 
-[https://github.com/Geodan/gost/releases/tag/0.2] (https://github.com/Geodan/gost/releases/tag/0.2)
+[https://github.com/Geodan/gost/releases/tag/0.3] (https://github.com/Geodan/gost/releases/tag/0.3)
 
 Binaries are build for Windows, Ubuntu and OSX.
 
@@ -29,7 +29,6 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	|
 |------------	|---------------------	|-----------------------------------------------------------------	|
-| 2016-12-05 	| 0.3                 	| OGC Test level 1,2 compliant,  Docker support,  Basic filtering 	|
 | 2017-02-06 	| 0.4                 	| OGC Test level 3 compliant                                      	|
 | 2017-03-06 	| 0.5                 	| TBD                                                             	|
 
