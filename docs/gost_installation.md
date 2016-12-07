@@ -35,8 +35,8 @@ This sample is using some tools: 7zip as unzip tool, wget as download tool and d
 ```sh
 docker run -p 5432:5432 -e POSTGRES_DB=gost -d geodan/gost-db
 wget https://github.com/Geodan/gost/releases/download/0.3/gost_windows_x64.zip
-7z x gost_windows_x64.zip -od:\aaa\gost
-cd d:\aaa\gost\win64
+7z x gost_windows_x64.zip
+cd win64
 gost.exe
 ```
 
