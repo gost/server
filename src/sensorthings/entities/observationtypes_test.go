@@ -25,7 +25,7 @@ func TestGetObservationTypeByValueShouldReturnCorrectObservationType(t *testing.
 func TestGetObservationTypeByCodeShouldReturnCorrectObservationType(t *testing.T) {
 	// arrange
 	expected := "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"
-	input := 1
+	input := int64(1)
 
 	// act
 	res, err := GetObservationTypeByID(input)
