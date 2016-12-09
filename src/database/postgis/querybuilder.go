@@ -29,28 +29,6 @@ func CreateQueryBuilder(schema string, maxTop int) *QueryBuilder {
 	return qb
 }
 
-// toAs returns the AS name for a field
-func (qb *QueryBuilder) toAs(e entities.Entity, field string) string {
-	as := strings.Replace(field, ".", "_", -1)
-	if i := strings.Index(field, "("); i != -1 { //remove methods such as public.ST_AsGeoJSON()
-		as = as[i+1 : len(field)-1]
-	}
-
-	if strings.Contains(as, "'") { //remove json selector ... -> 'field'
-		i1 := strings.Index(as, "'")
-		i2 := strings.LastIndex(as, "'")
-		as = as[i1+1 : i2]
-	}
-
-	et := e.GetEntityType()
-	if !strings.Contains(as, strings.ToLower(et.ToString())) {
-		table := qb.removeSchema(qb.tables[et])
-		as = fmt.Sprintf("%s_%s", table, as)
-	}
-
-	return strings.ToLower(as)
-}
-
 // removeSchema removes the prefix in front of a table
 func (qb *QueryBuilder) removeSchema(table string) string {
 	i := strings.Index(table, ".")
@@ -118,10 +96,10 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 		if len(selectString) > 0 {
 			toAdd += ", "
 		}
-
-		field := selectMappings[et.GetEntityType()][strings.ToLower(p)]
+		entityType := et.GetEntityType()
+		field := selectMappings[entityType][strings.ToLower(p)]
 		if addAs {
-			selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, qb.toAs(et, field))
+			selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, asMappings[entityType][strings.ToLower(p)])
 		} else {
 			selectString += fmt.Sprintf("%s%s", toAdd, field)
 		}
@@ -228,7 +206,7 @@ func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, err
 //   e2 = from entity
 //   id = where e2
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
-func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
+func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo, error) {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
@@ -250,20 +228,24 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
 	queryString = fmt.Sprintf("%s LIMIT %s OFFSET %s", queryString, qb.getLimit(qo), qb.getOffset(qo))
-	return queryString, nil
+
+	qpi := &QueryParseInfo{}
+	qpi.Init(entities.EntityTypeDatastream, 0, DatastreamParamFactory)
+
+	return queryString, qpi, nil
 }
 
 // Test is a temporarily test function while developing
 func (qb *QueryBuilder) Test() {
 	fmt.Println("------------GET THINGS------------")
-	sql1, _ := qb.CreateQuery(&entities.Thing{}, nil, nil, nil)
+	sql1, _, _ := qb.CreateQuery(&entities.Thing{}, nil, nil, nil)
 	fmt.Println(sql1)
 
 	fmt.Println("------------GET THING WITH SELECT BY DATASTREAM------------")
 	qo2 := &odata.QueryOptions{}
 	qo2.QuerySelect = &odata.QuerySelect{}
 	qo2.QuerySelect.Parse("name,description")
-	sql2, _ := qb.CreateQuery(&entities.Thing{}, &entities.Datastream{}, 1, qo2)
+	sql2, _, _ := qb.CreateQuery(&entities.Thing{}, &entities.Datastream{}, 1, qo2)
 	fmt.Println(sql2)
 
 	fmt.Println("------------GET DATASTREAMS WITH SELECT, EXPAND THING WITH SELECT------------")
@@ -272,26 +254,26 @@ func (qb *QueryBuilder) Test() {
 	qo31.QuerySelect.Parse("name,description")
 	qo31.QueryExpand = &odata.QueryExpand{}
 	qo31.QueryExpand.Parse("Thing($select=name)")
-	sql3, _ := qb.CreateQuery(&entities.Datastream{}, nil, nil, qo31)
+	sql3, _, _ := qb.CreateQuery(&entities.Datastream{}, nil, nil, qo31)
 	fmt.Println(sql3)
 
 	fmt.Println("------------GET THING BY LOCATION------------")
-	sql4, _ := qb.CreateQuery(&entities.Thing{}, &entities.Location{}, 1, nil)
+	sql4, _, _ := qb.CreateQuery(&entities.Thing{}, &entities.Location{}, 1, nil)
 	fmt.Println(sql4)
 
 	fmt.Println("------------GET HISTORICAL LOCATION BY THING ------------")
-	sql5, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, 1, nil)
+	sql5, _, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, 1, nil)
 	fmt.Println(sql5)
 
 	fmt.Println("------------GET LOCATION BY THING ------------")
-	sql6, _ := qb.CreateQuery(&entities.Location{}, &entities.Thing{}, 1, nil)
+	sql6, _, _ := qb.CreateQuery(&entities.Location{}, &entities.Thing{}, 1, nil)
 	fmt.Println(sql6)
 
 	fmt.Println("------------GET HISTORICAL LOCATION BY LOCATION ------------")
-	sql7, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, 1, nil)
+	sql7, _, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, 1, nil)
 	fmt.Println(sql7)
 
 	fmt.Println("------------GET OBSERVATIONS------------")
-	sql8, _ := qb.CreateQuery(&entities.Observation{}, nil, nil, nil)
+	sql8, _, _ := qb.CreateQuery(&entities.Observation{}, nil, nil, nil)
 	fmt.Println(sql8)
 }

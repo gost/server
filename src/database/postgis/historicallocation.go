@@ -258,13 +258,6 @@ func (gdb *GostDatabase) PatchHistoricalLocation(id interface{}, hl *entities.Hi
 		return nil, err
 	}
 
-	/*
-		query := fmt.Sprintf("DELETE FROM %s.location_to_historicallocation WHERE historicallocation_id = $1", gdb.Schema)
-		_, err = gdb.Db.Exec(query, intID)
-		if err != nil {
-			return nil, err
-		}*/
-
 	for _, l := range hl.Locations {
 		query := fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)", gdb.Schema)
 		_, err := gdb.Db.Exec(query, l.ID, intID)

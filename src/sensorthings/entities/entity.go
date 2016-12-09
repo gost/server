@@ -12,16 +12,17 @@ type EntityType string
 
 // List of all EntityTypes.
 const (
-	EntityTypeThing              EntityType = "Thing"
-	EntityTypeLocation           EntityType = "Location"
-	EntityTypeHistoricalLocation EntityType = "HistoricalLocation"
-	EntityTypeDatastream         EntityType = "Datastream"
-	EntityTypeSensor             EntityType = "Sensor"
-	EntityTypeObservedProperty   EntityType = "ObservedProperty"
-	EntityTypeObservation        EntityType = "Observation"
-	EntityTypeFeatureOfInterest  EntityType = "FeatureOfInterest"
-	EntityTypeThingToLocation    EntityType = "ThingToLocation"
-	EntityTypeUnknown            EntityType = "Unknown"
+	EntityTypeThing                        EntityType = "Thing"
+	EntityTypeLocation                     EntityType = "Location"
+	EntityTypeHistoricalLocation           EntityType = "HistoricalLocation"
+	EntityTypeDatastream                   EntityType = "Datastream"
+	EntityTypeSensor                       EntityType = "Sensor"
+	EntityTypeObservedProperty             EntityType = "ObservedProperty"
+	EntityTypeObservation                  EntityType = "Observation"
+	EntityTypeFeatureOfInterest            EntityType = "FeatureOfInterest"
+	EntityTypeThingToLocation              EntityType = "ThingToLocation"
+	EntityTypeLocationToHistoricalLocation EntityType = "LocationToHistoricalLocation"
+	EntityTypeUnknown                      EntityType = "Unknown"
 )
 
 // EntityTypeList is a list for all known entity types
@@ -131,6 +132,10 @@ func (b *BaseEntity) SetLinks(externalURL string) error {
 	return nil
 }
 
+func (b *BaseEntity) GetID() interface{} {
+	return b.ID
+}
+
 // GetEntityType defined to implement Entity
 func (b *BaseEntity) GetEntityType() EntityType {
 	return EntityTypeUnknown
@@ -165,6 +170,7 @@ func (e EntityLink) ToString() string {
 type Entity interface {
 	ParseEntity(data []byte) error
 	ContainsMandatoryParams() (bool, []error)
+	GetID() interface{}
 	SetID(newID interface{})
 	SetAllLinks(externalURL string)
 	SetSelfLink(externalURL string)

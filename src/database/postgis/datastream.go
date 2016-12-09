@@ -15,6 +15,54 @@ import (
 
 var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
 
+func DatastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	ds := &entities.Datastream{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeDatastream][datastreamID] {
+			ds.ID = value
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamObservedArea] {
+			t := value.(string)
+			observedAreaMap, err := JSONToMap(&t)
+			if err != nil {
+				return nil, err
+			}
+			ds.ObservedArea = observedAreaMap
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamName] {
+			ds.Name = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
+			ds.Description = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
+			ds.ResultTime = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
+			obs, _ := entities.GetObservationTypeByID(value.(int64))
+			ds.ObservationType = obs.Value
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
+			ds.PhenomenonTime = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
+			t := value.(string)
+			unitOfMeasurementMap, err := JSONToMap(&t)
+			if err != nil {
+				return nil, err
+			}
+
+			ds.UnitOfMeasurement = unitOfMeasurementMap
+		}
+	}
+
+	return ds, nil
+}
+
 // GetObservedArea returns the observed area of all observations of datastream
 func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
 	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
@@ -154,7 +202,7 @@ func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL
 		var observedarea *string
 		var phenomenonTime string
 		var resultTime string
-		var ot int
+		var ot int64
 
 		var params []interface{}
 		var qp []string

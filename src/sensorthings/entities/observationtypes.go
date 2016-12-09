@@ -6,7 +6,7 @@ import (
 
 // ObservationType holds the information on a ObservationType
 type ObservationType struct {
-	Code  int
+	Code  int64
 	Value string
 }
 
@@ -41,7 +41,7 @@ func GetObservationTypeByValue(observationType string) (ObservationType, error) 
 }
 
 // GetObservationTypeByID Get the observationType based on value, returns error
-func GetObservationTypeByID(observationType int) (ObservationType, error) {
+func GetObservationTypeByID(observationType int64) (ObservationType, error) {
 	for _, k := range ObservationTypes {
 		if k.Code == observationType {
 			return k, nil
