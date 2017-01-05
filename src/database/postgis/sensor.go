@@ -11,6 +11,32 @@ import (
 	"strings"
 )
 
+func sensorParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	s := &entities.Sensor{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeSensor][sensorID] {
+			s.ID = value
+		} else if as == asMappings[entities.EntityTypeSensor][sensorName] {
+			s.Name = value.(string)
+		} else if as == asMappings[entities.EntityTypeSensor][sensorDescription] {
+			s.Description = value.(string)
+		} else if as == asMappings[entities.EntityTypeSensor][sensorEncodingType] {
+			encodingType := value.(int64)
+			if encodingType != 0 {
+				s.EncodingType = entities.EncodingValues[encodingType].Value
+			}
+		} else if as == asMappings[entities.EntityTypeSensor][sensorMetadata] {
+			s.Metadata = value.(string)
+		}
+	}
+
+	return s, nil
+}
+
 // GetTotalSensors returns the total sensors count in the database
 func (gdb *GostDatabase) GetTotalSensors() int {
 	var count int

@@ -14,6 +14,23 @@ import (
 
 var hlMapping = map[string]string{"time": fmt.Sprintf("to_char(time at time zone 'UTC', '%s') as time", TimeFormat)}
 
+func historicalLocationParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	h := &entities.HistoricalLocation{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID] {
+			h.ID = value
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][historicalLocationTime] {
+			h.Time = value.(string)
+		}
+	}
+
+	return h, nil
+}
+
 // GetTotalHistoricalLocations returns the amount of HistoricalLocations in the database
 func (gdb *GostDatabase) GetTotalHistoricalLocations() int {
 	var count int

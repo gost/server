@@ -13,6 +13,27 @@ import (
 	"strings"
 )
 
+func observedPropertyParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	op := &entities.ObservedProperty{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyID] {
+			op.ID = value
+		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyName] {
+			op.Name = value.(string)
+		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyDescription] {
+			op.Description = value.(string)
+		} else if as == asMappings[entities.EntityTypeObservedProperty][observedPropertyDefinition] {
+			op.Definition = value.(string)
+		}
+	}
+
+	return op, nil
+}
+
 // GetTotalObservedProperties returns the total ObservedProperties count in the database
 func (gdb *GostDatabase) GetTotalObservedProperties() int {
 	var count int

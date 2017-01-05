@@ -12,8 +12,47 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
+func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	o := &entities.Observation{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeObservation][observationID] {
+			o.ID = value
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTime] {
+			o.PhenomenonTime = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationResultTime] {
+			o.ResultTime = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationResult] {
+			o.Result = value
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationValidTime] {
+			o.ValidTime = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationResultQuality] {
+			o.ResultQuality = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationParameters] {
+			t := value.(string)
+			parameterMap, err := JSONToMap(&t)
+			if err != nil {
+				return nil, err
+			}
+
+			o.Parameters = parameterMap
+		}
+	}
+
+	return o, nil
+}
+
 // observationParamFactory is used to construct a WHERE clause from an ODATA $select string
-func observationParamFactory(key string, value interface{}) (string, string, error) {
+func observationParamFactoryWhere(key string, value interface{}) (string, string, error) {
 	val := fmt.Sprintf("%v", value)
 	jsonVal := convertSelectValueForJSON(val)
 	switch key {
@@ -68,7 +107,7 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
 	var queryString string
 	var err error
-	if queryString, err = CreateFilterQueryString(qo, observationParamFactory, "WHERE "); err != nil {
+	if queryString, err = CreateFilterQueryString(qo, observationParamFactoryWhere, "WHERE "); err != nil {
 		return nil, 0, gostErrors.NewBadRequestError(err)
 	}
 
@@ -100,7 +139,7 @@ func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, q
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	if queryString, err = CreateFilterQueryString(qo, observationParamFactory, " AND "); err != nil {
+	if queryString, err = CreateFilterQueryString(qo, observationParamFactoryWhere, " AND "); err != nil {
 		return nil, 0, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
 	}
 

@@ -56,9 +56,14 @@ var (
 	locationToHistoricalLocationHistoricalLocationID = "historicallocation_id "
 )
 
+var (
+	asSeparator = "_"
+	idField     = "id"
+)
+
 // sensor fields
 var (
-	sensorID           = "id"
+	sensorID           = idField
 	sensorName         = "name"
 	sensorDescription  = "description"
 	sensorEncodingType = "encodingtype"
@@ -67,7 +72,7 @@ var (
 
 // observed property fields
 var (
-	observedPropertyID          = "id"
+	observedPropertyID          = idField
 	observedPropertyName        = "name"
 	observedPropertyDescription = "description"
 	observedPropertyDefinition  = "definition"
@@ -75,7 +80,7 @@ var (
 
 // datastream fields
 var (
-	datastreamID                 = "id"
+	datastreamID                 = idField
 	datastreamName               = "name"
 	datastreamDescription        = "description"
 	datastreamUnitOfMeasurement  = "unitofmeasurement"
@@ -90,9 +95,9 @@ var (
 
 // observation fields
 var (
-	observationID                  = "id"
+	observationID                  = idField
 	observationData                = "data"
-	observationPhenomenonTime      = "phenomenonTime"
+	observationPhenomenonTime      = "phenomenontime"
 	observationResultTime          = "resulttime"
 	observationResult              = "result"
 	observationValidTime           = "validtime"
@@ -104,7 +109,7 @@ var (
 
 // feature of interest fields
 var (
-	foiID                 = "id"
+	foiID                 = idField
 	foiName               = "name"
 	foiDescription        = "description"
 	foiEncodingType       = "encodingtype"
@@ -119,37 +124,44 @@ type QueryParseInfo struct {
 	ParamFactory ParamFactory
 	EntityType   entities.EntityType
 	Entity       entities.Entity
-	SubEntities  []QueryParseInfo
+	SubEntities  []*QueryParseInfo
 }
 
-func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, paramFactory ParamFactory) {
+func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int) {
 	q.QueryIndex = queryIndex
-	q.ParamFactory = paramFactory
 	q.EntityType = entityType
 	switch e := entityType; e {
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}
+		q.ParamFactory = thingParamFactory
 		break
 	case entities.EntityTypeFeatureOfInterest:
 		q.Entity = &entities.FeatureOfInterest{}
+		q.ParamFactory = featureOfInterestParamFactory
 		break
 	case entities.EntityTypeLocation:
 		q.Entity = &entities.Location{}
+		q.ParamFactory = locationParamFactory
 		break
 	case entities.EntityTypeObservation:
 		q.Entity = &entities.Observation{}
+		q.ParamFactory = observationParamFactory
 		break
 	case entities.EntityTypeObservedProperty:
 		q.Entity = &entities.ObservedProperty{}
+		q.ParamFactory = observedPropertyParamFactory
 		break
 	case entities.EntityTypeDatastream:
 		q.Entity = &entities.Datastream{}
+		q.ParamFactory = datastreamParamFactory
 		break
 	case entities.EntityTypeHistoricalLocation:
 		q.Entity = &entities.HistoricalLocation{}
+		q.ParamFactory = historicalLocationParamFactory
 		break
 	case entities.EntityTypeSensor:
 		q.Entity = &entities.Sensor{}
+		q.ParamFactory = sensorParamFactory
 		break
 	}
 }
@@ -169,84 +181,131 @@ func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
 	return nil
 }
 
+// GetNextQueryIndex returns the next query index number based on the added entities/sub entities
+func (q *QueryParseInfo) GetNextQueryIndex() int {
+	qi := q.QueryIndex
+	if len(q.SubEntities) > 0 {
+		lastSub := q.SubEntities[len(q.SubEntities)-1]
+		qi = lastSub.GetNextQueryIndex()
+	}
+
+	return qi + 1
+}
+
+// GetQueryIDRelationMap returns the query index relations, ie QueryParseInfo with sub entity datastream thing qid = 0, datastream qid = 1
+// example: returns [1]0 - datastream (1) relates to thing (0)
+// returns nil if no relation exists
+func (q *QueryParseInfo) GetQueryIDRelationMap(relationMap map[int]int) map[int]int {
+	if relationMap == nil {
+		relationMap = map[int]int{}
+	}
+
+	if len(q.SubEntities) == 0 {
+		return relationMap
+	}
+
+	for _, qpi := range q.SubEntities {
+		relationMap[qpi.QueryIndex] = q.QueryIndex
+		relationMap = qpi.GetQueryIDRelationMap(relationMap)
+	}
+
+	return relationMap
+}
+
 func (q *QueryParseInfo) Parse(values map[string]interface{}) (entities.Entity, error) {
 	return q.ParamFactory(values)
 }
 
 var asMappings = map[entities.EntityType]map[string]string{
 	entities.EntityTypeThing: {
-		thingID:          fmt.Sprintf("%s_%s", thingTable, thingID),
-		thingName:        fmt.Sprintf("%s_%s", thingTable, thingName),
-		thingDescription: fmt.Sprintf("%s_%s", thingTable, thingDescription),
-		thingProperties:  fmt.Sprintf("%s_%s", thingTable, thingProperties),
+		thingID:          constructAs(thingTable, thingID),
+		thingName:        constructAs(thingTable, thingName),
+		thingDescription: constructAs(thingTable, thingDescription),
+		thingProperties:  constructAs(thingTable, thingProperties),
 	},
 	entities.EntityTypeLocation: {
-		locationID:           fmt.Sprintf("%s_%s", locationTable, locationID),
-		locationName:         fmt.Sprintf("%s_%s", locationTable, locationName),
-		locationDescription:  fmt.Sprintf("%s_%s", locationTable, locationDescription),
-		locationEncodingType: fmt.Sprintf("%s_%s", locationTable, locationEncodingType),
-		locationLocation:     fmt.Sprintf("%s_%s", locationTable, locationLocation),
+		locationID:           constructAs(locationTable, locationID),
+		locationName:         constructAs(locationTable, locationName),
+		locationDescription:  constructAs(locationTable, locationDescription),
+		locationEncodingType: constructAs(locationTable, locationEncodingType),
+		locationLocation:     constructAs(locationTable, locationLocation),
 	},
 	entities.EntityTypeThingToLocation: {
-		thingToLocationThingID:    fmt.Sprintf("%s_%s", thingToLocationTable, thingToLocationThingID),
-		thingToLocationLocationID: fmt.Sprintf("%s_%s", thingToLocationTable, thingToLocationLocationID),
+		thingToLocationThingID:    constructAs(thingToLocationTable, thingToLocationThingID),
+		thingToLocationLocationID: constructAs(thingToLocationTable, thingToLocationLocationID),
 	},
 	entities.EntityTypeLocationToHistoricalLocation: {
-		locationToHistoricalLocationLocationID:           fmt.Sprintf("%s_%s", locationToHistoricalLocationTable, locationToHistoricalLocationLocationID),
-		locationToHistoricalLocationHistoricalLocationID: fmt.Sprintf("%s_%s", locationToHistoricalLocationTable, locationToHistoricalLocationHistoricalLocationID),
+		locationToHistoricalLocationLocationID:           constructAs(locationToHistoricalLocationTable, locationToHistoricalLocationLocationID),
+		locationToHistoricalLocationHistoricalLocationID: constructAs(locationToHistoricalLocationTable, locationToHistoricalLocationHistoricalLocationID),
 	},
 	entities.EntityTypeHistoricalLocation: {
-		historicalLocationID:         fmt.Sprintf("%s_%s", historicalLocationTable, historicalLocationID),
-		historicalLocationTime:       fmt.Sprintf("%s_%s", historicalLocationTable, historicalLocationTime),
-		historicalLocationThingID:    fmt.Sprintf("%s_%s", historicalLocationTable, historicalLocationThingID),
-		historicalLocationLocationID: fmt.Sprintf("%s_%s", historicalLocationTable, historicalLocationLocationID),
+		historicalLocationID:         constructAs(historicalLocationTable, historicalLocationID),
+		historicalLocationTime:       constructAs(historicalLocationTable, historicalLocationTime),
+		historicalLocationThingID:    constructAs(historicalLocationTable, historicalLocationThingID),
+		historicalLocationLocationID: constructAs(historicalLocationTable, historicalLocationLocationID),
 	},
 	entities.EntityTypeSensor: {
-		sensorID:           fmt.Sprintf("%s_%s", sensorTable, sensorID),
-		sensorName:         fmt.Sprintf("%s_%s", sensorTable, sensorName),
-		sensorDescription:  fmt.Sprintf("%s_%s", sensorTable, sensorDescription),
-		sensorEncodingType: fmt.Sprintf("%s_%s", sensorTable, sensorEncodingType),
-		sensorMetadata:     fmt.Sprintf("%s_%s", sensorTable, sensorMetadata),
+		sensorID:           constructAs(sensorTable, sensorID),
+		sensorName:         constructAs(sensorTable, sensorName),
+		sensorDescription:  constructAs(sensorTable, sensorDescription),
+		sensorEncodingType: constructAs(sensorTable, sensorEncodingType),
+		sensorMetadata:     constructAs(sensorTable, sensorMetadata),
 	},
 	entities.EntityTypeObservedProperty: {
-		observedPropertyID:          fmt.Sprintf("%s_%s", observedPropertyTable, observedPropertyID),
-		observedPropertyName:        fmt.Sprintf("%s_%s", observedPropertyTable, observedPropertyName),
-		observedPropertyDescription: fmt.Sprintf("%s_%s", observedPropertyTable, observedPropertyDescription),
-		observedPropertyDefinition:  fmt.Sprintf("%s_%s", observedPropertyTable, observedPropertyDefinition),
+		observedPropertyID:          constructAs(observedPropertyTable, observedPropertyID),
+		observedPropertyName:        constructAs(observedPropertyTable, observedPropertyName),
+		observedPropertyDescription: constructAs(observedPropertyTable, observedPropertyDescription),
+		observedPropertyDefinition:  constructAs(observedPropertyTable, observedPropertyDefinition),
 	},
 	entities.EntityTypeObservation: {
-		observationID:                  fmt.Sprintf("%s_%s", observationTable, observationID),
-		observationData:                fmt.Sprintf("%s_%s", observationTable, observationData),
-		observationPhenomenonTime:      fmt.Sprintf("%s_%s", observationTable, observationPhenomenonTime),
-		observationResultTime:          fmt.Sprintf("%s_%s", observationTable, observationResultTime),
-		observationResult:              fmt.Sprintf("%s_%s", observationTable, observationResult),
-		observationValidTime:           fmt.Sprintf("%s_%s", observationTable, observationValidTime),
-		observationResultQuality:       fmt.Sprintf("%s_%s", observationTable, observationResultQuality),
-		observationParameters:          fmt.Sprintf("%s_%s", observationTable, observationParameters),
-		observationStreamID:            fmt.Sprintf("%s_%s", observationTable, observationStreamID),
-		observationFeatureOfInterestID: fmt.Sprintf("%s_%s", observationTable, observationFeatureOfInterestID),
+		observationID:                  constructAs(observationTable, observationID),
+		observationData:                constructAs(observationTable, observationData),
+		observationPhenomenonTime:      constructAs(observationTable, observationPhenomenonTime),
+		observationResultTime:          constructAs(observationTable, observationResultTime),
+		observationResult:              constructAs(observationTable, observationResult),
+		observationValidTime:           constructAs(observationTable, observationValidTime),
+		observationResultQuality:       constructAs(observationTable, observationResultQuality),
+		observationParameters:          constructAs(observationTable, observationParameters),
+		observationStreamID:            constructAs(observationTable, observationStreamID),
+		observationFeatureOfInterestID: constructAs(observationTable, observationFeatureOfInterestID),
 	},
 	entities.EntityTypeFeatureOfInterest: {
-		foiID:                 fmt.Sprintf("%s_%s", featureOfInterestTable, foiID),
-		foiName:               fmt.Sprintf("%s_%s", featureOfInterestTable, foiName),
-		foiDescription:        fmt.Sprintf("%s_%s", featureOfInterestTable, foiDescription),
-		foiEncodingType:       fmt.Sprintf("%s_%s", featureOfInterestTable, foiEncodingType),
-		foiFeature:            fmt.Sprintf("%s_%s)", featureOfInterestTable, foiFeature),
-		foiOriginalLocationID: fmt.Sprintf("%s_%s", featureOfInterestTable, foiOriginalLocationID),
+		foiID:                 constructAs(featureOfInterestTable, foiID),
+		foiName:               constructAs(featureOfInterestTable, foiName),
+		foiDescription:        constructAs(featureOfInterestTable, foiDescription),
+		foiEncodingType:       constructAs(featureOfInterestTable, foiEncodingType),
+		foiFeature:            constructAs(featureOfInterestTable, foiFeature),
+		foiOriginalLocationID: constructAs(featureOfInterestTable, foiOriginalLocationID),
 	},
 	entities.EntityTypeDatastream: {
-		datastreamID:                 fmt.Sprintf("%s_%s", datastreamTable, datastreamID),
-		datastreamName:               fmt.Sprintf("%s_%s", datastreamTable, datastreamName),
-		datastreamDescription:        fmt.Sprintf("%s_%s", datastreamTable, datastreamDescription),
-		datastreamUnitOfMeasurement:  fmt.Sprintf("%s_%s", datastreamTable, datastreamUnitOfMeasurement),
-		datastreamObservationType:    fmt.Sprintf("%s_%s", datastreamTable, datastreamObservationType),
-		datastreamObservedArea:       fmt.Sprintf("%s_%s", datastreamTable, datastreamObservedArea),
-		datastreamPhenomenonTime:     fmt.Sprintf("%s_%s", datastreamTable, datastreamPhenomenonTime),
-		datastreamResultTime:         fmt.Sprintf("%s_%s", datastreamTable, datastreamResultTime),
-		datastreamThingID:            fmt.Sprintf("%s_%s", datastreamTable, datastreamThingID),
-		datastreamSensorID:           fmt.Sprintf("%s_%s", datastreamTable, datastreamSensorID),
-		datastreamObservedPropertyID: fmt.Sprintf("%s_%s", datastreamTable, datastreamObservedPropertyID),
+		datastreamID:                 constructAs(datastreamTable, datastreamID),
+		datastreamName:               constructAs(datastreamTable, datastreamName),
+		datastreamDescription:        constructAs(datastreamTable, datastreamDescription),
+		datastreamUnitOfMeasurement:  constructAs(datastreamTable, datastreamUnitOfMeasurement),
+		datastreamObservationType:    constructAs(datastreamTable, datastreamObservationType),
+		datastreamObservedArea:       constructAs(datastreamTable, datastreamObservedArea),
+		datastreamPhenomenonTime:     constructAs(datastreamTable, datastreamPhenomenonTime),
+		datastreamResultTime:         constructAs(datastreamTable, datastreamResultTime),
+		datastreamThingID:            constructAs(datastreamTable, datastreamThingID),
+		datastreamSensorID:           constructAs(datastreamTable, datastreamSensorID),
+		datastreamObservedPropertyID: constructAs(datastreamTable, datastreamObservedPropertyID),
 	},
+}
+
+func constructAs(table, field string) string {
+	return fmt.Sprintf("%s%s%s", table, asSeparator, field)
+}
+
+var tableMappings = map[entities.EntityType]string{
+	entities.EntityTypeThing:              thingTable,
+	entities.EntityTypeLocation:           locationTable,
+	entities.EntityTypeThingToLocation:    thingToLocationTable,
+	entities.EntityTypeHistoricalLocation: historicalLocationTable,
+	entities.EntityTypeSensor:             sensorTable,
+	entities.EntityTypeObservedProperty:   observedPropertyTable,
+	entities.EntityTypeObservation:        observationTable,
+	entities.EntityTypeFeatureOfInterest:  featureOfInterestTable,
+	entities.EntityTypeDatastream:         datastreamTable,
 }
 
 // maps an entity property name to the right field
@@ -290,12 +349,12 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	entities.EntityTypeObservation: {
 		observationID:                  fmt.Sprintf("%s.%s", observationTable, observationID),
 		observationData:                fmt.Sprintf("%s.%s", observationTable, observationData),
-		observationPhenomenonTime:      "data -> 'phenomenonTime'",
-		observationResultTime:          "data -> 'resultTime'",
-		observationResult:              "data -> 'result'",
-		observationValidTime:           "data -> 'validTime'",
-		observationResultQuality:       "data -> 'resultQuality'",
-		observationParameters:          "data -> 'parameters'",
+		observationPhenomenonTime:      fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "phenomenonTime"),
+		observationResultTime:          fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "resultTime"),
+		observationResult:              fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, observationResult),
+		observationValidTime:           fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "validTime"),
+		observationResultQuality:       fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "resultQuality"),
+		observationParameters:          fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, observationParameters),
 		observationStreamID:            fmt.Sprintf("%s.%s", observationTable, observationStreamID),
 		observationFeatureOfInterestID: fmt.Sprintf("%s.%s", observationTable, observationFeatureOfInterestID),
 	},
@@ -355,26 +414,26 @@ func createJoinMappings(tableMappings map[entities.EntityType]string) map[entiti
 				selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationID],
 				selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID],
 				selectMappings[entities.EntityTypeLocation][locationID]),
-			entities.EntityTypeThing: fmt.Sprintf("WHERE %s = %s", historicalLocationThingID, thingID),
+			entities.EntityTypeThing: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID], selectMappings[entities.EntityTypeThing][thingID]),
 		},
 		entities.EntityTypeSensor: { // get sensor by ...
-			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", sensorID, datastreamSensorID),
+			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeSensor][sensorID], selectMappings[entities.EntityTypeDatastream][datastreamSensorID]),
 		},
 		entities.EntityTypeObservedProperty: { // get observed property by ...
-			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", observedPropertyID, datastreamObservedPropertyID),
+			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservedProperty][observedPropertyID], selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID]),
 		},
 		entities.EntityTypeObservation: { // get observation by ...
-			entities.EntityTypeDatastream:        fmt.Sprintf("WHERE %s = %s", observationStreamID, datastreamID),
-			entities.EntityTypeFeatureOfInterest: fmt.Sprintf("WHERE %s = %s", observationFeatureOfInterestID, foiID),
+			entities.EntityTypeDatastream:        fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationStreamID], selectMappings[entities.EntityTypeDatastream][datastreamID]),
+			entities.EntityTypeFeatureOfInterest: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID], selectMappings[entities.EntityTypeFeatureOfInterest][foiID]),
 		},
 		entities.EntityTypeFeatureOfInterest: { // get feature of interest by ...
-			entities.EntityTypeObservation: fmt.Sprintf("WHERE %s = %s", foiID, observationFeatureOfInterestID),
+			entities.EntityTypeObservation: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeFeatureOfInterest][foiID], selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID]),
 		},
 		entities.EntityTypeDatastream: { // get Datastream by ...
-			entities.EntityTypeThing:            fmt.Sprintf("WHERE %s = %s", datastreamThingID, thingID),
-			entities.EntityTypeSensor:           fmt.Sprintf("WHERE %s = %s", datastreamSensorID, sensorID),
-			entities.EntityTypeObservedProperty: fmt.Sprintf("WHERE %s = %s", datastreamObservedPropertyID, observedPropertyID),
-			entities.EntityTypeObservation:      fmt.Sprintf("WHERE %s = %s", datastreamID, observationStreamID),
+			entities.EntityTypeThing:            fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamThingID], selectMappings[entities.EntityTypeThing][thingID]),
+			entities.EntityTypeSensor:           fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamSensorID], selectMappings[entities.EntityTypeSensor][sensorID]),
+			entities.EntityTypeObservedProperty: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID], selectMappings[entities.EntityTypeObservedProperty][observedPropertyID]),
+			entities.EntityTypeObservation:      fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamID], selectMappings[entities.EntityTypeObservation][observationStreamID]),
 		},
 	}
 

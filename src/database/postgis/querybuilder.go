@@ -70,7 +70,7 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 // select is set by ODATA's $select, if not set get all properties for the given entity (return all)
 // addID to true if it needs to be added and isn't in QuerySelect.Params, addAs to true if a field needs to be
 // outputted with AS [name]
-func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, addID bool, addAs bool, selectString string) string {
+func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, addID bool, addAs bool, fromAs bool, selectString string) string {
 	var properties []string
 	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
 		properties = et.GetPropertyNames()
@@ -97,7 +97,14 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 			toAdd += ", "
 		}
 		entityType := et.GetEntityType()
-		field := selectMappings[entityType][strings.ToLower(p)]
+
+		field := ""
+		if fromAs {
+			field = fmt.Sprintf("%s.%s", tableMappings[entityType], asMappings[entityType][strings.ToLower(p)])
+		} else {
+			field = selectMappings[entityType][strings.ToLower(p)]
+		}
+
 		if addAs {
 			selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, asMappings[entityType][strings.ToLower(p)])
 		} else {
@@ -107,42 +114,60 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 
 	if qo != nil && !qo.QueryExpand.IsNil() {
 		for _, o := range qo.QueryExpand.Operations {
-			selectString = qb.getSelect(o.Entity, o.QueryOptions, addID, addAs, selectString)
+			selectString = qb.getSelect(o.Entity, o.QueryOptions, addID, false, true, selectString)
 		}
 	}
 
 	return selectString
 }
 
-func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, joinString string) string {
+func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
 	if e2 != nil {
 		nqo := qo
+		et2 := e2.GetEntityType()
+
 		if !isExpand {
 			nqo = &odata.QueryOptions{
 				QuerySelect: &odata.QuerySelect{Params: []string{"id"}},
 			}
+			joinString = fmt.Sprintf("%s"+
+				"INNER JOIN LATERAL ("+
+				"SELECT %s FROM %s %s "+
+				"%s)"+
+				"AS %s on true ", joinString,
+				qb.getSelect(e2, nqo, true, true, false, ""),
+				qb.tables[et2],
+				qb.joins[et2][e1.GetEntityType()],
+				qb.getFilterQueryString(et2, nqo, true),
+				qb.removeSchema(qb.tables[et2]))
+		} else {
+			joinString = fmt.Sprintf("%s"+
+				"LEFT JOIN LATERAL ("+
+				"SELECT %s FROM %s %s "+
+				"%s"+
+				"ORDER BY %s "+
+				"LIMIT %s OFFSET %s) AS %s on true ", joinString,
+				qb.getSelect(e2, nqo, true, true, false, ""),
+				qb.tables[et2],
+				qb.joins[et2][e1.GetEntityType()],
+				qb.getFilterQueryString(et2, nqo, true),
+				qb.getOrderBy(et2, nqo),
+				qb.getLimit(nqo),
+				qb.getOffset(nqo),
+				qb.removeSchema(qb.tables[et2]))
+		}
+	}
+	if qo != nil && !qo.QueryExpand.IsNil() {
+		if qpi.SubEntities == nil {
+			qpi.SubEntities = make([]*QueryParseInfo, 0)
 		}
 
-		et2 := e2.GetEntityType()
-		joinString = fmt.Sprintf("%s"+
-			"INNER JOIN LATERAL ("+
-			"SELECT %s FROM %s %s "+
-			"%s"+
-			"ORDER BY %s "+
-			"LIMIT %s OFFSET %s) AS %s on true", joinString,
-			qb.getSelect(e2, nqo, true, false, ""),
-			qb.tables[et2],
-			qb.joins[e1.GetEntityType()][et2],
-			qb.getFilterQueryString(et2, nqo, true),
-			qb.getOrderBy(et2, nqo),
-			qb.getLimit(nqo),
-			qb.getOffset(nqo),
-			qb.removeSchema(qb.tables[et2]))
-	} else {
-		if qo != nil && !qo.QueryExpand.IsNil() {
-			for _, qe := range qo.QueryExpand.Operations {
-				joinString = qb.createLateralJoin(e1, qe.Entity, true, qe.QueryOptions, joinString)
-			}
+		for _, qe := range qo.QueryExpand.Operations {
+			nqpi := &QueryParseInfo{}
+			nqpi.Init(qe.Entity.GetEntityType(), qpi.GetNextQueryIndex())
+			qpi.SubEntities = append(qpi.SubEntities, nqpi)
+
+			joinString = qb.createLateralJoin(e1, qe.Entity, true, qe.QueryOptions, nqpi, joinString)
 		}
 	}
 
@@ -213,9 +238,12 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		et2 = e2.GetEntityType()
 	}
 
-	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, false, true, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, false, qo, ""))
+	qpi := &QueryParseInfo{}
+	qpi.Init(et1, 0)
+
+	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, true, true, false, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, false, qo, qpi, ""))
 	if id != nil {
-		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2]["id"], id)
+		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
 	}
 
 	if qo != nil && !qo.QueryFilter.IsNil() {
@@ -229,10 +257,30 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
 	queryString = fmt.Sprintf("%s LIMIT %s OFFSET %s", queryString, qb.getLimit(qo), qb.getOffset(qo))
 
-	qpi := &QueryParseInfo{}
-	qpi.Init(entities.EntityTypeDatastream, 0, DatastreamParamFactory)
-
 	return queryString, qpi, nil
+}
+
+func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
+	et1 := e1.GetEntityType()
+	et2 := e1.GetEntityType()
+	if e2 != nil { // 2nd entity is given, this means get e1 by e2
+		et2 = e2.GetEntityType()
+	}
+
+	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createLateralJoin(e1, e2, false, nil, nil, ""))
+	if id != nil {
+		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+	}
+
+	if qo != nil && !qo.QueryFilter.IsNil() {
+		if id != nil {
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, false))
+		} else {
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, true))
+		}
+	}
+
+	return queryString, nil
 }
 
 // Test is a temporarily test function while developing

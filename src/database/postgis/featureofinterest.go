@@ -14,6 +14,38 @@ import (
 
 var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
 
+func featureOfInterestParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	foi := &entities.FeatureOfInterest{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeFeatureOfInterest][foiID] {
+			foi.ID = value
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiName] {
+			foi.Name = value.(string)
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiDescription] {
+			foi.Description = value.(string)
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiEncodingType] {
+			encodingType := value.(int64)
+			if encodingType != 0 {
+				foi.EncodingType = entities.EncodingValues[encodingType].Value
+			}
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiFeature] {
+			t := value.(string)
+			featureMap, err := JSONToMap(&t)
+			if err != nil {
+				return nil, err
+			}
+
+			foi.Feature = featureMap
+		}
+	}
+
+	return foi, nil
+}
+
 // GetFeatureOfInterestByLocationID returns the FeatureOfInterest in the database
 // where original_location_id equals the given parameter
 func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {

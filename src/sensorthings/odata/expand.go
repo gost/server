@@ -82,7 +82,6 @@ func (q *QueryExpand) Parse(value string) error {
 	q.RawQuery = value
 	q.Params = strings.Split(value, ",")
 
-	// Work in progress, remove Params if finished
 	l1 := strings.Split(value, ",") // split layer 1, for example $expand=Observations/Things,Sensor,ObservedProperty
 	for _, sl1 := range l1 {
 		eo := ExpandOperation{}
@@ -92,11 +91,6 @@ func (q *QueryExpand) Parse(value string) error {
 
 		q.Operations = append(q.Operations, eo)
 	}
-
-	// debug print
-	/*for _, test := range q.Operations {
-		displayExpandOperation(test)
-	}*/
 
 	return nil
 }

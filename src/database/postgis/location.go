@@ -16,6 +16,38 @@ import (
 
 var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
 
+func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	l := &entities.Location{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeLocation][locationID] {
+			l.ID = value
+		} else if as == asMappings[entities.EntityTypeLocation][locationName] {
+			l.Name = value.(string)
+		} else if as == asMappings[entities.EntityTypeLocation][locationDescription] {
+			l.Description = value.(string)
+		} else if as == asMappings[entities.EntityTypeLocation][locationEncodingType] {
+			encodingType := value.(int64)
+			if encodingType != 0 {
+				l.EncodingType = entities.EncodingValues[encodingType].Value
+			}
+		} else if as == asMappings[entities.EntityTypeLocation][locationLocation] {
+			t := value.(string)
+			locationMap, err := JSONToMap(&t)
+			if err != nil {
+				return nil, err
+			}
+
+			l.Location = locationMap
+		}
+	}
+
+	return l, nil
+}
+
 // GetLocation retrieves the location for the given id from the database
 func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(id)

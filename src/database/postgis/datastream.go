@@ -15,7 +15,7 @@ import (
 
 var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
 
-func DatastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
+func datastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	ds := &entities.Datastream{}
 	for as, value := range values {
 		if value == nil {
@@ -24,32 +24,25 @@ func DatastreamParamFactory(values map[string]interface{}) (entities.Entity, err
 
 		if as == asMappings[entities.EntityTypeDatastream][datastreamID] {
 			ds.ID = value
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamObservedArea] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservedArea] {
 			t := value.(string)
 			observedAreaMap, err := JSONToMap(&t)
 			if err != nil {
 				return nil, err
 			}
 			ds.ObservedArea = observedAreaMap
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamName] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamName] {
 			ds.Name = value.(string)
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
 			ds.Description = value.(string)
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
 			ds.ResultTime = value.(string)
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
 			obs, _ := entities.GetObservationTypeByID(value.(int64))
 			ds.ObservationType = obs.Value
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
 			ds.PhenomenonTime = value.(string)
-		}
-		if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
+		} else if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
 			t := value.(string)
 			unitOfMeasurementMap, err := JSONToMap(&t)
 			if err != nil {

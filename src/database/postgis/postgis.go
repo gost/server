@@ -78,10 +78,6 @@ func (gdb *GostDatabase) Start() {
 
 	gdb.Db = db
 	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
-
-	//TEST
-	//sql9, qi, _ := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, nil, nil)
-	//ExecuteSelect(gdb.Db, qi, sql9)
 }
 
 // CreateSchema creates the needed schema in the database

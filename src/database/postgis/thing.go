@@ -14,6 +14,36 @@ import (
 	"strings"
 )
 
+func thingParamFactory(values map[string]interface{}) (entities.Entity, error) {
+	t := &entities.Thing{}
+	for as, value := range values {
+		if value == nil {
+			continue
+		}
+
+		if as == asMappings[entities.EntityTypeThing][thingID] {
+			t.ID = value
+		}
+		if as == asMappings[entities.EntityTypeThing][thingName] {
+			t.Name = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeThing][thingDescription] {
+			t.Description = value.(string)
+		}
+		if as == asMappings[entities.EntityTypeThing][thingProperties] {
+			p := value.(string)
+			propertiesMap, err := JSONToMap(&p)
+			if err != nil {
+				return nil, err
+			}
+
+			t.Properties = propertiesMap
+		}
+	}
+
+	return t, nil
+}
+
 // GetThing returns a thing entity based on id and query
 func (gdb *GostDatabase) GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error) {
 	intID, ok := ToIntID(id)
