@@ -20,7 +20,7 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 }
 
 // ExecuteSelect executes the select query and creates the retrieved entities
-func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, error) {
+func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity, error) {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 
@@ -35,7 +35,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 	deleteIDMap := make(map[int]bool)
 	queryParseInfoMap := make(map[int]*QueryParseInfo)                 // QueryID to QueryParseInfo
 	currentQIDEntityID := make(map[int]interface{})                    // keeps track of the current query id and entity id
-	parentEntities := map[interface{}]entities.Entity{}                // array of parent entities
+	parentEntities := []entities.Entity{}                              // array of parent entities
 	subEntities := map[int]map[int]map[interface{}][]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
 	relationMap := q.GetQueryIDRelationMap(nil)
 	asMap := make(map[string]string, 0) // column names mapped to the original as (without their prefix A_ etc)
@@ -118,7 +118,12 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 					}
 
 					if qi == 0 {
-						_, skip = parentEntities[val]
+						for _, e := range parentEntities {
+							if e.GetID() == val {
+								skip = true
+								break
+							}
+						}
 					} else {
 						_, skip = parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][val]
 						if !skip {
@@ -155,7 +160,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 			}
 
 			if qi == 0 {
-				parentEntities[currentQIDEntityID[qi]] = newEntity
+				parentEntities = append(parentEntities, newEntity)
 			} else {
 				subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = append(subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]], newEntity)
 				parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][newEntity.GetID()] = nil
@@ -202,11 +207,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 	if parentEntitiesLength == 0 {
 		return nil, nil
 	} else {
-		entitySlice := make([]interface{}, 0)
-		for _, e := range parentEntities {
-			entitySlice = append(entitySlice, e)
-		}
-		return entitySlice, nil
+		return parentEntities, nil
 	}
 
 	return nil, nil

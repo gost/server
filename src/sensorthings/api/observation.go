@@ -102,8 +102,6 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 	}
 
-	fmt.Printf("Location found, id: %v\n", l.ID)
-
 	var featureOfInterestID interface{}
 
 	// now check if the locationid already exists in featureofinterest.orginal_location id
