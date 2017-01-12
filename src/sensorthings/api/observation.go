@@ -102,11 +102,13 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 	}
 
-	var featureOfInterest *entities.FeatureOfInterest
+	fmt.Printf("Location found, id: %v\n", l.ID)
+
+	var featureOfInterestID interface{}
 
 	// now check if the locationid already exists in featureofinterest.orginal_location id
-	featureOfInterest, _ = db.GetFeatureOfInterestByLocationID(l.ID)
-	if featureOfInterest == nil {
+	featureOfInterestID, _ = db.GetFeatureOfInterestIDByLocationID(l.ID)
+	if featureOfInterestID == nil {
 		// if the FeatureOfInterest does not exist already, create it now
 		NewFeatureOfInterest := ConvertLocationToFoi(l)
 		CreatedFeatureOfInterest, err := db.PostFeatureOfInterest(NewFeatureOfInterest)
@@ -115,7 +117,7 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 		}
 		result = toStringID(CreatedFeatureOfInterest.ID)
 	} else {
-		result = toStringID(featureOfInterest.ID)
+		result = toStringID(featureOfInterestID)
 	}
 
 	return result, nil

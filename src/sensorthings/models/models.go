@@ -157,7 +157,7 @@ type Database interface {
 	PutDatastream(interface{}, *entities.Datastream) (*entities.Datastream, error)
 
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
-	GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error)
+	GetFeatureOfInterestIDByLocationID(id interface{}) (interface{}, error)
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterests(qo *odata.QueryOptions) (f []*entities.FeatureOfInterest, count int, e error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)

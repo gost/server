@@ -45,14 +45,24 @@ func featureOfInterestParamFactory(values map[string]interface{}) (entities.Enti
 
 // GetFeatureOfInterestByLocationID returns the FeatureOfInterest in the database
 // where original_location_id equals the given parameter
-func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*entities.FeatureOfInterest, error) {
+func (gdb *GostDatabase) GetFeatureOfInterestIDByLocationID(id interface{}) (interface{}, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, intID, nil)
-	return processFeatureOfInterest(gdb.Db, query, qi)
+	var fID interface{}
+	query := fmt.Sprintf("select id from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
+	err := gdb.Db.QueryRow(query).Scan(&fID)
+	if err != nil {
+		return nil, err
+	}
+
+	if fID == nil {
+		return nil, errors.New("Linked FeatureOfINterest not found")
+	}
+
+	return fID, nil
 }
 
 // GetFeatureOfInterest returns a feature of interest by id
