@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	gostErrors "github.com/geodan/gost/src/errors"
+	"time"
 )
 
 // HistoricalLocation in sensorthings represents the current and previous locations of a thing including time
@@ -41,6 +42,10 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 // ContainsMandatoryParams checks if all mandatory params for a HistoricalLocation are available before posting
 func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 	err := []error{}
+
+	if len(h.Time) == 0 {
+		h.Time = time.Now().UTC().Format(time.RFC3339Nano)
+	}
 
 	CheckMandatoryParam(&err, h.Time, h.GetEntityType(), "time")
 	CheckMandatoryParam(&err, h.Thing, h.GetEntityType(), "Thing")
