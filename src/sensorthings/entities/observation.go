@@ -92,6 +92,14 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 func (o *Observation) SetAllLinks(externalURL string) {
 	o.SetSelfLink(externalURL)
 	o.SetLinks(externalURL)
+
+	if o.Datastream != nil {
+		o.Datastream.SetAllLinks(externalURL)
+	}
+
+	if o.FeatureOfInterest != nil {
+		o.FeatureOfInterest.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

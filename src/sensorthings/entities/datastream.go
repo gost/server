@@ -29,8 +29,6 @@ type Datastream struct {
 	ResultTime          string                 `json:"resultTime,omitempty"`
 }
 
-// "phenomenonTime"
-
 // GetEntityType returns the EntityType for Datastream
 func (d Datastream) GetEntityType() EntityType {
 	return EntityTypeDatastream
@@ -74,6 +72,22 @@ func (d *Datastream) ContainsMandatoryParams() (bool, []error) {
 func (d *Datastream) SetAllLinks(externalURL string) {
 	d.SetSelfLink(externalURL)
 	d.SetLinks(externalURL)
+
+	if d.Thing != nil {
+		d.Thing.SetAllLinks(externalURL)
+	}
+
+	if d.Sensor != nil {
+		d.Sensor.SetAllLinks(externalURL)
+	}
+
+	if d.ObservedProperty != nil {
+		d.ObservedProperty.SetAllLinks(externalURL)
+	}
+
+	for _, o := range d.Observations {
+		o.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

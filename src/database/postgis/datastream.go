@@ -10,10 +10,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"strings"
 )
-
-var dsMapping = map[string]string{"observedArea": "public.ST_AsGeoJSON(datastream.observedarea) AS observedarea"}
 
 func datastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	ds := &entities.Datastream{}
@@ -86,8 +83,8 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream where id = %v", gdb.Schema, intID)
-	datastream, err := processDatastream(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, intID, qo)
+	datastream, err := processDatastream(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
 	}
@@ -113,22 +110,20 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 
 // GetDatastreams retrieves all datastreams
 func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, int, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "", "", dsMapping)+" FROM %s.datastream order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.datastream", gdb.Schema)
-	return processDatastreams(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, nil, nil, qo)
+	return processDatastreams(gdb.Db, query, qi, countSQL)
 }
-
-// expand
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
 func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	tID, ok := ToIntID(observationID)
+	intID, ok := ToIntID(observationID)
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observation on datastream.id = observation.stream_id where observation.id = %v", gdb.Schema, gdb.Schema, tID)
-	return processDatastream(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Observation{}, intID, qo)
+	return processDatastream(gdb.Db, query, qi)
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
@@ -138,9 +133,9 @@ func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.Qu
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.datastream inner join %s.thing on thing.id = datastream.thing_id where thing.id = %v", gdb.Schema, gdb.Schema, intID)
-	return processDatastreams(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
+	return processDatastreams(gdb.Db, query, qi, countSQL)
 }
 
 // GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
@@ -150,9 +145,9 @@ func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.datastream inner join %s.sensor on sensor.id = datastream.sensor_id where sensor.id = %v", gdb.Schema, gdb.Schema, intID)
-	return processDatastreams(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
+	return processDatastreams(gdb.Db, query, qi, countSQL)
 }
 
 // GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
@@ -162,13 +157,13 @@ func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *o
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Datastream{}, qo, "datastream.", "", dsMapping)+" FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = %v order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema, gdb.Schema, intID)
-	CountSQL := fmt.Sprintf("select COUNT(*) FROM %s.datastream inner join %s.observedproperty on observedproperty.id = datastream.observedproperty_id where observedproperty.id = %v", gdb.Schema, gdb.Schema, intID)
-	return processDatastreams(gdb.Db, sql, qo, CountSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
+	return processDatastreams(gdb.Db, query, qi, countSQL)
 }
 
-func processDatastream(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Datastream, error) {
-	datastreams, _, err := processDatastreams(db, sql, qo, "")
+func processDatastream(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Datastream, error) {
+	datastreams, _, err := processDatastreams(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -180,91 +175,24 @@ func processDatastream(db *sql.DB, sql string, qo *odata.QueryOptions) (*entitie
 	return datastreams[0], nil
 }
 
-func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Datastream, int, error) {
-	rows, err := db.Query(sql)
-	defer rows.Close()
-
+func processDatastreams(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Datastream, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	var datastreams = []*entities.Datastream{}
-	for rows.Next() {
-		var id interface{}
-		var name, description, unitofmeasurement string
-		var observedarea *string
-		var phenomenonTime string
-		var resultTime string
-		var ot int64
-
-		var params []interface{}
-		var qp []string
-		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			d := &entities.Datastream{}
-			qp = d.GetPropertyNames()
-		} else {
-			qp = qo.QuerySelect.Params
-		}
-
-		for _, p := range qp {
-			p = strings.ToLower(p)
-			if p == "id" {
-				params = append(params, &id)
-			}
-			if p == "name" {
-				params = append(params, &name)
-			}
-			if p == "description" {
-				params = append(params, &description)
-			}
-			if p == "unitofmeasurement" {
-				params = append(params, &unitofmeasurement)
-			}
-			if p == "observationtype" {
-				params = append(params, &ot)
-			}
-			if p == "observedarea" {
-				params = append(params, &observedarea)
-			}
-			if p == "phenomenontime" {
-				params = append(params, &phenomenonTime)
-			}
-			if p == "resulttime" {
-				params = append(params, &resultTime)
-			}
-		}
-
-		err = rows.Scan(params...)
-
-		unitOfMeasurementMap, err := JSONToMap(&unitofmeasurement)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		observedAreaMap, err := JSONToMap(observedarea)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		datastream := entities.Datastream{}
-		datastream.ID = id
-		datastream.Name = name
-		datastream.Description = description
-		datastream.UnitOfMeasurement = unitOfMeasurementMap
-		datastream.PhenomenonTime = phenomenonTime
-		datastream.ResultTime = resultTime
-		datastream.ObservedArea = observedAreaMap
-		if ot != 0 {
-			obs, _ := entities.GetObservationTypeByID(ot)
-			datastream.ObservationType = obs.Value
-		}
-
-		datastreams = append(datastreams, &datastream)
+	datastreams := make([]*entities.Datastream, 0)
+	for _, d := range data {
+		entity := d.(*entities.Datastream)
+		datastreams = append(datastreams, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
 	return datastreams, count, nil

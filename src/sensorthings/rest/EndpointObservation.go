@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
@@ -10,6 +11,7 @@ import (
 func createObservationsEndpoint(externalURL string) *Endpoint {
 	return &Endpoint{
 		Name:       "Observations",
+		EntityType: entities.EntityTypeObservation,
 		OutputInfo: true,
 		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Observations")),
 		SupportedQueryOptions: []odata.QueryOptionType{
@@ -17,19 +19,19 @@ func createObservationsEndpoint(externalURL string) *Endpoint {
 			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
 		},
 		SupportedExpandParams: []string{
-			"Datastream",
-			"FeatureOfInterest",
+			"datastream",
+			"featureofinterest",
 		},
 		SupportedSelectParams: []string{
 			"id",
 			"result",
-			"phenomenonTime",
-			"resultTime",
-			"resultQuality",
-			"validTime",
+			"phenomenontime",
+			"resulttime",
+			"resultquality",
+			"validtime",
 			"parameters",
-			"Datastream",
-			"FeatureOfInterest",
+			"datastream",
+			"featureofinterest",
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/observations", HandleGetObservations},

@@ -11,10 +11,7 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"strings"
 )
-
-var lMapping = map[string]string{"location": "public.ST_AsGeoJSON(location.location)"}
 
 func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	l := &entities.Location{}
@@ -55,15 +52,15 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location where id = %v", gdb.Schema, intID)
-	return processLocation(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, intID, qo)
+	return processLocation(gdb.Db, query, qi)
 }
 
 // GetLocations retrieves all locations
 func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "", "", lMapping)+" AS location from %s.location order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location", gdb.Schema)
-	return processLocations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, nil, nil, qo)
+	return processLocations(gdb.Db, query, qi, countSQL)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
@@ -73,20 +70,24 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.location_to_historicallocation on location_to_historicallocation.location_id = location.id where location_to_historicallocation.historicallocation_id = %v", gdb.Schema, gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.location_to_historicallocation on location_to_historicallocation.location_id = location.id where location_to_historicallocation.historicallocation_id = %v", gdb.Schema, gdb.Schema, intID)
-	return processLocations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
+	return processLocations(gdb.Db, query, qi, countSQL)
 }
 
 // GetLocationByDatastreamID returns a location linked to an observation
-func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}) (*entities.Location, error) {
+func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(datastreamID)
 	if !ok {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("SELECT "+CreateSelectString(&entities.Location{}, nil, "location.", "", lMapping)+" FROM %s.location INNER JOIN %s.thing_to_location on location.id = thing_to_location.location_id INNER JOIN %s.datastream on thing_to_location.thing_id = datastream.thing_id WHERE datastream.id = %v ORDER BY location.id DESC LIMIT 1", gdb.Schema, gdb.Schema, gdb.Schema, intID)
-	return processLocation(gdb.Db, sql, nil)
+	qo = &odata.QueryOptions{
+		QueryTop: &odata.QueryTop{Limit: 1},
+	}
+
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Datastream{}, intID, qo)
+	return processLocation(gdb.Db, query, qi)
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
@@ -96,13 +97,13 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.Quer
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Location{}, qo, "location.", "", lMapping)+" AS location from %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = %v order by id desc limit 1", gdb.Schema, gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.location inner join %s.thing_to_location on thing_to_location.location_id = location.id where thing_to_location.thing_id = %v", gdb.Schema, gdb.Schema, intID)
-	return processLocations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
+	return processLocations(gdb.Db, query, qi, countSQL)
 }
 
-func processLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Location, error) {
-	locations, _, err := processLocations(db, sql, qo, "")
+func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Location, error) {
+	locations, _, err := processLocations(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -114,72 +115,24 @@ func processLocation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.
 	return locations[0], nil
 }
 
-func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Location, int, error) {
-	rows, err := db.Query(sql)
-	defer rows.Close()
+func processLocations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Location, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	var locations = []*entities.Location{}
-	for rows.Next() {
-		var sensorID interface{}
-		var encodingType int
-		var name, description, location string
-
-		var params []interface{}
-		var qp []string
-		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			s := &entities.Location{}
-			qp = s.GetPropertyNames()
-		} else {
-			qp = qo.QuerySelect.Params
-		}
-
-		for _, p := range qp {
-			p = strings.ToLower(p)
-			if p == "id" {
-				params = append(params, &sensorID)
-			}
-			if p == "encodingtype" {
-				params = append(params, &encodingType)
-			}
-			if p == "name" {
-				params = append(params, &name)
-			}
-			if p == "description" {
-				params = append(params, &description)
-			}
-			if p == "location" {
-				params = append(params, &location)
-			}
-		}
-
-		err = rows.Scan(params...)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		locationMap, err := JSONToMap(&location)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		l := entities.Location{}
-		l.ID = sensorID
-		l.Name = name
-		l.Description = description
-		l.Location = locationMap
-		if encodingType != 0 {
-			l.EncodingType = entities.EncodingValues[encodingType].Value
-		}
-
-		locations = append(locations, &l)
+	locations := make([]*entities.Location, 0)
+	for _, d := range data {
+		entity := d.(*entities.Location)
+		locations = append(locations, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
 	return locations, count, nil

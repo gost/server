@@ -12,6 +12,7 @@ type EntityType string
 
 // List of all EntityTypes.
 const (
+	EntityTypeVersion                      EntityType = "Version"
 	EntityTypeThing                        EntityType = "Thing"
 	EntityTypeLocation                     EntityType = "Location"
 	EntityTypeHistoricalLocation           EntityType = "HistoricalLocation"
@@ -185,7 +186,6 @@ type Entity interface {
 // given list of errors.
 func CheckMandatoryParam(errorList *[]error, param interface{}, entityType EntityType, paramName string) {
 	isNil := false
-
 	if param != nil {
 		switch t := param.(type) {
 		case string:

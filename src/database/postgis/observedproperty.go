@@ -10,7 +10,6 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"strings"
 )
 
 func observedPropertyParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -34,14 +33,6 @@ func observedPropertyParamFactory(values map[string]interface{}) (entities.Entit
 	return op, nil
 }
 
-// GetTotalObservedProperties returns the total ObservedProperties count in the database
-func (gdb *GostDatabase) GetTotalObservedProperties() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.observedproperty", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
-}
-
 // GetObservedProperty returns an ObservedProperty by id
 func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
 	intID, ok := ToIntID(id)
@@ -49,8 +40,8 @@ func (gdb *GostDatabase) GetObservedProperty(id interface{}, qo *odata.QueryOpti
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "", nil)+" FROM %s.observedproperty where id = %v", gdb.Schema, intID)
-	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, nil, intID, qo)
+	observedProperty, err := processObservedProperty(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +56,8 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "observedproperty.", "", nil)+" FROM %s.observedproperty inner join %s.datastream on datastream.observedproperty_id = observedproperty.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
-	observedProperty, err := processObservedProperty(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, &entities.Datastream{}, intID, qo)
+	observedProperty, err := processObservedProperty(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
 	}
@@ -76,91 +67,52 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 
 // GetObservedProperties returns all observed properties
 func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.ObservedProperty{}, qo, "", "", nil)+" FROM %s.observedproperty order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observedproperty", gdb.Schema)
-	return processObservedProperties(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.ObservedProperty{}, nil, nil, qo)
+	return processObservedProperties(gdb.Db, query, qi, countSQL)
 }
 
-func processObservedProperty(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.ObservedProperty, error) {
-	observedProperties, _, err := processObservedProperties(db, sql, qo, "")
+func processObservedProperty(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.ObservedProperty, error) {
+	ops, _, err := processObservedProperties(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
 
-	if len(observedProperties) == 0 {
+	if len(ops) == 0 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty not found"))
 	}
 
-	return observedProperties[0], nil
+	return ops[0], nil
 }
 
-func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.ObservedProperty, int, error) {
-	rows, err := db.Query(sql)
+func processObservedProperties(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.ObservedProperty, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	defer rows.Close()
-	var observedProperties = []*entities.ObservedProperty{}
-
-	for rows.Next() {
-		var opID interface{}
-		var name string
-		var definition string
-		var description string
-
-		var params []interface{}
-		var qp []string
-		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			op := &entities.ObservedProperty{}
-			qp = op.GetPropertyNames()
-		} else {
-			qp = qo.QuerySelect.Params
-		}
-
-		for _, p := range qp {
-			p := strings.ToLower(p)
-			if p == "id" {
-				params = append(params, &opID)
-			}
-			if p == "name" {
-				params = append(params, &name)
-			}
-			if p == "definition" {
-				params = append(params, &definition)
-			}
-			if p == "description" {
-				params = append(params, &description)
-			}
-		}
-
-		err = rows.Scan(params...)
-
-		if err != nil {
-			return nil, 0, err
-		}
-		op := entities.ObservedProperty{}
-		op.ID = opID
-		op.Name = name
-		op.Definition = definition
-		op.Description = description
-
-		observedProperties = append(observedProperties, &op)
+	obs := make([]*entities.ObservedProperty, 0)
+	for _, d := range data {
+		entity := d.(*entities.ObservedProperty)
+		obs = append(obs, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
-	return observedProperties, count, nil
+	return obs, count, nil
 }
 
 // PostObservedProperty adds an ObservedProperty to the database
 func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	var opID int
-	sql := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
-	err := gdb.Db.QueryRow(sql, op.Name, op.Definition, op.Description).Scan(&opID)
+	query := fmt.Sprintf("INSERT INTO %s.observedproperty (name, definition, description) VALUES ($1, $2, $3) RETURNING id", gdb.Schema)
+	err := gdb.Db.QueryRow(query, op.Name, op.Definition, op.Description).Scan(&opID)
 	if err != nil {
 		return nil, err
 	}

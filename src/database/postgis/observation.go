@@ -10,6 +10,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"strconv"
 )
 
 func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -29,7 +30,18 @@ func observationParamFactory(values map[string]interface{}) (entities.Entity, er
 			o.ResultTime = value.(string)
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationResult] {
-			o.Result = value
+			var result interface{}
+			var err error
+			if strings.HasPrefix(value.(string), "\"") {
+				result = strings.Replace(value.(string), "\"", "", 2)
+			} else {
+				result, err = strconv.ParseFloat(value.(string), 64)
+				if err != nil {
+					result = strings.Replace(value.(string), "\"", "", 2)
+				}
+			}
+
+			o.Result = result
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationValidTime] {
 			o.ValidTime = value.(string)
@@ -51,42 +63,6 @@ func observationParamFactory(values map[string]interface{}) (entities.Entity, er
 	return o, nil
 }
 
-// observationParamFactory is used to construct a WHERE clause from an ODATA $select string
-func observationParamFactoryWhere(key string, value interface{}) (string, string, error) {
-	val := fmt.Sprintf("%v", value)
-	jsonVal := convertSelectValueForJSON(val)
-	switch key {
-	case "id":
-		return "id", val, nil
-		break
-	case "phenomenonTime":
-		return "data -> 'phenomenonTime'", jsonVal, nil
-		break
-	case "resultTime":
-		return "data -> 'resultTime'", jsonVal, nil
-		break
-	case "result":
-		return "data -> 'result'", jsonVal, nil
-		break
-	case "resultQuality":
-		return "data -> 'resultQuality'", jsonVal, nil
-		break
-	case "parameters": //implement parameters/parameterName
-		return "data -> 'parameters'", jsonVal, nil
-		break
-	}
-
-	return "", "", fmt.Errorf("Parameter %s not implemented", key)
-}
-
-func convertSelectValueForJSON(value string) string {
-	if strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'") {
-		return value
-	}
-
-	return fmt.Sprintf("'%v'", value)
-}
-
 // GetObservation retrieves an observation by id from the database
 func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error) {
 	intID, ok := ToIntID(id)
@@ -94,8 +70,8 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where id = %v ", gdb.Schema, intID)
-	observation, err := processObservation(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, nil, intID, qo)
+	observation, err := processObservation(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
 	}
@@ -103,17 +79,11 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 	return observation, nil
 }
 
-// GetObservations retrieves all datastreams
+// GetObservations retrieves all observations
 func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
-	var queryString string
-	var err error
-	if queryString, err = CreateFilterQueryString(qo, observationParamFactoryWhere, "WHERE "); err != nil {
-		return nil, 0, gostErrors.NewBadRequestError(err)
-	}
-
-	sql := fmt.Sprintf("select id, data FROM %s.observation "+queryString+"order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation", gdb.Schema)
-	return processObservations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, nil, nil, qo)
+	return processObservations(gdb.Db, query, qi, countSQL)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
@@ -123,33 +93,25 @@ func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, q
 		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select id, data FROM %s.observation where featureofinterest_id = %v order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation where featureofinterest_id = %v", gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
+	return processObservations(gdb.Db, query, qi, countSQL)
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
 func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
-	var intID int
-	var queryString string
-	var ok bool
-	var err error
-
-	if intID, ok = ToIntID(dataStreamID); !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+	intID, ok := ToIntID(dataStreamID)
+	if !ok {
+		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	if queryString, err = CreateFilterQueryString(qo, observationParamFactoryWhere, " AND "); err != nil {
-		return nil, 0, gostErrors.NewBadRequestError(errors.New("Datastream does not exist"))
-	}
-
-	sql := fmt.Sprintf("select id, data FROM %s.observation where stream_id = %v "+queryString+"order by id desc"+CreateTopSkipQueryString(qo), gdb.Schema, intID)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.observation where stream_id = %v", gdb.Schema, intID)
-	return processObservations(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
+	return processObservations(gdb.Db, query, qi, countSQL)
 }
 
-func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Observation, error) {
-	observations, _, err := processObservations(db, sql, qo, "")
+func processObservation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Observation, error) {
+	observations, _, err := processObservations(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -161,77 +123,27 @@ func processObservation(db *sql.DB, sql string, qo *odata.QueryOptions) (*entiti
 	return observations[0], nil
 }
 
-func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Observation, int, error) {
-	rows, err := db.Query(sql)
-	defer rows.Close()
-
+func processObservations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Observation, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	var observations = []*entities.Observation{}
-	for rows.Next() {
-		var id int
-		var data string
-
-		err := rows.Scan(&id, &data)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		observation := entities.Observation{}
-		observation.ID = id
-		err = observation.ParseEntity([]byte(data))
-
-		if err != nil {
-			return nil, 0, err
-		}
-
-		if qo != nil && qo.QuerySelect != nil && len(qo.QuerySelect.Params) > 0 {
-			set := make(map[string]bool)
-			for _, v := range qo.QuerySelect.Params {
-				set[strings.ToLower(v)] = true
-			}
-
-			_, ok := set["id"]
-			if !ok {
-				observation.ID = nil
-			}
-			_, ok = set["phenomenontime"]
-			if !ok {
-				observation.PhenomenonTime = ""
-			}
-			_, ok = set["result"]
-			if !ok {
-				observation.Result = nil
-			}
-			_, ok = set["resulttime"]
-			if !ok {
-				observation.ResultTime = ""
-			}
-			_, ok = set["resultquality"]
-			if !ok {
-				observation.ResultQuality = ""
-			}
-			_, ok = set["validtime"]
-			if !ok {
-				observation.ValidTime = ""
-			}
-			_, ok = set["parameters"]
-			if !ok {
-				observation.Parameters = nil
-			}
-		}
-
-		observations = append(observations, &observation)
+	o := make([]*entities.Observation, 0)
+	for _, d := range data {
+		entity := d.(*entities.Observation)
+		o = append(o, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
-	return observations, count, nil
+	return o, count, nil
 }
 
 // PutObservation replaces an observation to the database

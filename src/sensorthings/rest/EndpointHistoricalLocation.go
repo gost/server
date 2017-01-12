@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
@@ -10,6 +11,7 @@ import (
 func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
 	return &Endpoint{
 		Name:       "HistoricalLocations",
+		EntityType: entities.EntityTypeHistoricalLocation,
 		OutputInfo: true,
 		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "HistoricalLocations")),
 		SupportedQueryOptions: []odata.QueryOptionType{

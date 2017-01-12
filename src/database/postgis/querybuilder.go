@@ -12,7 +12,6 @@ type QueryBuilder struct {
 	maxTop int
 	schema string
 	tables map[entities.EntityType]string
-	joins  map[entities.EntityType]map[entities.EntityType]string
 }
 
 // CreateQueryBuilder instantiates a new queryBuilder, the queryBuilder is used to create
@@ -25,7 +24,6 @@ func CreateQueryBuilder(schema string, maxTop int) *QueryBuilder {
 		tables: createTableMappings(schema),
 	}
 
-	qb.joins = createJoinMappings(qb.tables)
 	return qb
 }
 
@@ -50,8 +48,8 @@ func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions) string {
 // getOffset returns the offset, this number is set by ODATA's
 // $skip, if not provided do not skip anything = return "0"
 func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryTop.IsNil() {
-		return fmt.Sprintf("%v", qo.QueryTop.Limit)
+	if qo != nil && !qo.QuerySkip.IsNil() {
+		return fmt.Sprintf("%v", qo.QuerySkip.Index)
 	}
 	return "0"
 }
@@ -70,7 +68,7 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 // select is set by ODATA's $select, if not set get all properties for the given entity (return all)
 // addID to true if it needs to be added and isn't in QuerySelect.Params, addAs to true if a field needs to be
 // outputted with AS [name]
-func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, addID bool, addAs bool, fromAs bool, selectString string) string {
+func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qpi *QueryParseInfo, addID bool, addAs bool, fromAs bool, isExpand bool, selectString string) string {
 	var properties []string
 	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
 		properties = et.GetPropertyNames()
@@ -82,13 +80,22 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 			}
 			for _, pn := range et.GetPropertyNames() {
 				if strings.ToLower(p) == strings.ToLower(pn) {
-					properties = append(properties, pn)
+					if p == "id" {
+						properties = append([]string{"id"}, properties...)
+					} else {
+						properties = append(properties, pn)
+					}
 				}
 			}
 		}
 		if addID && !idAdded {
-			properties = append(properties, "id")
+			properties = append([]string{"id"}, properties...)
 		}
+	}
+
+	// ToDo: this is a fix for supporting $expand=Observations/FeatureOfInterest, try to add observationFeatureOfInterestID in a different way
+	if isExpand && et.GetEntityType() == entities.EntityTypeObservation {
+		properties = append([]string{observationFeatureOfInterestID}, properties...)
 	}
 
 	for _, p := range properties {
@@ -100,31 +107,50 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, ad
 
 		field := ""
 		if fromAs {
-			field = fmt.Sprintf("%s.%s", tableMappings[entityType], asMappings[entityType][strings.ToLower(p)])
+			field = qb.addAsPrefix(qpi, fmt.Sprintf("%s.%s", tableMappings[entityType], asMappings[entityType][strings.ToLower(p)]))
 		} else {
 			field = selectMappings[entityType][strings.ToLower(p)]
 		}
 
 		if addAs {
-			selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, asMappings[entityType][strings.ToLower(p)])
+			if !isExpand {
+				selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, qb.addAsPrefix(qpi, asMappings[entityType][strings.ToLower(p)]))
+			} else {
+				selectString += fmt.Sprintf("%s%s AS %s", toAdd, field, asMappings[entityType][strings.ToLower(p)])
+			}
 		} else {
 			selectString += fmt.Sprintf("%s%s", toAdd, field)
 		}
 	}
 
-	if qo != nil && !qo.QueryExpand.IsNil() {
-		for _, o := range qo.QueryExpand.Operations {
-			selectString = qb.getSelect(o.Entity, o.QueryOptions, addID, false, true, selectString)
+	if qpi != nil && len(qpi.SubEntities) > 0 {
+		for _, subQPI := range qpi.SubEntities {
+			selectString = qb.getSelect(subQPI.Entity, subQPI.ExpandOperation.QueryOptions, subQPI, true, true, true, false, selectString)
 		}
 	}
 
 	return selectString
 }
 
-func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
+// addAsPrefix adds a prefix in front of the current as for example A_, B_ to be able to
+// distinguish the different results if multiple tables are requested of the same type
+func (qb *QueryBuilder) addAsPrefix(qpi *QueryParseInfo, as string) string {
+	if qpi == nil {
+		return as
+	} else {
+		return fmt.Sprintf("%v_%s", qpi.AsPrefix, as)
+	}
+}
+
+func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
 	if e2 != nil {
 		nqo := qo
 		et2 := e2.GetEntityType()
+
+		asPrefix := ""
+		if qpi != nil && qpi.Parent != nil && qpi.Parent.QueryIndex != 0 {
+			asPrefix = qpi.Parent.AsPrefix
+		}
 
 		if !isExpand {
 			nqo = &odata.QueryOptions{
@@ -133,13 +159,13 @@ func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 			joinString = fmt.Sprintf("%s"+
 				"INNER JOIN LATERAL ("+
 				"SELECT %s FROM %s %s "+
-				"%s)"+
+				"%s) "+
 				"AS %s on true ", joinString,
-				qb.getSelect(e2, nqo, true, true, false, ""),
+				qb.getSelect(e2, nqo, nil, true, true, false, false, ""),
 				qb.tables[et2],
-				qb.joins[et2][e1.GetEntityType()],
+				getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix),
 				qb.getFilterQueryString(et2, nqo, true),
-				qb.removeSchema(qb.tables[et2]))
+				tableMappings[et2])
 		} else {
 			joinString = fmt.Sprintf("%s"+
 				"LEFT JOIN LATERAL ("+
@@ -147,31 +173,34 @@ func (qb *QueryBuilder) createLateralJoin(e1 entities.Entity, e2 entities.Entity
 				"%s"+
 				"ORDER BY %s "+
 				"LIMIT %s OFFSET %s) AS %s on true ", joinString,
-				qb.getSelect(e2, nqo, true, true, false, ""),
+				qb.getSelect(e2, nqo, qpi, true, true, false, true, ""),
 				qb.tables[et2],
-				qb.joins[et2][e1.GetEntityType()],
+				getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix),
 				qb.getFilterQueryString(et2, nqo, true),
 				qb.getOrderBy(et2, nqo),
 				qb.getLimit(nqo),
 				qb.getOffset(nqo),
-				qb.removeSchema(qb.tables[et2]))
+				qb.addAsPrefix(qpi, tableMappings[et2]))
 		}
 	}
-	if qo != nil && !qo.QueryExpand.IsNil() {
-		if qpi.SubEntities == nil {
-			qpi.SubEntities = make([]*QueryParseInfo, 0)
-		}
 
-		for _, qe := range qo.QueryExpand.Operations {
-			nqpi := &QueryParseInfo{}
-			nqpi.Init(qe.Entity.GetEntityType(), qpi.GetNextQueryIndex())
-			qpi.SubEntities = append(qpi.SubEntities, nqpi)
-
-			joinString = qb.createLateralJoin(e1, qe.Entity, true, qe.QueryOptions, nqpi, joinString)
+	if qpi != nil && len(qpi.SubEntities) > 0 {
+		for _, subQPI := range qpi.SubEntities {
+			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, true, subQPI.ExpandOperation.QueryOptions, subQPI, joinString)
 		}
 	}
 
 	return joinString
+}
+
+func (qb *QueryBuilder) constructQueryParseInfo(operation *odata.ExpandOperation, main *QueryParseInfo, from *QueryParseInfo) {
+	nQPI := &QueryParseInfo{}
+	nQPI.Init(operation.Entity.GetEntityType(), main.GetNextQueryIndex(), from, operation)
+	main.SubEntities = append(main.SubEntities, nQPI)
+
+	if operation.ExpandOperation != nil {
+		qb.constructQueryParseInfo(operation.ExpandOperation, main, nQPI)
+	}
 }
 
 // createFilterQueryString converts an OData query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
@@ -227,23 +256,37 @@ func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, err
 }
 
 // CreateQuery creates a new query based on given input
-//   e1 = entity to get
-//   e2 = from entity
-//   id = where e2
+//   e1: entity to get
+//   e2: from entity
+//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
-func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo, error) {
+func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo) {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
 		et2 = e2.GetEntityType()
 	}
 
+	eo := &odata.ExpandOperation{
+		QueryOptions: qo,
+	}
 	qpi := &QueryParseInfo{}
-	qpi.Init(et1, 0)
+	qpi.Init(et1, 0, nil, eo)
 
-	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, true, true, false, ""), qb.tables[et1], qb.createLateralJoin(e1, e2, false, qo, qpi, ""))
+	if qo != nil && !qo.QueryExpand.IsNil() {
+		qpi.SubEntities = make([]*QueryParseInfo, 0)
+		for _, qe := range qo.QueryExpand.Operations {
+			qb.constructQueryParseInfo(qe, qpi, qpi)
+		}
+	}
+
+	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, qpi, true, true, false, false, ""), qb.tables[et1], qb.createJoin(e1, e2, false, qo, qpi, ""))
 	if id != nil {
-		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+		if e2 == nil {
+			queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
+		} else {
+			queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+		}
 	}
 
 	if qo != nil && !qo.QueryFilter.IsNil() {
@@ -257,17 +300,17 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
 	queryString = fmt.Sprintf("%s LIMIT %s OFFSET %s", queryString, qb.getLimit(qo), qb.getOffset(qo))
 
-	return queryString, qpi, nil
+	return queryString, qpi
 }
 
-func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, error) {
+func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
 		et2 = e2.GetEntityType()
 	}
 
-	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createLateralJoin(e1, e2, false, nil, nil, ""))
+	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, false, nil, nil, ""))
 	if id != nil {
 		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
 	}
@@ -280,48 +323,5 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 		}
 	}
 
-	return queryString, nil
-}
-
-// Test is a temporarily test function while developing
-func (qb *QueryBuilder) Test() {
-	fmt.Println("------------GET THINGS------------")
-	sql1, _, _ := qb.CreateQuery(&entities.Thing{}, nil, nil, nil)
-	fmt.Println(sql1)
-
-	fmt.Println("------------GET THING WITH SELECT BY DATASTREAM------------")
-	qo2 := &odata.QueryOptions{}
-	qo2.QuerySelect = &odata.QuerySelect{}
-	qo2.QuerySelect.Parse("name,description")
-	sql2, _, _ := qb.CreateQuery(&entities.Thing{}, &entities.Datastream{}, 1, qo2)
-	fmt.Println(sql2)
-
-	fmt.Println("------------GET DATASTREAMS WITH SELECT, EXPAND THING WITH SELECT------------")
-	qo31 := &odata.QueryOptions{}
-	qo31.QuerySelect = &odata.QuerySelect{}
-	qo31.QuerySelect.Parse("name,description")
-	qo31.QueryExpand = &odata.QueryExpand{}
-	qo31.QueryExpand.Parse("Thing($select=name)")
-	sql3, _, _ := qb.CreateQuery(&entities.Datastream{}, nil, nil, qo31)
-	fmt.Println(sql3)
-
-	fmt.Println("------------GET THING BY LOCATION------------")
-	sql4, _, _ := qb.CreateQuery(&entities.Thing{}, &entities.Location{}, 1, nil)
-	fmt.Println(sql4)
-
-	fmt.Println("------------GET HISTORICAL LOCATION BY THING ------------")
-	sql5, _, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, 1, nil)
-	fmt.Println(sql5)
-
-	fmt.Println("------------GET LOCATION BY THING ------------")
-	sql6, _, _ := qb.CreateQuery(&entities.Location{}, &entities.Thing{}, 1, nil)
-	fmt.Println(sql6)
-
-	fmt.Println("------------GET HISTORICAL LOCATION BY LOCATION ------------")
-	sql7, _, _ := qb.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, 1, nil)
-	fmt.Println(sql7)
-
-	fmt.Println("------------GET OBSERVATIONS------------")
-	sql8, _, _ := qb.CreateQuery(&entities.Observation{}, nil, nil, nil)
-	fmt.Println(sql8)
+	return queryString
 }

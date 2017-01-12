@@ -21,7 +21,7 @@ type API interface {
 	GetAcceptedPaths() []string
 	GetVersionInfo() *VersionInfo
 	GetBasePathInfo() *ArrayResponse
-	GetEndpoints() *[]Endpoint
+	GetEndpoints() *map[entities.EntityType]Endpoint
 	GetTopics() *[]Topic
 
 	GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
@@ -121,7 +121,7 @@ type Database interface {
 	GetLocations(qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
 	GetLocationsByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
 	GetLocationsByThing(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
-	GetLocationByDatastreamID(id interface{}) (*entities.Location, error)
+	GetLocationByDatastreamID(id interface{}, qo *odata.QueryOptions) (*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
 	LinkLocation(id interface{}, locationID interface{}) error
 	PatchLocation(interface{}, *entities.Location) (*entities.Location, error)

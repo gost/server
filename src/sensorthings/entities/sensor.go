@@ -59,6 +59,10 @@ func (s *Sensor) ContainsMandatoryParams() (bool, []error) {
 func (s *Sensor) SetAllLinks(externalURL string) {
 	s.SetSelfLink(externalURL)
 	s.SetLinks(externalURL)
+
+	for _, d := range s.Datastreams {
+		d.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

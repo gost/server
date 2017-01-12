@@ -98,7 +98,7 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 	var l *entities.Location
 	var err error
 
-	if l, err = db.GetLocationByDatastreamID(datastreamID); err != nil {
+	if l, err = db.GetLocationByDatastreamID(datastreamID, nil); err != nil || l == nil {
 		return "", gostErrors.NewConflictRequestError(errors.New("No location found for datastream.Thing"))
 	}
 

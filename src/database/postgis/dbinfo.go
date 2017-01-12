@@ -3,6 +3,7 @@ package postgis
 import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 // tables as defined in postgis
@@ -119,17 +120,27 @@ var (
 
 type ParamFactory func(values map[string]interface{}) (entities.Entity, error)
 
-type QueryParseInfo struct {
-	QueryIndex   int
-	ParamFactory ParamFactory
-	EntityType   entities.EntityType
-	Entity       entities.Entity
-	SubEntities  []*QueryParseInfo
+var asPrefixArr = [...]string{
+	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+	"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ",
+	"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ",
 }
 
-func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int) {
+type QueryParseInfo struct {
+	QueryIndex      int
+	AsPrefix        string
+	Entity          entities.Entity
+	ExpandOperation *odata.ExpandOperation
+	ParamFactory    ParamFactory
+	Parent          *QueryParseInfo
+	SubEntities     []*QueryParseInfo
+}
+
+func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandOperation *odata.ExpandOperation) {
+	q.Parent = parent
+	q.AsPrefix = asPrefixArr[queryIndex]
 	q.QueryIndex = queryIndex
-	q.EntityType = entityType
+	q.ExpandOperation = expandOperation
 	switch e := entityType; e {
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}
@@ -186,7 +197,7 @@ func (q *QueryParseInfo) GetNextQueryIndex() int {
 	qi := q.QueryIndex
 	if len(q.SubEntities) > 0 {
 		lastSub := q.SubEntities[len(q.SubEntities)-1]
-		qi = lastSub.GetNextQueryIndex()
+		qi = lastSub.GetNextQueryIndex() - 1
 	}
 
 	return qi + 1
@@ -205,7 +216,7 @@ func (q *QueryParseInfo) GetQueryIDRelationMap(relationMap map[int]int) map[int]
 	}
 
 	for _, qpi := range q.SubEntities {
-		relationMap[qpi.QueryIndex] = q.QueryIndex
+		relationMap[qpi.QueryIndex] = qpi.Parent.QueryIndex
 		relationMap = qpi.GetQueryIDRelationMap(relationMap)
 	}
 
@@ -308,6 +319,42 @@ var tableMappings = map[entities.EntityType]string{
 	entities.EntityTypeDatastream:         datastreamTable,
 }
 
+var selectAsMappings = map[entities.EntityType]map[string]string{
+	entities.EntityTypeThing: {
+		thingID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeThing], asMappings[entities.EntityTypeThing][thingID]),
+	},
+	entities.EntityTypeLocation: {
+		locationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeLocation], asMappings[entities.EntityTypeLocation][locationID]),
+	},
+	entities.EntityTypeThingToLocation: {
+		thingToLocationThingID:    fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeThingToLocation], asMappings[entities.EntityTypeThingToLocation][thingToLocationThingID]),
+		thingToLocationLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeThingToLocation], asMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID]),
+	},
+	entities.EntityTypeHistoricalLocation: {
+		historicalLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeHistoricalLocation], asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID]),
+	},
+	entities.EntityTypeLocationToHistoricalLocation: {
+		locationToHistoricalLocationHistoricalLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeLocationToHistoricalLocation], asMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID]),
+		locationToHistoricalLocationLocationID:           fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeLocationToHistoricalLocation], asMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID]),
+	},
+	entities.EntityTypeSensor: {
+		sensorID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeSensor], asMappings[entities.EntityTypeSensor][sensorID]),
+	},
+	entities.EntityTypeObservedProperty: {
+		observedPropertyID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservedProperty], asMappings[entities.EntityTypeObservedProperty][observedPropertyID]),
+	},
+	entities.EntityTypeObservation: {
+		observationID:                  fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservation], asMappings[entities.EntityTypeObservation][observationID]),
+		observationFeatureOfInterestID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservation], asMappings[entities.EntityTypeObservation][observationFeatureOfInterestID]),
+	},
+	entities.EntityTypeFeatureOfInterest: {
+		foiID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeFeatureOfInterest], asMappings[entities.EntityTypeFeatureOfInterest][foiID]),
+	},
+	entities.EntityTypeDatastream: {
+		datastreamID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamID]),
+	},
+}
+
 // maps an entity property name to the right field
 var selectMappings = map[entities.EntityType]map[string]string{
 	entities.EntityTypeThing: {
@@ -329,9 +376,13 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	},
 	entities.EntityTypeHistoricalLocation: {
 		historicalLocationID:         fmt.Sprintf("%s.%s", historicalLocationTable, historicalLocationID),
-		historicalLocationTime:       fmt.Sprintf("%s.%s", historicalLocationTable, historicalLocationTime),
+		historicalLocationTime:       fmt.Sprintf("to_char(%s.%s at time zone 'UTC', '%s')", historicalLocationTable, historicalLocationTime, TimeFormat),
 		historicalLocationThingID:    fmt.Sprintf("%s.%s", historicalLocationTable, historicalLocationThingID),
 		historicalLocationLocationID: fmt.Sprintf("%s.%s", historicalLocationTable, historicalLocationLocationID),
+	},
+	entities.EntityTypeLocationToHistoricalLocation: {
+		locationToHistoricalLocationHistoricalLocationID: fmt.Sprintf("%s.%s", locationToHistoricalLocationTable, locationToHistoricalLocationHistoricalLocationID),
+		locationToHistoricalLocationLocationID:           fmt.Sprintf("%s.%s", locationToHistoricalLocationTable, locationToHistoricalLocationLocationID),
 	},
 	entities.EntityTypeSensor: {
 		sensorID:           fmt.Sprintf("%s.%s", sensorTable, sensorID),
@@ -349,12 +400,12 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	entities.EntityTypeObservation: {
 		observationID:                  fmt.Sprintf("%s.%s", observationTable, observationID),
 		observationData:                fmt.Sprintf("%s.%s", observationTable, observationData),
-		observationPhenomenonTime:      fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "phenomenonTime"),
-		observationResultTime:          fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "resultTime"),
+		observationPhenomenonTime:      fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "phenomenonTime"),
+		observationResultTime:          fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "resultTime"),
 		observationResult:              fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, observationResult),
-		observationValidTime:           fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "validTime"),
-		observationResultQuality:       fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, "resultQuality"),
-		observationParameters:          fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, observationParameters),
+		observationValidTime:           fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "validTime"),
+		observationResultQuality:       fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "resultQuality"),
+		observationParameters:          fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, observationParameters),
 		observationStreamID:            fmt.Sprintf("%s.%s", observationTable, observationStreamID),
 		observationFeatureOfInterestID: fmt.Sprintf("%s.%s", observationTable, observationFeatureOfInterestID),
 	},
@@ -381,63 +432,117 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	},
 }
 
-func createJoinMappings(tableMappings map[entities.EntityType]string) map[entities.EntityType]map[entities.EntityType]string {
-	joinMappings := map[entities.EntityType]map[entities.EntityType]string{
-		entities.EntityTypeThing: { // get thing by ...
-			entities.EntityTypeDatastream:         fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeThing][thingID], selectMappings[entities.EntityTypeDatastream][datastreamThingID]),
-			entities.EntityTypeHistoricalLocation: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeThing][thingID], selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID]),
-			entities.EntityTypeLocation: fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
-				tableMappings[entities.EntityTypeThingToLocation],
+func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, by entities.EntityType, asPrefix string) string {
+	switch get {
+	case entities.EntityTypeThing:
+		switch by {
+		case entities.EntityTypeDatastream:
+			return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeThing][thingID], createWhereIs(entities.EntityTypeDatastream, datastreamThingID, asPrefix))
+		case entities.EntityTypeHistoricalLocation:
+			return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeThing][thingID], createWhereIs(entities.EntityTypeHistoricalLocation, historicalLocationThingID, asPrefix))
+		case entities.EntityTypeLocation:
+			return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
+				tableMap[entities.EntityTypeThingToLocation],
 				selectMappings[entities.EntityTypeThing][thingID],
 				selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
 				selectMappings[entities.EntityTypeLocation][thingID],
-				selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID]),
-		},
-		entities.EntityTypeLocation: { // get Location by ...
-			entities.EntityTypeHistoricalLocation: fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
-				tableMappings[entities.EntityTypeLocationToHistoricalLocation],
-				selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID],
-				selectMappings[entities.EntityTypeLocation][locationID],
-				selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID],
-				selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationID]),
-			entities.EntityTypeThing: fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
-				tableMappings[entities.EntityTypeThingToLocation],
-				selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID],
-				selectMappings[entities.EntityTypeLocation][locationID],
-				selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
-				selectMappings[entities.EntityTypeThing][thingID]),
-		},
-		entities.EntityTypeHistoricalLocation: { // get HistoricalLocation by ...
-			entities.EntityTypeLocation: fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
-				tableMappings[entities.EntityTypeLocationToHistoricalLocation],
-				selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID],
-				selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationID],
-				selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID],
-				selectMappings[entities.EntityTypeLocation][locationID]),
-			entities.EntityTypeThing: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID], selectMappings[entities.EntityTypeThing][thingID]),
-		},
-		entities.EntityTypeSensor: { // get sensor by ...
-			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeSensor][sensorID], selectMappings[entities.EntityTypeDatastream][datastreamSensorID]),
-		},
-		entities.EntityTypeObservedProperty: { // get observed property by ...
-			entities.EntityTypeDatastream: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservedProperty][observedPropertyID], selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID]),
-		},
-		entities.EntityTypeObservation: { // get observation by ...
-			entities.EntityTypeDatastream:        fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationStreamID], selectMappings[entities.EntityTypeDatastream][datastreamID]),
-			entities.EntityTypeFeatureOfInterest: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID], selectMappings[entities.EntityTypeFeatureOfInterest][foiID]),
-		},
-		entities.EntityTypeFeatureOfInterest: { // get feature of interest by ...
-			entities.EntityTypeObservation: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeFeatureOfInterest][foiID], selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID]),
-		},
-		entities.EntityTypeDatastream: { // get Datastream by ...
-			entities.EntityTypeThing:            fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamThingID], selectMappings[entities.EntityTypeThing][thingID]),
-			entities.EntityTypeSensor:           fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamSensorID], selectMappings[entities.EntityTypeSensor][sensorID]),
-			entities.EntityTypeObservedProperty: fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID], selectMappings[entities.EntityTypeObservedProperty][observedPropertyID]),
-			entities.EntityTypeObservation:      fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamID], selectMappings[entities.EntityTypeObservation][observationStreamID]),
-		},
+				createWhereIs(entities.EntityTypeThingToLocation, thingToLocationLocationID, asPrefix))
+		}
+	case entities.EntityTypeLocation: // get Location by ...
+		{
+			switch by {
+			case entities.EntityTypeHistoricalLocation:
+				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
+					tableMap[entities.EntityTypeLocationToHistoricalLocation],
+					selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID],
+					selectMappings[entities.EntityTypeLocation][locationID],
+					selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID],
+					createWhereIs(entities.EntityTypeHistoricalLocation, historicalLocationID, asPrefix))
+			case entities.EntityTypeThing:
+				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
+					tableMap[entities.EntityTypeThingToLocation],
+					selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID],
+					selectMappings[entities.EntityTypeLocation][locationID],
+					selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
+					createWhereIs(entities.EntityTypeThing, thingID, asPrefix))
+			}
+		}
+	case entities.EntityTypeHistoricalLocation: // get HistoricalLocation by ... //fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+		{
+			switch by {
+			case entities.EntityTypeLocation:
+				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
+					tableMap[entities.EntityTypeLocationToHistoricalLocation],
+					selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID],
+					selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationID],
+					selectMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationLocationID],
+					createWhereIs(entities.EntityTypeLocation, locationID, asPrefix))
+			case entities.EntityTypeThing:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID], createWhereIs(entities.EntityTypeThing, thingID, asPrefix))
+			}
+		}
+	case entities.EntityTypeSensor: // get sensor by ...
+		{
+			switch by {
+			case entities.EntityTypeDatastream:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeSensor][sensorID], createWhereIs(entities.EntityTypeDatastream, datastreamSensorID, asPrefix))
+			}
+		}
+	case entities.EntityTypeObservedProperty: // get observed property by ...
+		{
+			switch by {
+			case entities.EntityTypeDatastream:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservedProperty][observedPropertyID], createWhereIs(entities.EntityTypeDatastream, datastreamObservedPropertyID, asPrefix))
+			}
+		}
+	case entities.EntityTypeObservation: // get observation by ...
+		{
+			switch by {
+			case entities.EntityTypeDatastream:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationStreamID], createWhereIs(entities.EntityTypeDatastream, datastreamID, asPrefix))
+			case entities.EntityTypeFeatureOfInterest:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID], createWhereIs(entities.EntityTypeFeatureOfInterest, foiID, asPrefix))
+			}
+		}
+	case entities.EntityTypeFeatureOfInterest: // get feature of interest by ...
+		{
+			switch by {
+			case entities.EntityTypeObservation:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeFeatureOfInterest][foiID], createWhereIs(entities.EntityTypeObservation, observationFeatureOfInterestID, asPrefix))
+			}
+		}
+	case entities.EntityTypeDatastream: // get Datastream by ...
+		{
+			switch by {
+			case entities.EntityTypeThing:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamThingID], createWhereIs(entities.EntityTypeThing, thingID, asPrefix))
+			case entities.EntityTypeSensor:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamSensorID], createWhereIs(entities.EntityTypeSensor, sensorID, asPrefix))
+			case entities.EntityTypeObservedProperty:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID], createWhereIs(entities.EntityTypeObservedProperty, observedPropertyID, asPrefix))
+			case entities.EntityTypeObservation:
+				return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeDatastream][datastreamID], createWhereIs(entities.EntityTypeObservation, observationStreamID, asPrefix))
+			case entities.EntityTypeLocation:
+				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
+					tableMap[entities.EntityTypeThingToLocation],
+					selectMappings[entities.EntityTypeLocation][locationID],
+					selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID],
+					selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
+					selectMappings[entities.EntityTypeDatastream][datastreamThingID],
+				)
+			}
+		}
 	}
 
-	return joinMappings
+	return ""
+}
+
+func createWhereIs(et entities.EntityType, field string, asPrefix string) string {
+	if len(asPrefix) == 0 {
+		return selectMappings[et][field]
+	} else {
+		return fmt.Sprintf("%v_%v", asPrefix, selectAsMappings[et][field])
+	}
 }
 
 func createTableMappings(schema string) map[entities.EntityType]string {

@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 )
@@ -10,6 +11,7 @@ import (
 func createSensorsEndpoint(externalURL string) *Endpoint {
 	return &Endpoint{
 		Name:       "Sensors",
+		EntityType: entities.EntityTypeSensor,
 		OutputInfo: true,
 		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Sensors")),
 		SupportedQueryOptions: []odata.QueryOptionType{
@@ -17,15 +19,15 @@ func createSensorsEndpoint(externalURL string) *Endpoint {
 			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
 		},
 		SupportedExpandParams: []string{
-			"Datastream",
+			"datastreams",
 		},
 		SupportedSelectParams: []string{
 			"id",
 			"name",
 			"description",
-			"encodingType",
+			"encodingtype",
 			"metadata",
-			"Datastream",
+			"datastreams",
 		},
 		Operations: []models.EndpointOperation{
 			{models.HTTPOperationGet, "/v1.0/sensors", HandleGetSensors},

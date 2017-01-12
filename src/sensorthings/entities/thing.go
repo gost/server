@@ -61,6 +61,18 @@ func (t *Thing) ContainsMandatoryParams() (bool, []error) {
 func (t *Thing) SetAllLinks(externalURL string) {
 	t.SetSelfLink(externalURL)
 	t.SetLinks(externalURL)
+
+	for _, l := range t.Locations {
+		l.SetAllLinks(externalURL)
+	}
+
+	for _, d := range t.Datastreams {
+		d.SetAllLinks(externalURL)
+	}
+
+	for _, hl := range t.HistoricalLocations {
+		hl.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

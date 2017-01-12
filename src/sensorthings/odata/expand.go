@@ -9,9 +9,14 @@ import (
 
 // ExpandOperation holds information on a received $expand query
 type ExpandOperation struct {
-	Entity          entities.Entity
+	RawName         string
+	Entity          entities.Entity //ToDo: remove dependency
 	QueryOptions    *QueryOptions
 	ExpandOperation *ExpandOperation
+}
+
+func (e *ExpandOperation) IsValid() bool {
+	return true
 }
 
 // Create tries to construct the ExpandOperation from given query string
@@ -39,7 +44,7 @@ func (e *ExpandOperation) Create(eo string) []error {
 	}
 
 	e.Entity = et
-
+	e.RawName = fp
 	if len(queryString) > 0 {
 		splitQuery := strings.Split(queryString, ";")
 		values := map[string]string{}
@@ -72,19 +77,37 @@ func (e *ExpandOperation) Create(eo string) []error {
 // Expand retrieves the specified named property and represents it inline to the base entity.
 type QueryExpand struct {
 	QueryBase
-	Params     []string
-	Operations []ExpandOperation
+	Operations []*ExpandOperation
 }
 
 // Parse splits the given values by the , delimiter and stores the params, if the delimiter is not
 // a comma the IsValid will filter it out later on
 func (q *QueryExpand) Parse(value string) error {
 	q.RawQuery = value
-	q.Params = strings.Split(value, ",")
 
-	l1 := strings.Split(value, ",") // split layer 1, for example $expand=Observations/Things,Sensor,ObservedProperty
-	for _, sl1 := range l1 {
-		eo := ExpandOperation{}
+	splitString := make([]string, 0)
+	current := ""
+	isQuery := false
+	for i := 0; i < len(value); i++ {
+		if string(value[i]) == "(" {
+			isQuery = true
+		} else if string(value[i]) == ")" {
+			isQuery = false
+		}
+
+		if string(value[i]) == "," && !isQuery {
+			continue
+		}
+
+		current = fmt.Sprintf("%v%v", current, string(value[i]))
+		if i+1 == len(value) || (string(value[i+1]) == "," && !isQuery) {
+			splitString = append(splitString, current)
+			current = ""
+		}
+	}
+
+	for _, sl1 := range splitString {
+		eo := &ExpandOperation{}
 		if err := eo.Create(sl1); err != nil {
 			return err[0]
 		}
@@ -95,43 +118,23 @@ func (q *QueryExpand) Parse(value string) error {
 	return nil
 }
 
-// debug
-func displayExpandOperation(e ExpandOperation) {
-	fmt.Println("====== top level expand: " + e.Entity.GetEntityType().ToString() + " ======")
-	printQueries(e.QueryOptions)
-	if e.ExpandOperation != nil {
-		displayExpandOperationLower(e.ExpandOperation, 1)
-	}
-}
-
-func displayExpandOperationLower(e *ExpandOperation, level int) {
-	fmt.Printf("--- sub expand %v: %s ---\n", level, e.Entity.GetEntityType().ToString())
-	printQueries(e.QueryOptions)
-}
-
-func printQueries(qo *QueryOptions) {
-	if qo != nil {
-		fmt.Println(" Queries:")
-		test2 := *qo.QuerySelect
-		fmt.Println("    " + test2.RawQuery)
-	} else {
-		fmt.Println(" No queries defined")
-	}
-}
-
 // IsValid checks if the endpoint supports the expand params given by the user
-func (q *QueryExpand) IsValid(values []string, endpointName string) (bool, error) {
-	for _, value := range q.Params {
+func (q *QueryExpand) IsValid(endpointName string) (bool, error) {
+	for _, opp := range q.Operations {
 		found := false
-		for _, param := range values {
-			if param == value {
-				found = true
-				break
+		for epName, params := range supportedExpandParamsMap {
+			if strings.ToLower(epName) == strings.ToLower(endpointName) {
+				for _, v := range params {
+					if strings.ToLower(v) == strings.ToLower(opp.RawName) {
+						found = true
+						break
+					}
+				}
 			}
 		}
 
 		if !found {
-			return false, CreateQueryError(QueryExpandAvailable, http.StatusBadRequest, value, endpointName)
+			return false, CreateQueryError(QueryExpandAvailable, http.StatusBadRequest, opp.Entity.GetEntityType().ToString(), endpointName)
 		}
 	}
 

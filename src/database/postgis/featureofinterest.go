@@ -9,10 +9,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"strings"
 )
-
-var foiMapping = map[string]string{"feature": "public.ST_AsGeoJSON(featureofinterest.feature) AS feature"}
 
 func featureOfInterestParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	foi := &entities.FeatureOfInterest{}
@@ -54,16 +51,8 @@ func (gdb *GostDatabase) GetFeatureOfInterestByLocationID(id interface{}) (*enti
 		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, nil, "", "", foiMapping)+" from %s.featureofinterest where original_location_id=%v", gdb.Schema, intID)
-	return processFeatureOfInterest(gdb.Db, sql, nil)
-}
-
-// GetTotalFeaturesOfInterest returns the number of FeaturesOfInterest records in the database
-func (gdb *GostDatabase) GetTotalFeaturesOfInterest() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.featureofinterest", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, intID, nil)
+	return processFeatureOfInterest(gdb.Db, query, qi)
 }
 
 // GetFeatureOfInterest returns a feature of interest by id
@@ -73,8 +62,8 @@ func (gdb *GostDatabase) GetFeatureOfInterest(id interface{}, qo *odata.QueryOpt
 		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest where id = %v", gdb.Schema, intID)
-	return processFeatureOfInterest(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, intID, qo)
+	return processFeatureOfInterest(gdb.Db, query, qi)
 }
 
 // GetFeatureOfInterestByObservation returns a feature of interest by given observation id
@@ -84,15 +73,15 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "featureofinterest.", "", foiMapping)+" from %s.featureofinterest inner join %s.observation on observation.featureofinterest_id = featureofinterest.id where observation.id = %v limit 1", gdb.Schema, gdb.Schema, intID)
-	return processFeatureOfInterest(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, &entities.Observation{}, intID, qo)
+	return processFeatureOfInterest(gdb.Db, query, qi)
 }
 
 // GetFeatureOfInterests returns all feature of interests
 func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.FeatureOfInterest{}, qo, "", "", foiMapping)+" from %s.featureofinterest order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSSQL := fmt.Sprintf("select COUNT(*) FROM %s.featureofinterest", gdb.Schema)
-	return processFeatureOfInterests(gdb.Db, sql, qo, countSSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
+	return processFeatureOfInterests(gdb.Db, query, qi, countSQL)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
@@ -113,27 +102,10 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 // PutFeatureOfInterest inserts a new FeatureOfInterest into the database
 func (gdb *GostDatabase) PutFeatureOfInterest(id interface{}, f *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
 	return gdb.PatchFeatureOfInterest(id, f)
-	/*
-		locationBytes, _ := json.Marshal(f.Feature)
-		intID, _ := ToIntID(id)
-		encoding, _ := entities.CreateEncodingType(f.EncodingType)
-
-		if !gdb.FeatureOfInterestExists(intID) {
-			return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
-		}
-
-		sql := fmt.Sprintf("update %s.featureofinterest set name=$1, description=$2, encodingtype=$3, feature= ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), original_location_id=$4 where id=$5", gdb.Schema, string(locationBytes[:]))
-		_, err := gdb.Db.Exec(sql, f.Name, f.Description, encoding.Code, f.OriginalLocationID, intID)
-		if err != nil {
-			return nil, err
-		}
-
-		f.ID = intID
-		return f, nil*/
 }
 
-func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error) {
-	locations, _, err := processFeatureOfInterests(db, sql, qo, "")
+func processFeatureOfInterest(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.FeatureOfInterest, error) {
+	locations, _, err := processFeatureOfInterests(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -145,73 +117,27 @@ func processFeatureOfInterest(db *sql.DB, sql string, qo *odata.QueryOptions) (*
 	return locations[0], nil
 }
 
-func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.FeatureOfInterest, int, error) {
-	rows, err := db.Query(sql)
-	defer rows.Close()
-
+func processFeatureOfInterests(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.FeatureOfInterest, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	var featureOfInterests = []*entities.FeatureOfInterest{}
-	for rows.Next() {
-		var ID interface{}
-		var encodingType int
-		var name, description, feature string
-
-		var params []interface{}
-		var qp []string
-		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			f := &entities.FeatureOfInterest{}
-			qp = f.GetPropertyNames()
-		} else {
-			qp = qo.QuerySelect.Params
-		}
-
-		for _, p := range qp {
-			p = strings.ToLower(p)
-			if p == "id" {
-				params = append(params, &ID)
-			}
-			if p == "encodingtype" {
-				params = append(params, &encodingType)
-			}
-			if p == "name" {
-				params = append(params, &name)
-			}
-			if p == "description" {
-				params = append(params, &description)
-			}
-			if p == "feature" {
-				params = append(params, &feature)
-			}
-		}
-
-		err = rows.Scan(params...)
-
-		featureMap, err := JSONToMap(&feature)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		foi := entities.FeatureOfInterest{}
-		foi.ID = ID
-		foi.Name = name
-		foi.Description = description
-		foi.Feature = featureMap
-		if encodingType != 0 {
-			foi.EncodingType = entities.EncodingValues[encodingType].Value
-		}
-
-		featureOfInterests = append(featureOfInterests, &foi)
+	fois := make([]*entities.FeatureOfInterest, 0)
+	for _, d := range data {
+		entity := d.(*entities.FeatureOfInterest)
+		fois = append(fois, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
-	return featureOfInterests, count, nil
+	return fois, count, nil
 }
 
 // PatchFeatureOfInterest updates a FeatureOfInterest in the database

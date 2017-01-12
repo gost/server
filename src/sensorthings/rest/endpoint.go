@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"net/http"
@@ -13,7 +14,8 @@ import (
 type Endpoint struct {
 	Name                  string                     `json:"name"` // Name of the endpoint
 	URL                   string                     `json:"url"`  // External URL to the endpoint
-	OutputInfo            bool                       `json:"-"`    //Output when BasePathInfo is requested by the user
+	EntityType            entities.EntityType        `json:"-"`
+	OutputInfo            bool                       `json:"-"` //Output when BasePathInfo is requested by the user
 	Operations            []models.EndpointOperation `json:"-"`
 	SupportedQueryOptions []odata.QueryOptionType    `json:"-"`
 	SupportedExpandParams []string                   `json:"-"`
@@ -55,6 +57,7 @@ func (e *Endpoint) GetSupportedSelectParams() []string {
 	return e.SupportedSelectParams
 }
 
+// ToDo: refactor AreQueryOptionsSupported remove dependencies
 // AreQueryOptionsSupported checks if the endpoint supports the requested query and if
 // the values are valid for the given endpoint
 func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (bool, []error) {
@@ -95,8 +98,15 @@ func checkQueryOptionSupported(e *Endpoint, q odata.QueryOption, errorList *[]er
 	// check if query is valid for endpoint
 	switch v := q.(type) {
 	case *odata.QueryExpand:
-		if _, err = v.IsValid(e.SupportedExpandParams, e.Name); err != nil {
+		if _, err = v.IsValid(e.Name); err != nil {
 			*errorList = append(errors, err)
+		}
+		for _, operation := range v.Operations {
+			ep := Endpoints[operation.Entity.GetEntityType()]
+			supported, qoe := ep.AreQueryOptionsSupported(operation.QueryOptions)
+			if !supported {
+				*errorList = append(errors, qoe...)
+			}
 		}
 	case *odata.QuerySelect:
 		if _, err = v.IsValid(e.SupportedSelectParams); err != nil {

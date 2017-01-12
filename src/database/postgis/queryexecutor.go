@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
 
+	"sort"
 	"strings"
 )
 
@@ -31,13 +32,15 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 	count := len(columns)
 	values := make([]interface{}, count)
 	valueP := make([]interface{}, count)
-	queryParseInfoMap := make(map[int]*QueryParseInfo)
-	currentQIDEntityID := make(map[int]interface{})                                  // keeps track of the current query id and entity id
-	parentEntities := map[interface{}]entities.Entity{}                              // array of parent entities
-	subEntities := map[int]map[int]map[interface{}]map[interface{}]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
+	deleteIDMap := make(map[int]bool)
+	queryParseInfoMap := make(map[int]*QueryParseInfo)                 // QueryID to QueryParseInfo
+	currentQIDEntityID := make(map[int]interface{})                    // keeps track of the current query id and entity id
+	parentEntities := map[interface{}]entities.Entity{}                // array of parent entities
+	subEntities := map[int]map[int]map[interface{}][]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
 	relationMap := q.GetQueryIDRelationMap(nil)
-
-	// for every _id found store the QueryParseInfo so we know where the column belongs to
+	asMap := make(map[string]string, 0) // column names mapped to the original as (without their prefix A_ etc)
+	parsedMap := make(map[int]map[int]map[interface{}]map[interface{}]interface{}, 0)
+	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
 	ranges := map[int]*QueryParseInfo{}
 	qpi := q
 	queryId := -1
@@ -46,8 +49,23 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 			queryId++
 			qpi = q.GetQueryParseInfoByQueryIndex(queryId)
 			queryParseInfoMap[queryId] = qpi
+
+			// construct deleteIDMap
+			deleteIDMap[qpi.QueryIndex] = false
+			if qpi.ExpandOperation != nil && qpi.ExpandOperation.QueryOptions != nil && !qpi.ExpandOperation.QueryOptions.QuerySelect.IsNil() {
+				found := false
+				for _, p := range qpi.ExpandOperation.QueryOptions.QuerySelect.Params {
+					if p == "id" {
+						found = true
+					}
+				}
+				deleteIDMap[qpi.QueryIndex] = !found
+			}
 		}
 		ranges[i] = qpi
+
+		slashIndex := strings.Index(c, "_")
+		asMap[c] = c[slashIndex+1:]
 	}
 
 	for rows.Next() {
@@ -63,6 +81,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 			var v interface{}
 			val := values[i]
 			b, ok := val.([]byte)
+
 			if ok {
 				v = string(b)
 			} else {
@@ -74,11 +93,19 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 				sortEntities[ranges[i].QueryIndex] = make(map[string]interface{})
 			}
 
-			sortEntities[ranges[i].QueryIndex][col] = v
+			sortEntities[ranges[i].QueryIndex][asMap[col]] = v
 		}
 
+		keys := []int{}
+		for k := range sortEntities {
+			keys = append(keys, k)
+		}
+		sort.Ints(keys)
+
 		// for every entity found in a row
-		for qi, data := range sortEntities {
+		for _, k := range keys {
+			qi := k
+			data := sortEntities[k]
 			// filter out already parsed and nil entities
 			skip := false
 			for col, val := range data {
@@ -93,19 +120,22 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 					if qi == 0 {
 						_, skip = parentEntities[val]
 					} else {
-						_, skip = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][val]
+						_, skip = parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][val]
 						if !skip {
 							_, ok := subEntities[qi]
 							if !ok {
-								subEntities[qi] = make(map[int]map[interface{}]map[interface{}]entities.Entity)
+								subEntities[qi] = make(map[int]map[interface{}][]entities.Entity)
+								parsedMap[qi] = make(map[int]map[interface{}]map[interface{}]interface{})
 							}
 							_, ok = subEntities[qi][relationMap[qi]]
 							if !ok {
-								subEntities[qi][relationMap[qi]] = make(map[interface{}]map[interface{}]entities.Entity)
+								subEntities[qi][relationMap[qi]] = make(map[interface{}][]entities.Entity)
+								parsedMap[qi][relationMap[qi]] = make(map[interface{}]map[interface{}]interface{})
 							}
 							_, ok = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]]
 							if !ok {
-								subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]entities.Entity)
+								subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make([]entities.Entity, 0)
+								parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]interface{}, 0)
 							}
 						}
 					}
@@ -127,13 +157,45 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 			if qi == 0 {
 				parentEntities[currentQIDEntityID[qi]] = newEntity
 			} else {
-				subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][currentQIDEntityID[qi]] = newEntity
+				subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = append(subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]], newEntity)
+				parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][newEntity.GetID()] = nil
 			}
 		}
 	}
 
 	for _, entity := range parentEntities {
-		parseResults(entity, 0, relationMap, subEntities)
+		parseResults(entity, 0, relationMap, subEntities, deleteIDMap)
+	}
+
+	for _, parentEntity := range parentEntities {
+		if deleteIDMap[0] {
+			parentEntity.SetID(nil)
+		}
+
+		for subQI := range subEntities {
+			if !deleteIDMap[subQI] {
+				continue
+			}
+
+			for parentQID := range subEntities[subQI] {
+				for parentID := range subEntities[subQI][parentQID] {
+					entityMap := subEntities[subQI][parentQID][parentID]
+					for _, se := range entityMap {
+						se.SetID(nil)
+					}
+				}
+			}
+
+			parentIdMap := subEntities[subQI]
+			for pID := range parentIdMap {
+				for _, entityMap := range parentIdMap[pID] {
+					for _, se := range entityMap {
+						se.SetID(nil)
+					}
+				}
+			}
+
+		}
 	}
 
 	parentEntitiesLength := len(parentEntities)
@@ -144,14 +206,13 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]interface{}, er
 		for _, e := range parentEntities {
 			entitySlice = append(entitySlice, e)
 		}
-
 		return entitySlice, nil
 	}
 
 	return nil, nil
 }
 
-func parseResults(entity entities.Entity, from int, relationMap map[int]int, subEntities map[int]map[int]map[interface{}]map[interface{}]entities.Entity) {
+func parseResults(entity entities.Entity, from int, relationMap map[int]int, subEntities map[int]map[int]map[interface{}][]entities.Entity, removeIDMap map[int]bool) {
 	for subQI := range subEntities {
 		relation, ok := relationMap[subQI]
 		if ok && relation == from {
@@ -159,14 +220,15 @@ func parseResults(entity entities.Entity, from int, relationMap map[int]int, sub
 			if ok {
 				addRelationToEntity(entity, relatedEntityMap)
 				for _, relatedEntity := range relatedEntityMap {
-					parseResults(relatedEntity, subQI, relationMap, subEntities)
+					parseResults(relatedEntity, subQI, relationMap, subEntities, removeIDMap)
 				}
+			} else {
 			}
 		}
 	}
 }
 
-func addRelationToEntity(parent entities.Entity, subEntities map[interface{}]entities.Entity) {
+func addRelationToEntity(parent entities.Entity, subEntities []entities.Entity) {
 	switch parentEntity := parent.(type) {
 	case *entities.Thing:
 		for _, se := range subEntities {

@@ -18,7 +18,7 @@ import (
 type APIv1 struct {
 	db            models.Database
 	config        configuration.Config
-	endPoints     []models.Endpoint
+	endPoints     map[entities.EntityType]models.Endpoint
 	topics        []models.Topic
 	mqtt          models.MQTTClient
 	acceptedPaths []string
@@ -26,7 +26,7 @@ type APIv1 struct {
 
 // NewAPI Initialise a new SensorThings API
 func NewAPI(database models.Database, config configuration.Config, mqtt models.MQTTClient) models.API {
-	return &APIv1{
+	api := &APIv1{
 		db:     database,
 		mqtt:   mqtt,
 		config: config,
@@ -52,10 +52,22 @@ func NewAPI(database models.Database, config configuration.Config, mqtt models.M
 			"dashboard",
 		},
 	}
+
+	api.Start()
+	return api
 }
 
 // Start is used to set the initial state of the api such as loading of the foi states
 func (a *APIv1) Start() {
+	eps := *a.GetEndpoints()
+	expandParams := map[string][]string{}
+	selectParams := map[string][]string{}
+	for _, e := range eps {
+		expandParams[e.GetName()] = e.GetSupportedExpandParams()
+		selectParams[e.GetName()] = e.GetSupportedSelectParams()
+	}
+
+	odata.Init(expandParams, selectParams)
 }
 
 // GetConfig return the current configuration.Config set for the api
@@ -97,7 +109,7 @@ func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
 }
 
 // GetEndpoints returns all configured endpoints for the HTTP server
-func (a *APIv1) GetEndpoints() *[]models.Endpoint {
+func (a *APIv1) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 	if a.endPoints == nil {
 		a.endPoints = rest.CreateEndPoints(a.config.GetExternalServerURI())
 	}
@@ -129,7 +141,6 @@ func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions
 	if qo != nil && qo.QueryOptionRef {
 		entity.SetSelfLink(a.config.GetExternalServerURI())
 		entity.SetID(nil)
-
 	} else if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 { //no query options, set all links
 		entity.SetAllLinks(a.config.GetExternalServerURI())
 	}
@@ -151,25 +162,25 @@ func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOpt
 
 	queryString := ""
 	if !qo.QueryFilter.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionFilter.String(), qo.QueryFilter.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionFilter.String(), qo.QueryFilter.RawQuery))
 	}
 	if !qo.QueryCount.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionCount.String(), qo.QueryCount.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionCount.String(), qo.QueryCount.RawQuery))
 	}
 	if !qo.QueryExpand.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionExpand.String(), qo.QueryExpand.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionExpand.String(), qo.QueryExpand.RawQuery))
 	}
 	if !qo.QueryOrderBy.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionOrderBy.String(), qo.QueryOrderBy.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionOrderBy.String(), qo.QueryOrderBy.RawQuery))
 	}
 	if !qo.QueryResultFormat.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionResultFormat.String(), qo.QueryResultFormat.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionResultFormat.String(), qo.QueryResultFormat.RawQuery))
 	}
 	if !qo.QueryTop.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionTop.String(), qo.QueryTop.RawQuery))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionTop.String(), qo.QueryTop.RawQuery))
 	}
 	if !qo.QuerySkip.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%v=%v", odata.QueryOptionSkip.String(), qo.QuerySkip.Index+qo.QueryTop.Limit))
+		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%v", odata.QueryOptionSkip.String(), qo.QuerySkip.Index+qo.QueryTop.Limit))
 	}
 
 	return fmt.Sprintf("%s/%s", incomingURL, queryString)

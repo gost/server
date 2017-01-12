@@ -60,6 +60,10 @@ func (f *FeatureOfInterest) ContainsMandatoryParams() (bool, []error) {
 func (f *FeatureOfInterest) SetAllLinks(externalURL string) {
 	f.SetSelfLink(externalURL)
 	f.SetLinks(externalURL)
+
+	for _, o := range f.Observations {
+		o.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

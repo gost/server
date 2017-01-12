@@ -8,7 +8,6 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
-	"strings"
 )
 
 func sensorParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -37,14 +36,6 @@ func sensorParamFactory(values map[string]interface{}) (entities.Entity, error) 
 	return s, nil
 }
 
-// GetTotalSensors returns the total sensors count in the database
-func (gdb *GostDatabase) GetTotalSensors() int {
-	var count int
-	sql := fmt.Sprintf("SELECT Count(*) from %s.sensor", gdb.Schema)
-	gdb.Db.QueryRow(sql).Scan(&count)
-	return count
-}
-
 // GetSensor return a sensor by id
 func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error) {
 	intID, ok := ToIntID(id)
@@ -52,8 +43,9 @@ func (gdb *GostDatabase) GetSensor(id interface{}, qo *odata.QueryOptions) (*ent
 		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" from %s.sensor where id = %v", gdb.Schema, intID)
-	sensor, err := processSensor(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, nil, intID, qo)
+	sensor, err := processSensor(gdb.Db, query, qi)
+
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +60,8 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "sensor.", "", nil)+" from %s.sensor inner join %s.datastream on datastream.sensor_id = sensor.id where datastream.id = %v", gdb.Schema, gdb.Schema, intID)
-	sensor, err := processSensor(gdb.Db, sql, qo)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, &entities.Datastream{}, intID, qo)
+	sensor, err := processSensor(gdb.Db, query, qi)
 	if err != nil {
 		return nil, err
 	}
@@ -79,13 +71,13 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 
 // GetSensors retrieves all sensors based on the QueryOptions
 func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, error) {
-	sql := fmt.Sprintf("select "+CreateSelectString(&entities.Sensor{}, qo, "", "", nil)+" FROM %s.sensor order by id desc "+CreateTopSkipQueryString(qo), gdb.Schema)
-	countSQL := fmt.Sprintf("select COUNT(*) FROM %s.sensor", gdb.Schema)
-	return processSensors(gdb.Db, sql, qo, countSQL)
+	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, nil, nil, qo)
+	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Sensor{}, nil, nil, qo)
+	return processSensors(gdb.Db, query, qi, countSQL)
 }
 
-func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Sensor, error) {
-	sensors, _, err := processSensors(db, sql, qo, "")
+func processSensor(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Sensor, error) {
+	sensors, _, err := processSensors(db, sql, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -97,70 +89,24 @@ func processSensor(db *sql.DB, sql string, qo *odata.QueryOptions) (*entities.Se
 	return sensors[0], nil
 }
 
-func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, countSQL string) ([]*entities.Sensor, int, error) {
-	rows, err := db.Query(sql)
-	defer rows.Close()
-
+func processSensors(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Sensor, int, error) {
+	data, err := ExecuteSelect(db, qi, sql)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("Error executing query %v", err)
 	}
 
-	defer rows.Close()
-	var sensors = []*entities.Sensor{}
-
-	for rows.Next() {
-		var id interface{}
-		var encodingType int
-		var name, description, metadata string
-
-		var params []interface{}
-		var qp []string
-		if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-			s := &entities.Sensor{}
-			qp = s.GetPropertyNames()
-		} else {
-			qp = qo.QuerySelect.Params
-		}
-
-		for _, p := range qp {
-			p = strings.ToLower(p)
-			if p == "id" {
-				params = append(params, &id)
-			}
-			if p == "name" {
-				params = append(params, &name)
-			}
-			if p == "encodingtype" {
-				params = append(params, &encodingType)
-			}
-			if p == "description" {
-				params = append(params, &description)
-			}
-			if p == "metadata" {
-				params = append(params, &metadata)
-			}
-		}
-
-		err = rows.Scan(params...)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		sensor := entities.Sensor{}
-		sensor.ID = id
-		sensor.Name = name
-		sensor.Description = description
-		sensor.Metadata = metadata
-		if encodingType != 0 {
-			sensor.EncodingType = entities.EncodingValues[encodingType].Value
-		}
-
-		sensors = append(sensors, &sensor)
+	sensors := make([]*entities.Sensor, 0)
+	for _, d := range data {
+		entity := d.(*entities.Sensor)
+		sensors = append(sensors, entity)
 	}
 
 	var count int
 	if len(countSQL) > 0 {
-		db.QueryRow(countSQL).Scan(&count)
+		count, err = ExecuteSelectCount(db, countSQL)
+		if err != nil {
+			return nil, 0, fmt.Errorf("Error executing count %v", err)
+		}
 	}
 
 	return sensors, count, nil

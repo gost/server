@@ -57,6 +57,10 @@ func (o *ObservedProperty) ContainsMandatoryParams() (bool, []error) {
 func (o *ObservedProperty) SetAllLinks(externalURL string) {
 	o.SetSelfLink(externalURL)
 	o.SetLinks(externalURL)
+
+	for _, d := range o.Datastreams {
+		d.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity

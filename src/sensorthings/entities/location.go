@@ -67,6 +67,14 @@ func (l *Location) ContainsMandatoryParams() (bool, []error) {
 func (l *Location) SetAllLinks(externalURL string) {
 	l.SetSelfLink(externalURL)
 	l.SetLinks(externalURL)
+
+	for _, t := range l.Things {
+		t.SetAllLinks(externalURL)
+	}
+
+	for _, hl := range l.HistoricalLocations {
+		hl.SetAllLinks(externalURL)
+	}
 }
 
 // SetSelfLink sets the self link for the entity
