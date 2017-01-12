@@ -118,6 +118,7 @@ var (
 	foiOriginalLocationID = "original_location_id"
 )
 
+// ParamFactory receives a map of columns (with select as names) with values an implementation should parse it to the correct entity
 type ParamFactory func(values map[string]interface{}) (entities.Entity, error)
 
 var asPrefixArr = [...]string{
@@ -126,9 +127,11 @@ var asPrefixArr = [...]string{
 	"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ",
 }
 
+// QueryParseInfo is constructed based on the input send to the QueryBuilder, with the help of QueryParseInfo
+// the response rows from the database can be parsed into the correct entities with their relations and sub entities
 type QueryParseInfo struct {
-	QueryIndex      int
-	AsPrefix        string
+	QueryIndex      int    // Order of quest
+	AsPrefix        string // Extra AS that gets added to the join string
 	Entity          entities.Entity
 	ExpandOperation *odata.ExpandOperation
 	ParamFactory    ParamFactory
@@ -136,6 +139,7 @@ type QueryParseInfo struct {
 	SubEntities     []*QueryParseInfo
 }
 
+// Init initialises a QueryParseInfo object by setting al the needed info
 func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandOperation *odata.ExpandOperation) {
 	q.Parent = parent
 	q.AsPrefix = asPrefixArr[queryIndex]
@@ -177,6 +181,8 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	}
 }
 
+// GetQueryParseInfoByQueryIndex returns the QueryParseInfo by a given QueryID, this func should be called from the main
+// QueryParseInfo object
 func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
 	if q.QueryIndex == id {
 		return q
@@ -223,6 +229,8 @@ func (q *QueryParseInfo) GetQueryIDRelationMap(relationMap map[int]int) map[int]
 	return relationMap
 }
 
+// Parse receives a map containing row names with their values and executes the set ParamFactory to
+// parse the database response into an entity
 func (q *QueryParseInfo) Parse(values map[string]interface{}) (entities.Entity, error) {
 	return q.ParamFactory(values)
 }
@@ -540,9 +548,9 @@ func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, b
 func createWhereIs(et entities.EntityType, field string, asPrefix string) string {
 	if len(asPrefix) == 0 {
 		return selectMappings[et][field]
-	} else {
-		return fmt.Sprintf("%v_%v", asPrefix, selectAsMappings[et][field])
 	}
+
+	return fmt.Sprintf("%v_%v", asPrefix, selectAsMappings[et][field])
 }
 
 func createTableMappings(schema string) map[entities.EntityType]string {

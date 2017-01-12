@@ -133,6 +133,7 @@ func (b *BaseEntity) SetLinks(externalURL string) error {
 	return nil
 }
 
+// GetID return the ID of the entity
 func (b *BaseEntity) GetID() interface{} {
 	return b.ID
 }

@@ -57,9 +57,9 @@ func (e *Endpoint) GetSupportedSelectParams() []string {
 	return e.SupportedSelectParams
 }
 
-// ToDo: refactor AreQueryOptionsSupported remove dependencies
 // AreQueryOptionsSupported checks if the endpoint supports the requested query and if
 // the values are valid for the given endpoint
+// ToDo: refactor AreQueryOptionsSupported remove dependencies
 func (e *Endpoint) AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (bool, []error) {
 	if queryOptions == nil {
 		return true, nil

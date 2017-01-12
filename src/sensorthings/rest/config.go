@@ -5,6 +5,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/models"
 )
 
+// Endpoints contains the current set-up of the endpoints
 var Endpoints = map[entities.EntityType]models.Endpoint{}
 
 // CreateEndPoints creates the pre-defined endpoint config, the config contains all endpoint info

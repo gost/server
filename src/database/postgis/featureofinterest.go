@@ -43,7 +43,7 @@ func featureOfInterestParamFactory(values map[string]interface{}) (entities.Enti
 	return foi, nil
 }
 
-// GetFeatureOfInterestByLocationID returns the FeatureOfInterest in the database
+// GetFeatureOfInterestIDByLocationID returns the FeatureOfInterest id in the database
 // where original_location_id equals the given parameter
 func (gdb *GostDatabase) GetFeatureOfInterestIDByLocationID(id interface{}) (interface{}, error) {
 	intID, ok := ToIntID(id)

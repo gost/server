@@ -15,10 +15,6 @@ type ExpandOperation struct {
 	ExpandOperation *ExpandOperation
 }
 
-func (e *ExpandOperation) IsValid() bool {
-	return true
-}
-
 // Create tries to construct the ExpandOperation from given query string
 func (e *ExpandOperation) Create(eo string) []error {
 	slashIndex := strings.Index(eo, "/")

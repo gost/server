@@ -137,9 +137,9 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 func (qb *QueryBuilder) addAsPrefix(qpi *QueryParseInfo, as string) string {
 	if qpi == nil {
 		return as
-	} else {
-		return fmt.Sprintf("%v_%s", qpi.AsPrefix, as)
 	}
+
+	return fmt.Sprintf("%v_%s", qpi.AsPrefix, as)
 }
 
 func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
@@ -303,6 +303,11 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	return queryString, qpi
 }
 
+// CreateCountQuery creates the correct count query based on the given info
+//   e1: entity to get
+//   e2: from entity
+//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+// example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()

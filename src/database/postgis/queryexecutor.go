@@ -43,12 +43,12 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
 	ranges := map[int]*QueryParseInfo{}
 	qpi := q
-	queryId := -1
+	queryID := -1
 	for i, c := range columns {
 		if strings.HasSuffix(c, idAsSuffix) {
-			queryId++
-			qpi = q.GetQueryParseInfoByQueryIndex(queryId)
-			queryParseInfoMap[queryId] = qpi
+			queryID++
+			qpi = q.GetQueryParseInfoByQueryIndex(queryID)
+			queryParseInfoMap[queryID] = qpi
 
 			// construct deleteIDMap
 			deleteIDMap[qpi.QueryIndex] = false
@@ -191,9 +191,9 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 				}
 			}
 
-			parentIdMap := subEntities[subQI]
-			for pID := range parentIdMap {
-				for _, entityMap := range parentIdMap[pID] {
+			parentIDMap := subEntities[subQI]
+			for pID := range parentIDMap {
+				for _, entityMap := range parentIDMap[pID] {
 					for _, se := range entityMap {
 						se.SetID(nil)
 					}
@@ -206,11 +206,9 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 	parentEntitiesLength := len(parentEntities)
 	if parentEntitiesLength == 0 {
 		return nil, nil
-	} else {
-		return parentEntities, nil
 	}
 
-	return nil, nil
+	return parentEntities, nil
 }
 
 func parseResults(entity entities.Entity, from int, relationMap map[int]int, subEntities map[int]map[int]map[interface{}][]entities.Entity, removeIDMap map[int]bool) {
