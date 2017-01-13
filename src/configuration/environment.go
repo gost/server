@@ -7,6 +7,52 @@ import (
 
 // SetEnvironmentVariables changes config settings when certain environment variables are found
 func SetEnvironmentVariables(conf *Config) {
+
+	// Server settings
+	gostServerName := os.Getenv("gost_server_name")
+	if gostServerName != "" {
+		conf.Server.Name = gostServerName
+	}
+
+	gostServerHost := os.Getenv("gost_server_host")
+	if gostServerHost != "" {
+		conf.Server.Host = gostServerHost
+	}
+
+	gostServerPort := os.Getenv("gost_server_port")
+	if gostServerPort != "" {
+		port, err := strconv.Atoi(gostServerPort)
+		if err == nil {
+			conf.Server.Port = int(port)
+		}
+	}
+
+	gostServerExternalURI := os.Getenv("gost_server_external_uri")
+	if gostServerExternalURI != "" {
+		conf.Server.ExternalURI = gostServerExternalURI
+	}
+
+	gostClientContent := os.Getenv("gost_client_content")
+	if gostClientContent != "" {
+		conf.Server.ClientContent = gostClientContent
+	}
+
+	gostServerMaxEntities := os.Getenv("gost_server_max_entities")
+	if gostServerMaxEntities != "" {
+		port, err := strconv.Atoi(gostServerMaxEntities)
+		if err == nil {
+			conf.Server.MaxEntityResponse = int(port)
+		}
+	}
+
+	gostServerIndentJSON := os.Getenv("gost_server_indent_json")
+	if gostServerIndentJSON != "" {
+		h, err := strconv.ParseBool(gostServerIndentJSON)
+		if err == nil {
+			conf.Server.IndentedJSON = h
+		}
+	}
+
 	gostServerHTTPS := os.Getenv("gost_server_https")
 	if gostServerHTTPS != "" {
 		h, err := strconv.ParseBool(gostServerHTTPS)
@@ -25,49 +71,32 @@ func SetEnvironmentVariables(conf *Config) {
 		conf.Server.HTTPSCert = gostServerHTTPSCert
 	}
 
-	gostMqttHost := os.Getenv("gost_mqtt_host")
-	if gostMqttHost != "" {
-		conf.MQTT.Host = gostMqttHost
+	// MQTT settings
+	gostMQTTEnabled := os.Getenv("gost_mqtt_enabled")
+	if gostMQTTEnabled != "" {
+		h, err := strconv.ParseBool(gostMQTTEnabled)
+		if err == nil {
+			conf.MQTT.Enabled = h
+		}
 	}
 
-	gostMqttPort := os.Getenv("gost_mqtt_port")
-	if gostMqttPort != "" {
-		port, err := strconv.Atoi(gostMqttPort)
+	gostMQTTHost := os.Getenv("gost_mqtt_host")
+	if gostMQTTHost != "" {
+		conf.MQTT.Host = gostMQTTHost
+	}
+
+	gostMQTTPort := os.Getenv("gost_mqtt_port")
+	if gostMQTTPort != "" {
+		port, err := strconv.Atoi(gostMQTTPort)
 		if err == nil {
 			conf.MQTT.Port = int(port)
 		}
 	}
 
-	gostServerHost := os.Getenv("gost_server_host")
-	if gostServerHost != "" {
-		conf.Server.Host = gostServerHost
-	}
-
-	gostServerExternalURI := os.Getenv("gost_server_external_uri")
-	if gostServerExternalURI != "" {
-		conf.Server.ExternalURI = gostServerExternalURI
-	}
-
-	gostClientContent := os.Getenv("gost_client_content")
-	if gostClientContent != "" {
-		conf.Server.ClientContent = gostClientContent
-	}
-
-	gostServerPort := os.Getenv("gost_server_port")
-	if gostServerPort != "" {
-		port, err := strconv.Atoi(gostServerPort)
-		if err == nil {
-			conf.Server.Port = int(port)
-		}
-	}
+	// Database settings
 	gostDbHost := os.Getenv("gost_db_host")
 	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
-	}
-
-	gostDbDatabase := os.Getenv("gost_db_database")
-	if gostDbDatabase != "" {
-		conf.Database.Database = gostDbDatabase
 	}
 
 	gostDbPort := os.Getenv("gost_db_port")
@@ -86,5 +115,39 @@ func SetEnvironmentVariables(conf *Config) {
 	gostDbPassword := os.Getenv("gost_db_password")
 	if gostDbPassword != "" {
 		conf.Database.Password = gostDbPassword
+	}
+
+	gostDbDatabase := os.Getenv("gost_db_database")
+	if gostDbDatabase != "" {
+		conf.Database.Database = gostDbDatabase
+	}
+
+	gostDbSchema := os.Getenv("gost_db_schema")
+	if gostDbSchema != "" {
+		conf.Database.Schema = gostDbSchema
+	}
+
+	gostDbSSL := os.Getenv("gost_mqtt_ssl_enabled")
+	if gostDbSSL != "" {
+		h, err := strconv.ParseBool(gostDbSSL)
+		if err == nil {
+			conf.Database.SSL = h
+		}
+	}
+
+	gostDbMaxIdle := os.Getenv("gost_db_max_idle_cons")
+	if gostDbMaxIdle != "" {
+		idle, err := strconv.Atoi(gostDbMaxIdle)
+		if err == nil {
+			conf.Database.MaxIdleConns = idle
+		}
+	}
+
+	gostDbMaxCons := os.Getenv("gost_db_max_open_cons")
+	if gostDbMaxCons != "" {
+		open, err := strconv.Atoi(gostDbMaxCons)
+		if err == nil {
+			conf.Database.MaxOpenConns = open
+		}
 	}
 }
