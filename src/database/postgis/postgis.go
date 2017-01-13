@@ -64,8 +64,7 @@ func (gdb *GostDatabase) Start() {
 	//gdb.QueryBuilder.Test()
 
 	//ToDo: implement SSL
-	log.Println("Creating database connection...")
-	log.Printf("Database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
+	log.Printf("Creating database connection, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
 
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", gdb.Host, gdb.User, gdb.Password, gdb.Database)
 	db, err := sql.Open("postgres", dbInfo)
@@ -77,7 +76,7 @@ func (gdb *GostDatabase) Start() {
 	}
 
 	gdb.Db = db
-	log.Printf("Connected to database, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
+	log.Println("Connected to database")
 }
 
 // CreateSchema creates the needed schema in the database

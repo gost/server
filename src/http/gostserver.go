@@ -18,28 +18,45 @@ type Server interface {
 // GostServer is the type that contains all of the relevant information to set
 // up the GOST HTTP Server
 type GostServer struct {
-	host string      // Hostname for example "localhost" or "192.168.1.14"
-	port int         // Portnumber where you want to run your http server on
-	api  *models.API // Sensorthings api to interact with from the HttpServer
+	host      string      // Hostname for example "localhost" or "192.168.1.14"
+	port      int         // Portnumber where you want to run your http server on
+	api       *models.API // Sensorthings api to interact with from the HttpServer
+	https     bool
+	httpsCert string
+	httpsKey  string
 }
 
 // CreateServer initialises a new GOST HTTPServer based on the given parameters
-func CreateServer(host string, port int, api *models.API) Server {
+func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
 	return &GostServer{
-		host: host,
-		port: port,
-		api:  api,
+		host:      host,
+		port:      port,
+		api:       api,
+		https:     https,
+		httpsCert: httpsCert,
+		httpsKey:  httpsKey,
 	}
 }
 
 // Start command to start the GOST HTTPServer
 func (s *GostServer) Start() {
-	log.Printf("Started GOST HTTP Server on %v:%v", s.host, s.port)
-	router := CreateRouter(s.api)
-	httpError := http.ListenAndServe(s.host+":"+strconv.Itoa(s.port), s.LowerCaseURI(router))
+	t := "HTTP"
+	if s.https {
+		t = "HTTPS"
+	}
+	log.Printf("Started GOST %v Server on %v:%v", t, s.host, s.port)
 
-	if httpError != nil {
-		log.Fatal(httpError)
+	router := CreateRouter(s.api)
+
+	var err error
+	if s.https {
+		err = http.ListenAndServeTLS(s.host+":"+strconv.Itoa(s.port), s.httpsCert, s.httpsKey, s.LowerCaseURI(router))
+	} else {
+		err = http.ListenAndServe(s.host+":"+strconv.Itoa(s.port), s.LowerCaseURI(router))
+	}
+
+	if err != nil {
+		log.Fatal(err)
 		return
 	}
 }

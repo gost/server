@@ -57,7 +57,7 @@ func createDatabase(db models.Database, sqlFile string) {
 func createAndStartServer(api *models.API) {
 	a := *api
 	a.Start()
-
-	gostServer := http.CreateServer(a.GetConfig().Server.Host, a.GetConfig().Server.Port, api)
+	config := a.GetConfig()
+	gostServer := http.CreateServer(config.Server.Host, config.Server.Port, api, config.Server.HTTPS, config.Server.HTTPSCert, config.Server.HTTPSKey)
 	gostServer.Start()
 }

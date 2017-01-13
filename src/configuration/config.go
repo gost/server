@@ -18,6 +18,9 @@ type ServerConfig struct {
 	Host              string `yaml:"host"`
 	Port              int    `yaml:"port"`
 	ExternalURI       string `yaml:"externalUri"`
+	HTTPS             bool   `yaml:"https"`
+	HTTPSCert         string `yaml:"httpsCert"`
+	HTTPSKey          string `yaml:"httpsKey"`
 	ClientContent     string `yaml:"clientContent"`
 	MaxEntityResponse int    `yaml:"maxEntityResponse"`
 	IndentedJSON      string `yaml:"indentedJson"`

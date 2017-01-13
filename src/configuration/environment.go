@@ -7,6 +7,24 @@ import (
 
 // SetEnvironmentVariables changes config settings when certain environment variables are found
 func SetEnvironmentVariables(conf *Config) {
+	gostServerHTTPS := os.Getenv("gost_server_https")
+	if gostServerHTTPS != "" {
+		h, err := strconv.ParseBool(gostServerHTTPS)
+		if err == nil {
+			conf.Server.HTTPS = h
+		}
+	}
+
+	gostServerHTTPSKey := os.Getenv("gost_server_https_key")
+	if gostServerHTTPSKey != "" {
+		conf.Server.HTTPSKey = gostServerHTTPSKey
+	}
+
+	gostServerHTTPSCert := os.Getenv("gost_server_https_cert")
+	if gostServerHTTPSCert != "" {
+		conf.Server.HTTPSCert = gostServerHTTPSCert
+	}
+
 	gostMqttHost := os.Getenv("gost_mqtt_host")
 	if gostMqttHost != "" {
 		conf.MQTT.Host = gostMqttHost
@@ -46,6 +64,7 @@ func SetEnvironmentVariables(conf *Config) {
 	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
 	}
+
 	gostDbDatabase := os.Getenv("gost_db_database")
 	if gostDbDatabase != "" {
 		conf.Database.Database = gostDbDatabase

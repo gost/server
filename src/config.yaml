@@ -1,4 +1,4 @@
-server: 
+server:
     name: GOST Server
     host:
     port: 8080
@@ -6,6 +6,9 @@ server:
     clientContent: ./client/
     maxEntityResponse: 20
     indentedJson: true
+    https: false
+    httpsCert:
+    httpsKey:
 database:
     host: localhost
     port: 5432
