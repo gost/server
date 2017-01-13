@@ -10,6 +10,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
 	"net/url"
+	"strconv"
 )
 
 // getEntityID retrieves the id from the request, for example
@@ -58,9 +59,13 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		query["$value"] = "true"
 	}
 
-	// if $top is not found, retrieve max 200
-	if _, ok := query["$top"]; !ok {
-		query["$top"] = "200"
+	if t, ok := query["$top"]; !ok {
+		query["$top"] = strconv.Itoa(MaxEntities)
+	} else {
+		top, err := strconv.Atoi(t)
+		if err != nil || top > MaxEntities {
+			query["$top"] = strconv.Itoa(MaxEntities)
+		}
 	}
 
 	if _, ok := query["$skip"]; !ok {

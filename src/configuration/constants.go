@@ -6,4 +6,7 @@ const (
 
 	// SensorThingsAPIVersion specifies the supported SensorThings API version
 	SensorThingsAPIVersion string = "v1.0"
+
+	// DefaultMaxEntries is used when config maxEntries is empty or $top exceeds this default value
+	DefaultMaxEntries int = 200
 )

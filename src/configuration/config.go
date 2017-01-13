@@ -23,7 +23,7 @@ type ServerConfig struct {
 	HTTPSKey          string `yaml:"httpsKey"`
 	ClientContent     string `yaml:"clientContent"`
 	MaxEntityResponse int    `yaml:"maxEntityResponse"`
-	IndentedJSON      string `yaml:"indentedJson"`
+	IndentedJSON      bool   `yaml:"indentedJson"`
 }
 
 // DatabaseConfig contains the database server information, can be overruled by environment variables

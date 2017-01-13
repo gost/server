@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/geodan/gost/src/configuration"
-	//gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/mqtt"
@@ -52,7 +51,7 @@ func NewAPI(database models.Database, config configuration.Config, mqtt models.M
 			"dashboard",
 		},
 	}
-
+	api.initRest()
 	api.Start()
 	return api
 }
@@ -115,6 +114,15 @@ func (a *APIv1) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 	}
 
 	return &a.endPoints
+}
+
+func (a *APIv1) initRest() {
+	if a.config.Server.MaxEntityResponse == 0 {
+		a.config.Server.MaxEntityResponse = configuration.DefaultMaxEntries
+	}
+
+	rest.IndentJSON = a.config.Server.IndentedJSON
+	rest.MaxEntities = a.config.Server.MaxEntityResponse
 }
 
 // GetTopics returns all configured topics for the MQTT client

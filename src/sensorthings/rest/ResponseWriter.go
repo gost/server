@@ -57,7 +57,13 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 
 //JSONMarshal converts the data and converts special characters such as &
 func JSONMarshal(data interface{}, safeEncoding bool) ([]byte, error) {
-	b, err := json.MarshalIndent(data, "", "   ")
+	var b []byte
+	var err error
+	if IndentJSON {
+		b, err = json.MarshalIndent(data, "", "   ")
+	} else {
+		b, err = json.Marshal(data)
+	}
 
 	if safeEncoding {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
