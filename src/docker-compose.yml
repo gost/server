@@ -31,8 +31,6 @@ services:
         depends_on:
             - mosquitto
             - gost-db
-        links:
-            - gost-db
         environment:
             gost_db_host: gost-db
             gost_mqtt_host: mosquitto
