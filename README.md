@@ -40,8 +40,6 @@ See [GOST and Docker](docs/gost_docker.md)
 TL;DR:
 
 ```
-$ apt-get install docker.io
-
 $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
 
 $ docker-compose up
