@@ -156,10 +156,11 @@ func ParseODATAFilter(filterStr string) (*Predicate, error) {
 var odataRegex = map[string]string{
 	"regexParenthesis": "^([(](.*)[)])$",
 	"regexAndor":       "^(.*?) (or|and)+ (.*)$",
-	"regexOp":          "(\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
-	"regexStartsWith":  "^startswith[(](.*),'(.*)'[)]",
-	"regexEndsWith":    "^endswith[(](.*),'(.*)'[)]",
-	"regexContains":    "^contains[(](.*),'(.*)'[)]",
+	//"regexOp": "(\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
+	"regexOp":         "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
+	"regexStartsWith": "^startswith[(](.*),'(.*)'[)]",
+	"regexEndsWith":   "^endswith[(](.*),'(.*)'[)]",
+	"regexContains":   "^contains[(](.*),'(.*)'[)]",
 }
 
 var errorInvalidFilter = errors.New("Invalid filter")
@@ -176,7 +177,6 @@ func parseFragment(filter string) (*Predicate, error) {
 
 		r, _ := regexp.Compile(regex)
 		match := r.FindStringSubmatch(filter)
-
 		if len(match) > 0 {
 			if k == "regexParenthesis" {
 				if len(match) > 2 {
@@ -215,10 +215,10 @@ func parseFragment(filter string) (*Predicate, error) {
 				// if not string value
 				if strings.Index(match[3], "'") == -1 {
 					if val, err = strconv.ParseFloat(match[3], 64); err != nil {
-						val = fmt.Sprintf("'%v'", match[3])
+						val = match[3]
 					}
 				} else {
-					val = match[3]
+					val = match[3] //strings.Replace(fmt.Sprintf("%v", match[3]), "\"", "'", -1)
 				}
 
 				predicate = &Predicate{

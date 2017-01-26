@@ -214,9 +214,29 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 			q += " WHERE "
 		}
 		ps, ops := qo.QueryFilter.Predicate.Split()
+
 		for i, p := range ps {
 			operator, _ := qb.odataOperatorToPostgreSQL(p.Operator)
-			q += fmt.Sprintf("%v %v %v", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p.Left))], operator, p.Right)
+			leftString := fmt.Sprintf("%v", p.Left)
+			if strings.Contains(leftString, ".") {
+				parts := strings.Split(leftString, ".")
+				for i, p := range parts {
+					if i == 0 {
+						q += fmt.Sprintf("%v ", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p))])
+						continue
+					}
+
+					arrow := "->"
+					if i+1 == len(parts) {
+						arrow = "->>"
+					}
+					q += fmt.Sprintf("%v '%v'", arrow, p)
+				}
+				q += fmt.Sprintf("%v %v", operator, p.Right)
+			} else {
+				q += fmt.Sprintf("%v %v %v", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p.Left))], operator, fmt.Sprintf("%v", p.Right))
+			}
+
 			if len(ops)-1 >= i {
 				q += fmt.Sprintf(" %v ", ops[i])
 			}
