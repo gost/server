@@ -34,7 +34,6 @@ func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*models.Arr
 
 	datastreams, count, err := a.db.GetDatastreams(qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
-
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
