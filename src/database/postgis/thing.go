@@ -157,6 +157,7 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 	var intID int
 	updates := make(map[string]interface{})
 
+	thing.ID = id
 	if intID, ok = ToIntID(id); !ok || !gdb.ThingExists(intID) {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
@@ -193,6 +194,14 @@ func (gdb *GostDatabase) PatchThing(id interface{}, thing *entities.Thing) (*ent
 							return nil, err
 						}
 					}
+
+					hl := &entities.HistoricalLocation{
+						Thing:     thing,
+						Locations: []*entities.Location{location},
+					}
+
+					hl.ContainsMandatoryParams()
+					gdb.PostHistoricalLocation(hl)
 				}
 			}
 		}

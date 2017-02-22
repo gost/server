@@ -35,7 +35,6 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		schema = "https://"
 	}
 
-	fmt.Printf("%v://%v%v\n", schema, r.Host, r.URL.Path)
 	data, err2 := handler(queryOptions, fmt.Sprintf(schema+r.Host+r.URL.Path))
 	if err2 != nil {
 		sendError(w, []error{err2})

@@ -26,7 +26,7 @@ func TestVersionHandler(t *testing.T) {
 	api := api.NewAPI(database, cfg, mqttServer)
 	api.Start()
 
-	gostServer := http.CreateServer(server, port, &api)
+	gostServer := http.CreateServer(server, port, &api, false, nil, nil)
 	go gostServer.Start()
 	versionURL := fmt.Sprintf("%s/Version", "http://"+server+":"+strconv.Itoa(port))
 
