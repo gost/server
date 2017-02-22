@@ -9,7 +9,7 @@ import (
 // Count is used to retrieve the total number of items in a collection matching the requested entity.
 type QueryCount struct {
 	QueryBase
-	count bool
+	Count bool
 }
 
 // GetQueryOptionType returns the QueryOptionType for QueryCount
@@ -26,7 +26,7 @@ func (q *QueryCount) Parse(value string) error {
 		return CreateQueryError(QueryCountInvalid, http.StatusBadRequest, value)
 	}
 
-	q.count = b
+	q.Count = b
 	return nil
 }
 

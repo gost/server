@@ -25,7 +25,7 @@ func TestParseCount(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err)
-	assert.Equal(t, true, qOptCount.count, "QueryCount.count should have been true")
+	assert.Equal(t, true, qOptCount.Count, "QueryCount.count should have been true")
 }
 
 func TestParseFailCount(t *testing.T) {
@@ -37,7 +37,7 @@ func TestParseFailCount(t *testing.T) {
 
 	//assert
 	assert.NotNil(t, err)
-	assert.Equal(t, false, qOptCount.count, "QueryCount.count should have been false")
+	assert.Equal(t, false, qOptCount.Count, "QueryCount.count should have been false")
 }
 
 func TestIsNilTrueCount(t *testing.T) {
