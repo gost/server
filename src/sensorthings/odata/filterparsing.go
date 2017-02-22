@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// Operator are the supporter ODATA operators
+// Operator are the supported ODATA operators
 type Operator string
 
 // List of all ODATA Operators.
@@ -134,7 +134,6 @@ func internalSplit(p *Predicate, result *[]*Predicate, ops *[]Operator) {
 
 // ParseODATAFilter parses a filter string into a predicate, simple implementation for now
 // ToDo: handle separators ( ) -> also in split function
-// ToDo: handle 'property/property' inside filter
 // ToDo: get the 'not' operator working
 // ToDo: check for valid operators -> return error
 // ToDo: handle arithmetic operators

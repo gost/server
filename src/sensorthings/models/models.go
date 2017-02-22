@@ -259,7 +259,7 @@ type APIVersion struct {
 
 // ArrayResponse is the default response format for sending content back
 type ArrayResponse struct {
-	Count    int          `json:"count,omitempty"`
+	Count    int          `json:"@iot.count,omitempty"`
 	NextLink string       `json:"@iot.nextLink,omitempty"`
 	Data     *interface{} `json:"value"`
 }

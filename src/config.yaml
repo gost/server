@@ -10,7 +10,7 @@ server:
     httpsCert:
     httpsKey:
 database:
-    host: localhost
+    host: 192.168.99.100
     port: 5432
     user: postgres
     password: postgres
@@ -21,5 +21,5 @@ database:
     maxOpenConns: 100
 mqtt:
     enabled: true
-    host: localhost
+    host: 192.168.99.100
     port: 1883
