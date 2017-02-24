@@ -19,7 +19,7 @@ func createFeaturesOfInterestEndpoint(externalURL string) *Endpoint {
 			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
 		},
 		SupportedExpandParams: []string{
-			"observation",
+			"observations",
 		},
 		SupportedSelectParams: []string{
 			"id",

@@ -339,7 +339,8 @@ var selectAsMappings = map[entities.EntityType]map[string]string{
 		thingToLocationLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeThingToLocation], asMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID]),
 	},
 	entities.EntityTypeHistoricalLocation: {
-		historicalLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeHistoricalLocation], asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID]),
+		historicalLocationID:      fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeHistoricalLocation], asMappings[entities.EntityTypeHistoricalLocation][historicalLocationID]),
+		historicalLocationThingID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeHistoricalLocation], asMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID]),
 	},
 	entities.EntityTypeLocationToHistoricalLocation: {
 		locationToHistoricalLocationHistoricalLocationID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeLocationToHistoricalLocation], asMappings[entities.EntityTypeLocationToHistoricalLocation][locationToHistoricalLocationHistoricalLocationID]),
@@ -353,13 +354,17 @@ var selectAsMappings = map[entities.EntityType]map[string]string{
 	},
 	entities.EntityTypeObservation: {
 		observationID:                  fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservation], asMappings[entities.EntityTypeObservation][observationID]),
+		observationStreamID:            fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservation], asMappings[entities.EntityTypeObservation][observationStreamID]),
 		observationFeatureOfInterestID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeObservation], asMappings[entities.EntityTypeObservation][observationFeatureOfInterestID]),
 	},
 	entities.EntityTypeFeatureOfInterest: {
 		foiID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeFeatureOfInterest], asMappings[entities.EntityTypeFeatureOfInterest][foiID]),
 	},
 	entities.EntityTypeDatastream: {
-		datastreamID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamID]),
+		datastreamID:                 fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamID]),
+		datastreamThingID:            fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamThingID]),
+		datastreamObservedPropertyID: fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID]),
+		datastreamSensorID:           fmt.Sprintf("%s.%s", tableMappings[entities.EntityTypeDatastream], asMappings[entities.EntityTypeDatastream][datastreamSensorID]),
 	},
 }
 
@@ -453,8 +458,8 @@ func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, b
 				tableMap[entities.EntityTypeThingToLocation],
 				selectMappings[entities.EntityTypeThing][thingID],
 				selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
-				selectMappings[entities.EntityTypeLocation][thingID],
-				createWhereIs(entities.EntityTypeThingToLocation, thingToLocationLocationID, asPrefix))
+				createWhereIs(entities.EntityTypeLocation, thingID, asPrefix),
+				selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID])
 		}
 	case entities.EntityTypeLocation: // get Location by ...
 		{

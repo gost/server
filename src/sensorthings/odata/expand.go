@@ -9,32 +9,16 @@ import (
 
 // ExpandOperation holds information on a received $expand query
 type ExpandOperation struct {
-	RawName         string
-	Entity          entities.Entity //ToDo: remove dependency
-	QueryOptions    *QueryOptions
-	ExpandOperation *ExpandOperation
+	RawName          string
+	Entity           entities.Entity //ToDo: remove dependency
+	QueryOptions     *QueryOptions
+	ExpandOperations []*ExpandOperation
 }
 
 // Create tries to construct the ExpandOperation from given query string
 func (e *ExpandOperation) Create(eo string) []error {
-	slashIndex := strings.Index(eo, "/")
-	var fp, trail string
-
-	if slashIndex != -1 {
-		trail = eo[slashIndex+1:]
-		fp = eo[:slashIndex]
-	} else {
-		fp = eo
-	}
-
-	var queryString string
-	queryIndexStart := strings.Index(fp, "(")
-	if queryIndexStart != -1 {
-		queryString = fp[queryIndexStart+1 : len(fp)-1]
-		fp = fp[:queryIndexStart]
-	}
-
-	et, err := entities.EntityFromString(fp)
+	fp, queryString, trail := extractFirstExpandPart(eo)
+	et, err := entities.EntityFromString(strings.ToLower(fp))
 	if err != nil {
 		return []error{fmt.Errorf("Unable to create expand query, unknown entity %s", fp)}
 	}
@@ -61,12 +45,47 @@ func (e *ExpandOperation) Create(eo string) []error {
 	}
 
 	if len(trail) > 0 {
-		neo := &ExpandOperation{}
-		neo.Create(trail)
-		e.ExpandOperation = neo
+		var eo *ExpandOperation
+		for i := 0; i < len(e.ExpandOperations); i++ {
+			if strings.ToLower(e.ExpandOperations[i].RawName) == strings.ToLower(fp) {
+				eo = e.ExpandOperations[i]
+				break
+			}
+		}
+
+		if eo == nil {
+			eo = &ExpandOperation{}
+			e.ExpandOperations = append(e.ExpandOperations, eo)
+		}
+
+		if err := eo.Create(trail); err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+// extractFirstExpandPart extracts the expand name, odata query string and trail
+func extractFirstExpandPart(expandString string) (string, string, string) {
+	slashIndex := strings.Index(expandString, "/")
+	var fp, trail string
+
+	if slashIndex != -1 {
+		trail = expandString[slashIndex+1:]
+		fp = expandString[:slashIndex]
+	} else {
+		fp = expandString
+	}
+
+	var queryString string
+	queryIndexStart := strings.Index(fp, "(")
+	if queryIndexStart != -1 {
+		queryString = fp[queryIndexStart+1 : len(fp)-1]
+		fp = fp[:queryIndexStart]
+	}
+
+	return fp, queryString, trail
 }
 
 // QueryExpand is used to return a linked entity member’s full details.
@@ -103,12 +122,24 @@ func (q *QueryExpand) Parse(value string) error {
 	}
 
 	for _, sl1 := range splitString {
-		eo := &ExpandOperation{}
-		if err := eo.Create(sl1); err != nil {
-			return err[0]
+		fp, _, _ := extractFirstExpandPart(sl1)
+
+		var e *ExpandOperation
+		for i := 0; i < len(q.Operations); i++ {
+			if strings.ToLower(q.Operations[i].RawName) == strings.ToLower(fp) {
+				e = q.Operations[i]
+				break
+			}
 		}
 
-		q.Operations = append(q.Operations, eo)
+		if e == nil {
+			e = &ExpandOperation{}
+			q.Operations = append(q.Operations, e)
+		}
+
+		if err := e.Create(sl1); err != nil {
+			return err[0]
+		}
 	}
 
 	return nil

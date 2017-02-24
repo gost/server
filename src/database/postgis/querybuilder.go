@@ -61,7 +61,7 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 		return fmt.Sprintf("%v %v", selectMappings[et][strings.ToLower(qo.QueryOrderBy.Property)], strings.ToUpper(qo.QueryOrderBy.Suffix))
 	}
 
-	return fmt.Sprintf("%s DESC", selectMappings[et]["id"])
+	return fmt.Sprintf("%s DESC", selectMappings[et][idField])
 }
 
 // getSelect return the select string that needs to be placed after SELECT in the query
@@ -75,13 +75,13 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 	} else {
 		idAdded := false
 		for _, p := range qo.QuerySelect.Params {
-			if p == "id" {
+			if p == idField {
 				idAdded = true
 			}
 			for _, pn := range et.GetPropertyNames() {
 				if strings.ToLower(p) == strings.ToLower(pn) {
-					if p == "id" {
-						properties = append([]string{"id"}, properties...)
+					if p == idField {
+						properties = append([]string{idField}, properties...)
 					} else {
 						properties = append(properties, pn)
 					}
@@ -94,8 +94,22 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 	}
 
 	// ToDo: this is a fix for supporting $expand=Observations/FeatureOfInterest, try to add observationFeatureOfInterestID in a different way
-	if isExpand && et.GetEntityType() == entities.EntityTypeObservation {
-		properties = append([]string{observationFeatureOfInterestID}, properties...)
+	if isExpand {
+		if et.GetEntityType() == entities.EntityTypeObservation {
+			properties = append([]string{observationFeatureOfInterestID}, properties...)
+		}
+
+		if et.GetEntityType() == entities.EntityTypeDatastream {
+			properties = append([]string{datastreamThingID, datastreamObservedPropertyID, datastreamSensorID}, properties...)
+		}
+
+		if et.GetEntityType() == entities.EntityTypeHistoricalLocation {
+			properties = append([]string{historicalLocationThingID}, properties...)
+		}
+
+		if et.GetEntityType() == entities.EntityTypeObservation {
+			properties = append([]string{observationStreamID}, properties...)
+		}
 	}
 
 	for _, p := range properties {
@@ -193,13 +207,15 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 	return joinString
 }
 
-func (qb *QueryBuilder) constructQueryParseInfo(operation *odata.ExpandOperation, main *QueryParseInfo, from *QueryParseInfo) {
-	nQPI := &QueryParseInfo{}
-	nQPI.Init(operation.Entity.GetEntityType(), main.GetNextQueryIndex(), from, operation)
-	main.SubEntities = append(main.SubEntities, nQPI)
+func (qb *QueryBuilder) constructQueryParseInfo(operations []*odata.ExpandOperation, main *QueryParseInfo, from *QueryParseInfo) {
+	for _, o := range operations {
+		nQPI := &QueryParseInfo{}
+		nQPI.Init(o.Entity.GetEntityType(), main.GetNextQueryIndex(), from, o)
+		main.SubEntities = append(main.SubEntities, nQPI)
 
-	if operation.ExpandOperation != nil {
-		qb.constructQueryParseInfo(operation.ExpandOperation, main, nQPI)
+		if len(o.ExpandOperations) > 0 {
+			qb.constructQueryParseInfo(o.ExpandOperations, main, nQPI)
+		}
 	}
 }
 
@@ -295,8 +311,8 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 
 	if qo != nil && !qo.QueryExpand.IsNil() {
 		qpi.SubEntities = make([]*QueryParseInfo, 0)
-		for _, qe := range qo.QueryExpand.Operations {
-			qb.constructQueryParseInfo(qe, qpi, qpi)
+		if len(qo.QueryExpand.Operations) > 0 {
+			qb.constructQueryParseInfo(qo.QueryExpand.Operations, qpi, qpi)
 		}
 	}
 
@@ -320,6 +336,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
 	queryString = fmt.Sprintf("%s LIMIT %s OFFSET %s", queryString, qb.getLimit(qo), qb.getOffset(qo))
 
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
