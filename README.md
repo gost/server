@@ -8,6 +8,8 @@
 
 GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
 
+<div style="text-align:center; border:1px solid #777; background-color: #FFF; padding:12px; width:190px;"><span style="font-weight:bold; color:#000;font-size:106.8%;">Geodan Holding BV</span> ![Certified OGC Compliant Logo](https://portal.opengeospatial.org/public_ogc/compliance/Certified_OGC_Compliant_Logo_Web.gif) <span style="font-weight:bold; font-size:89%;">GOST 0.3</span> [![](https://portal.opengeospatial.org/public_ogc/compliance/badge.php?s=SensorThings 1.0)](http://www.opengeospatial.org/resource/products/details/?pid=1419) <span style="color:#BBB;font-size:62.3%;">Valid Until: 2018-01-29</span></div>
+
 Implementation of the Tasking profile (part 2) and Rules Engine profile (part 3) of the OGC SensorThings API is planned as a future work activity.
 
 The GOST website and blog can be found at [www.gostserver.xyz](https://www.gostserver.xyz).
