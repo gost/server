@@ -31,8 +31,8 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	|
 |------------	|---------------------	|-----------------------------------------------------------------	|
-| 2017-02-06 	| 0.4                 	| OGC Test level 3 compliant                                      	|
-| 2017-03-06 	| 0.5                 	| TBD                                                             	|
+| 2017-03-31 	| 0.4                 	| OGC Test level 3 compliant                                      	|
+| 2017-05-06 	| 0.5                 	| TBD                                                             	|
 
 
 ## Docker support
@@ -54,7 +54,7 @@ GOST is being tested against the OGC SensorThings API Test Suite [https://github
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
 | Sensing Core                          | A.1       | beta                  | 6/6      |
-| Filtering Extension                   | A.2       | alpha                 | 6/8      |
+| Filtering Extension                   | A.2       | alpha                 | 7/8      |
 | Create-Update-Delete                  | A.3       | beta                  | 9/9       |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
@@ -85,10 +85,6 @@ MQTT: For getting started with Gost and MQTT for publishing/receiving data see [
 - Benchmarks
 - Authentication
 - Different storage providers such as MongoDB (Now using PostgreSQL)
-
-## TODO
-
-[See wiki](https://github.com/Geodan/gost/wiki/TODO)
 
 ## Benchmarks
 
