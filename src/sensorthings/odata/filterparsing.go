@@ -155,8 +155,8 @@ func ParseODATAFilter(filterStr string) (*Predicate, error) {
 var odataRegex = map[string]string{
 	"regexParenthesis": "^([(](.*)[)])$",
 	"regexAndor":       "^(.*?) (or|and)+ (.*)$",
-	//"regexOp": "(\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
-	"regexOp":         "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
+	//"regexOp": 	   "(\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
+	"regexOp":         "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|(.*))",
 	"regexStartsWith": "^startswith[(](.*),'(.*)'[)]",
 	"regexEndsWith":   "^endswith[(](.*),'(.*)'[)]",
 	"regexContains":   "^contains[(](.*),'(.*)'[)]",
@@ -203,7 +203,6 @@ func parseFragment(filter string) (*Predicate, error) {
 				if predicate.Right, err = parseFragment(match[3]); err != nil {
 					return nil, errorInvalidFilter
 				}
-
 			} else if k == "regexOp" {
 				if len(match) < 4 {
 					return nil, errorInvalidFilter
@@ -214,7 +213,7 @@ func parseFragment(filter string) (*Predicate, error) {
 				// if not string value
 				if strings.Index(match[3], "'") == -1 {
 					if val, err = strconv.ParseFloat(match[3], 64); err != nil {
-						val = match[3]
+						val = fmt.Sprintf("'%s'", match[3])
 					}
 				} else {
 					val = match[3] //strings.Replace(fmt.Sprintf("%v", match[3]), "\"", "'", -1)

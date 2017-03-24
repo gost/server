@@ -117,7 +117,6 @@ func CreateQueryOptions(queryParams map[string]string) (*QueryOptions, []error) 
 			qo.QueryOptionValue = true
 			break
 		default:
-			// Req 21 If a service does not support a system query option, it SHALL fail any request that contains the
 			// unsupported option and SHOULD return 501 Not Implemented.
 			errorList = append(errorList, CreateQueryError(QueryUnknown, http.StatusNotImplemented, key))
 		}
@@ -132,7 +131,7 @@ func CreateQueryOptions(queryParams map[string]string) (*QueryOptions, []error) 
 
 // ParseQueryOption tries to parse the user supplied values into the desired QueryOption
 // if an error occurred in the parsing process a new error will be added
-// to the supplied errorlist
+// to the supplied error list
 func ParseQueryOption(value string, q QueryOption, errorList *[]error) {
 	e := q.Parse(value)
 	if e != nil {

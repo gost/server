@@ -25,8 +25,8 @@ func TestOrderByParsingShouldGivePropertyAndSuffix(t *testing.T) {
 
 	//assert
 	assert.Nil(t, err, "Empty QueryOrderBy should give errors")
-	assert.Equal(t, orderby.Property, "hallo", "orderby.property should be correct")
-	assert.Equal(t, orderby.Suffix, "asc", "orderby.suffix should be correct")
+	assert.Equal(t, orderby.Queries[0].Property, "hallo", "orderby.property should be correct")
+	assert.Equal(t, orderby.Queries[0].OrderType, OrderTypeASC, "orderby.suffix should be correct")
 }
 
 // todo: add test for IQueryOrderBy.IsValid when implementing

@@ -17,7 +17,7 @@ func (q *QueryFilter) Parse(value string) error {
 	q.RawQuery = value
 	q.Predicate, err = ParseODATAFilter(value)
 	if err != nil {
-		return CreateQueryError(QueryfilterFormatInvalid, http.StatusBadRequest, value)
+		return CreateQueryError(QueryFilterFormatInvalid, http.StatusBadRequest, value)
 	}
 
 	return nil

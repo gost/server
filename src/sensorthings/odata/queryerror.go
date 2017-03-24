@@ -15,7 +15,7 @@ const (
 	QueryOrderByInvalid      QueryErrorMessage = "The value %s for $orderby is invalid, please use the following format $orderby=\"propertyname\" \"asc/desc\""
 	QueryCountInvalid        QueryErrorMessage = "The value %s for $count is invalid, available options: \"true\" or \"false\" "
 	QueryResultFormatInvalid QueryErrorMessage = "The value %s for $resultFormat is invalid, available options: dataArray"
-	QueryfilterFormatInvalid QueryErrorMessage = "The value %s for filter is invalid"
+	QueryFilterFormatInvalid QueryErrorMessage = "The value %s for filter is invalid"
 	QueryUnknown             QueryErrorMessage = "The query parameter %s is not supported"
 	QueryNotAvailable        QueryErrorMessage = "Query %s is not available on endpoint %s"
 	QueryExpandAvailable     QueryErrorMessage = "Expand %s is not available on endpoint %s"

@@ -2,6 +2,7 @@ package entities
 
 import (
 	"errors"
+	"strings"
 )
 
 // ObservationType holds the information on a ObservationType
@@ -32,7 +33,7 @@ var ObservationTypes = []ObservationType{
 // GetObservationTypeByValue Get the observationType based on value, returns error
 func GetObservationTypeByValue(observationType string) (ObservationType, error) {
 	for _, k := range ObservationTypes {
-		if k.Value == observationType {
+		if strings.ToLower(k.Value) == strings.ToLower(observationType) {
 			return k, nil
 		}
 	}

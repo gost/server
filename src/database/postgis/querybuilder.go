@@ -5,6 +5,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"strings"
+	"time"
 )
 
 // QueryBuilder can construct queries based on entities and QueryOptions
@@ -58,7 +59,17 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
 func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
 	if qo != nil && !qo.QueryOrderBy.IsNil() {
-		return fmt.Sprintf("%v %v", selectMappings[et][strings.ToLower(qo.QueryOrderBy.Property)], strings.ToUpper(qo.QueryOrderBy.Suffix))
+		obString := ""
+		for _, query := range qo.QueryOrderBy.Queries {
+			propertyName := selectMappings[et][strings.ToLower(query.Property)]
+			if len(obString) == 0 {
+				obString = fmt.Sprintf("%s %s", propertyName, query.OrderType.ToString())
+			} else {
+				obString = fmt.Sprintf("%s, %s %s", obString, propertyName, query.OrderType.ToString())
+			}
+		}
+
+		return obString
 	}
 
 	return fmt.Sprintf("%s DESC", selectMappings[et][idField])
@@ -232,6 +243,7 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 		ps, ops := qo.QueryFilter.Predicate.Split()
 
 		for i, p := range ps {
+			qb.prepareFilterRight(p)
 			operator, _ := qb.odataOperatorToPostgreSQL(p.Operator)
 			leftString := fmt.Sprintf("%v", p.Left)
 			if strings.Contains(leftString, ".") {
@@ -261,6 +273,34 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 	}
 
 	return q
+}
+
+func (qb *QueryBuilder) prepareFilterRight(p *odata.Predicate) {
+	e := strings.Replace(fmt.Sprintf("%v", p.Right), "'", "", -1)
+	property := strings.ToLower(fmt.Sprintf("%v", p.Left))
+
+	if property == "encodingtype" {
+		et, err := entities.CreateEncodingType(e)
+		if err == nil {
+			p.Right = et.Code
+		}
+		return
+	}
+
+	if property == "observationtype" {
+		et, err := entities.GetObservationTypeByValue(e)
+		if err == nil {
+			p.Right = et.Code
+		}
+		return
+	}
+
+	if property == "phenomenontime" || property == "resulttime" || property == "time" {
+		if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
+			p.Right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+		}
+		return
+	}
 }
 
 // OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
