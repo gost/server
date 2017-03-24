@@ -64,11 +64,10 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 		}
 	}
 
-	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
-	// null value to the resultTime.
-	if len(o.ResultTime) == 0 {
-		o.ResultTime = "null"
-	} else {
+	// From spec: "When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
+	// null value to the resultTime."
+	// Implementation: omit resultTime in database when null (see also https://github.com/Geodan/gost/issues/68)
+	if len(o.ResultTime) != 0 {
 		if t, err := time.Parse(time.RFC3339Nano, o.ResultTime); err != nil {
 			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid resultTime: %v", err.Error())))
 		} else {
@@ -78,7 +77,6 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 
 	CheckMandatoryParam(&errors, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
 	CheckMandatoryParam(&errors, o.Result, o.GetEntityType(), "result")
-	CheckMandatoryParam(&errors, o.ResultTime, o.GetEntityType(), "resultTime")
 	CheckMandatoryParam(&errors, o.Datastream, o.GetEntityType(), "Datastream")
 
 	if len(errors) != 0 {
