@@ -246,8 +246,8 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 			qb.prepareFilterRight(p)
 			operator, _ := qb.odataOperatorToPostgreSQL(p.Operator)
 			leftString := fmt.Sprintf("%v", p.Left)
-			if strings.Contains(leftString, ".") {
-				parts := strings.Split(leftString, ".")
+			if strings.Contains(leftString, "/") {
+				parts := strings.Split(leftString, "/")
 				for i, p := range parts {
 					if i == 0 {
 						q += fmt.Sprintf("%v ", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p))])
