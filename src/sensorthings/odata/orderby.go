@@ -40,7 +40,7 @@ type OrderBy struct {
 func (q *QueryOrderBy) Parse(value string) error {
 	q.RawQuery = value
 	queries := strings.Split(value, ",")
-	if len(queries) < 1 {
+	if len(queries) < 1 || queries[0] == "" {
 		return CreateQueryError(QueryOrderByInvalid, http.StatusBadRequest, value)
 	}
 

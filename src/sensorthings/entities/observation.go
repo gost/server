@@ -17,7 +17,7 @@ type Observation struct {
 	BaseEntity
 	PhenomenonTime       string                 `json:"phenomenonTime,omitempty"`
 	Result               interface{}            `json:"result,omitempty"`
-	ResultTime           string                 `json:"resultTime,omitempty"`
+	ResultTime           *string                `json:"resultTime,omitempty"`
 	ResultQuality        string                 `json:"resultQuality,omitempty"`
 	ValidTime            string                 `json:"validTime,omitempty"`
 	Parameters           map[string]interface{} `json:"parameters,omitempty"`
@@ -66,19 +66,17 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 
 	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
 	// null value to the resultTime.
-	if len(o.ResultTime) == 0 {
-		o.ResultTime = "null"
-	} else {
-		if t, err := time.Parse(time.RFC3339Nano, o.ResultTime); err != nil {
+	if o.ResultTime != nil {
+		rt := *o.ResultTime
+		if t, err := time.Parse(time.RFC3339Nano, rt); err != nil {
 			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid resultTime: %v", err.Error())))
 		} else {
-			o.ResultTime = t.UTC().Format("2006-01-02T15:04:05.000Z")
+			rt = t.UTC().Format("2006-01-02T15:04:05.000Z")
 		}
 	}
 
 	CheckMandatoryParam(&errors, o.PhenomenonTime, o.GetEntityType(), "phenomenonTime")
 	CheckMandatoryParam(&errors, o.Result, o.GetEntityType(), "result")
-	CheckMandatoryParam(&errors, o.ResultTime, o.GetEntityType(), "resultTime")
 	CheckMandatoryParam(&errors, o.Datastream, o.GetEntityType(), "Datastream")
 
 	if len(errors) != 0 {
@@ -86,6 +84,29 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	}
 
 	return true, nil
+}
+
+func (o *Observation) MarshalJSON() ([]byte, error) {
+	if o.ResultTime != nil {
+		rt := o.ResultTime
+		if len(*o.ResultTime) == 0 {
+			rt = nil
+		}
+
+		return json.Marshal(struct {
+			Observation
+			ResultTime *string `json:"resultTime"`
+		}{
+			Observation: *o,
+			ResultTime:  rt,
+		})
+	} else {
+		return json.Marshal(struct {
+			Observation
+		}{
+			Observation: *o,
+		})
+	}
 }
 
 // SetAllLinks sets the self link and relational links
@@ -115,6 +136,11 @@ func (o *Observation) SetLinks(externalURL string) {
 
 // MarshalPostgresJSON marshalls an observation entity for saving into PostgreSQL
 func (o Observation) MarshalPostgresJSON() ([]byte, error) {
+	rt := ""
+	if o.ResultTime != nil {
+		rt = *o.ResultTime
+	}
+
 	return json.Marshal(&struct {
 		PhenomenonTime string                 `json:"phenomenonTime,omitempty"`
 		Result         interface{}            `json:"result,omitempty"`
@@ -125,7 +151,7 @@ func (o Observation) MarshalPostgresJSON() ([]byte, error) {
 	}{
 		PhenomenonTime: o.PhenomenonTime,
 		Result:         o.Result,
-		ResultTime:     o.ResultTime,
+		ResultTime:     rt,
 		ResultQuality:  o.ResultQuality,
 		ValidTime:      o.ValidTime,
 		Parameters:     o.Parameters,

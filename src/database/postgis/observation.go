@@ -16,18 +16,24 @@ import (
 func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {
 	o := &entities.Observation{}
 	for as, value := range values {
+		if as == asMappings[entities.EntityTypeObservation][observationResultTime] {
+			if value == nil {
+				empty := ""
+				o.ResultTime = &empty
+			} else {
+				rt := value.(string)
+				o.ResultTime = &rt
+			}
+		}
+
 		if value == nil {
 			continue
 		}
-
 		if as == asMappings[entities.EntityTypeObservation][observationID] {
 			o.ID = value
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTime] {
 			o.PhenomenonTime = value.(string)
-		}
-		if as == asMappings[entities.EntityTypeObservation][observationResultTime] {
-			o.ResultTime = value.(string)
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationResult] {
 			var result interface{}
@@ -212,9 +218,6 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	}
 
 	o.ID = oID
-	if o.ResultTime == "NULL" {
-		o.ResultTime = ""
-	}
 
 	// clear inner entities to serves links upon response
 	o.Datastream = nil
@@ -249,7 +252,7 @@ func (gdb *GostDatabase) PatchObservation(id interface{}, o *entities.Observatio
 		observation.Result = o.Result
 	}
 
-	if len(o.ResultTime) > 0 {
+	if o.ResultTime != nil {
 		observation.ResultTime = o.ResultTime
 	}
 

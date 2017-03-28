@@ -194,6 +194,16 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 				isNil = true
 			}
 			break
+		case *string:
+			if t != nil {
+				t1 := *t
+				if len(t1) == 0 {
+					isNil = true
+				}
+				break
+			} else {
+				isNil = true
+			}
 		case map[string]string:
 			if len(t) == 0 {
 				isNil = true
