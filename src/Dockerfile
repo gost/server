@@ -1,15 +1,29 @@
-FROM golang:latest
-RUN apt-get update
-RUN mkdir -p /go/src/github.com/geodan/gost/
-ADD . /go/src/github.com/geodan/gost/src
-RUN go get github.com/gorilla/mux
-RUN go get gopkg.in/yaml.v2
-RUN go get github.com/lib/pq
-RUN go get github.com/eclipse/paho.mqtt.golang
-RUN go build -o /go/bin/gost/gost github.com/geodan/gost/src
-RUN mkdir -p /go/bin/gost/client/
-RUN cp -avr /go/src/github.com/geodan/gost/src/client /go/bin/gost
-RUN cp /go/src/github.com/geodan/gost/src/config.yaml /go/bin/gost/config.yaml
+FROM alpine:3.4
+MAINTAINER Geodan <info@geodan.nl>
+
+ADD . /go/src/github.com/geodan/gost/src/
+ENV GOPATH=/go/
+ENV CGO_ENABLED=0
+
+    # Make directories
+RUN apk add --no-cache --virtual .build-deps bash git openssh go && \
+    mkdir -p /go/src/github.com/geodan/gost/ /go/bin/gost/client/ && \
+
+    # Resolve dependencies
+    go get github.com/gorilla/mux && \
+    go get gopkg.in/yaml.v2 && \
+    go get github.com/lib/pq && \
+    go get github.com/eclipse/paho.mqtt.golang && \
+
+    # Build application
+    go build -a -ldflags '-extldflags "-static"' -o /go/bin/gost/gost github.com/geodan/gost/src && \
+    cp -avr /go/src/github.com/geodan/gost/src/client /go/bin/gost && \
+    cp /go/src/github.com/geodan/gost/src/config.yaml /go/bin/gost/config.yaml && \
+
+    # Cleanup
+    apk del .build-deps && \
+    rm -rf /usr/local/go
+
 WORKDIR /go/bin/gost
-ENTRYPOINT ["/go/bin/gost/gost"]
 EXPOSE 8080
+ENTRYPOINT /go/bin/gost/gost
