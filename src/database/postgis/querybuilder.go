@@ -356,7 +356,11 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		}
 	}
 
+	etIdField := fmt.Sprintf("%s.id", tableMappings[et1])
+	orderBy := qb.getOrderBy(et1, qo)
 	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, qpi, true, true, false, false, ""), qb.tables[et1], qb.createJoin(e1, e2, false, qo, qpi, ""))
+	queryString = fmt.Sprintf("%s WHERE %s IN (SELECT %s FROM %s %s", queryString, etIdField, etIdField, qb.tables[et1], qb.createJoin(e1, e2, false, qo, qpi, ""))
+
 	if id != nil {
 		if e2 == nil {
 			queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
@@ -373,9 +377,13 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		}
 	}
 
-	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, qb.getOrderBy(et1, qo))
-	queryString = fmt.Sprintf("%s LIMIT %s OFFSET %s", queryString, qb.getLimit(qo), qb.getOffset(qo))
-	//fmt.Print(queryString + "\n")
+	limit := ""
+	if qo != nil && !qo.QueryTop.IsNil() && qo.QueryTop.Limit != -1 {
+		limit = fmt.Sprintf("LIMIT %s", qb.getLimit(qo))
+	}
+	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, orderBy, limit, qb.getOffset(qo))
+	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, orderBy)
+
 	return queryString, qpi
 }
 
