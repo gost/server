@@ -10,7 +10,7 @@ For more information about the Docker gost-db image, see [https://github.com/Geo
 
 The docker images can run separately, or running in a combined way using the Dockercompose file.
 
-Tags: Use the tag latest for the latest development version, otherwise use a tag like '0.3' for more stable versions.
+Tags: Use the tag latest for the latest development version, otherwise use a tag like '0.4' for more stable versions.
 
 # Running GOST with Docker-compose
 
