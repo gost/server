@@ -9,7 +9,7 @@ import (
 	"sort"
 )
 
-// CreateRouter creates a new mux.Router and sets up all endpoints defind in the sensothings api
+// CreateRouter creates a new mux.Router and sets up all endpoints defined in the SensorThings api
 func CreateRouter(api *models.API) *mux.Router {
 	// Note: tried julienschmidt/httprouter instead of gorilla/mux but had some
 	// problems with interfering endpoints cause of the wildcard used for the (id) in requests
@@ -57,5 +57,5 @@ func setDashboardRedirects(router *mux.Router) {
 }
 
 func dashboardRedirector(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, r.URL.Host+"/Dashboard/", 302)
+	http.Redirect(w, r, fmt.Sprintf("%s/Dashboard/", r.URL.Host), 301)
 }
