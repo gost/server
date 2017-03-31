@@ -20,9 +20,7 @@ GOST is alpha software and is not (yet) considered appropriate for customer use.
 
 ## Binaries
 
-Current release 0.4: 2016-03-31
-
-[https://github.com/Geodan/gost/releases/tag/0.4] (https://github.com/Geodan/gost/releases/tag/0.4)
+Current release [V0.4](https://github.com/Geodan/gost/releases/tag/0.4): 2016-03-31
 
 Binaries are build for Windows, Ubuntu and OSX.
 
