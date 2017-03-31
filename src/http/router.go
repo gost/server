@@ -49,11 +49,10 @@ func CreateRouter(api *models.API) *mux.Router {
 }
 
 func setDashboardRedirects(router *mux.Router) {
+	router.Methods("GET").Path("/").HandlerFunc(dashboardRedirector)
 	router.Methods("GET").Path("/Dashboard").HandlerFunc(dashboardRedirector)
 	router.Methods("GET").Path("/dashboard").HandlerFunc(dashboardRedirector)
 	router.Methods("GET").Path("/dashboard/").HandlerFunc(dashboardRedirector)
-	router.Methods("GET").Path("").HandlerFunc(dashboardRedirector)
-	router.Methods("GET").Path("/").HandlerFunc(dashboardRedirector)
 }
 
 func dashboardRedirector(w http.ResponseWriter, r *http.Request) {
