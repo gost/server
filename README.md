@@ -29,8 +29,8 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	|
 |------------	|---------------------	|-----------------------------------------------------------------	|
-| 2017-03-31 	| [0.4](https://github.com/Geodan/gost/releases/tag/0.4)                 	| OGC Test level 3 compliant                                      	|
 | 2017-05-06 	| 0.5                 	| TBD                                                             	|
+| 2017-06-03 	| 0.6                 	| TBD                                                             	|
 
 
 ## Docker support
