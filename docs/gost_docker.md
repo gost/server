@@ -31,6 +31,7 @@ For making connection to external database use environmental variables gost_db_h
 For example: 
 ```
 docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gost geodan/gost
+
 ```
 # Building GOST service and dashboard image
 
@@ -43,5 +44,12 @@ docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gos
 
 . $ docker push geodan/gost
 
+```
+# Building GOST service and dashboard image for Raspberrypi
+
+```
+docker build -f Dockerfile-rpi -t geodan/rpi-gost .
+
+docker push geodan/rpi-gost
 ```
 
