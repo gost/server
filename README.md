@@ -45,6 +45,13 @@ $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.y
 $ docker-compose up
 ```
 
+or on Raspberry Pi:
+```
+$ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose-rpi.yml
+
+$ docker-compose -f docker-compose-rpi.yml up
+```
+
 ## OGC Compliance testing status
 
 GOST is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
