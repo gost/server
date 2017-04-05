@@ -45,7 +45,7 @@ $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.y
 $ docker-compose up
 ```
 
-or on Raspberry Pi:
+or on Raspberry Pi (experimental):
 ```
 $ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose-rpi.yml
 
