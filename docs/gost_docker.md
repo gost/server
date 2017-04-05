@@ -32,7 +32,11 @@ For example:
 ```
 docker run -p 8080:8080 -t -e gost_db_host=192.168.40.10 -e gost_db_database=gost geodan/gost
 
+on raspberrypi:
+
+docker run -p 8080:8080 -t -e gost_db_host=raspberrypi -e gost_db_database=gost geodan/rpi-gost
 ```
+
 # Building GOST service and dashboard image
 
 ```
