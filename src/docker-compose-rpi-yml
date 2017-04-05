@@ -1,0 +1,27 @@
+version: '2'
+services:
+    mosquitto:
+        image: pascaldevink/rpi-mosquitto
+        ports:
+            - "1883:1883"
+            - "9001:9001"
+    gost-db:
+        image: geodan/rpi-gost-db
+        volumes:
+            - /home/pi/.local/share/postgresql:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: gost
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+    gost:
+        image: geodan/rpi-gost
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mosquitto
+            - gost-db
+        environment:
+            gost_db_host: gost-db
+            gost_mqtt_host: mosquitto
