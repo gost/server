@@ -1,19 +1,7 @@
 package main
 
-import (
-	"fmt"
-	"strconv"
-	"testing"
-
-	net "net/http"
-
-	"github.com/geodan/gost/src/configuration"
-	"github.com/geodan/gost/src/database/postgis"
-	"github.com/geodan/gost/src/http"
-	"github.com/geodan/gost/src/mqtt"
-	"github.com/geodan/gost/src/sensorthings/api"
-	"github.com/stretchr/testify/assert"
-)
+import ()
+import "testing"
 
 func TestVersionHandler(t *testing.T) {
 	//arrange

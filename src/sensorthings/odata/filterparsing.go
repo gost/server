@@ -87,8 +87,8 @@ var ODATAOperators = map[string]Operator{
 
 // Predicate is the basic model construct of the odata expression
 type Predicate struct {
-	Left     interface{}
 	Right    interface{}
+	Left     interface{}
 	Operator Operator
 }
 
@@ -155,11 +155,10 @@ func ParseODATAFilter(filterStr string) (*Predicate, error) {
 var odataRegex = map[string]string{
 	"regexParenthesis": "^([(](.*)[)])$",
 	"regexAndor":       "^(.*?) (or|and)+ (.*)$",
-	//"regexOp": 	   "(\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|'(.*)'|[0-9]*)",
-	"regexOp":         "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|(.*))",
-	"regexStartsWith": "^startswith[(](.*),'(.*)'[)]",
-	"regexEndsWith":   "^endswith[(](.*),'(.*)'[)]",
-	"regexContains":   "^contains[(](.*),'(.*)'[)]",
+	"regexOp":          "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|(.*))",
+	"regexStartsWith":  "^startswith[(](.*),'(.*)'[)]",
+	"regexEndsWith":    "^endswith[(](.*),'(.*)'[)]",
+	"regexContains":    "^contains[(](.*),'(.*)'[)]",
 }
 
 var errorInvalidFilter = errors.New("Invalid filter")
@@ -216,7 +215,7 @@ func parseFragment(filter string) (*Predicate, error) {
 						val = fmt.Sprintf("'%s'", match[3])
 					}
 				} else {
-					val = match[3] //strings.Replace(fmt.Sprintf("%v", match[3]), "\"", "'", -1)
+					val = match[3]
 				}
 
 				predicate = &Predicate{

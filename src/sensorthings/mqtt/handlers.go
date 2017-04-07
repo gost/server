@@ -21,7 +21,7 @@ func MainMqttHandler(a *models.API, topic string, message []byte) {
 		i2 := strings.Index(topic, ")")
 		first := topic[0 : i+1]
 		id = topic[i+1 : i2]
-		last := topic[i2:len(topic)]
+		last := topic[i2:]
 		topicMapName = first + last
 	}
 
