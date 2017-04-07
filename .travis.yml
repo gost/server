@@ -1,0 +1,22 @@
+language: go
+
+go:
+  - 1.7.x
+  - 1.8.x
+  - master
+
+before_install:
+  - go get github.com/tebben/overalls
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+
+script:
+  - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git,client" -debug true
+  - goveralls -coverprofile=src/overalls.coverprofile -service=travis-ci 
+
+notifications:
+  email:
+    recipients:
+      - tim.ebben@geodan.nl
+    on_success: change
+    on_failure: always
