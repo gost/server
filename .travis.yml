@@ -12,7 +12,7 @@ before_install:
 
 script:
   - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git,client" -debug true
-  - goveralls -coverprofile=src/overalls.coverprofile -service=travis-ci 
+  - goveralls -coverprofile=/home/travis/gopath/src/github.com/geodan/gost/src/overalls.coverprofile -service=travis-ci 
 
 notifications:
   email:
