@@ -11,6 +11,7 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
 
 script:
+  - go test ./...
   - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git,client" -debug true
   - goveralls -coverprofile=/home/travis/gopath/src/github.com/geodan/gost/src/overalls.coverprofile -service=travis-ci 
 
