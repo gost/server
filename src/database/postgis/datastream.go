@@ -242,6 +242,12 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		period := ParseTMPeriod(d.PhenomenonTime)
 		phenomenonTime = "'" + ToPostgresPeriodFormat(period) + "'"
 	}
+
+	resultTime := "NULL"
+	if len(d.ResultTime) != 0 {
+		periodResultTime := ParseTMPeriod(d.ResultTime)
+		resultTime = "'" + ToPostgresPeriodFormat(periodResultTime) + "'"
+	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
 
@@ -249,7 +255,7 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s) RETURNING id", gdb.Schema, geom, phenomenonTime)
+	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime, resulttime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s, %s) RETURNING id", gdb.Schema, geom, phenomenonTime, resultTime)
 	err = gdb.Db.QueryRow(sql, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
 	if err != nil {
 		return nil, err
