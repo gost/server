@@ -100,6 +100,7 @@ func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
 			}
 		*/
 
+		r.URL.RawPath = r.URL.Path
 		r.URL.Path = lowerCasePath
 		h.ServeHTTP(w, r)
 	}

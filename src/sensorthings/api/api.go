@@ -121,6 +121,7 @@ func (a *APIv1) initRest() {
 		a.config.Server.MaxEntityResponse = configuration.DefaultMaxEntries
 	}
 
+	rest.ExternalURI = a.config.GetExternalServerURI()
 	rest.IndentJSON = a.config.Server.IndentedJSON
 	rest.MaxEntities = a.config.Server.MaxEntityResponse
 }
