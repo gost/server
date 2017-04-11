@@ -304,7 +304,7 @@ func (qb *QueryBuilder) prepareFilterRight(p *odata.Predicate) {
 }
 
 // OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
-func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.Operator) (string, error) {
+func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.OdataOperator) (string, error) {
 	switch o {
 	case odata.And:
 		return "AND", nil

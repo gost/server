@@ -50,12 +50,12 @@ func TestToPostgresPeriodFormat(t *testing.T) {
 	// arrange
 	var period [2]time.Time
 	period[0] = time.Date(2014, time.March, 1, 13, 0, 0, 0, time.UTC)
-	period[1] = time.Date(2015, time.May, 11, 15, 30, 0, 0, time.UTC) 
+	period[1] = time.Date(2015, time.May, 11, 15, 30, 0, 0, time.UTC)
 	var expectedResult = "[2014-03-01T13:00:00.000Z,2015-05-11T15:30:00.000Z]"
 
 	// act
 	var postgresPeriod = ToPostgresPeriodFormat(period)
 
 	// assert
-	assert.Equal(t,expectedResult,postgresPeriod,"ToPostgresPeriodFormat error")
+	assert.Equal(t, expectedResult, postgresPeriod, "ToPostgresPeriodFormat error")
 }

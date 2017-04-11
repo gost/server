@@ -9,35 +9,15 @@ import (
 )
 
 // Operator are the supported ODATA operators
-type Operator string
+type OdataOperator string
 
-// List of all ODATA Operators.
-const (
-	//logical
-	And Operator = "and"
-	Or  Operator = "or"
-	Not Operator = "not"
-
-	//comparison
-	Equals              Operator = "eq"
-	NotEquals           Operator = "ne"
-	GreaterThan         Operator = "gt"
-	GreaterThanOrEquals Operator = "ge"
-	LessThan            Operator = "lt"
-	LessThanOrEquals    Operator = "le"
-	Like                Operator = "like"
-	IsNull              Operator = "is null"
-
-	// arithmetic
-	Addition       Operator = "add"
-	Subtraction    Operator = "sub"
-	Multiplication Operator = "mul"
-	Division       Operator = "div"
-	Modulo         Operator = "mod"
-)
+// ToString representation of the ComparisonOperator
+func (o OdataOperator) ToString() string {
+	return fmt.Sprintf("%s", o)
+}
 
 // IsLogical returns whether a defined operation is a logical operator or not.
-func (o Operator) IsLogical() bool {
+func (o OdataOperator) IsLogical() bool {
 	if o == And || o == Or {
 		return true
 	}
@@ -47,7 +27,7 @@ func (o Operator) IsLogical() bool {
 
 // IsUnary returns whether a defined operation is unary or binary.  Will return true
 // if the operation only supports a subject with no value.
-func (o Operator) IsUnary() bool {
+func (o OdataOperator) IsUnary() bool {
 	if o == IsNull {
 		return true
 	}
@@ -55,41 +35,25 @@ func (o Operator) IsUnary() bool {
 	return false
 }
 
-// ToString representation of the ComparisonOperator
-func (o Operator) ToString() string {
-	return fmt.Sprintf("%s", o)
+// Function are the supported ODATA functions
+type Function string
+
+// ToString representation of a function
+func (f Function) ToString() string {
+	return fmt.Sprintf("%s", f)
 }
 
-// ODATAOperators map, using: ODATAOperators["eq"]
-var ODATAOperators = map[string]Operator{
-	// logic
-	And.ToString(): And,
-	Or.ToString():  Or,
-	Not.ToString(): Not,
-
-	// comparison
-	Equals.ToString():              Equals,
-	NotEquals.ToString():           NotEquals,
-	GreaterThan.ToString():         GreaterThan,
-	GreaterThanOrEquals.ToString(): GreaterThanOrEquals,
-	LessThan.ToString():            LessThan,
-	LessThanOrEquals.ToString():    LessThanOrEquals,
-	Like.ToString():                Like,
-	IsNull.ToString():              IsNull,
-
-	// arithmetic
-	Addition.ToString():       LessThanOrEquals,
-	Subtraction.ToString():    Subtraction,
-	Multiplication.ToString(): Multiplication,
-	Division.ToString():       Division,
-	Modulo.ToString():         Modulo,
+type OdataFunction struct {
+	Function Function
+	Args     []interface{}
 }
 
 // Predicate is the basic model construct of the odata expression
 type Predicate struct {
-	Right    interface{}
 	Left     interface{}
-	Operator Operator
+	Operator OdataOperator
+	Right    interface{}
+	Function OdataFunction
 }
 
 // Split separates the left and right predicates when containing a *Predicate
@@ -106,11 +70,11 @@ type Predicate struct {
 //  }
 //
 //  output = id <- ge -> 10 --and-- id <- lt -> 100 --or-- user <- eq -> 'tim' --and-- status <- eq -> 'active'
-func (p *Predicate) Split() ([]*Predicate, []Operator) {
+func (p *Predicate) Split() ([]*Predicate, []OdataOperator) {
 	var pr []*Predicate
 	predicates := &pr
 
-	var ops []Operator
+	var ops []OdataOperator
 	operators := &ops
 
 	if p.Operator.IsLogical() {
@@ -122,7 +86,7 @@ func (p *Predicate) Split() ([]*Predicate, []Operator) {
 	return pr, ops
 }
 
-func internalSplit(p *Predicate, result *[]*Predicate, ops *[]Operator) {
+func internalSplit(p *Predicate, result *[]*Predicate, ops *[]OdataOperator) {
 	if p.Operator.IsLogical() {
 		*ops = append(*ops, p.Operator)
 		internalSplit(p.Left.(*Predicate), result, ops)
@@ -153,12 +117,13 @@ func ParseODATAFilter(filterStr string) (*Predicate, error) {
 }
 
 var odataRegex = map[string]string{
-	"regexParenthesis": "^([(](.*)[)])$",
-	"regexAndor":       "^(.*?) (or|and)+ (.*)$",
-	"regexOp":          "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|(.*))",
-	"regexStartsWith":  "^startswith[(](.*),'(.*)'[)]",
-	"regexEndsWith":    "^endswith[(](.*),'(.*)'[)]",
-	"regexContains":    "^contains[(](.*),'(.*)'[)]",
+	"regexParenthesis":   "^([(](.*)[)])$",
+	"regexAndor":         "^(.*?) (or|and)+ (.*)$",
+	"regexOp":            "(.*\\w*) (eq|gt|lt|ge|le|ne) (datetimeoffset'(.*)'|(.*))",
+	"regexStartsWith":    "^startswith[(](.*),'(.*)'[)]",
+	"regexEndsWith":      "^endswith[(](.*),'(.*)'[)]",
+	"regexContains":      "^contains[(](.*),'(.*)'[)]",
+	OSRWithin.ToString(): "^st_within[(](.*),(.*)[)]",
 }
 
 var errorInvalidFilter = errors.New("Invalid filter")
@@ -231,7 +196,7 @@ func parseFragment(filter string) (*Predicate, error) {
 						obj.value = new Date(m[1]);
 					}
 				}*/
-			} else if k == "regexStartsWith" || k == "regexEndsWith" || k == "regexContains" {
+			} else if k == "regexStartsWith" || k == "regexEndsWith" || k == "regexContains" || k == OSRWithin.ToString() {
 				predicate, err = buildLike(match, k)
 				if err != nil {
 					return nil, err
@@ -253,12 +218,15 @@ func buildLike(match []string, key string) (*Predicate, error) {
 	var right string
 	if key == "startsWith" {
 		right = match[2] + "*"
-	} else {
-		if key == "endsWith" {
-			right = "*" + match[2]
-		} else {
-			right = "*" + match[2] + "*"
-		}
+	} else if key == "endsWith" {
+		right = "*" + match[2]
+	} else if key == OSRWithin.ToString() {
+		return &Predicate{
+			Function: OdataFunction{
+				Args:     []interface{}{match[1], match[2]},
+				Function: OSRWithin,
+			},
+		}, nil
 	}
 
 	p := &Predicate{
@@ -270,69 +238,110 @@ func buildLike(match []string, key string) (*Predicate, error) {
 	return p, nil
 }
 
-// StringFunction are the supporter ODATA string functions
-type StringFunction string
-
-// List of all ODATA String Functions
+// List of all ODATA Operators.
 const (
-	OSSubstringOf StringFunction = "substringof"
-	OSEndsWith    StringFunction = "endswith"
-	OSStartsWith  StringFunction = "startswith"
-	OSLength      StringFunction = "length"
-	OSIndexOf     StringFunction = "indexof"
-	OSSubstring   StringFunction = "substring"
-	OSToLower     StringFunction = "tolower"
-	OSToUpper     StringFunction = "toupper"
-	OSTrim        StringFunction = "trim"
-	OSConcat      StringFunction = "concat"
+	//logical
+	And OdataOperator = "and"
+	Or  OdataOperator = "or"
+	Not OdataOperator = "not"
+
+	//comparison
+	Equals              OdataOperator = "eq"
+	NotEquals           OdataOperator = "ne"
+	GreaterThan         OdataOperator = "gt"
+	GreaterThanOrEquals OdataOperator = "ge"
+	LessThan            OdataOperator = "lt"
+	LessThanOrEquals    OdataOperator = "le"
+	Like                OdataOperator = "like"
+	IsNull              OdataOperator = "is null"
+
+	// arithmetic
+	Addition       OdataOperator = "add"
+	Subtraction    OdataOperator = "sub"
+	Multiplication OdataOperator = "mul"
+	Division       OdataOperator = "div"
+	Modulo         OdataOperator = "mod"
 )
 
-// ToString representation of a StringFunction
-func (s StringFunction) ToString() string {
-	return fmt.Sprintf("%s", s)
+// ODATAOperators map, using: ODATAOperators["eq"]
+var ODATAOperators = map[string]OdataOperator{
+	// logic
+	And.ToString(): And,
+	Or.ToString():  Or,
+	Not.ToString(): Not,
+
+	// comparison
+	Equals.ToString():              Equals,
+	NotEquals.ToString():           NotEquals,
+	GreaterThan.ToString():         GreaterThan,
+	GreaterThanOrEquals.ToString(): GreaterThanOrEquals,
+	LessThan.ToString():            LessThan,
+	LessThanOrEquals.ToString():    LessThanOrEquals,
+	Like.ToString():                Like,
+	IsNull.ToString():              IsNull,
+
+	// arithmetic
+	Addition.ToString():       LessThanOrEquals,
+	Subtraction.ToString():    Subtraction,
+	Multiplication.ToString(): Multiplication,
+	Division.ToString():       Division,
+	Modulo.ToString():         Modulo,
 }
 
-// StringFunctions map, using: StringFunctions["substring"]
-var StringFunctions = map[string]StringFunction{
-	OSSubstringOf.ToString(): OSSubstringOf,
-	OSEndsWith.ToString():    OSEndsWith,
-	OSStartsWith.ToString():  OSStartsWith,
-	OSLength.ToString():      OSLength,
-	OSIndexOf.ToString():     OSIndexOf,
-	OSSubstring.ToString():   OSSubstring,
-	OSToLower.ToString():     OSToLower,
-	OSToUpper.ToString():     OSToUpper,
-	OSTrim.ToString():        OSTrim,
-	OSConcat.ToString():      OSConcat,
-}
-
-// DateFunction are the supporter ODATA date functions
-type DateFunction string
-
-// List of all ODATA date functions
+// List of all ODATA Functions
 const (
-	ODYear               DateFunction = "year"
-	ODMonth              DateFunction = "month"
-	ODDay                DateFunction = "day"
-	ODHour               DateFunction = "hour"
-	ODMinute             DateFunction = "minute"
-	ODSecond             DateFunction = "second"
-	ODFractionalSeconds  DateFunction = "fractionalseconds"
-	ODDate               DateFunction = "date"
-	ODTime               DateFunction = "time"
-	ODTotalOffsetMinutes DateFunction = "totaloffsetminutes"
-	ODNow                DateFunction = "now"
-	ODMinDateTime        DateFunction = "mindatetime"
-	ODMaxDateTime        DateFunction = "maxdatetime"
+	OSSubstringOf        Function = "substringof"
+	OSEndsWith           Function = "endswith"
+	OSStartsWith         Function = "startswith"
+	OSLength             Function = "length"
+	OSIndexOf            Function = "indexof"
+	OSSubstring          Function = "substring"
+	OSToLower            Function = "tolower"
+	OSToUpper            Function = "toupper"
+	OSTrim               Function = "trim"
+	OSConcat             Function = "concat"
+	ODYear               Function = "year"
+	ODMonth              Function = "month"
+	ODDay                Function = "day"
+	ODHour               Function = "hour"
+	ODMinute             Function = "minute"
+	ODSecond             Function = "second"
+	ODFractionalSeconds  Function = "fractionalseconds"
+	ODDate               Function = "date"
+	ODTime               Function = "time"
+	ODTotalOffsetMinutes Function = "totaloffsetminutes"
+	ODNow                Function = "now"
+	ODMinDateTime        Function = "mindatetime"
+	ODMaxDateTime        Function = "maxdatetime"
+	OMRound              Function = "round"
+	OMFloor              Function = "floor"
+	OMCeiling            Function = "ceiling"
+	OGSDistance          Function = "geo.distance"
+	OGSLength            Function = "geo.length"
+	OGSIntersects        Function = "geo.intersects"
+	OSREquals            Function = "st_equals"
+	OSRDisjoint          Function = "st_disjoint"
+	OSRTouches           Function = "st_touches"
+	OSRWithin            Function = "st_within"
+	OSROverlaps          Function = "st_overlaps"
+	OSRCrosses           Function = "st_crosses"
+	OSRIntersects        Function = "st_intersects"
+	OSRContains          Function = "st_contains"
+	OSRRelate            Function = "st_relate"
 )
 
-// ToString representation of a DateFunction
-func (d DateFunction) ToString() string {
-	return fmt.Sprintf("%s", d)
-}
-
-// DateFunctions map, using: DateFunctions["now"]
-var DateFunctions = map[string]DateFunction{
+// Functions map, using: Functions["substring"]
+var Functions = map[string]Function{
+	OSSubstringOf.ToString():        OSSubstringOf,
+	OSEndsWith.ToString():           OSEndsWith,
+	OSStartsWith.ToString():         OSStartsWith,
+	OSLength.ToString():             OSLength,
+	OSIndexOf.ToString():            OSIndexOf,
+	OSSubstring.ToString():          OSSubstring,
+	OSToLower.ToString():            OSToLower,
+	OSToUpper.ToString():            OSToUpper,
+	OSTrim.ToString():               OSTrim,
+	OSConcat.ToString():             OSConcat,
 	ODYear.ToString():               ODYear,
 	ODMonth.ToString():              ODMonth,
 	ODDay.ToString():                ODDay,
@@ -346,82 +355,19 @@ var DateFunctions = map[string]DateFunction{
 	ODNow.ToString():                ODNow,
 	ODMinDateTime.ToString():        ODMinDateTime,
 	ODMaxDateTime.ToString():        ODMaxDateTime,
-}
-
-// MathFunction are the supporter ODATA math functions
-type MathFunction string
-
-// List of all ODATA math functions
-const (
-	OMRound   MathFunction = "round"
-	OMFloor   MathFunction = "floor"
-	OMCeiling MathFunction = "ceiling"
-)
-
-// ToString representation of a MathFunction
-func (m MathFunction) ToString() string {
-	return fmt.Sprintf("%s", m)
-}
-
-// MathFunctions map, using: MathFunctions["round"]
-var MathFunctions = map[string]MathFunction{
-	OMRound.ToString():   OMRound,
-	OMFloor.ToString():   OMFloor,
-	OMCeiling.ToString(): OMCeiling,
-}
-
-// GeospatialFunction are the supporter ODATA geospatial functions
-type GeospatialFunction string
-
-// List of all ODATA geospatial functions
-const (
-	OGSDistance   GeospatialFunction = "geo.distance"
-	OGSLength     GeospatialFunction = "geo.length"
-	OGSIntersects GeospatialFunction = "geo.intersects"
-)
-
-// ToString representation of a GeospatialFunction
-func (g GeospatialFunction) ToString() string {
-	return fmt.Sprintf("%s", g)
-}
-
-// GeospatialFunctions map, using: GeospatialFunctions["distance"]
-var GeospatialFunctions = map[string]GeospatialFunction{
-	OGSDistance.ToString():   OGSDistance,
-	OGSLength.ToString():     OGSLength,
-	OGSIntersects.ToString(): OGSIntersects,
-}
-
-// SpatialRelationshipFunction are the supporter ODATA spatial relationship functions
-type SpatialRelationshipFunction string
-
-// List of all ODATA spatial relationship functions
-const (
-	OSREquals     SpatialRelationshipFunction = "st_equals"
-	OSRDisjoint   SpatialRelationshipFunction = "st_disjoint"
-	OSRTouches    SpatialRelationshipFunction = "st_touches"
-	OSRWithin     SpatialRelationshipFunction = "st_within"
-	OSROverlaps   SpatialRelationshipFunction = "st_overlaps"
-	OSRCrosses    SpatialRelationshipFunction = "st_crosses"
-	OSRIntersects SpatialRelationshipFunction = "st_intersects"
-	OSRContains   SpatialRelationshipFunction = "st_contains"
-	OSRRelate     SpatialRelationshipFunction = "st_relate"
-)
-
-// ToString representation of a GeospatialFunction
-func (g SpatialRelationshipFunction) ToString() string {
-	return fmt.Sprintf("%s", g)
-}
-
-// SpatialRelationshipFunctions map, using: SpatialRelationshipFunctions["st_equals"]
-var SpatialRelationshipFunctions = map[string]SpatialRelationshipFunction{
-	OSREquals.ToString():     OSREquals,
-	OSRDisjoint.ToString():   OSRDisjoint,
-	OSRTouches.ToString():    OSRTouches,
-	OSRWithin.ToString():     OSRWithin,
-	OSROverlaps.ToString():   OSROverlaps,
-	OSRCrosses.ToString():    OSRCrosses,
-	OSRIntersects.ToString(): OSRIntersects,
-	OSRContains.ToString():   OSRContains,
-	OSRRelate.ToString():     OSRRelate,
+	OMRound.ToString():              OMRound,
+	OMFloor.ToString():              OMFloor,
+	OMCeiling.ToString():            OMCeiling,
+	OGSDistance.ToString():          OGSDistance,
+	OGSLength.ToString():            OGSLength,
+	OGSIntersects.ToString():        OGSIntersects,
+	OSREquals.ToString():            OSREquals,
+	OSRDisjoint.ToString():          OSRDisjoint,
+	OSRTouches.ToString():           OSRTouches,
+	OSRWithin.ToString():            OSRWithin,
+	OSROverlaps.ToString():          OSROverlaps,
+	OSRCrosses.ToString():           OSRCrosses,
+	OSRIntersects.ToString():        OSRIntersects,
+	OSRContains.ToString():          OSRContains,
+	OSRRelate.ToString():            OSRRelate,
 }
