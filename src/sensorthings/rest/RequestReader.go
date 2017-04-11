@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"fmt"
+	"github.com/crestonbunch/godata"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
-	"net/url"
 	"strconv"
 )
 
@@ -27,20 +27,6 @@ func getEntityID(r *http.Request) string {
 // went wrong with parsing the query into QueryOptions and will contain information
 // on what went wrong
 func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
-	query := make(map[string]string)
-	if strings.Contains(r.URL.String(), "?") {
-		unescapedQuery, _ := url.QueryUnescape(r.URL.RawQuery)
-		splitQuery := strings.Split(unescapedQuery, "&")
-		for _, sq := range splitQuery {
-			splitIndex := strings.Index(sq, "=")
-			if splitIndex == -1 {
-				return nil, []error{fmt.Errorf("Incorrect request: %s", r.URL.RawQuery)}
-			}
-
-			query[sq[:splitIndex]] = sq[splitIndex+1:]
-		}
-	}
-
 	//If request contains parameters from route wildcard convert it to a select query
 	vars := mux.Vars(r)
 	value := vars["params"]
@@ -49,31 +35,34 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		//If $ref found create select query with id
 		if vars["params"] == "$ref" {
 			value = "id"
-			query["$ref"] = "true"
+			r.URL.Query()["$ref"] = []string{"true"}
 		}
 
-		query["$select"] = value
+		r.URL.Query()["$select"] = []string{value}
 	}
 
 	if strings.HasSuffix(r.URL.Path, "$value") {
-		query["$value"] = "true"
+		r.URL.Query()["$value"] = []string{"true"}
 	}
 
-	if t, ok := query["$top"]; !ok {
-		query["$top"] = strconv.Itoa(MaxEntities)
+	if t, ok := r.URL.Query()["$top"]; !ok {
+		r.URL.Query()["$top"] = []string{strconv.Itoa(MaxEntities)}
 	} else {
-		top, err := strconv.Atoi(t)
+		top, err := strconv.Atoi(t[0])
 		if err != nil || top > MaxEntities {
-			query["$top"] = strconv.Itoa(MaxEntities)
+			r.URL.Query()["$top"] = []string{strconv.Itoa(MaxEntities)}
 		}
 	}
 
-	if _, ok := query["$skip"]; !ok {
-		query["$skip"] = "0"
+	if _, ok := r.URL.Query()["$skip"]; !ok {
+		r.URL.Query()["$skip"] = []string{"0"}
 	}
 
-	qo, e := odata.CreateQueryOptions(query)
-	return qo, e
+	qo, e := godata.ParseUrlQuery(r.URL.Query())
+	vals := *qo.Filter.Tree
+	fmt.Printf("%v", vals)
+
+	return nil, []error{e}
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
