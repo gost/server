@@ -1,7 +1,7 @@
 ## GOST and security
 
 The SensorThings API does not define specific security capabilities, security aspects should be handled
-in a differt application layer (see http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#21).
+in a different application layer (see http://docs.opengeospatial.org/is/15-078r6/15-078r6.html#21).
 
 One common usecase is to limit write access to the SensorThings API. By configuring a proxy server like Apache2 or 
 NGINX this can be achieved.
