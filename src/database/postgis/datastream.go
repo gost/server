@@ -308,6 +308,16 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 		updates["observedarea"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
 	}
 
+	if len(ds.PhenomenonTime) > 0 {
+		phenomenonTime := now.Iso8601ToPostgresPeriod(ds.PhenomenonTime)
+		updates["phenomenontime"] = phenomenonTime
+	}
+
+	if len(ds.ResultTime) > 0 {
+		resultTime := now.Iso8601ToPostgresPeriod(ds.ResultTime)
+		updates["resulttime"] = resultTime
+	}
+
 	if err = gdb.updateEntityColumns("datastream", updates, intID); err != nil {
 		return nil, err
 	}
