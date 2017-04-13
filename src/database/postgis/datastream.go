@@ -240,12 +240,12 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 
 	phenomenonTime := "NULL"
 	if len(d.PhenomenonTime) != 0 {
-		phenomenonTime = "'" + now.Iso8601ToPostgresPeriodFormat(d.PhenomenonTime) + "'"
+		phenomenonTime = "'" + now.Iso8601ToPostgresPeriod(d.PhenomenonTime) + "'"
 	}
 
 	resultTime := "NULL"
 	if len(d.ResultTime) != 0 {
-		resultTime = "'" + now.Iso8601ToPostgresPeriodFormat(d.ResultTime) + "'"
+		resultTime = "'" + now.Iso8601ToPostgresPeriod(d.ResultTime) + "'"
 	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
