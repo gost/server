@@ -192,7 +192,7 @@ func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOpt
 		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%v", odata.QueryOptionSkip.String(), qo.QuerySkip.Index+qo.QueryTop.Limit))
 	}
 
-	return fmt.Sprintf("%s/%s", incomingURL, queryString)
+	return fmt.Sprintf("%s%s", incomingURL, queryString)
 }
 
 func appendQueryPart(base string, q string) string {
