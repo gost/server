@@ -33,12 +33,12 @@ func datastreamParamFactory(values map[string]interface{}) (entities.Entity, err
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
 			ds.Description = value.(string)
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
-			ds.ResultTime = value.(string)
+			ds.ResultTime = ToIso8601Period(value.(string))
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
 			obs, _ := entities.GetObservationTypeByID(value.(int64))
 			ds.ObservationType = obs.Value
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
-			ds.PhenomenonTime = value.(string)
+			ds.PhenomenonTime = ToIso8601Period(value.(string))
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
 			t := value.(string)
 			unitOfMeasurementMap, err := JSONToMap(&t)
