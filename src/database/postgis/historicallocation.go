@@ -132,8 +132,11 @@ func (gdb *GostDatabase) PostHistoricalLocation(hl *entities.HistoricalLocation)
 
 	for _, l := range hl.Locations {
 		lid, _ := ToIntID(l.ID)
-		query := fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)", gdb.Schema)
-		gdb.Db.QueryRow(query, lid, hlID)
+		query := fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)  RETURNING historicallocation_id", gdb.Schema)
+		err = gdb.Db.QueryRow(query, lid, hlID).Scan(&lid)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	hl.ID = hlID
