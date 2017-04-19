@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"fmt"
-	"github.com/crestonbunch/godata"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
+	"github.com/gost/godata"
 	"strconv"
 )
 
