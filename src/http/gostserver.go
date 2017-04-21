@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/models"
+	"time"
 )
 
 // Server interface for starting and stopping the HTTP server
@@ -33,13 +34,18 @@ type GostServer struct {
 func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
 	router := CreateRouter(api)
 	return &GostServer{
-		host:       host,
-		port:       port,
-		api:        api,
-		https:      https,
-		httpsCert:  httpsCert,
-		httpsKey:   httpsKey,
-		httpServer: &http.Server{Addr: fmt.Sprintf("%s:%s", host, strconv.Itoa(port)), Handler: LowerCaseURI(router)},
+		host:      host,
+		port:      port,
+		api:       api,
+		https:     https,
+		httpsCert: httpsCert,
+		httpsKey:  httpsKey,
+		httpServer: &http.Server{
+			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
+			Handler:      LowerCaseURI(router),
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 30 * time.Second,
+		},
 	}
 }
 
