@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -19,7 +18,7 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 	w.WriteHeader(status)
 
 	if data != nil {
-		b, err := JSONMarshal(data, true)
+		b, err := JSONMarshal(data)
 		if err != nil {
 			panic(err)
 		}
@@ -55,8 +54,8 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 	}
 }
 
-//JSONMarshal converts the data and converts special characters such as &
-func JSONMarshal(data interface{}, safeEncoding bool) ([]byte, error) {
+//JSONMarshal converts the entities to json bytes
+func JSONMarshal(data interface{}) ([]byte, error) {
 	var b []byte
 	var err error
 	if IndentJSON {
@@ -65,11 +64,6 @@ func JSONMarshal(data interface{}, safeEncoding bool) ([]byte, error) {
 		b, err = json.Marshal(data)
 	}
 
-	if safeEncoding {
-		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
-		b = bytes.Replace(b, []byte("\\u003e"), []byte(">"), -1)
-		b = bytes.Replace(b, []byte("\\u0026"), []byte("&"), -1)
-	}
 	return b, err
 }
 
