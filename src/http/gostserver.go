@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"context"
+	"fmt"
 	"github.com/geodan/gost/src/sensorthings/models"
 )
 
@@ -18,23 +20,26 @@ type Server interface {
 // GostServer is the type that contains all of the relevant information to set
 // up the GOST HTTP Server
 type GostServer struct {
-	host      string      // Hostname for example "localhost" or "192.168.1.14"
-	port      int         // Portnumber where you want to run your http server on
-	api       *models.API // Sensorthings api to interact with from the HttpServer
-	https     bool
-	httpsCert string
-	httpsKey  string
+	host       string      // Hostname for example "localhost" or "192.168.1.14"
+	port       int         // Portnumber where you want to run your http server on
+	api        *models.API // Sensorthings api to interact with from the HttpServer
+	https      bool
+	httpsCert  string
+	httpsKey   string
+	httpServer *http.Server
 }
 
 // CreateServer initialises a new GOST HTTPServer based on the given parameters
 func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
+	router := CreateRouter(api)
 	return &GostServer{
-		host:      host,
-		port:      port,
-		api:       api,
-		https:     https,
-		httpsCert: httpsCert,
-		httpsKey:  httpsKey,
+		host:       host,
+		port:       port,
+		api:        api,
+		https:      https,
+		httpsCert:  httpsCert,
+		httpsKey:   httpsKey,
+		httpServer: &http.Server{Addr: fmt.Sprintf("%s:%s", host, strconv.Itoa(port)), Handler: LowerCaseURI(router)},
 	}
 }
 
@@ -46,13 +51,11 @@ func (s *GostServer) Start() {
 	}
 	log.Printf("Started GOST %v Server on %v:%v", t, s.host, s.port)
 
-	router := CreateRouter(s.api)
-
 	var err error
 	if s.https {
-		err = http.ListenAndServeTLS(s.host+":"+strconv.Itoa(s.port), s.httpsCert, s.httpsKey, s.LowerCaseURI(router))
+		err = s.httpServer.ListenAndServeTLS(s.httpsCert, s.httpsKey)
 	} else {
-		err = http.ListenAndServe(s.host+":"+strconv.Itoa(s.port), s.LowerCaseURI(router))
+		err = s.httpServer.ListenAndServe()
 	}
 
 	if err != nil {
@@ -63,11 +66,14 @@ func (s *GostServer) Start() {
 
 // Stop command to stop the GOST HTTP server, currently not supported
 func (s *GostServer) Stop() {
-
+	if s.httpServer != nil {
+		log.Print("Stopping HTTP(S) Server")
+		s.httpServer.Shutdown(context.Background())
+	}
 }
 
 // LowerCaseURI is a middleware function that lower cases the url path
-func (s *GostServer) LowerCaseURI(h http.Handler) http.Handler {
+func LowerCaseURI(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(strings.ToLower(r.URL.Path), "dashboard") {
 			h.ServeHTTP(w, r)
