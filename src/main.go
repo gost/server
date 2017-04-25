@@ -53,7 +53,11 @@ func main() {
 	} else {
 		mqttClient = mqtt.CreateMQTTClient(conf.MQTT)
 		stAPI = api.NewAPI(database, conf, mqttClient)
-		mqttClient.Start(&stAPI)
+
+		if conf.MQTT.Enabled {
+			mqttClient.Start(&stAPI)
+		}
+
 		createAndStartServer(&stAPI)
 	}
 }
