@@ -15,7 +15,6 @@ services:
         ports:
             - "8080:8080"
         depends_on:
-            - mosquitto
             - gost-db
         environment:
             gost_db_host: gost-db
