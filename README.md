@@ -54,7 +54,7 @@ $ docker-compose -f docker-compose-rpi.yml up
 
 ## OGC Compliance testing status
 
-GOST is being tested against the OGC SensorThings API Test Suite [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
+GOST is being tested against the OGC SensorThings API Test Suite 1.0 [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
 
 | Conformance Class                     | Reference | Implementation status |Test Status               |
 |---------------------------------------|-----------|-----------------------|--------------------------| 
