@@ -55,8 +55,6 @@ func TestSetLinksAdvanced(t *testing.T) {
 	assert.NotNil(t, datastream.NavObservedProperty, "NavObservedProperty should be filled in")
 }
 
-
-
 func TestParseEntity(t *testing.T){
 	// arrange
 	datastream := &Datastream{}
