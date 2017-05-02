@@ -3,15 +3,36 @@ package errors
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"errors"
 )
 
-func TestErrors(t *testing.T) {
-	// todo add error tests...
+func TestApiError(t *testing.T) {
 	// arrange
-	var a = 1
-	var b = 2
-	// act
-	var res = a + b
+	err := errors.New("yo")
+	var apierr = APIError{err,200}
+
 	// assert
-	assert.Equal(t, 3, res, "computer error again")
+	assert.Equal(t, 200, apierr.GetHTTPErrorStatusCode(), "should return 200")
+	assert.Equal(t, "yo", apierr.Error(), "should return 200")
 }
+
+func TestRequestStatusCodes(t *testing.T){
+	// arrange
+	badrequesterror := NewBadRequestError(errors.New("bad"))
+	notfounderror := NewRequestNotFound(errors.New("notfound"))
+	conflicterror := NewConflictRequestError(errors.New("conflict"))
+	notimplementederror := NewRequestNotImplemented(errors.New("notimplemented"))
+	notallowederror := NewRequestMethodNotAllowed(errors.New("notallowed"))
+	internalservererror := NewRequestInternalServerError(errors.New("internalserver"))
+
+	// assert
+	assert.Equal(t, "bad", badrequesterror.Error())
+	assert.Equal(t, "notfound", notfounderror.Error())
+	assert.Equal(t, "conflict", conflicterror.Error())
+	assert.Equal(t,"notimplemented",notimplementederror.Error())
+	assert.Equal(t,"notallowed",notallowederror.Error())
+	assert.Equal(t,"internalserver",internalservererror.Error())
+
+
+}
+
