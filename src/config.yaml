@@ -1,8 +1,8 @@
 server:
     name: GOST Server
     host:
-    port: 8081
-    externalUri: http://localhost:8081/
+    port: 8080
+    externalUri: http://localhost:8080/
     clientContent: ./client/
     maxEntityResponse: 20
     indentedJson: true

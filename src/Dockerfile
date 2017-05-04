@@ -11,4 +11,4 @@ RUN go build -o /go/bin/gost/gost github.com/geodan/gost/src
 RUN cp /go/src/github.com/geodan/gost/src/config.yaml /go/bin/gost/config.yaml
 WORKDIR /go/bin/gost
 ENTRYPOINT ["/go/bin/gost/gost"]
-EXPOSE 8081
+EXPOSE 8080

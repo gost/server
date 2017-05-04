@@ -26,8 +26,6 @@ services:
             POSTGRES_PASSWORD: postgres
     gost:
         image: geodan/gost
-        ports:
-            - "8081:8081"
         depends_on:
             - mosquitto
             - gost-db
