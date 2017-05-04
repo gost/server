@@ -10,8 +10,10 @@ func TestModels(t *testing.T) {
 	// arrange
 	var a = 1
 	var b = 2
+	er := ErrorResponse{}
 	// act
 	var res = a + b
 	// assert
 	assert.Equal(t, 3, res, "computer error again")
+	assert.NotNil(t, er)
 }

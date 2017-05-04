@@ -59,6 +59,33 @@ func TestCreateEntityLink(t *testing.T) {
 	assert.Equal(t, "", linkEmpty, "EntityLink link should be empty")
 }
 
+func TestBaseEntity(t *testing.T) {
+	// arrange
+	b := BaseEntity{}
+
+	// act
+	parse := b.ParseEntity(nil)
+	m, _ := b.ContainsMandatoryParams()
+	linkerror := b.SetLinks("")
+	id := b.GetID()
+	entitytype := b.GetEntityType()
+	propnames := b.GetPropertyNames()
+	selflink := b.GetSelfLink()
+	encoding := b.GetSupportedEncoding()
+	b.SetID(35)
+
+	// assert
+	assert.Nil(t, parse)
+	assert.False(t, m)
+	assert.Nil(t, linkerror)
+	assert.Nil(t, id)
+	assert.Nil(t, propnames)
+	assert.True(t, entitytype == EntityTypeUnknown)
+	assert.True(t, selflink == "")
+	assert.Nil(t, encoding)
+
+}
+
 func TestCheckMandatoryParamNoErrors(t *testing.T) {
 	//arrange
 	errLis1 := []error{}
@@ -66,11 +93,21 @@ func TestCheckMandatoryParamNoErrors(t *testing.T) {
 	errLis3 := []error{}
 	errLis4 := []error{}
 	errLis5 := []error{}
+	errLis6 := []error{}
+	errLis7 := []error{}
+	errLis8 := []error{}
+	errLis9 := []error{}
+	errLis10 := []error{}
+	errLis11 := []error{}
+	errLis12 := []error{}
 
 	testString := "test"
 	testMap := map[string]string{"test": "test"}
+	emptytestMap := map[string]string{}
 
-	testThing := &Sensor{}
+	testemptystring := ""
+
+	testThing := &Thing{}
 	testThing.ID = "1"
 
 	testSensor := &Sensor{}
@@ -79,12 +116,25 @@ func TestCheckMandatoryParamNoErrors(t *testing.T) {
 	testObservedProperty := &ObservedProperty{}
 	testObservedProperty.ID = "1"
 
+	datastream := &Datastream{}
+	datastream.ID = "3"
+
+	var nilstring *string
+	var datastreamnil *Datastream
+
 	//act
 	CheckMandatoryParam(&errLis1, testString, et, "test")
 	CheckMandatoryParam(&errLis2, testMap, et, "test")
 	CheckMandatoryParam(&errLis3, testThing, et, "test")
 	CheckMandatoryParam(&errLis4, testSensor, et, "test")
 	CheckMandatoryParam(&errLis5, testObservedProperty, et, "test")
+	CheckMandatoryParam(&errLis6, &testString, et, "test")
+	CheckMandatoryParam(&errLis7, datastream, et, "test")
+	CheckMandatoryParam(&errLis8, nil, et, "test")
+	CheckMandatoryParam(&errLis9, &testemptystring, et, "test")
+	CheckMandatoryParam(&errLis10, nilstring, et, "test")
+	CheckMandatoryParam(&errLis11, datastreamnil, et, "test")
+	CheckMandatoryParam(&errLis12, emptytestMap, et, "test")
 
 	//assert
 	assert.Equal(t, len(errLis1), 0, "CheckMandatoryParam string should not have returned an error")
@@ -92,6 +142,13 @@ func TestCheckMandatoryParamNoErrors(t *testing.T) {
 	assert.Equal(t, len(errLis3), 0, "CheckMandatoryParam Thing should not have returned an error")
 	assert.Equal(t, len(errLis4), 0, "CheckMandatoryParam Sensor should not have returned an error")
 	assert.Equal(t, len(errLis5), 0, "CheckMandatoryParam ObservedProperty should not have returned an error")
+	assert.Equal(t, len(errLis6), 0, "CheckMandatoryParam string pointer should not have returned an error")
+	assert.Equal(t, len(errLis7), 0, "CheckMandatoryParam datastream pointer should not have returned an error")
+	assert.Equal(t, len(errLis8), 1, "CheckMandatoryParam nil parameter should have returned an error")
+	assert.Equal(t, len(errLis9), 1, "CheckMandatoryParam empty string  parameter should have returned an error")
+	assert.Equal(t, len(errLis10), 1, "CheckMandatoryParam nil string pointer parameter should have returned an error")
+	assert.Equal(t, len(errLis11), 1, "CheckMandatoryParam datastream nil pointer parameter should have returned an error")
+	assert.Equal(t, len(errLis12), 1, "CheckMandatoryParam empty string map parameter should have returned an error")
 }
 
 func TestCheckMandatoryParamErrors(t *testing.T) {

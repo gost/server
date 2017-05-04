@@ -33,8 +33,8 @@ func TestEndPointSort(t *testing.T) {
 	restep := rest.Endpoint{}
 	restep.Name = "ep1"
 	// error in next line, why? About models.EndpointOperation
-	// op1 := models.EndpointOperation{models.HTTPOperationGet, "/v1.0/observedproperties",HandleTest}
-	// httpep1 := &Endpoint{Endpoint: restep, Operation: op1}
+	//op1 := models.EndpointOperation{models.HTTPOperationGet, "/v1.0/observedproperties",HandleTest}
+	//httpep1 := &Endpoint{Endpoint: restep, Operation: op1}
 	httpep1 := &Endpoint{}
 	httpep2 := &Endpoint{}
 
