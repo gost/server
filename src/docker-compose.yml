@@ -18,8 +18,6 @@ services:
         image: geodan/gost-db
         volumes:
             - postgis:/var/lib/pgsql/9.5/data
-        ports:
-            - "5432:5432"
         environment:
             POSTGRES_DB: gost
             POSTGRES_USER: postgres

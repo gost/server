@@ -3,7 +3,6 @@ server:
     host:
     port: 8080
     externalUri: http://localhost:8080/
-    clientContent: ./client/
     maxEntityResponse: 20
     indentedJson: true
     https: false

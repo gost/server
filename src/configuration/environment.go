@@ -32,11 +32,6 @@ func SetEnvironmentVariables(conf *Config) {
 		conf.Server.ExternalURI = gostServerExternalURI
 	}
 
-	gostClientContent := os.Getenv("gost_client_content")
-	if gostClientContent != "" {
-		conf.Server.ClientContent = gostClientContent
-	}
-
 	gostServerMaxEntities := os.Getenv("gost_server_max_entities")
 	if gostServerMaxEntities != "" {
 		port, err := strconv.Atoi(gostServerMaxEntities)

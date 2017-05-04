@@ -21,7 +21,6 @@ type ServerConfig struct {
 	HTTPS             bool   `yaml:"https"`
 	HTTPSCert         string `yaml:"httpsCert"`
 	HTTPSKey          string `yaml:"httpsKey"`
-	ClientContent     string `yaml:"clientContent"`
 	MaxEntityResponse int    `yaml:"maxEntityResponse"`
 	IndentedJSON      bool   `yaml:"indentedJson"`
 }

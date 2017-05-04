@@ -7,7 +7,6 @@ server: <br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;host: localhost (host of webserver, set to 0.0.0.0 if hosting on external machine)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;port: 8080 (port of webserver)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;externalUri: http://localhost:8080/ (change to the uri where users can reach the service)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clientContent: ./client/ (Location of the client folder (dashboard))<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;maxEntityResponse: 50 (Max entities to return if no $top and $skip is given, not implemented yet)<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indentedJson: true (return indented JSON, not implemented yet)<br />
 database:<br />
