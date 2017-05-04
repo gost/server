@@ -1,12 +1,11 @@
 package http
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"github.com/bert/gost/src/sensorthings/models"
-	"net/http"
-	"fmt"
+	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/geodan/gost/src/sensorthings/rest"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"testing"
 )
 
 func TestEndPointLength(t *testing.T) {
@@ -23,7 +22,6 @@ func TestEndPointLength(t *testing.T) {
 	// assert
 	assert.True(t, l == 2, "Number of Endpoints should be 2")
 }
-
 
 func HandleTest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 }
