@@ -3,7 +3,7 @@ package postgis
 import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
-	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/godata"
 )
 
 // tables as defined in postgis
@@ -130,21 +130,21 @@ var asPrefixArr = [...]string{
 // QueryParseInfo is constructed based on the input send to the QueryBuilder, with the help of QueryParseInfo
 // the response rows from the database can be parsed into the correct entities with their relations and sub entities
 type QueryParseInfo struct {
-	QueryIndex      int    // Order of quest
-	AsPrefix        string // Extra AS that gets added to the join string
-	Entity          entities.Entity
-	ExpandOperation *odata.ExpandOperation
-	ParamFactory    ParamFactory
-	Parent          *QueryParseInfo
-	SubEntities     []*QueryParseInfo
+	QueryIndex   int    // Order of quest
+	AsPrefix     string // Extra AS that gets added to the join string
+	Entity       entities.Entity
+	ExpandItem   *godata.ExpandItem
+	ParamFactory ParamFactory
+	Parent       *QueryParseInfo
+	SubEntities  []*QueryParseInfo
 }
 
 // Init initialises a QueryParseInfo object by setting al the needed info
-func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandOperation *odata.ExpandOperation) {
+func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandItem *godata.ExpandItem) {
 	q.Parent = parent
 	q.AsPrefix = asPrefixArr[queryIndex]
 	q.QueryIndex = queryIndex
-	q.ExpandOperation = expandOperation
+	q.ExpandItem = expandItem
 	switch e := entityType; e {
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}

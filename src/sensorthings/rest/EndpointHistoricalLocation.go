@@ -5,7 +5,6 @@ import (
 
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
-	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
@@ -14,10 +13,6 @@ func createHistoricalLocationsEndpoint(externalURL string) *Endpoint {
 		EntityType: entities.EntityTypeHistoricalLocation,
 		OutputInfo: true,
 		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "HistoricalLocations")),
-		SupportedQueryOptions: []odata.QueryOptionType{
-			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
-		},
 		SupportedExpandParams: []string{
 			"locations",
 			"thing",

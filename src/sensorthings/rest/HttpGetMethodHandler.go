@@ -15,15 +15,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 
 	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
-	if err != nil {
-		sendError(w, err)
-		return
-	}
-
-	// Check if the requested endpoints supports the parsed queries
-	endpoint := *e
-	_, err = endpoint.AreQueryOptionsSupported(queryOptions)
-	if err != nil {
+	if err != nil && len(err) > 0 {
 		sendError(w, err)
 		return
 	}

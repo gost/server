@@ -66,7 +66,8 @@ func (a *APIv1) Start() {
 		selectParams[e.GetName()] = e.GetSupportedSelectParams()
 	}
 
-	odata.Init(expandParams, selectParams)
+	odata.SupportedExpandParameters = expandParams
+	odata.SupportedSelectParameters = selectParams
 }
 
 // GetConfig return the current configuration.Config set for the api
@@ -146,10 +147,10 @@ func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.En
 // ProcessGetRequest processes the entities by setting the necessary links before sending back
 func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions) {
 	// a $ref request, id's are selected to create selfLink, remove after setting self url
-	if qo != nil && qo.QueryOptionRef {
+	if qo != nil && qo.Ref != nil && bool(*qo.Ref) {
 		entity.SetSelfLink(a.config.GetExternalServerURI())
 		entity.SetID(nil)
-	} else if qo == nil || qo.QuerySelect.IsNil() || len(qo.QuerySelect.Params) == 0 { //no query options, set all links
+	} else if qo == nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 { //no query options, set all links
 		entity.SetAllLinks(a.config.GetExternalServerURI())
 	}
 }
@@ -159,36 +160,36 @@ func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions
 //  incomingUrl is the url of the request excluding oData query params
 func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string {
 	// do not create a nextLink when there is no top and skip given
-	if qo == nil && qo.QueryTop.Limit == 0 && qo.QuerySkip.Index == 0 {
+	if qo == nil || qo.Top == nil || qo.Skip == nil || (int(*qo.Top) == 0 && int(*qo.Skip) == 0) {
 		return ""
 	}
 
 	// do not create a nextLink when the current page has no following one
-	if qo.QueryTop.Limit+qo.QuerySkip.Index >= count || count < qo.QueryTop.Limit {
+	if int(*qo.Top)+int(*qo.Skip) >= count || count < int(*qo.Top) {
 		return ""
 	}
 
 	queryString := ""
-	if !qo.QueryFilter.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionFilter.String(), qo.QueryFilter.RawQuery))
+	if qo.Filter != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$filter=%s", qo.RawFilter))
 	}
-	if !qo.QueryCount.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionCount.String(), qo.QueryCount.RawQuery))
+	if qo.Count != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$count=%v", *qo.Count))
 	}
-	if !qo.QueryExpand.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionExpand.String(), qo.QueryExpand.RawQuery))
+	if qo.Expand != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$expand=%s", qo.RawExpand))
 	}
-	if !qo.QueryOrderBy.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionOrderBy.String(), qo.QueryOrderBy.RawQuery))
+	if qo.OrderBy != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$orderby=%s", qo.RawOrderBy))
 	}
-	if !qo.QueryResultFormat.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionResultFormat.String(), qo.QueryResultFormat.RawQuery))
+	if qo.Format != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$format=%s", qo.Format))
 	}
-	if !qo.QueryTop.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%s", odata.QueryOptionTop.String(), qo.QueryTop.RawQuery))
+	if qo.Top != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$top=%v", *qo.Top))
 	}
-	if !qo.QuerySkip.IsNil() {
-		queryString = appendQueryPart(queryString, fmt.Sprintf("%s=%v", odata.QueryOptionSkip.String(), qo.QuerySkip.Index+qo.QueryTop.Limit))
+	if qo.Skip != nil {
+		queryString = appendQueryPart(queryString, fmt.Sprintf("$skip=%v", int(*qo.Skip)+int(*qo.Top)))
 	}
 
 	return fmt.Sprintf("%s/%s", incomingURL, queryString)

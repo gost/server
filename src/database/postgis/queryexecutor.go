@@ -52,10 +52,11 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 
 			// construct deleteIDMap
 			deleteIDMap[qpi.QueryIndex] = false
-			if qpi.ExpandOperation != nil && qpi.ExpandOperation.QueryOptions != nil && !qpi.ExpandOperation.QueryOptions.QuerySelect.IsNil() {
+			if qpi.ExpandItem != nil && qpi.ExpandItem.Select != nil {
 				found := false
-				for _, p := range qpi.ExpandOperation.QueryOptions.QuerySelect.Params {
-					if p == "id" {
+
+				for _, p := range qpi.ExpandItem.Select.SelectItems {
+					if p.Segments[0].Value == "id" {
 						found = true
 					}
 				}

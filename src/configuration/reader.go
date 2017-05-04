@@ -40,5 +40,6 @@ func GetConfig(cfgFile string) (Config, error) {
 		return Config{}, err
 	}
 
-	return conf, nil
+	CurrentConfig = conf
+	return CurrentConfig, nil
 }

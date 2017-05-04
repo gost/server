@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// CurrentConfig
+var CurrentConfig Config
+
 // Config contains the settings for the Http server, databases and mqtt
 type Config struct {
 	Server   ServerConfig   `yaml:"server"`

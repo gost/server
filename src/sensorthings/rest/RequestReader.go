@@ -31,38 +31,52 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 	vars := mux.Vars(r)
 	value := vars["params"]
 
+	values := r.URL.Query()
 	if len(vars["params"]) > 0 {
 		//If $ref found create select query with id
 		if vars["params"] == "$ref" {
 			value = "id"
-			r.URL.Query()["$ref"] = []string{"true"}
+			values["$ref"] = []string{"true"}
 		}
 
-		r.URL.Query()["$select"] = []string{value}
+		values["$select"] = []string{value}
 	}
 
 	if strings.HasSuffix(r.URL.Path, "$value") {
-		r.URL.Query()["$value"] = []string{"true"}
+		values["$value"] = []string{"true"}
 	}
 
 	if t, ok := r.URL.Query()["$top"]; !ok {
-		r.URL.Query()["$top"] = []string{strconv.Itoa(MaxEntities)}
+		values["$top"] = []string{strconv.Itoa(MaxEntities)}
 	} else {
 		top, err := strconv.Atoi(t[0])
 		if err != nil || top > MaxEntities {
-			r.URL.Query()["$top"] = []string{strconv.Itoa(MaxEntities)}
+			values["$top"] = []string{strconv.Itoa(MaxEntities)}
 		}
 	}
 
-	if _, ok := r.URL.Query()["$skip"]; !ok {
-		r.URL.Query()["$skip"] = []string{"0"}
+	if _, ok := values["$skip"]; !ok {
+		values["$skip"] = []string{"0"}
 	}
 
-	qo, e := godata.ParseUrlQuery(r.URL.Query())
-	vals := *qo.Filter.Tree
-	fmt.Printf("%v", vals)
+	qo, e := odata.ParseUrlQuery(values)
+	if e != nil {
+		return nil, []error{e}
+	}
+	if qo != nil && qo.Filter != nil {
+		printTest(*qo.Filter.Tree)
+	}
 
-	return nil, []error{e}
+	return qo, nil
+}
+
+func printTest(q godata.ParseNode) {
+	fmt.Printf("Token Type %v\n", q.Token.Type)
+	fmt.Printf("Token Value %v\n", q.Token.Value)
+
+	for _, c := range q.Children {
+		printTest(*c)
+	}
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {
