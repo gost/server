@@ -27,8 +27,6 @@ func CreateRouter(api *models.API) *mux.Router {
 	sort.Sort(eps)
 
 	router := mux.NewRouter().StrictSlash(false)
-	router.PathPrefix("/Dashboard/").Handler(http.StripPrefix("/Dashboard/", http.FileServer(http.Dir(a.GetConfig().Server.ClientContent))))
-	setDashboardRedirects(router)
 
 	for _, e := range eps {
 		op := e
@@ -46,15 +44,4 @@ func CreateRouter(api *models.API) *mux.Router {
 	}
 
 	return router
-}
-
-func setDashboardRedirects(router *mux.Router) {
-	router.Methods("GET").Path("/").HandlerFunc(dashboardRedirector)
-	router.Methods("GET").Path("/Dashboard").HandlerFunc(dashboardRedirector)
-	router.Methods("GET").Path("/dashboard").HandlerFunc(dashboardRedirector)
-	router.Methods("GET").Path("/dashboard/").HandlerFunc(dashboardRedirector)
-}
-
-func dashboardRedirector(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, fmt.Sprintf("%s/Dashboard/", r.URL.Host), 301)
 }

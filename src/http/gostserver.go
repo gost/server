@@ -81,11 +81,6 @@ func (s *GostServer) Stop() {
 // LowerCaseURI is a middleware function that lower cases the url path
 func LowerCaseURI(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		if strings.Contains(strings.ToLower(r.URL.Path), "dashboard") {
-			h.ServeHTTP(w, r)
-			return
-		}
-
 		lowerCasePath := strings.ToLower(r.URL.Path)
 		// temporarily disabled checking on paths due to problems in serving with /$value
 		/*
