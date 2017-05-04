@@ -18,19 +18,19 @@ func TestEndPointGetNameShouldReturnCorrectName(t *testing.T) {
 	output := endpoint.ShowOutputInfo()
 	url := endpoint.GetURL()
 	ops := endpoint.GetOperations()
-	qos:= endpoint.GetSupportedQueryOptions()
+	qos := endpoint.GetSupportedQueryOptions()
 	expand := endpoint.GetSupportedExpandParams()
 	sel := endpoint.GetSupportedSelectParams()
 	// point.AreQueryOptionsSupported()
 
 	//assert
 	assert.Equal(t, "test", name, "name should be correct")
-	assert.True(t,!output)
-	assert.Equal(t,url, "http://www.nu.nl")
-	assert.True(t,len(ops)==0)
-	assert.True(t,len(qos)==0)
-	assert.True(t,len(expand)==0)
-	assert.True(t,len(sel)==0)
+	assert.True(t, !output)
+	assert.Equal(t, url, "http://www.nu.nl")
+	assert.True(t, len(ops) == 0)
+	assert.True(t, len(qos) == 0)
+	assert.True(t, len(expand) == 0)
+	assert.True(t, len(sel) == 0)
 
 }
 

@@ -1,9 +1,9 @@
 package entities
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"encoding/json"
 )
 
 func TestSetLinksReturnsVariousLinks(t *testing.T) {
@@ -23,8 +23,8 @@ func TestSetLinksReturnsVariousLinks(t *testing.T) {
 	assert.NotNil(t, datastream.NavSensor, "NavSensor should be filled in")
 	assert.NotNil(t, datastream.NavObservations, "NavObservations should be filled in")
 	assert.NotNil(t, datastream.NavObservedProperty, "NavObservedProperty should be filled in")
-	assert.True(t,len(propertynames)>0)
-	assert.True(t,len(supportedencoding)==0)
+	assert.True(t, len(propertynames) > 0)
+	assert.True(t, len(supportedencoding) == 0)
 }
 
 func TestSetLinksAdvanced(t *testing.T) {
@@ -55,17 +55,17 @@ func TestSetLinksAdvanced(t *testing.T) {
 	assert.NotNil(t, datastream.NavObservedProperty, "NavObservedProperty should be filled in")
 }
 
-func TestParseEntity(t *testing.T){
+func TestParseEntity(t *testing.T) {
 	// arrange
 	datastream := &Datastream{}
 	datastream.ID = "0"
-	dsjson,_:=json.Marshal(datastream)
+	dsjson, _ := json.Marshal(datastream)
 
 	// act
 	datastream.ParseEntity(dsjson)
 
 	// assert
-	assert.True(t,datastream.ID == "0")
+	assert.True(t, datastream.ID == "0")
 }
 
 func TestGetEntityType(t *testing.T) {

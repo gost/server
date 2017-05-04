@@ -1,8 +1,8 @@
 package entities
 
 import (
-	"github.com/stretchr/testify/assert"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -65,4 +65,3 @@ func TestCheckEncodingSupportedSensorFail(t *testing.T) {
 	//assert
 	assert.NotNil(t, err, "Sensor should not support encoding http://www.opengis.net/doc/IS/SensorML/2")
 }
-

@@ -1,8 +1,8 @@
 package rest
 
 import (
-"testing"
-"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestGetEndPointThing(t *testing.T) {
@@ -11,6 +11,6 @@ func TestGetEndPointThing(t *testing.T) {
 	ep.Name = "yo"
 
 	// assert
-	assert.True(t, ep!= nil)
+	assert.True(t, ep != nil)
 	assert.True(t, ep.GetName() == "yo")
 }

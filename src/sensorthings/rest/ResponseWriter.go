@@ -65,7 +65,7 @@ func JSONMarshal(data interface{}, safeEncoding bool) ([]byte, error) {
 		b, err = json.Marshal(data)
 	}
 
-	// This code is needed if the response contains special characters like &, <, >, 
+	// This code is needed if the response contains special characters like &, <, >,
 	// and those characters must not be converted to safe encoding.
 	if safeEncoding {
 		b = bytes.Replace(b, []byte("\\u003c"), []byte("<"), -1)
