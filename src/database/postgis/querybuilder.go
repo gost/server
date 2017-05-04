@@ -153,7 +153,11 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 
 	if qpi != nil && len(qpi.SubEntities) > 0 {
 		for _, subQPI := range qpi.SubEntities {
-			qo := odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			qo := &odata.QueryOptions{}
+			if subQPI.ExpandItem != nil {
+				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			}
+
 			selectString = qb.getSelect(subQPI.Entity, qo, subQPI, true, true, true, false, selectString)
 		}
 	}
@@ -215,7 +219,10 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 
 	if qpi != nil && len(qpi.SubEntities) > 0 {
 		for _, subQPI := range qpi.SubEntities {
-			qo := odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			qo := &odata.QueryOptions{}
+			if subQPI.ExpandItem != nil {
+				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			}
 			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, true, qo, subQPI, joinString)
 		}
 	}
