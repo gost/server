@@ -232,21 +232,24 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 
 func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem, main *QueryParseInfo, from *QueryParseInfo) {
 	for _, o := range operations {
+		currentFrom := from
 		for i, t := range o.Path {
 			nQPI := &QueryParseInfo{}
 			et, _ := entities.EntityFromString(strings.ToLower(t.Value))
 
 			if i == len(o.Path)-1 {
-				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), from, nil)
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), currentFrom, o)
 				main.SubEntities = append(main.SubEntities, nQPI)
 
 				if o.Expand != nil && len(o.Expand.ExpandItems) > 0 {
 					qb.constructQueryParseInfo(o.Expand.ExpandItems, main, nQPI)
 				}
 			} else {
-				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), from, o)
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), currentFrom, nil)
 				main.SubEntities = append(main.SubEntities, nQPI)
 			}
+
+			currentFrom = nQPI
 		}
 	}
 }
