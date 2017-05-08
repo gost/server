@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestGetEntityTypeReturnsCorrectType(t *testing.T) {
@@ -20,6 +21,11 @@ func TestGetEntityTypeReturnsCorrectType(t *testing.T) {
 func TestSetLinksReturnsCorrectLinks(t *testing.T) {
 	// arrange
 	observation := &Observation{}
+	datastream := &Datastream{}
+	foi := &FeatureOfInterest{}
+
+	observation.Datastream = datastream
+	observation.FeatureOfInterest = foi
 
 	// act
 	observation.SetAllLinks("www.nu.nl")
@@ -28,6 +34,42 @@ func TestSetLinksReturnsCorrectLinks(t *testing.T) {
 	assert.NotNil(t, observation.NavSelf, " NAvSelf should be filled in")
 	assert.NotNil(t, observation.NavDatastream, " NavDatastream should be filled in")
 	assert.NotNil(t, observation.NavFeatureOfInterest, " NavFeatureOfInterest should be filled in")
+	assert.NotNil(t, observation.FeatureOfInterest.NavSelf, " NavSelf FeatureofInterest should be filled in")
+	assert.NotNil(t, observation.Datastream.NavSelf, " NavSelf Datastream should be filled in")
+
+}
+
+func GetPropertyNames(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+
+	// act
+	props := observation.GetPropertyNames()
+
+	// assert
+	assert.True(t, len(props) > 0)
+
+}
+func MarshalJsonTest(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+
+	// act
+	obsjson, _ := observation.MarshalJSON()
+
+	// assert
+	assert.NotNil(t, obsjson)
+}
+
+func TestGetPropertyNames(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+
+	// act
+	propertynames := observation.GetPropertyNames()
+
+	// assert
+	assert.True(t, propertynames[0] == "id")
 }
 
 func TestGetSupportedEncodingShouldNotReturnAnyEncoding(t *testing.T) {
@@ -64,6 +106,34 @@ func TestMissingMandatoryParametersObservation(t *testing.T) {
 	if len(err) > 0 {
 		assert.Contains(t, fmt.Sprintf("%v", err[0]), "result")
 	}
+}
+
+func TestMissingMandatoryParametersWithTimesObservation(t *testing.T) {
+	//arrange
+	observation := &Observation{}
+	observation.PhenomenonTime = time.Now().UTC().Format(time.RFC3339Nano)
+	resulttime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	observation.ResultTime = &resulttime
+
+	//act
+	ok, _ := observation.ContainsMandatoryParams()
+
+	// assert
+	assert.False(t, ok)
+}
+
+func TestMissingMandatoryParametersWithWrongTimesObservation(t *testing.T) {
+	//arrange
+	observation := &Observation{}
+	observation.PhenomenonTime = "haha"
+	resulttime := "hoho"
+	observation.ResultTime = &resulttime
+
+	//act
+	ok, _ := observation.ContainsMandatoryParams()
+
+	// assert
+	assert.False(t, ok)
 }
 
 func TestMarshalPostgresJSONReturnsSomething(t *testing.T) {
