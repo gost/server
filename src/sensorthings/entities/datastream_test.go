@@ -68,6 +68,18 @@ func TestParseEntity(t *testing.T) {
 	assert.True(t, datastream.ID == "0")
 }
 
+func TestParseEntityFails(t *testing.T) {
+	// arrange
+	dsjson, _ := json.Marshal("hoho")
+
+	// act
+	datastream := &Datastream{}
+	err := datastream.ParseEntity(dsjson)
+
+	// assert
+	assert.True(t, err != nil)
+}
+
 func TestGetEntityType(t *testing.T) {
 	// arrange
 	datastream := &Datastream{}

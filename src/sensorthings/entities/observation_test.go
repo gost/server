@@ -7,6 +7,17 @@ import (
 	"time"
 )
 
+var jsonObservation = ` {
+         "@iot.id": 1368606,
+         "@iot.selfLink": "http://gost.geodan.nl/v1.0/Observations(1368606)",
+         "phenomenonTime": "2017-05-08T09:09:52.032311769Z",
+         "result": 10.291769996296797,
+         "Datastream@iot.navigationLink": "http://gost.geodan.nl/v1.0/Observations(1368606)/Datastream",
+         "FeatureOfInterest@iot.navigationLink": "http://gost.geodan.nl/v1.0/Observations(1368606)/FeatureOfInterest",
+         "resultTime": null
+      }`
+
+
 func TestGetEntityTypeReturnsCorrectType(t *testing.T) {
 	//arrange
 	observation := &Observation{}
@@ -39,18 +50,7 @@ func TestSetLinksReturnsCorrectLinks(t *testing.T) {
 
 }
 
-func GetPropertyNames(t *testing.T) {
-	// arrange
-	observation := &Observation{}
-
-	// act
-	props := observation.GetPropertyNames()
-
-	// assert
-	assert.True(t, len(props) > 0)
-
-}
-func MarshalJsonTest(t *testing.T) {
+func TestMarshalJson(t *testing.T) {
 	// arrange
 	observation := &Observation{}
 
@@ -60,6 +60,20 @@ func MarshalJsonTest(t *testing.T) {
 	// assert
 	assert.NotNil(t, obsjson)
 }
+
+func TestMarshalJsonWithTimes(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+	resultTime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	observation.ResultTime = &resultTime
+
+	// act
+	obsjson, _ := observation.MarshalJSON()
+
+	// assert
+	assert.NotNil(t, obsjson)
+}
+
 
 func TestGetPropertyNames(t *testing.T) {
 	// arrange
@@ -81,6 +95,17 @@ func TestGetSupportedEncodingShouldNotReturnAnyEncoding(t *testing.T) {
 
 	// assert
 	assert.Equal(t, 0, len(supportedEncoding), "Observation should not supprt any encoding")
+}
+
+func TestParseEntityShouldWork(t *testing.T) {
+	//arrange
+	observation := &Observation{}
+
+	//act
+	err := observation.ParseEntity([]byte(jsonObservation))
+
+	//assert
+	assert.Equal(t, err, nil, "Observation parse from json should have succeeded")
 }
 
 func TestParseEntityShouldFail(t *testing.T) {
@@ -112,8 +137,8 @@ func TestMissingMandatoryParametersWithTimesObservation(t *testing.T) {
 	//arrange
 	observation := &Observation{}
 	observation.PhenomenonTime = time.Now().UTC().Format(time.RFC3339Nano)
-	resulttime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
-	observation.ResultTime = &resulttime
+	resultTime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	observation.ResultTime = &resultTime
 
 	//act
 	ok, _ := observation.ContainsMandatoryParams()

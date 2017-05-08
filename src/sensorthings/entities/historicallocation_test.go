@@ -6,6 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var historicalLocationJson = `{
+	"@iot.id": 89,
+	"@iot.selfLink": "http://gost.geodan.nl/v1.0/HistoricalLocations(89)",
+	"time": "2017-05-04T14:22:04.646Z",
+	"Thing@iot.navigationLink": "http://gost.geodan.nl/v1.0/HistoricalLocations(89)/Thing",
+	"Locations@iot.navigationLink": "http://gost.geodan.nl/v1.0/HistoricalLocations(89)/Locations"
+}`
+
 func TestHistoricalLocationWithMandatoryParameters(t *testing.T) {
 	//arrange
 	historicalLocation := &HistoricalLocation{}
@@ -38,6 +46,17 @@ func TestHistoricalLocationWithoutMandatoryParameters(t *testing.T) {
 	assert.NotNil(t, err, "HistoricalLocation mandatory param description not filled in should have returned error")
 }
 
+func TestGetHistoricalLocationsPropertyNames(t *testing.T) {
+	// arrange
+	historicalLocation := &HistoricalLocation{}
+
+	// act
+	props := historicalLocation.GetPropertyNames()
+
+	// assert
+	assert.True(t, len(props) > 0)
+}
+
 func TestSetAllLinks(t *testing.T) {
 	//arrange
 	historicalLocation := &HistoricalLocation{}
@@ -63,4 +82,26 @@ func TestParseHistoricalLocationShouldFail(t *testing.T) {
 
 	//assert
 	assert.NotEqual(t, err, nil, "Historical parse from json should have failed")
+}
+
+func TestParseHistoricalLocationShouldSucceed(t *testing.T) {
+	//arrange
+	historicalLocation := &HistoricalLocation{}
+
+	//act
+	err := historicalLocation.ParseEntity([]byte(historicalLocationJson))
+
+	//assert
+	assert.Equal(t, err, nil, "Historical parse from json should have succeeded")
+}
+
+func TestGetSupportedEncoding(t *testing.T){
+	//arrange
+	historicalLocation := &HistoricalLocation{}
+
+	// act
+	enc := historicalLocation.GetSupportedEncoding()
+
+	// assert
+	assert.True(t, enc != nil)
 }

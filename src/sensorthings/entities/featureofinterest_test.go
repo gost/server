@@ -36,6 +36,18 @@ func TestParseEntityFoi(t *testing.T) {
 	assert.True(t, foi.ID == "0")
 }
 
+func TestParseEntityFoiFails(t *testing.T) {
+	// arrange
+	foi := &FeatureOfInterest{}
+	dsjson, _ := json.Marshal("hoho")
+
+	// act
+	err := foi.ParseEntity(dsjson)
+
+	// assert
+	assert.True(t, err != nil)
+}
+
 func TestMissingMandatoryParametersFeatureOfInterest(t *testing.T) {
 	//arrange
 	featureofinterest := &FeatureOfInterest{}
@@ -48,4 +60,19 @@ func TestMissingMandatoryParametersFeatureOfInterest(t *testing.T) {
 	if len(err) > 0 {
 		assert.Contains(t, fmt.Sprintf("%v", err[0]), "name")
 	}
+}
+
+func TestMissingMandatoryParametersFeatureOfInterestSucceeds(t *testing.T) {
+	//arrange
+	featureofinterest := &FeatureOfInterest{}
+	featureofinterest.Name = "name"
+	featureofinterest.Description = "desc"
+	featureofinterest.EncodingType = "type"
+	featureofinterest.Feature = map[string]interface{}{"name": "location name 1"}
+
+	//act
+	_, err := featureofinterest.ContainsMandatoryParams()
+
+	//assert
+	assert.Nil(t, err, "FeatureOfInterest mandatory param description filled in should not have returned error")
 }

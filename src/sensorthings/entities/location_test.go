@@ -65,6 +65,8 @@ func TestParseEntityResultOkLocation(t *testing.T) {
 	assert.Equal(t, err, nil, "Unable to parse json into Location")
 }
 
+
+
 func TestParseEntityResultNotOkLocation(t *testing.T) {
 	//arrange
 	location := &Location{}
