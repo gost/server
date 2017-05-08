@@ -105,16 +105,6 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 	return &formatted, nil
 }
 
-// Contains checks a string array
-func Contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 // ContainsToLower checks a string array, array and given string are set to lower-case
 func ContainsToLower(s []string, e string) bool {
 	for _, a := range s {
@@ -187,8 +177,11 @@ func ToIntID(id interface{}) (int, bool) {
 
 	intID, err := strconv.Atoi(fmt.Sprintf("%v", id))
 	if err != nil {
+		// why not return:  0, err
 		return 0, false
 	}
+
+	// why not return: intID, nil
 	return intID, true
 }
 
