@@ -8,10 +8,6 @@ before_install:
   - go get github.com/tebben/overalls
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-  
-branches:
-  except:
-    - feature/odata-parsing
 
 script:
   - go test ./...
