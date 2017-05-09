@@ -74,6 +74,18 @@ func TestMarshalJsonWithTimes(t *testing.T) {
 	assert.NotNil(t, obsjson)
 }
 
+func TestMarshalJsonWithEmptyTimes(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+	resultTime := ""
+	observation.ResultTime = &resultTime
+
+	// act
+	obsjson, _ := observation.MarshalJSON()
+
+	// assert
+	assert.NotNil(t, obsjson)
+}
 
 func TestGetPropertyNames(t *testing.T) {
 	// arrange
@@ -164,6 +176,21 @@ func TestMissingMandatoryParametersWithWrongTimesObservation(t *testing.T) {
 func TestMarshalPostgresJSONReturnsSomething(t *testing.T) {
 	// arrange
 	observation := &Observation{}
+
+	// act
+	bytes, _ := observation.MarshalPostgresJSON()
+
+	// assert
+
+	assert.NotNil(t, bytes)
+}
+
+func TestMarshalPostgresJSONWithResultTime(t *testing.T) {
+	// arrange
+	observation := &Observation{}
+	resultTime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+
+	observation.ResultTime= &resultTime
 
 	// act
 	bytes, _ := observation.MarshalPostgresJSON()

@@ -32,6 +32,17 @@ func TestMissingMandatoryParametersSensor(t *testing.T) {
 	}
 }
 
+func TestSensorGetPropertyNames(t *testing.T) {
+	// arrange
+	sensor := &Sensor{}
+
+	// act
+	propertynames := sensor.GetPropertyNames()
+
+	// assert
+	assert.True(t, propertynames[0] == "id")
+}
+
 func TestMandatoryParametersExistSensor(t *testing.T) {
 	//arrange
 	sensor := &Sensor{

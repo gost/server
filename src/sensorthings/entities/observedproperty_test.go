@@ -30,6 +30,18 @@ func TestMissingMandatoryParametersObservedProperty(t *testing.T) {
 	}
 }
 
+func TestObservedPropertyGetPropertyNames(t *testing.T) {
+	// arrange
+	op := &ObservedProperty{}
+
+	// act
+	propertynames := op.GetPropertyNames()
+
+	// assert
+	assert.True(t, propertynames[0] == "id")
+}
+
+
 func TestMandatoryParametersExistObservedProperty(t *testing.T) {
 	//arrange
 	op := &ObservedProperty{

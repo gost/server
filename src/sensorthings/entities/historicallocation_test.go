@@ -105,3 +105,14 @@ func TestGetSupportedEncoding(t *testing.T){
 	// assert
 	assert.True(t, enc != nil)
 }
+
+func TestHistoricalLocationContainsMandatoryParameters(t *testing.T) {
+	// arrange
+	historicalLocation := &HistoricalLocation{}
+
+	// act
+	contains, _ := historicalLocation.ContainsMandatoryParams()
+
+	// assert
+	assert.False(t, contains, "HistoricalLocation is expected not to have mandatory paramaters")
+}

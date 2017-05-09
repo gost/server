@@ -31,6 +31,32 @@ func TestGetObservationTypeByCodeShouldReturnCorrectObservationType(t *testing.T
 	res, err := GetObservationTypeByID(input)
 
 	// assert
-	assert.Nil(t, err, "Error should not be nil")
+	assert.Nil(t, err, "Error should be nil")
+	assert.True(t, res.Value == expected, "Code should be "+expected)
+}
+
+func TestGetObservationTypeByNotExistingCodeShouldReturnError(t *testing.T) {
+	// arrange
+	expected := "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"
+	input := int64(9999)
+
+	// act
+	res, err := GetObservationTypeByID(input)
+
+	// assert
+	assert.NotNil(t, err, "Error should not be nil")
+	assert.True(t, res.Value == expected, "Code should be "+expected)
+}
+
+func TestGetObservationTypeByNotExistingValueShouldReturnError(t *testing.T) {
+	// arrange
+	input := "not_existing"
+	expected := "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation"
+
+	// act
+	res, err := GetObservationTypeByValue(input)
+
+	// assert
+	assert.NotNil(t, err, "Error should not be nil")
 	assert.True(t, res.Value == expected, "Code should be "+expected)
 }
