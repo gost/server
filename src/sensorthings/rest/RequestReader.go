@@ -5,11 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"fmt"
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gorilla/mux"
-	"github.com/gost/godata"
 	"strconv"
 )
 
@@ -63,20 +61,8 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 	if e != nil {
 		return nil, []error{e}
 	}
-	if qo != nil && qo.Filter != nil {
-		printTest(*qo.Filter.Tree)
-	}
 
 	return qo, nil
-}
-
-func printTest(q godata.ParseNode) {
-	fmt.Printf("Token Type %v\n", q.Token.Type)
-	fmt.Printf("Token Value %v\n", q.Token.Value)
-
-	for _, c := range q.Children {
-		printTest(*c)
-	}
 }
 
 func checkContentType(w http.ResponseWriter, r *http.Request) bool {

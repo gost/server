@@ -6,6 +6,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/gost/godata"
 	"strings"
+	"time"
 )
 
 // QueryBuilder can construct queries based on entities and QueryOptions
@@ -259,101 +260,140 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
 func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, addWhere bool) string {
-	return ""
-	//q := ""
-	//if qo != nil && qo.Filter != nil {
-	//	if addWhere {
-	//		q += " WHERE "
-	//	}
-	//	ps, ops := qo.QueryFilter.Predicate.Split()
-	//
-	//	for i, p := range ps {
-	//		qb.prepareFilterRight(p)
-	//		operator, _ := qb.odataLogicalOperatorToPostgreSQL(p.Operator)
-	//		leftString := fmt.Sprintf("%v", p.Left)
-	//		if strings.Contains(leftString, "/") {
-	//			parts := strings.Split(leftString, "/")
-	//			for i, p := range parts {
-	//				if i == 0 {
-	//					q += fmt.Sprintf("%v ", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p))])
-	//					continue
-	//				}
-	//
-	//				arrow := "->"
-	//				if i+1 == len(parts) {
-	//					arrow = "->>"
-	//				}
-	//				q += fmt.Sprintf("%v '%v'", arrow, p)
-	//			}
-	//			q += fmt.Sprintf("%v %v", operator, p.Right)
-	//		} else {
-	//			q += fmt.Sprintf("%v %v %v", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p.Left))], operator, fmt.Sprintf("%v", p.Right))
-	//		}
-	//
-	//		if len(ops)-1 >= i {
-	//			q += fmt.Sprintf(" %v ", ops[i])
-	//		}
-	//	}
-	//	q += " "
-	//}
-	//
-	//return q
-}
+	q := ""
+	if qo != nil && qo.Filter != nil {
+		if addWhere {
+			q += " WHERE "
+		}
 
-//func (qb *QueryBuilder) prepareFilterRight(p *odata.Predicate) {
-//	e := strings.Replace(fmt.Sprintf("%v", p.Right), "'", "", -1)
-//	property := strings.ToLower(fmt.Sprintf("%v", p.Left))
-//
-//	if property == "encodingtype" {
-//		et, err := entities.CreateEncodingType(e)
-//		if err == nil {
-//			p.Right = et.Code
-//		}
-//		return
-//	}
-//
-//	if property == "observationtype" {
-//		et, err := entities.GetObservationTypeByValue(e)
-//		if err == nil {
-//			p.Right = et.Code
-//		}
-//		return
-//	}
-//
-//	if property == "phenomenontime" || property == "resulttime" || property == "time" {
-//		if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
-//			p.Right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
-//		}
-//		return
-//	}
-//}
-
-// odataLogicalOperatorToPostgreSQL converts a logical operator to a PostgreSQL string representation
-func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) (string, error) {
-	switch o {
-	case "and":
-		return "AND", nil
-	case "or":
-		return "OR", nil
-	case "not":
-		return "NOT", nil
-	case "has":
-		return "HAS", nil
-	case "eq":
-		return "=", nil
-	case "ne":
-		return "!=", nil
-	case "gt":
-		return ">", nil
-	case "ge":
-		return ">=", nil
-	case "lt":
-		return "<", nil
-	case "le":
-		return "<=", nil
+		q += qb.createFilter(qo.Filter.Tree)
 	}
 
-	return "", fmt.Errorf("Operator %v not implemented", o)
+	return q
+}
+
+func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
+	output := ""
+	switch pn.Token.Type {
+	case godata.FilterTokenOpenParen:
+		return ""
+	case godata.FilterTokenCloseParen:
+		return ""
+	case godata.FilterTokenWhitespace:
+		return ""
+	case godata.FilterTokenNav:
+		q := ""
+		for i, part := range pn.Children {
+			if i == 0 {
+				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(part)))
+				continue
+			}
+
+			arrow := "->"
+			if i+1 == len(pn.Children) {
+				arrow = "->>"
+			}
+			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(part))
+		}
+		return q
+	case godata.FilterTokenColon:
+		return ""
+	case godata.FilterTokenComma: //5
+		return ""
+	case godata.FilterTokenLogical:
+		left := qb.createFilter(pn.Children[0])
+		right := qb.createFilter(pn.Children[1])
+		right = qb.prepareFilterRight(left, right)
+		return fmt.Sprintf("%v %v %v", strings.ToLower(left), qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
+	case godata.FilterTokenOp:
+		return ""
+	case godata.FilterTokenFunc:
+		return ""
+	case godata.FilterTokenLambda:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenNull: // 10
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenIt:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenRoot:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenFloat:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenInteger:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenString: //15
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenDate:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenTime:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenDateTime:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenBoolean:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenLiteral: // 20
+		return fmt.Sprintf("%v", pn.Token.Value)
+	}
+
+	return output
+}
+
+func (qb *QueryBuilder) prepareFilterRight(left, right string) string {
+	e := strings.Replace(fmt.Sprintf("%v", right), "'", "", -1)
+	property := strings.ToLower(fmt.Sprintf("%v", left))
+
+	if property == "encodingtype" {
+		et, err := entities.CreateEncodingType(e)
+		if err == nil {
+			right = fmt.Sprintf("%v", et.Code)
+		}
+		return right
+	}
+
+	if property == "observationtype" {
+		et, err := entities.GetObservationTypeByValue(e)
+		if err == nil {
+			right = fmt.Sprintf("%v", et.Code)
+		}
+		return right
+	}
+
+	if property == "phenomenontime" || property == "resulttime" || property == "time" {
+		if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
+			right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+		}
+		return right
+	}
+
+	return right
+}
+
+// odataLogicalOperatorToPostgreSQL converts a logical operator to a PostgreSQL string representation
+func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
+	switch o {
+	case "and":
+		return "AND"
+	case "or":
+		return "OR"
+	case "not":
+		return "NOT"
+	case "has":
+		return "HAS"
+	case "eq":
+		return "="
+	case "ne":
+		return "!="
+	case "gt":
+		return ">"
+	case "ge":
+		return ">="
+	case "lt":
+		return "<"
+	case "le":
+		return "<="
+	}
+
+	return ""
 }
 
 // CreateQuery creates a new query based on given input
@@ -416,8 +456,6 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	}
 	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, orderBy, limit, qb.getOffset(qo))
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, orderBy)
-
-	fmt.Printf("%v \n", queryString)
 
 	return queryString, qpi
 }
