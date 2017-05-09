@@ -15,25 +15,27 @@ services:
             - "1883:1883"
             - "9001:9001"
     gost-db:
-        image: geodan/gost-db:0.4
+        image: geodan/gost-db
         volumes:
             - postgis:/var/lib/pgsql/9.5/data
-        ports:
-            - "5432:5432"
         environment:
             POSTGRES_DB: gost
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
     gost:
-        image: geodan/gost:0.4
-        ports:
-            - "8080:8080"
+        image: geodan/gost
         depends_on:
             - mosquitto
             - gost-db
         environment:
             gost_db_host: gost-db
             gost_mqtt_host: mosquitto
+    dashboard:
+        image: geodan/gost-dashboard
+        ports:
+          - "8080:8080"
+        depends_on:
+            - gost
 volumes:
     postgis: {}
     nodered: {}
