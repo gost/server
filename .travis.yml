@@ -14,7 +14,7 @@ branches:
     - feature/odata-parsing
 script:
   - go test ./...
-  - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git,client" -debug true
+  - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git" -debug true
   - goveralls -coverprofile=/home/travis/gopath/src/github.com/geodan/gost/src/overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
 
 notifications:
