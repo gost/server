@@ -33,11 +33,10 @@ func TestSetLinksAdvanced(t *testing.T) {
 	sensor := &Sensor{}
 	datastream := &Datastream{}
 	observedproperty := &ObservedProperty{}
-	// todo: how to set observations???
-	// obs1 := &Observation{}
-	// obs2 := &Observation{}
-	//obs := []Observation{}
-	//datastream.Observations=*obs
+	obs1 := &Observation{}
+	obs2 := &Observation{}
+	obs := []*Observation{obs1, obs2}
+	datastream.Observations = obs
 
 	datastream.ID = "0"
 	datastream.Thing = thing
@@ -91,7 +90,7 @@ func TestGetEntityType(t *testing.T) {
 	assert.Equal(t, EntityTypeDatastream, entityType, "GetEntityType should be Datastream")
 }
 
-func TestContainsMandatoryParameters(t *testing.T) {
+func TestContainsMandatoryParametersFails(t *testing.T) {
 	// arrange
 	datastream := &Datastream{}
 
@@ -100,4 +99,39 @@ func TestContainsMandatoryParameters(t *testing.T) {
 
 	// assert
 	assert.False(t, contains, "Datastream is expected not to have mandatory paramaters")
+}
+
+func TestContainsMandatoryParametersSucceeds(t *testing.T) {
+	// arrange
+	datastream := &Datastream{}
+	datastream.Name = "name"
+	datastream.Description = "desc"
+	unitofmeasurement := map[string]interface{}{"definition": "http://www.qudt.org/qudt/owl/1.0.0/unit/Instances.html/Lumen", "name": "Centigrade", "symbol": "C"}
+	datastream.UnitOfMeasurement = unitofmeasurement
+	datastream.ObservationType = "OMCategoryUnknown"
+	thing := &Thing{}
+	thing.Name = "name"
+	thing.Description = "desc"
+	datastream.Thing = thing
+	sensor := &Sensor{
+		Name:         "test",
+		Description:  "test",
+		EncodingType: "test",
+		Metadata:     "test",
+	}
+	datastream.Sensor = sensor
+	op := &ObservedProperty{
+		Name:        "test",
+		Definition:  "test",
+		Description: "test",
+	}
+
+
+	datastream.ObservedProperty = op
+
+	// act
+	contains, _ := datastream.ContainsMandatoryParams()
+
+	// assert
+	assert.True(t, contains, "Datastream is expected to have mandatory paramaters")
 }

@@ -65,6 +65,11 @@ func TestSetAllLinks(t *testing.T) {
 	thing.Description = "testdescription"
 	historicalLocation.Thing = &thing
 
+	obs1 := &Location{}
+	obs2 := &Location{}
+	locations := []*Location{obs1, obs2}
+	historicalLocation.Locations = locations
+
 	//act
 	historicalLocation.SetAllLinks("http://www.test.com")
 

@@ -83,6 +83,10 @@ func TestSetLinksSObservedProperty(t *testing.T) {
 	//arrange
 	op := &ObservedProperty{}
 	op.ID = id
+	ds1 := &Datastream{}
+	ds2 := &Datastream{}
+	datastreams := []*Datastream{ds1, ds2}
+	op.Datastreams = datastreams
 
 	//act
 	op.SetAllLinks(externalURL)

@@ -15,6 +15,48 @@ const (
 	id          = "myid"
 )
 
+func TestEntityFromType(t *testing.T) {
+	// act
+	thing := EntityFromType(EntityTypeThing)
+	location := EntityFromType(EntityTypeLocation)
+	historicallocation := EntityFromType(EntityTypeHistoricalLocation)
+	datastream := EntityFromType(EntityTypeDatastream)
+	sensor := EntityFromType(EntityTypeSensor)
+	observedproperty := EntityFromType(EntityTypeObservedProperty)
+	observation := EntityFromType(EntityTypeObservation)
+	foi := EntityFromType(EntityTypeFeatureOfInterest)
+	unknown := EntityFromType(EntityTypeUnknown)
+
+	// assert
+	assert.NotNil(t, thing)
+	assert.NotNil(t, location)
+	assert.NotNil(t, historicallocation)
+	assert.NotNil(t, datastream)
+	assert.NotNil(t, sensor)
+	assert.NotNil(t, observedproperty)
+	assert.NotNil(t, observation)
+	assert.NotNil(t, foi)
+	assert.Nil(t, unknown)
+}
+
+func TestEntityTypeFromString(t *testing.T) {
+	// act
+	version, err := EntityFromString("thing")
+
+	// assert
+	assert.NotNil(t, version)
+	assert.Nil(t, err)
+}
+
+func TestEntityTypeFromStringFails(t *testing.T) {
+	// act
+	version, err := EntityFromString("hoho")
+
+	// assert
+	assert.Nil(t, version)
+	assert.NotNil(t, err)
+}
+
 func TestEntityTypeStrings(t *testing.T) {
 	assert.Equal(t, "Thing", EntityTypeThing.ToString())
 	assert.Equal(t, "Location", EntityTypeLocation.ToString())

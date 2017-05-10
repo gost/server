@@ -11,6 +11,10 @@ func TestSetLinks(t *testing.T) {
 	// arrange
 	foi := &FeatureOfInterest{}
 	foi.ID = "0"
+	obs1 := &Observation{}
+	obs2 := &Observation{}
+	obs := []*Observation{obs1, obs2}
+	foi.Observations = obs
 
 	// act
 	foi.SetAllLinks("http://www.nu.nl")

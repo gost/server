@@ -85,6 +85,10 @@ func TestSetLinksSensor(t *testing.T) {
 	//arrange
 	sensor := &Sensor{}
 	sensor.ID = id
+	ds1 := &Datastream{}
+	ds2 := &Datastream{}
+	datastreams := []*Datastream{ds1, ds2}
+	sensor.Datastreams = datastreams
 
 	//act
 	sensor.SetAllLinks(externalURL)
