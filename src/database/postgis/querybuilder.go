@@ -59,10 +59,11 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 // getOrderBy returns the string that needs to be placed after ORDER BY, this is set using
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
 func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
-	if qo != nil && qo.OrderBy != nil {
+	if qo != nil && qo.OrderBy != nil && len(qo.OrderBy.OrderByItems) > 0 {
 		obString := ""
 		for _, obi := range qo.OrderBy.OrderByItems {
 			propertyName := selectMappings[et][strings.ToLower(obi.Field.Value)]
+			fmt.Printf("PROPERTY %s - %s - %s\n", et.ToString(), obi.Field.Value, propertyName)
 			if len(obString) == 0 {
 				obString = fmt.Sprintf("%s %s", propertyName, obi.Order)
 			} else {
@@ -266,13 +267,13 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 			q += " WHERE "
 		}
 
-		q += qb.createFilter(qo.Filter.Tree)
+		q += qb.createFilter(et, qo.Filter.Tree)
 	}
 
 	return q
 }
 
-func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
+func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode) string {
 	output := ""
 	switch pn.Token.Type {
 	case godata.FilterTokenOpenParen:
@@ -285,7 +286,7 @@ func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
 		q := ""
 		for i, part := range pn.Children {
 			if i == 0 {
-				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(part)))
+				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part)))
 				continue
 			}
 
@@ -293,7 +294,7 @@ func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
 			if i+1 == len(pn.Children) {
 				arrow = "->>"
 			}
-			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(part))
+			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part))
 		}
 		return q
 	case godata.FilterTokenColon:
@@ -301,10 +302,11 @@ func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
 	case godata.FilterTokenComma: //5
 		return ""
 	case godata.FilterTokenLogical:
-		left := qb.createFilter(pn.Children[0])
-		right := qb.createFilter(pn.Children[1])
+		left := qb.createFilter(et, pn.Children[0])
+		left = qb.prepareFilterLeft(et, left)
+		right := qb.createFilter(et, pn.Children[1])
 		right = qb.prepareFilterRight(left, right)
-		return fmt.Sprintf("%v %v %v", strings.ToLower(left), qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
+		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenOp:
 		return ""
 	case godata.FilterTokenFunc:
@@ -336,6 +338,15 @@ func (qb *QueryBuilder) createFilter(pn *godata.ParseNode) string {
 	}
 
 	return output
+}
+
+func (qb *QueryBuilder) prepareFilterLeft(et entities.EntityType, left string) string {
+	p := selectMappings[et][strings.ToLower(left)]
+	if p != "" {
+		return p
+	}
+
+	return left
 }
 
 func (qb *QueryBuilder) prepareFilterRight(left, right string) string {
@@ -456,7 +467,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	}
 	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, orderBy, limit, qb.getOffset(qo))
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, orderBy)
-
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 

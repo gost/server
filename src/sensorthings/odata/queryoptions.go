@@ -63,6 +63,7 @@ func ParseUrlQuery(query url.Values) (*QueryOptions, error) {
 	}
 	result.Value = &val
 
+	value = query.Get("$ref")
 	ref := GoDataRefQuery(false)
 	if value != "" {
 		ref = GoDataRefQuery(true)
