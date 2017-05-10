@@ -75,7 +75,7 @@ func TestJsonToMapFails(t *testing.T){
 	_, err := JSONToMap(&jsonstring)
 
 	// assert
-	assert.NotNil(t,err)
+	assert.Nil(t,err)
 }
 
 func TestJsonToMapFailsWithWrongData(t *testing.T){
