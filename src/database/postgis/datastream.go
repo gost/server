@@ -218,9 +218,7 @@ func CheckDatastreamRelationsExist(gdb *GostDatabase, d *entities.Datastream) er
 	return nil
 }
 
-// PostDatastream todo
-// TODO: !!!!ADD phenomenonTime SUPPORT!!!!
-// TODO: !!!!ADD resulttime SUPPORT!!!!
+// PostDatastream posts a datastream
 func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datastream, error) {
 	err := CheckDatastreamRelationsExist(gdb, d)
 	if err != nil {

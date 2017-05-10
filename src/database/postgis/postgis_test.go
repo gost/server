@@ -53,3 +53,38 @@ func TestContainsNotToLower(t *testing.T){
 	// assert
 	assert.False(t,res)
 }
+
+func TestJsonToMapSucceeds(t *testing.T){
+	// arrange
+	jsonstring := `{"value": [{"name": "Things","url": "http://gost.geodan.nl/v1.0/Things"}]}`
+
+	// act
+	res, err := JSONToMap(&jsonstring)
+
+	// assert
+	assert.Nil(t,err)
+	assert.NotNil(t,res)
+	assert.NotNil(t,res["value"])
+}
+
+func TestJsonToMapFails(t *testing.T){
+	// arrange
+	jsonstring := ``
+
+	// act
+	_, err := JSONToMap(&jsonstring)
+
+	// assert
+	assert.NotNil(t,err)
+}
+
+func TestJsonToMapFailsWithWrongData(t *testing.T){
+	// arrange
+	jsonstring := `hoho`
+
+	// act
+	_, err := JSONToMap(&jsonstring)
+
+	// assert
+	assert.NotNil(t,err)
+}

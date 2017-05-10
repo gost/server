@@ -31,9 +31,11 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 			var m map[string]json.RawMessage
 			err = json.Unmarshal(b, &m)
 			if err != nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+				// unreachable code?
 				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
 			}
 
+			// whats happening here?
 			mVal := []byte{}
 			for k, v := range m {
 				if strings.ToLower(k) == qo.QuerySelect.Params[0] {
