@@ -26,6 +26,12 @@ func TestEndPointLength(t *testing.T) {
 func HandleTest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 }
 
+func TestIsDynamic(t *testing.T){
+	url := "http://www.nu.nl"
+	result := isDynamic(url)
+	assert.False(t, result)
+}
+
 func TestEndPointSort(t *testing.T) {
 	// arrange
 	restep := rest.Endpoint{}
