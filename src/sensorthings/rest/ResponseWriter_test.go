@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
-
 )
 
 func TestSendErrorWithNoError(t *testing.T) {

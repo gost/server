@@ -25,6 +25,7 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 		}
 
 		// $value is requested only send back the value, ToDo: move to API code?
+		// need to check on qo.QuerySelect.Params[0] ?
 		if qo != nil && qo.QueryOptionValue {
 			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.QuerySelect.Params[0])
 			var m map[string]json.RawMessage
