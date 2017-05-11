@@ -35,7 +35,7 @@ func TestGetEntityId(t *testing.T) {
 
 func TestGetQueryOptions(t *testing.T) {
 	// arrange
-	req, _ := http.NewRequest("GET", "/v1.0/Things?$top=1", nil)
+	req, _ := http.NewRequest("GET", "/v1.0/Things/$value?$top=201", nil)
 
 	// act
 	qo, _ := getQueryOptions(req)
