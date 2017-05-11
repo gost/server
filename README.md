@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/gost/dashboard/master/content/assets/img/logo.png" width="353"><br />
+<img src="https://raw.githubusercontent.com/gost/dashboard/master/content/assets/img/icon.png" width="353"><br />
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Geodan/gost/blob/master/LICENSE)
 [![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/Geodan/gost)
 [![Build Status](https://travis-ci.org/Geodan/gost.svg?branch=master)](https://travis-ci.org/Geodan/gost)
