@@ -63,7 +63,6 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 		obString := ""
 		for _, obi := range qo.OrderBy.OrderByItems {
 			propertyName := selectMappings[et][strings.ToLower(obi.Field.Value)]
-			fmt.Printf("PROPERTY %s - %s - %s\n", et.ToString(), obi.Field.Value, propertyName)
 			if len(obString) == 0 {
 				obString = fmt.Sprintf("%s %s", propertyName, obi.Order)
 			} else {
@@ -232,26 +231,33 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 	return joinString
 }
 
-func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem, main *QueryParseInfo, from *QueryParseInfo) {
+func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem, main *QueryParseInfo) {
 	for _, o := range operations {
-		currentFrom := from
 		for i, t := range o.Path {
 			nQPI := &QueryParseInfo{}
 			et, _ := entities.EntityFromString(strings.ToLower(t.Value))
 
+			path := make([]entities.EntityType, 0)
+			for p := 0; p < i+1; p++ {
+				etfs, _ := entities.EntityFromString(o.Path[p].Value)
+				path = append(path, etfs.GetEntityType())
+			}
+			parent := main.GetParent(path)
+			if parent.Entity.GetEntityType() == et.GetEntityType() {
+				continue
+			}
+
 			if i == len(o.Path)-1 {
-				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), currentFrom, o)
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), parent, o)
 				main.SubEntities = append(main.SubEntities, nQPI)
 
 				if o.Expand != nil && len(o.Expand.ExpandItems) > 0 {
-					qb.constructQueryParseInfo(o.Expand.ExpandItems, main, nQPI)
+					qb.constructQueryParseInfo(o.Expand.ExpandItems, main)
 				}
 			} else {
-				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), currentFrom, nil)
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), parent, nil)
 				main.SubEntities = append(main.SubEntities, nQPI)
 			}
-
-			currentFrom = nQPI
 		}
 	}
 }
@@ -303,9 +309,11 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		return ""
 	case godata.FilterTokenLogical:
 		left := qb.createFilter(et, pn.Children[0])
-		left = qb.prepareFilterLeft(et, left)
 		right := qb.createFilter(et, pn.Children[1])
+
+		// do not change order
 		right = qb.prepareFilterRight(left, right)
+		left = qb.prepareFilterLeft(et, left)
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenOp:
 		return ""
@@ -436,7 +444,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	if qo != nil && qo.Expand != nil {
 		qpi.SubEntities = make([]*QueryParseInfo, 0)
 		if len(qo.Expand.ExpandItems) > 0 {
-			qb.constructQueryParseInfo(qo.Expand.ExpandItems, qpi, qpi)
+			qb.constructQueryParseInfo(qo.Expand.ExpandItems, qpi)
 		}
 	}
 
@@ -467,7 +475,8 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	}
 	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, orderBy, limit, qb.getOffset(qo))
 	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, orderBy)
-	fmt.Printf("%s\n", queryString)
+
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 

@@ -181,6 +181,61 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	}
 }
 
+// AppendSubEntity appends a sub entity to the SubEntityList
+func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
+	cq := q
+	path := ""
+	if len(etl) > 1 {
+		for i, e := range etl {
+			if i+1 == len(etl) {
+				continue
+			}
+
+			if i == 0 {
+				path = fmt.Sprintf("%v", e)
+			} else {
+				path = fmt.Sprintf("%v/%v", path, e)
+			}
+
+		}
+	}
+
+	if path != "" {
+		for _, se := range q.SubEntities {
+			if se.getPath("") == path {
+				cq = se
+				break
+			}
+		}
+	}
+
+	return cq
+}
+
+func (q *QueryParseInfo) getPath(path string) string {
+	if len(path) == 0 {
+		path = q.Entity.GetEntityType().ToString()
+	} else {
+		path = fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
+	}
+
+	if q.Parent != nil {
+		q.Parent.getPath(path)
+	}
+
+	return path
+}
+
+func (q *QueryParseInfo) getSubEntity(et entities.EntityType) *QueryParseInfo {
+	for i, se := range q.SubEntities {
+		if et == se.Entity.GetEntityType() {
+			return q.SubEntities[i]
+		}
+	}
+
+	return q
+}
+
 // GetQueryParseInfoByQueryIndex returns the QueryParseInfo by a given QueryID, this func should be called from the main
 // QueryParseInfo object
 func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
@@ -200,6 +255,19 @@ func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
 
 // GetNextQueryIndex returns the next query index number based on the added entities/sub entities
 func (q *QueryParseInfo) GetNextQueryIndex() int {
+	qpi := q.GetMainQueryParseInfo()
+
+	qi := qpi.QueryIndex
+	if len(qpi.SubEntities) > 0 {
+		lastSub := qpi.SubEntities[len(qpi.SubEntities)-1]
+		qi = lastSub.getNextQueryIndex() - 1
+	}
+
+	return qi + 1
+}
+
+// GetNextQueryIndex returns the next query index number based on the added entities/sub entities
+func (q *QueryParseInfo) getNextQueryIndex() int {
 	qi := q.QueryIndex
 	if len(q.SubEntities) > 0 {
 		lastSub := q.SubEntities[len(q.SubEntities)-1]
@@ -207,6 +275,16 @@ func (q *QueryParseInfo) GetNextQueryIndex() int {
 	}
 
 	return qi + 1
+}
+
+// GetMainQueryParseInfo returns the first QueryParseInfo from the tree
+func (q *QueryParseInfo) GetMainQueryParseInfo() *QueryParseInfo {
+	qpi := q
+	if qpi.Parent != nil {
+		qpi = qpi.Parent.GetMainQueryParseInfo()
+	}
+
+	return qpi
 }
 
 // GetQueryIDRelationMap returns the query index relations, ie QueryParseInfo with sub entity datastream thing qid = 0, datastream qid = 1
