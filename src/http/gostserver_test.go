@@ -7,6 +7,9 @@ import (
 	api "github.com/geodan/gost/src/sensorthings/api"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"net/http/httptest"
+	"io/ioutil"
+	"net/http"
 )
 
 func TestCreateServer(t *testing.T) {
@@ -20,4 +23,18 @@ func TestCreateServer(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, server)
+}
+
+
+func TestLowerCaseURI(t *testing.T) {
+	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		assert.True(t, req.URL.Path == "/test")
+
+	})
+	ts := httptest.NewServer(LowerCaseURI(n))
+	defer ts.Close()
+	res, _ := http.Get(ts.URL + "/TEST")
+	defer res.Body.Close()
+	b, _ := ioutil.ReadAll(res.Body)
+	assert.NotNil(t, b)
 }
