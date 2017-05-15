@@ -10,7 +10,6 @@ import (
 
 // handlePatchRequest todo: currently almost same as handlePostRequest, merge if it stays like this
 func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if !checkContentType(w, r) {
 		return
 	}

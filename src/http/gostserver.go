@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/models"
+	"github.com/rs/cors"
 	"time"
 )
 
@@ -42,7 +43,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      LowerCaseURI(router),
+			Handler:      cors.Default().Handler(LowerCaseURI(router)),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},

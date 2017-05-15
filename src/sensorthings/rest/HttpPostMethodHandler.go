@@ -10,7 +10,6 @@ import (
 
 // handlePostRequest
 func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, entity entities.Entity, h *func() (interface{}, []error)) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
 	if !checkContentType(w, r) {
 		return
 	}
