@@ -3,14 +3,15 @@ package http
 import (
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"strings"
-
 	"context"
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/rs/cors"
 	"time"
+	"github.com/geodan/gost/src/sensorthings/rest"
 )
 
 // Server interface for starting and stopping the HTTP server
@@ -43,7 +44,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      cors.Default().Handler(LowerCaseURI(router)),
+			Handler:      cors.Default().Handler(HandleExternalUri(LowerCaseURI(router))),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},
@@ -113,5 +114,24 @@ func LowerCaseURI(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	}
 
+	return http.HandlerFunc(fn)
+}
+
+func HandleExternalUri(h http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+			rec := httptest.NewRecorder()
+			h.ServeHTTP(rec, r)
+			bytes := rec.Body.Bytes()
+			s := string(bytes)
+			if len(s) > 0 {
+				forwarded_uri := r.Header.Get("X-Forwarded-For")
+				if len(forwarded_uri) > 0 {
+					orig_uri := rest.ExternalURI
+					s = strings.Replace(s, orig_uri, forwarded_uri, -1)
+				}
+
+			}
+			w.Write([]byte(s))
+		}
 	return http.HandlerFunc(fn)
 }
