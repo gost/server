@@ -6,6 +6,7 @@ RUN go get github.com/gorilla/mux
 RUN go get gopkg.in/yaml.v2
 RUN go get github.com/lib/pq
 RUN go get github.com/gost/now
+RUN go get github.com/rs/cors
 RUN go get github.com/eclipse/paho.mqtt.golang
 RUN go build -o /go/bin/gost/gost github.com/geodan/gost/src
 RUN cp /go/src/github.com/geodan/gost/src/config.yaml /go/bin/gost/config.yaml
