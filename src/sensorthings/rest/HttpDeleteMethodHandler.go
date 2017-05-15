@@ -8,7 +8,6 @@ import (
 
 // handleDeleteRequest
 func handleDeleteRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func() error) {
-	w.Header().Add("Access-Control-Allow-Origin", "*")
 	handle := *h
 	err := handle()
 	if err != nil {

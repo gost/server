@@ -10,6 +10,5 @@ import (
 func HandleAPIRoot(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
 	a := *api
 	bpi := a.GetBasePathInfo()
-	w.Header().Add("Access-Control-Allow-Origin", "*")
 	sendJSONResponse(w, http.StatusOK, bpi, nil)
 }
