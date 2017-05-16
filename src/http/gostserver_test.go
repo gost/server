@@ -5,11 +5,12 @@ import (
 	"github.com/geodan/gost/src/database/postgis"
 	"github.com/geodan/gost/src/mqtt"
 	api "github.com/geodan/gost/src/sensorthings/api"
+	"github.com/geodan/gost/src/sensorthings/rest"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"net/http/httptest"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestCreateServer(t *testing.T) {
@@ -25,7 +26,6 @@ func TestCreateServer(t *testing.T) {
 	assert.NotNil(t, server)
 }
 
-
 func TestLowerCaseURI(t *testing.T) {
 	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		assert.True(t, req.URL.Path == "/test")
@@ -37,4 +37,27 @@ func TestLowerCaseURI(t *testing.T) {
 	defer res.Body.Close()
 	b, _ := ioutil.ReadAll(res.Body)
 	assert.NotNil(t, b)
+}
+
+func TestPostProcessHandler(t *testing.T) {
+	rest.ExternalURI = "tea"
+	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		rw.WriteHeader(http.StatusTeapot)
+		rw.Header().Add("Location","tea location" )
+		rw.Write([]byte("hello teapot"))
+	})
+	ts := httptest.NewServer(PostProcessHandler(n))
+	defer ts.Close()
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", ts.URL + "/", nil)
+	req.Header.Set("X-Forwarded-For", "coffee")
+	res, _ := client.Do(req)
+	defer res.Body.Close()
+	b, _ := ioutil.ReadAll(res.Body)
+	body := string(b)
+	assert.NotNil(t, body)
+	assert.True(t, body == "hello coffeepot")
+	assert.True(t, res.StatusCode == http.StatusTeapot)
+	assert.True(t, res.Header.Get("Location") == "coffee location")
+
 }
