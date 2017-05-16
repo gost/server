@@ -5,6 +5,7 @@ import (
 
 	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 )
 
 func TestEndPointGetNameShouldReturnCorrectName(t *testing.T) {
@@ -39,9 +40,49 @@ func TestEndPointGetQueryOptions(t *testing.T) {
 	qo := &odata.QueryOptions{}
 	endpoint := Endpoint{}
 
-	//act
+	// act
 	b, _ := endpoint.AreQueryOptionsSupported(qo)
 
 	// assert
 	assert.True(t, b, "QueryOptionsSupport should be true")
+}
+
+func TestSupportsQueryOptionTypeResultFalse(t *testing.T) {
+	// arrange
+	qo := odata.QueryOptions{}
+	endpoint := Endpoint{}
+
+	// act
+	b := endpoint.SupportsQueryOptionType(qo.QueryCount.GetQueryOptionType())
+
+	// assert
+	assert.False(t, b)
+}
+
+func TestQueryOptionSupported (t *testing.T) {
+	// arrange
+	epDatastream := createDatastreamsEndpoint("http:/www.nu.nl")
+	qo := odata.QueryOptions{}
+	qo.QueryCount = &odata.QueryCount{}
+
+	var errorList []error
+
+	// act
+	checkQueryOptionSupported(epDatastream, qo.QueryCount, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryTop.GetQueryOptionType().String(), epDatastream.Name))
+
+	// assert
+	assert.True(t, len(errorList) == 0)
+}
+
+func TestSupportsQueryOptionTypeResultTrue(t *testing.T) {
+	// arrange
+	epDatatream := createDatastreamsEndpoint("http:/www.nu.nl")
+	qo := odata.QueryOptions{}
+
+	//act
+	b := epDatatream.SupportsQueryOptionType(qo.QueryCount.GetQueryOptionType())
+
+	// assert
+	assert.True(t, b)
+
 }
