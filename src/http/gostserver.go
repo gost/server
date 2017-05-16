@@ -1,17 +1,16 @@
 package http
 
 import (
+	"context"
+	"fmt"
+	"github.com/geodan/gost/src/sensorthings/models"
+	"github.com/geodan/gost/src/sensorthings/rest"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
-	"context"
-	"fmt"
-	"github.com/geodan/gost/src/sensorthings/models"
-	"github.com/rs/cors"
 	"time"
-	"github.com/geodan/gost/src/sensorthings/rest"
 )
 
 // Server interface for starting and stopping the HTTP server
@@ -44,7 +43,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      cors.Default().Handler(HandleExternalUri(LowerCaseURI(router))),
+			Handler:      PostProcessHandler(LowerCaseURI(router)),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},
@@ -117,21 +116,50 @@ func LowerCaseURI(h http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func HandleExternalUri(h http.Handler) http.Handler {
+// PostProcessHandler runs after all the other handlers and can be used to modify
+// the response. In this case modify links (due to proxy running) or handle CORS functionality
+// Basically we catch all the response using httptest.NewRecorder (headers + body), modify and
+// write to response. Is this a right approach?
+func PostProcessHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-			rec := httptest.NewRecorder()
-			h.ServeHTTP(rec, r)
-			bytes := rec.Body.Bytes()
-			s := string(bytes)
-			if len(s) > 0 {
-				forwarded_uri := r.Header.Get("X-Forwarded-For")
-				if len(forwarded_uri) > 0 {
-					orig_uri := rest.ExternalURI
-					s = strings.Replace(s, orig_uri, forwarded_uri, -1)
-				}
+		orig_uri := rest.ExternalURI
+		forwarded_uri := r.Header.Get("X-Forwarded-For")
+		rec := httptest.NewRecorder()
 
+		// first run the next handler and get results
+		h.ServeHTTP(rec, r)
+
+		// read response body and replace links
+		bytes := rec.Body.Bytes()
+		s := string(bytes)
+		if len(s) > 0 {
+			if len(forwarded_uri) > 0 {
+				s = strings.Replace(s, orig_uri, forwarded_uri, -1)
 			}
-			w.Write([]byte(s))
+
 		}
+		// handle headers too...
+		for k, v := range rec.HeaderMap {
+			val := v[0]
+
+			// if there is a location header and a proxy running, change
+			// the location url too
+			if k == "Location" && len(forwarded_uri) > 0 {
+				val = strings.Replace(val, orig_uri, forwarded_uri, -1)
+			}
+
+			// add the header to response
+			w.Header().Add(k, val)
+		}
+
+		// handle status code
+		w.WriteHeader(rec.Code)
+
+		// now add CORS response header
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+
+		// write modified response
+		w.Write([]byte(s))
+	}
 	return http.HandlerFunc(fn)
 }
