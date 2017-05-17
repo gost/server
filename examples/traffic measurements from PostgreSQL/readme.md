@@ -1,0 +1,1 @@
+This example uses a PostgreSQL database containing ongoing traffic measurements (data measured by traffic detectors). Thing identifiers are added to a database table, whereupon the PostgreSQL notification system is used to update the GOST data store.
