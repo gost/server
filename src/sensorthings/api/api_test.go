@@ -24,3 +24,30 @@ func TestCreateApi(t *testing.T) {
 	assert.NotNil(t, ep)
 	assert.NotEqual(t, len(endpoints), 0, "Endpoints empty")
 }
+
+func TestGetTopics(t *testing.T){
+	// arrange
+	cfg := configuration.Config{}
+	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
+	stAPI := NewAPI(database, cfg, mqttServer)
+
+	// act
+	topics := stAPI.GetTopics()
+
+	// assert
+	assert.NotNil(t, topics)
+	firsttopic := (*topics)[0]
+	assert.True(t, firsttopic.Path == "GOST/#")
+}
+
+func TestAppendQueryPart(t *testing.T){
+	// act
+	result := appendQueryPart("base","q")
+	result1 := appendQueryPart("base?","q")
+
+	// assert
+	assert.True(t,result=="base?q")
+	assert.True(t,result1=="base?&q")
+
+}

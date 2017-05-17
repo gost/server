@@ -15,6 +15,7 @@ func TestMqtt(t *testing.T) {
 	// act
 	mqttClient := CreateMQTTClient(config)
 
+
 	// assert
 	assert.NotNil(t, mqttClient, "function should return MqqtClient")
 }
