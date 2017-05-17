@@ -64,11 +64,13 @@ func TestQueryOptionSupported (t *testing.T) {
 	epDatastream := createDatastreamsEndpoint("http:/www.nu.nl")
 	qo := odata.QueryOptions{}
 	qo.QueryCount = &odata.QueryCount{}
+	qo.QueryExpand = &odata.QueryExpand{}
 
 	var errorList []error
 
 	// act
 	checkQueryOptionSupported(epDatastream, qo.QueryCount, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryTop.GetQueryOptionType().String(), epDatastream.Name))
+	//checkQueryOptionSupported(epDatastream, qo.QueryExpand, &errorList, odata.CreateQueryError(odata.QueryNotAvailable, http.StatusNotImplemented, qo.QueryTop.GetQueryOptionType().String(), epDatastream.Name))
 
 	// assert
 	assert.True(t, len(errorList) == 0)
@@ -77,12 +79,10 @@ func TestQueryOptionSupported (t *testing.T) {
 func TestSupportsQueryOptionTypeResultTrue(t *testing.T) {
 	// arrange
 	epDatatream := createDatastreamsEndpoint("http:/www.nu.nl")
-	qo := odata.QueryOptions{}
+	querycount := odata.QueryOptions{}.QueryExpand
 
 	//act
-	b := epDatatream.SupportsQueryOptionType(qo.QueryCount.GetQueryOptionType())
-
+	supportsQueryCount := epDatatream.SupportsQueryOptionType(querycount.GetQueryOptionType())
 	// assert
-	assert.True(t, b)
-
+	assert.True(t, supportsQueryCount)
 }
