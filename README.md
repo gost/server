@@ -35,19 +35,19 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## Docker support
 
-See [GOST and Docker](docs/gost_docker.md)
+See [GOST and Docker](https://github.com/gost/docs/blob/master/gost_docker.md)
 
 TL;DR:
 
 ```
-$ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose.yml 
+$ wget https://raw.githubusercontent.com/gost/docker-compose/master/src/docker-compose.yml 
 
 $ docker-compose up
 ```
 
 or on Raspberry Pi (experimental):
 ```
-$ wget https://raw.githubusercontent.com/Geodan/gost/master/src/docker-compose-rpi.yml
+$ wget https://raw.githubusercontent.com/gost/docker-compose/master/src/docker-compose-rpi.yml
 
 $ docker-compose -f docker-compose-rpi.yml up
 ```
@@ -71,20 +71,20 @@ Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/detail
 
 ## Installation and configuration
 
-[GOST installation](docs/gost_installation.md)
+[GOST installation]((https://github.com/gost/docs/blob/master/gost_installation.md)
 
-[GOST configuration](docs/gost_configuration.md)
+[GOST configuration]((https://github.com/gost/docs/blob/master/gost_configuration.md)
 
 ## Security
 
-[GOST security](docs/gost_security.md)
+[GOST security]((https://github.com/gost/docs/blob/master/gost_security.md)
 
 ## Samples
 
-HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 
-For a complete collection of working requests install Postman and import the [Postman file](test/GOST.json.postman_collection) 
+HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground]((https://github.com/gost/docs/blob/master/playground_tests.md). 
+For a complete collection of working requests install Postman and import the [Postman file]((https://github.com/gost/postman/blob/master/GOST.json.postman_collection) 
 
-MQTT: For getting started with Gost and MQTT for publishing/receiving data see [GOST and MQTT - Getting started](docs/gost_mqtt_getting_started.md)
+MQTT: For getting started with Gost and MQTT for publishing/receiving data see [GOST and MQTT - Getting started]((https://github.com/gost/docs/blob/master/docs/gost_mqtt_getting_started.md)
 
 ## Goals
 
