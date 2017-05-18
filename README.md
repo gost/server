@@ -82,7 +82,7 @@ Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/detail
 ## Samples
 
 HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground]((https://github.com/gost/docs/blob/master/playground_tests.md). 
-For a complete collection of working requests install Postman and import the [Postman file]((https://github.com/gost/postman/blob/master/GOST.json.postman_collection) 
+For a complete collection of working requests install Postman and import the [Postman file]((https://github.com/gost/postman/blob/master/GOST.postman_collection.json) 
 
 MQTT: For getting started with Gost and MQTT for publishing/receiving data see [GOST and MQTT - Getting started]((https://github.com/gost/docs/blob/master/docs/gost_mqtt_getting_started.md)
 
