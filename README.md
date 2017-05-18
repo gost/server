@@ -40,7 +40,7 @@ See [GOST and Docker](https://github.com/gost/docs/blob/master/gost_docker.md)
 TL;DR:
 
 ```
-$ wget https://raw.githubusercontent.com/gost/docker-compose/master/src/docker-compose.yml 
+$ wget https://raw.githubusercontent.com/gost/docker-compose/master/docker-compose.yml 
 
 $ docker-compose up
 ```
