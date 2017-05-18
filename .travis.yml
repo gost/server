@@ -11,7 +11,7 @@ before_install:
 
 script:
   - go test ./...
-  - overalls -project=github.com/geodan/gost/src -covermode=count -ignore=".git" -debug true
+  - overalls -project=github.com/geodan/gost -covermode=count -ignore=".git" -debug true
   - goveralls -coverprofile=/home/travis/gopath/src/github.com/geodan/gost/overalls.coverprofile -service=travis-ci -repotoken=$COVERALLS_TOKEN
 
 notifications:
