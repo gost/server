@@ -50,7 +50,7 @@ func TestPostProcessHandler(t *testing.T) {
 	defer ts.Close()
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", ts.URL + "/", nil)
-	req.Header.Set("X-Forwarded-For", "coffee")
+	req.Header.Set("X-Forwarded-Host", "coffee")
 	res, _ := client.Do(req)
 	defer res.Body.Close()
 	b, _ := ioutil.ReadAll(res.Body)
