@@ -43,14 +43,14 @@ func TestPostProcessHandler(t *testing.T) {
 	rest.ExternalURI = "tea"
 	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusTeapot)
-		rw.Header().Add("Location","tea location" )
+		rw.Header().Add("Location", "tea location")
 		rw.Write([]byte("hello teapot"))
 	})
 	ts := httptest.NewServer(PostProcessHandler(n))
 	defer ts.Close()
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", ts.URL + "/", nil)
-	req.Header.Set("X-Forwarded-Host", "coffee")
+	req, _ := http.NewRequest("GET", ts.URL+"/", nil)
+	req.Header.Set("X-Forwarded-For", "coffee")
 	res, _ := client.Do(req)
 	defer res.Body.Close()
 	b, _ := ioutil.ReadAll(res.Body)
