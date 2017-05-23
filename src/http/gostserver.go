@@ -124,6 +124,8 @@ func PostProcessHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		orig_uri := rest.ExternalURI
 		forwarded_uri := r.Header.Get("X-Forwarded-For")
+		log.Println("X-Forwarded-For: " + forwarded_uri)
+
 		rec := httptest.NewRecorder()
 
 		// first run the next handler and get results
