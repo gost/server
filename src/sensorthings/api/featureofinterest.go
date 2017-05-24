@@ -11,11 +11,6 @@ import (
 
 // GetFeatureOfInterest returns a FeatureOfInterest by id
 func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
-	if err != nil {
-		return nil, err
-	}
-
 	l, err := a.db.GetFeatureOfInterest(id, qo)
 	if err != nil {
 		return nil, err
@@ -27,11 +22,6 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, pat
 
 // GetFeatureOfInterestByObservation retrieves a FeatureOfInterest by given Observation id
 func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
-	if err != nil {
-		return nil, err
-	}
-
 	l, err := a.db.GetFeatureOfInterestByObservation(id, qo)
 	if err != nil {
 		return nil, err
@@ -43,11 +33,6 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 
 // GetFeatureOfInterests return FeaturesOfInterest based on the given QueryOptions
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.FeatureOfInterest{})
-	if err != nil {
-		return nil, err
-	}
-
 	fois, count, err := a.db.GetFeatureOfInterests(qo)
 	return processFeatureOfInterest(a, fois, qo, path, count, err)
 }

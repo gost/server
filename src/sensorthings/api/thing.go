@@ -14,11 +14,6 @@ import (
 // GetThing returns a thing entity based on the given id and QueryOptions
 // returns an error when the entity cannot be found
 func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
-	if err != nil {
-		return nil, err
-	}
-
 	t, err := a.db.GetThing(id, qo)
 	if err != nil {
 		return nil, err
@@ -30,11 +25,6 @@ func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*
 
 // GetThingByDatastream returns a thing entity based on the given datastream id and QueryOptions
 func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
-	if err != nil {
-		return nil, err
-	}
-
 	t, err := a.db.GetThingByDatastream(id, qo)
 	if err != nil {
 		return nil, err
@@ -46,21 +36,12 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, pat
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
 func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
-	if err != nil {
-		return nil, err
-	}
-
 	things, count, err := a.db.GetThingsByLocation(id, qo)
 	return processThings(a, things, qo, path, count, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
 func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
-	if err != nil {
-		return nil, err
-	}
 	t, err := a.db.GetThingByHistoricalLocation(id, qo)
 	if err != nil {
 		return nil, err
@@ -72,10 +53,6 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Thing{})
-	if err != nil {
-		return nil, err
-	}
 	things, count, err := a.db.GetThings(qo)
 	return processThings(a, things, qo, path, count, err)
 }

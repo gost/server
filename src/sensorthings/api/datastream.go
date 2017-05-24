@@ -11,11 +11,6 @@ import (
 
 // GetDatastream retrieves a sensor by id and given query
 func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	ds, err := a.db.GetDatastream(id, qo)
 	if err != nil {
 		return nil, err
@@ -27,33 +22,18 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 
 // GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	datastreams, count, err := a.db.GetDatastreams(qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
 func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	datastreams, count, err := a.db.GetDatastreamsByThing(thingID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
 func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	ds, err := a.db.GetDatastreamByObservation(observationID, qo)
 	if err != nil {
 		return nil, err
@@ -65,22 +45,12 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
 func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	datastreams, count, err := a.db.GetDatastreamsBySensor(sensorID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
 func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Datastream{})
-	if err != nil {
-		return nil, err
-	}
-
 	datastreams, count, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }

@@ -11,11 +11,6 @@ import (
 
 // GetObservedProperty todo
 func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
-	if err != nil {
-		return nil, err
-	}
-
 	op, err := a.db.GetObservedProperty(id, qo)
 	if err != nil {
 		return nil, err
@@ -27,11 +22,6 @@ func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path
 
 // GetObservedPropertyByDatastream todo
 func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
-	if err != nil {
-		return nil, err
-	}
-
 	op, err := a.db.GetObservedPropertyByDatastream(datastreamID, qo)
 	if err != nil {
 		return nil, err
@@ -43,11 +33,6 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 
 // GetObservedProperties todo
 func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.ObservedProperty{})
-	if err != nil {
-		return nil, err
-	}
-
 	ops, count, err := a.db.GetObservedProperties(qo)
 	if err != nil {
 		return nil, err

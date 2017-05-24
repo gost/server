@@ -135,16 +135,6 @@ func (a *APIv1) GetTopics() *[]models.Topic {
 	return &a.topics
 }
 
-// QueryOptionsSupported checks if the query options are supported for the current entity
-// todo: parameter entity is not used here? and error is always nil...
-func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.Entity) (bool, error) {
-	if qo == nil {
-		return true, nil
-	}
-
-	return true, nil
-}
-
 // ProcessGetRequest processes the entities by setting the necessary links before sending back
 func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions) {
 	// a $ref request, id's are selected to create selfLink, remove after setting self url

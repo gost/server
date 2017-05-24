@@ -12,11 +12,6 @@ import (
 
 // GetHistoricalLocation retrieves a single HistoricalLocation by id
 func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.HistoricalLocation, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
-	if err != nil {
-		return nil, err
-	}
-
 	hl, err := a.db.GetHistoricalLocation(id, qo)
 	if err != nil {
 		return nil, err
@@ -28,33 +23,18 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, pa
 
 // GetHistoricalLocations retrieves all HistoricalLocations
 func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
-	if err != nil {
-		return nil, err
-	}
-
 	hl, count, err := a.db.GetHistoricalLocations(qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
 func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
-	if err != nil {
-		return nil, err
-	}
-
 	hl, count, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
 func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.HistoricalLocation{})
-	if err != nil {
-		return nil, err
-	}
-
 	hl, count, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }

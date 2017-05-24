@@ -79,11 +79,6 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 
 // GetLocation retrieves a single location by id
 func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
-	if err != nil {
-		return nil, err
-	}
-
 	l, err := a.db.GetLocation(id, qo)
 	if err != nil {
 		return nil, err
@@ -95,33 +90,18 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string)
 
 // GetLocations retrieves all locations from the database and returns it as and ArrayResponse
 func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
-	if err != nil {
-		return nil, err
-	}
-
 	locations, count, err := a.db.GetLocations(qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
 func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
-	if err != nil {
-		return nil, err
-	}
-
 	locations, count, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
 func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	_, err := a.QueryOptionsSupported(qo, &entities.Location{})
-	if err != nil {
-		return nil, err
-	}
-
 	locations, count, err := a.db.GetLocationsByThing(thingID, qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
