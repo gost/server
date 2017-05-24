@@ -86,11 +86,7 @@ func (gdb *GostDatabase) CreateSchema(location string) error {
 
 	c := *create
 	_, err2 := gdb.Db.Exec(c)
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
+	return err2
 }
 
 // GetCreateDatabaseQuery returns the database creation script for PostgreSQL
@@ -210,9 +206,5 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
 	log.Println("sql:" + sql)
 	_, err := gdb.Db.Exec(sql, entityID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }

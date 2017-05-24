@@ -37,9 +37,5 @@ func (q *QuerySkip) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QuerySkip is nil
 func (q *QuerySkip) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

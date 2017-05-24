@@ -39,9 +39,5 @@ func (q *QueryTop) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QueryTop is nil
 func (q *QueryTop) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

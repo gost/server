@@ -394,7 +394,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryCount.IsNil() && qo.QueryCount.Count == false {
+	if qo != nil && !qo.QueryCount.IsNil() && !qo.QueryCount.Count {
 		return ""
 	}
 

@@ -240,9 +240,6 @@ func (gdb *GostDatabase) LinkLocation(thingID interface{}, locationID interface{
 
 	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
 	_, err3 := gdb.Db.Exec(sql, tid, lid)
-	if err3 != nil {
-		return err3
-	}
 
-	return nil
+	return err3
 }

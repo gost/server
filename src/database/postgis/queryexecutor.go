@@ -38,8 +38,8 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 	parentEntities := []entities.Entity{}                              // array of parent entities
 	subEntities := map[int]map[int]map[interface{}][]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
 	relationMap := q.GetQueryIDRelationMap(nil)
-	asMap := make(map[string]string, 0) // column names mapped to the original as (without their prefix A_ etc)
-	parsedMap := make(map[int]map[int]map[interface{}]map[interface{}]interface{}, 0)
+	asMap := make(map[string]string)
+	parsedMap := make(map[int]map[int]map[interface{}]map[interface{}]interface{})
 	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
 	ranges := map[int]*QueryParseInfo{}
 	qpi := q
@@ -140,7 +140,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 							_, ok = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]]
 							if !ok {
 								subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make([]entities.Entity, 0)
-								parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]interface{}, 0)
+								parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]interface{})
 							}
 						}
 					}

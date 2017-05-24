@@ -81,41 +81,31 @@ func CreateQueryOptions(queryParams map[string]string) (*QueryOptions, []error) 
 		case QueryOptionExpand.String():
 			qo.QueryExpand = &QueryExpand{}
 			ParseQueryOption(value, qo.QueryExpand, err)
-			break
 		case QueryOptionSelect.String():
 			qo.QuerySelect = &QuerySelect{}
 			ParseQueryOption(value, qo.QuerySelect, err)
-			break
 		case QueryOptionOrderBy.String():
 			qo.QueryOrderBy = &QueryOrderBy{}
 			ParseQueryOption(value, qo.QueryOrderBy, err)
-			break
 		case QueryOptionTop.String():
 			qo.QueryTop = &QueryTop{}
 			ParseQueryOption(value, qo.QueryTop, &errorList)
-			break
 		case QueryOptionSkip.String():
 			qo.QuerySkip = &QuerySkip{}
 			ParseQueryOption(value, qo.QuerySkip, err)
-			break
 		case QueryOptionCount.String():
 			qo.QueryCount = &QueryCount{}
 			ParseQueryOption(value, qo.QueryCount, err)
-			break
 		case QueryOptionFilter.String():
 			qo.QueryFilter = &QueryFilter{}
 			ParseQueryOption(value, qo.QueryFilter, err)
-			break
 		case QueryOptionResultFormat.String():
 			qo.QueryResultFormat = &QueryResultFormat{}
 			ParseQueryOption(value, qo.QueryResultFormat, err)
-			break
 		case QueryOptionRef.String():
 			qo.QueryOptionRef = true
-			break
 		case QueryOptionValue.String():
 			qo.QueryOptionValue = true
-			break
 		default:
 			// unsupported option and SHOULD return 501 Not Implemented.
 			errorList = append(errorList, CreateQueryError(QueryUnknown, http.StatusNotImplemented, key))
