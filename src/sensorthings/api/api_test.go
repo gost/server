@@ -18,14 +18,23 @@ func TestCreateApi(t *testing.T) {
 
 	// act
 	ep := stAPI.GetEndpoints()
+	config := stAPI.GetConfig()
+	paths := stAPI.GetAcceptedPaths()
+	versionInfo := stAPI.GetVersionInfo()
+	basePathInfo := stAPI.GetBasePathInfo()
+
 	endpoints := *ep
 
 	// assert
+	assert.NotNil(t, basePathInfo)
+	assert.NotNil(t, versionInfo)
+	assert.NotNil(t, paths)
+	assert.NotNil(t, config)
 	assert.NotNil(t, ep)
 	assert.NotEqual(t, len(endpoints), 0, "Endpoints empty")
 }
 
-func TestGetTopics(t *testing.T){
+func TestGetTopics(t *testing.T) {
 	// arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
@@ -41,13 +50,13 @@ func TestGetTopics(t *testing.T){
 	assert.True(t, firsttopic.Path == "GOST/#")
 }
 
-func TestAppendQueryPart(t *testing.T){
+func TestAppendQueryPart(t *testing.T) {
 	// act
-	result := appendQueryPart("base","q")
-	result1 := appendQueryPart("base?","q")
+	result := appendQueryPart("base", "q")
+	result1 := appendQueryPart("base?", "q")
 
 	// assert
-	assert.True(t,result=="base?q")
-	assert.True(t,result1=="base?&q")
+	assert.True(t, result == "base?q")
+	assert.True(t, result1 == "base?&q")
 
 }

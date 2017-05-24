@@ -136,7 +136,7 @@ func (a *APIv1) GetTopics() *[]models.Topic {
 }
 
 // QueryOptionsSupported checks if the query options are supported for the current entity
-// todo: parameter entity is not used here?
+// todo: parameter entity is not used here? and error is always nil...
 func (a *APIv1) QueryOptionsSupported(qo *odata.QueryOptions, entity entities.Entity) (bool, error) {
 	if qo == nil {
 		return true, nil
