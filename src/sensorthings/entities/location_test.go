@@ -84,11 +84,9 @@ func TestSetLinksLocation(t *testing.T) {
 	//act
 	location.SetAllLinks(externalURL)
 	propertynames := location.GetPropertyNames()
-	supportedencoding := location.GetSupportedEncoding()
 
 	//assert
 	assert.True(t, len(propertynames) > 0)
-	assert.True(t, len(supportedencoding) > 0)
 	assert.Equal(t, location.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkLocations.ToString(), id), "Location navself incorrect")
 	assert.Equal(t, location.NavThings, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkThings.ToString()), "Location NavThings incorrect")
 	assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
@@ -108,25 +106,10 @@ func TestSetLinksLocationExpanded(t *testing.T) {
 	//act
 	location.SetAllLinks(externalURL)
 	propertynames := location.GetPropertyNames()
-	supportedencoding := location.GetSupportedEncoding()
 
 	//assert
 	assert.True(t, len(propertynames) > 0)
-	assert.True(t, len(supportedencoding) > 0)
 	assert.Equal(t, location.NavSelf, fmt.Sprintf("%s/v1.0/%s(%s)", externalURL, EntityLinkLocations.ToString(), id), "Location navself incorrect")
 	//assert.Equal(t, location.NavThings, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkThings.ToString()), "Location NavThings incorrect")
 	//assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
-}
-
-func TestGetSupportedEncodingLocation(t *testing.T) {
-	//arrange
-	location := &Location{}
-
-	//act
-	encodings := location.GetSupportedEncoding()
-	_, ok := encodings[EncodingGeoJSON.Code]
-
-	//assert
-	assert.Equal(t, 1, len(encodings), "Location should support 2 encodings")
-	assert.Equal(t, true, ok, "Location should support EncodingGeoJSON")
 }

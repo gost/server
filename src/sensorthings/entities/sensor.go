@@ -75,7 +75,3 @@ func (s *Sensor) SetLinks(externalURL string) {
 	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, externalURL, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
 }
 
-// GetSupportedEncoding returns the supported encoding tye for this entity
-func (s Sensor) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingSensorML.Code: EncodingSensorML, EncodingPDF.Code: EncodingPDF}
-}

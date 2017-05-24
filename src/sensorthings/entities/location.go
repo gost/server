@@ -87,8 +87,3 @@ func (l *Location) SetLinks(externalURL string) {
 	l.NavThings = CreateEntityLink(l.Things == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkThings.ToString(), l.ID)
 	l.NavHistoricalLocations = CreateEntityLink(l.HistoricalLocations == nil, externalURL, EntityLinkLocations.ToString(), EntityLinkHistoricalLocations.ToString(), l.ID)
 }
-
-// GetSupportedEncoding returns the supported encoding tye for this entity
-func (l Location) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON}
-}

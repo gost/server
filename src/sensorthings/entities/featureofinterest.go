@@ -75,8 +75,3 @@ func (f *FeatureOfInterest) SetSelfLink(externalURL string) {
 func (f *FeatureOfInterest) SetLinks(externalURL string) {
 	f.NavObservations = CreateEntityLink(f.Observations == nil, externalURL, EntityLinkFeatureOfInterests.ToString(), EntityLinkObservations.ToString(), f.ID)
 }
-
-// GetSupportedEncoding returns the supported encoding tye for this entity
-func (f FeatureOfInterest) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON}
-}
