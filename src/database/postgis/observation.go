@@ -155,34 +155,6 @@ func processObservations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL st
 // PutObservation replaces an observation to the database
 func (gdb *GostDatabase) PutObservation(id interface{}, o *entities.Observation) (*entities.Observation, error) {
 	return gdb.PatchObservation(id, o)
-	/*var err error
-	var ok bool
-	var intID, dID, fID int
-
-	if intID, ok = ToIntID(id); !ok || !gdb.ObservationExists(intID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
-	}
-
-	if dID, ok = ToIntID(o.Datastream.ID); !ok || !gdb.ObservationExists(dID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
-	}
-
-	if fID, ok = ToIntID(o.FeatureOfInterest.ID); !ok || !gdb.FeatureOfInterestExists(fID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
-	}
-
-	json, _ := o.MarshalPostgresJSON()
-	obs := fmt.Sprintf("'%s'", string(json[:]))
-	sql := fmt.Sprintf("update %s.observation set data=%v, stream_id=%v, featureofinterest_id=%v where id=%v", gdb.Schema, obs, dID, fID, intID)
-
-	_, err2 := gdb.Db.Exec(sql)
-	if err2 != nil {
-		return nil, err
-	}
-
-	o.ID = intID
-	return o, nil
-	*/
 }
 
 // PostObservation adds an observation to the database

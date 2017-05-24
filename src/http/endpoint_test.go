@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/geodan/gost/src/sensorthings/models"
 	"github.com/stretchr/testify/assert"
-	"net/http"
 	"sort"
 	"testing"
 )
@@ -23,9 +22,6 @@ func TestEndPointLength(t *testing.T) {
 	assert.True(t, l == 2, "Number of Endpoints should be 2")
 }
 
-func HandleTest(w http.ResponseWriter, r *http.Request, endpoint *models.Endpoint, api *models.API) {
-}
-
 func TestIsDynamic(t *testing.T) {
 	// arrange
 	urlDynamic := "http://www.{}.nl"
@@ -42,14 +38,14 @@ func TestIsDynamic(t *testing.T) {
 
 func TestEndPointSort(t *testing.T) {
 	// arrange
-	httpep1 := &Endpoint{}
-	httpep1.Operation.Path = "ep1"
-	httpep1.Operation.OperationType = models.HTTPOperationGet
-	httpep2 := &Endpoint{}
-	httpep2.Operation.Path = "ep2"
-	httpep2.Operation.OperationType = models.HTTPOperationPost
+	ep1 := &Endpoint{}
+	ep1.Operation.Path = "ep1"
+	ep1.Operation.OperationType = models.HTTPOperationGet
+	ep2 := &Endpoint{}
+	ep2.Operation.Path = "ep2"
+	ep2.Operation.OperationType = models.HTTPOperationPost
 
-	eps := Endpoints{httpep1,httpep2}
+	eps := Endpoints{ep1,ep2}
 
 	// act
 	sort.Sort(eps)
