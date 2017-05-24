@@ -73,8 +73,10 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 	if err != nil {
 		return nil, err
 	}
+	encodings := foi.GetSupportedEncoding()
+	currentEncoding, err2 := entities.CreateEncodingType(foi.EncodingType)
+	supported, err2 := entities.SupportsEncodingType(encodings, currentEncoding)
 
-	supported, err2 := entities.CheckEncodingSupported(foi.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}

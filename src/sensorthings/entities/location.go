@@ -90,5 +90,5 @@ func (l *Location) SetLinks(externalURL string) {
 
 // GetSupportedEncoding returns the supported encoding tye for this entity
 func (l Location) GetSupportedEncoding() map[int]EncodingType {
-	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON, EncodingLocationType.Code: EncodingLocationType}
- }
+	return map[int]EncodingType{EncodingGeoJSON.Code: EncodingGeoJSON}
+}

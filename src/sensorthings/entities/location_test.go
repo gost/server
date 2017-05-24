@@ -65,8 +65,6 @@ func TestParseEntityResultOkLocation(t *testing.T) {
 	assert.Equal(t, err, nil, "Unable to parse json into Location")
 }
 
-
-
 func TestParseEntityResultNotOkLocation(t *testing.T) {
 	//arrange
 	location := &Location{}
@@ -101,11 +99,11 @@ func TestSetLinksLocationExpanded(t *testing.T) {
 	location := &Location{}
 	location.ID = id
 	thing := &Thing{}
-	thing.ID =66
+	thing.ID = 66
 	location.Things = []*Thing{thing}
-	historicallocation:= &HistoricalLocation{}
-	historicallocation.ID =77
-	location.HistoricalLocations=[]*HistoricalLocation{historicallocation}
+	historicallocation := &HistoricalLocation{}
+	historicallocation.ID = 77
+	location.HistoricalLocations = []*HistoricalLocation{historicallocation}
 
 	//act
 	location.SetAllLinks(externalURL)
@@ -120,8 +118,6 @@ func TestSetLinksLocationExpanded(t *testing.T) {
 	//assert.Equal(t, location.NavHistoricalLocations, fmt.Sprintf("%s/v1.0/%s(%s)/%s", externalURL, EntityLinkLocations.ToString(), id, EntityLinkHistoricalLocations.ToString()), "Location NavHistoricalLocations incorrect")
 }
 
-
-
 func TestGetSupportedEncodingLocation(t *testing.T) {
 	//arrange
 	location := &Location{}
@@ -131,6 +127,6 @@ func TestGetSupportedEncodingLocation(t *testing.T) {
 	_, ok := encodings[EncodingGeoJSON.Code]
 
 	//assert
-	assert.Equal(t, 2, len(encodings), "Location should support 2 encodings")
+	assert.Equal(t, 1, len(encodings), "Location should support 2 encodings")
 	assert.Equal(t, true, ok, "Location should support EncodingGeoJSON")
 }

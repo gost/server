@@ -74,8 +74,10 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 	if err != nil {
 		return nil, err
 	}
+	encodings := sensor.GetSupportedEncoding()
+	currentEncoding, err2 := entities.CreateEncodingType(sensor.EncodingType)
+	supported, err2 := entities.SupportsEncodingType(encodings, currentEncoding)
 
-	supported, err2 := entities.CheckEncodingSupported(sensor.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
