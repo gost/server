@@ -263,7 +263,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 }
 
 // CheckEncodingSupported returns true of the Location entity supports the given encoding type
-func CheckEncodingSupported(entity Entity, encodingType string) (bool, error) {
+func CheckEncodingSupported(encodingType string) (bool, error) {
 	_, err := CreateEncodingType(encodingType)
 	if err != nil {
 		return false, err

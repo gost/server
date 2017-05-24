@@ -75,7 +75,7 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 		return nil, err
 	}
 
-	supported, err2 := entities.CheckEncodingSupported(sensor, sensor.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(sensor.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -97,7 +97,7 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 	}
 
 	if len(sensor.EncodingType) != 0 {
-		supported, err := entities.CheckEncodingSupported(sensor, sensor.EncodingType)
+		supported, err := entities.CheckEncodingSupported(sensor.EncodingType)
 		if !supported || err != nil {
 			return nil, err
 		}

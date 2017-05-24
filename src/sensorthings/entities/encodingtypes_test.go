@@ -45,11 +45,8 @@ func TestEncodingTypeFail(t *testing.T) {
 }
 
 func TestCheckEncodingSupportedSensorOk(t *testing.T) {
-	//arrange
-	s := &Sensor{}
-
 	//act
-	_, err := CheckEncodingSupported(s, "http://www.opengis.net/doc/IS/SensorML/2.0")
+	_, err := CheckEncodingSupported("http://www.opengis.net/doc/IS/SensorML/2.0")
 
 	//assert
 	assert.Nil(t, err, "Sensor should support encoding http://www.opengis.net/doc/IS/SensorML/2.0")
@@ -57,10 +54,9 @@ func TestCheckEncodingSupportedSensorOk(t *testing.T) {
 
 func TestCheckEncodingSupportedSensorFail(t *testing.T) {
 	//arrange
-	s := &Sensor{}
 
 	//act
-	_, err := CheckEncodingSupported(s, "http://www.opengis.net/doc/IS/SensorML/2")
+	_, err := CheckEncodingSupported("http://www.opengis.net/doc/IS/SensorML/2")
 
 	//assert
 	assert.NotNil(t, err, "Sensor should not support encoding http://www.opengis.net/doc/IS/SensorML/2")

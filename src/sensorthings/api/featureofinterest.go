@@ -74,7 +74,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 		return nil, err
 	}
 
-	supported, err2 := entities.CheckEncodingSupported(foi, foi.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(foi.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -90,7 +90,7 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 
 // PutFeatureOfInterest adds a FeatureOfInterest to the database
 func (a *APIv1) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
-	supported, err2 := entities.CheckEncodingSupported(foi, foi.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(foi.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -111,7 +111,7 @@ func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfIn
 	}
 
 	if len(foi.EncodingType) != 0 {
-		supported, err := entities.CheckEncodingSupported(foi, foi.EncodingType)
+		supported, err := entities.CheckEncodingSupported(foi.EncodingType)
 		if !supported || err != nil {
 			return nil, err
 		}

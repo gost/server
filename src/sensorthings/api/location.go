@@ -18,7 +18,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 		return nil, err
 	}
 
-	supported, err2 := entities.CheckEncodingSupported(location, location.EncodingType)
+	supported, err2 := entities.CheckEncodingSupported(location.EncodingType)
 	if !supported || err2 != nil {
 		return nil, []error{err2}
 	}
@@ -148,7 +148,7 @@ func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*ent
 	}
 
 	if len(location.EncodingType) != 0 {
-		supported, err := entities.CheckEncodingSupported(location, location.EncodingType)
+		supported, err := entities.CheckEncodingSupported(location.EncodingType)
 		if !supported || err != nil {
 			return nil, err
 		}
