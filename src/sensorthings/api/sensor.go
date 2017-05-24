@@ -74,12 +74,10 @@ func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) 
 	if err != nil {
 		return nil, err
 	}
-	encodings := sensor.GetSupportedEncoding()
-	currentEncoding, err2 := entities.CreateEncodingType(sensor.EncodingType)
-	supported, err2 := entities.SupportsEncodingType(encodings, currentEncoding)
 
-	if !supported || err2 != nil {
-		return nil, []error{err2}
+	if (sensor.EncodingType != entities.EncodingPDF.Value) && (sensor.EncodingType != entities.EncodingSensorML.Value) {
+		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingPDF.Value + ", " + entities.EncodingSensorML.Value)
+		return nil, []error{err}
 	}
 
 	ns, err2 := a.db.PostSensor(sensor)
@@ -99,8 +97,8 @@ func (a *APIv1) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.
 	}
 
 	if len(sensor.EncodingType) != 0 {
-		supported, err := entities.CheckEncodingSupported(sensor.EncodingType)
-		if !supported || err != nil {
+		if (sensor.EncodingType != entities.EncodingPDF.Value) && (sensor.EncodingType != entities.EncodingSensorML.Value) {
+			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingPDF.Value + ", " + entities.EncodingSensorML.Value)
 			return nil, err
 		}
 	}

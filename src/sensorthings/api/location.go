@@ -18,12 +18,9 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 		return nil, err
 	}
 
-	encodings := location.GetSupportedEncoding()
-	currentEncoding, err2 := entities.CreateEncodingType(location.EncodingType)
-	supported, err2 := entities.SupportsEncodingType(encodings, currentEncoding)
-
-	if !supported || err2 != nil {
-		return nil, []error{err2}
+	if location.EncodingType != entities.EncodingGeoJSON.Value {
+		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+		return nil, []error{err}
 	}
 
 	l, err2 := a.db.PostLocation(location)
@@ -151,8 +148,8 @@ func (a *APIv1) PatchLocation(id interface{}, location *entities.Location) (*ent
 	}
 
 	if len(location.EncodingType) != 0 {
-		supported, err := entities.CheckEncodingSupported(location.EncodingType)
-		if !supported || err != nil {
+		if location.EncodingType != entities.EncodingGeoJSON.Value {
+			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
 			return nil, err
 		}
 	}

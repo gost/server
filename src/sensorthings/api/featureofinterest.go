@@ -73,12 +73,10 @@ func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entitie
 	if err != nil {
 		return nil, err
 	}
-	encodings := foi.GetSupportedEncoding()
-	currentEncoding, err2 := entities.CreateEncodingType(foi.EncodingType)
-	supported, err2 := entities.SupportsEncodingType(encodings, currentEncoding)
 
-	if !supported || err2 != nil {
-		return nil, []error{err2}
+	if foi.EncodingType != entities.EncodingGeoJSON.Value {
+		err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+		return nil, []error{err}
 	}
 
 	l, err2 := a.db.PostFeatureOfInterest(foi)
@@ -113,6 +111,11 @@ func (a *APIv1) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfIn
 	}
 
 	if len(foi.EncodingType) != 0 {
+		if foi.EncodingType != entities.EncodingGeoJSON.Value {
+			err := errors.New("Encoding not supported. Supported encoding: " + entities.EncodingGeoJSON.Value)
+			return nil, err
+		}
+
 		supported, err := entities.CheckEncodingSupported(foi.EncodingType)
 		if !supported || err != nil {
 			return nil, err
