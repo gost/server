@@ -121,7 +121,7 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 
 				hl.ContainsMandatoryParams()
 
-				if hl, err = a.PostHistoricalLocation(hl); len(err) > 0 {
+				if _, err = a.PostHistoricalLocation(hl); len(err) > 0 {
 					a.reverseInserts(nt, postedLocations, postedDatastreams)
 					err = append(err, gostErrors.NewConflictRequestError(errors.New("Creating Historical Location went wrong")))
 					return nil, err

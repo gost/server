@@ -76,6 +76,8 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 }
 
 // GetLocationByDatastreamID returns a location linked to an observation
+// todo fix staticcheck error: 'argument qo is overwritten before first use'
+// remove qo parameter? or change function
 func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(datastreamID)
 	if !ok {

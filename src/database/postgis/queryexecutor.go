@@ -22,11 +22,11 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 // ExecuteSelect executes the select query and creates the retrieved entities
 func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity, error) {
 	rows, err := db.Query(sql)
-	defer rows.Close()
-
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	columns, _ := rows.Columns()
 	count := len(columns)
@@ -221,7 +221,6 @@ func parseResults(entity entities.Entity, from int, relationMap map[int]int, sub
 				for _, relatedEntity := range relatedEntityMap {
 					parseResults(relatedEntity, subQI, relationMap, subEntities, removeIDMap)
 				}
-			} else {
 			}
 		}
 	}
