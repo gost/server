@@ -152,10 +152,12 @@ func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
 func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string {
 	// do not create a nextLink when there is no top and skip given
 	if qo == nil && qo.QueryTop.Limit == 0 && qo.QuerySkip.Index == 0 {
+		// todo: check unreachable code here?
 		return ""
 	}
 
 	// do not create a nextLink when the current page has no following one
+	// todo: what if qo.QueryTop.Limit, qo.QuerySkip.Index, qo.QueryTop.Limit are nil?
 	if qo.QueryTop.Limit+qo.QuerySkip.Index >= count || count < qo.QueryTop.Limit {
 		return ""
 	}

@@ -101,6 +101,7 @@ type API interface {
 
 	LinkLocation(thingID interface{}, locationID interface{}) error
 	SetLinks(entity entities.Entity, qo *odata.QueryOptions)
+	CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string
 }
 
 // Database specifies the operations that the database provider needs to support

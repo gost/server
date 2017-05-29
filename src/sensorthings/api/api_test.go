@@ -5,8 +5,10 @@ import (
 	"github.com/geodan/gost/src/database/postgis"
 	"github.com/geodan/gost/src/mqtt"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -75,4 +77,53 @@ func TestSetLinks(t *testing.T) {
 
 	// assert
 	assert.True(t, ds.GetSelfLink() == "/v1.0/Datastreams")
+}
+
+func TestSetLinkWithQuery(t *testing.T) {
+	// arrange
+	cfg := configuration.Config{}
+	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
+	stAPI := NewAPI(database, cfg, mqttServer)
+	ds := entities.Datastream{}
+
+	qo := &odata.QueryOptions{}
+	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 2}
+	qo.QueryOptionRef = true
+	// act
+	stAPI.SetLinks(&ds, qo)
+
+	// assert
+	assert.True(t, ds.GetSelfLink() == "/v1.0/Datastreams")
+	assert.True(t, ds.ID == nil)
+
+}
+
+func TestCreateNextLink(t *testing.T) {
+	// arrange
+	cfg := configuration.Config{}
+	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
+	stAPI := NewAPI(database, cfg, mqttServer)
+	qo := &odata.QueryOptions{}
+
+	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 2}
+	qo.QuerySkip = &odata.QuerySkip{odata.QueryBase{"0"}, 1}
+
+	// act
+	result := stAPI.CreateNextLink(1, "http://www.nu.nl", qo)
+	assert.NotNil(t, result)
+	assert.True(t, result == "")
+
+	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 0}
+	filter := &odata.QueryFilter{}
+	filter.RawQuery = "a=a"
+	qo.QueryFilter = filter
+	// add QueryCount, QueryExpand, QueryOrderBy, QueryResultFormat
+
+	result1 := stAPI.CreateNextLink(10, "http://www.nu.nl", qo)
+
+	// assert
+	assert.NotNil(t, result1)
+	assert.True(t, strings.Contains(result1, "a=a"))
 }
