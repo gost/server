@@ -175,9 +175,5 @@ func (q *QueryExpand) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QueryExpand is nil
 func (q *QueryExpand) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

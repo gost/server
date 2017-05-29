@@ -35,9 +35,5 @@ func (q *QueryFilter) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QueryFilter is nil
 func (q *QueryFilter) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

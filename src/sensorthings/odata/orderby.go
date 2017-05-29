@@ -92,9 +92,5 @@ func (q *QueryOrderBy) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QueryOrderBy is nil
 func (q *QueryOrderBy) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

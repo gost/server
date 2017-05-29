@@ -39,8 +39,5 @@ func observationsByDatastream(a *models.API, message []byte, id string) {
 	}
 
 	api := *a
-	_, err2 := api.PostObservationByDatastream(id, &o)
-	if err2 != nil {
-		//log.Printf("%v", err2)
-	}
+	api.PostObservationByDatastream(id, &o)
 }

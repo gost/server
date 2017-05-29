@@ -28,11 +28,7 @@ func (o OdataOperator) IsLogical() bool {
 // IsUnary returns whether a defined operation is unary or binary.  Will return true
 // if the operation only supports a subject with no value.
 func (o OdataOperator) IsUnary() bool {
-	if o == IsNull {
-		return true
-	}
-
-	return false
+	return (o == IsNull)
 }
 
 // Function are the supported ODATA functions
@@ -175,7 +171,7 @@ func parseFragment(filter string) (*Predicate, error) {
 				var val interface{}
 
 				// if not string value
-				if strings.Index(match[3], "'") == -1 {
+				if !strings.Contains(match[3], "'") {
 					if val, err = strconv.ParseFloat(match[3], 64); err != nil {
 						val = fmt.Sprintf("'%s'", match[3])
 					}

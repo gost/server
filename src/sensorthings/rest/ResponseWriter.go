@@ -90,11 +90,10 @@ func sendError(w http.ResponseWriter, error []error) {
 	// Set te status code, default 500 for error, check if there is an ApiError an get
 	// the status code
 	var statusCode = http.StatusInternalServerError
-	if error != nil && len(error) > 0 {
+	if len(error) > 0 {
 		switch e := error[0].(type) {
 		case gostErrors.APIError:
 			statusCode = e.GetHTTPErrorStatusCode()
-			break
 		}
 	}
 

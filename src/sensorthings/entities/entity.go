@@ -193,7 +193,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 			if len(t) == 0 {
 				isNil = true
 			}
-			break
 		case *string:
 			if t != nil {
 				t1 := *t
@@ -208,7 +207,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 			if len(t) == 0 {
 				isNil = true
 			}
-			break
 		case *Thing:
 			var contains bool
 			if t != nil {
@@ -218,7 +216,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 			if t == nil || (t.ID == nil && !contains) {
 				isNil = true
 			}
-			break
 		case *Sensor:
 			var contains bool
 			if t != nil {
@@ -228,7 +225,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 			if t == nil || (t.ID == nil && !contains) {
 				isNil = true
 			}
-			break
 		case *ObservedProperty:
 			var contains bool
 			if t != nil {
@@ -239,7 +235,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 
 				isNil = true
 			}
-			break
 		case *Datastream:
 			var contains bool
 			if t != nil {
@@ -250,7 +245,6 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 
 				isNil = true
 			}
-			break
 		}
 	} else {
 		isNil = true

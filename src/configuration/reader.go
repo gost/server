@@ -20,11 +20,7 @@ func readFile(cfgFile string) ([]byte, error) {
 func readConfig(fileContent []byte) (Config, error) {
 	config := Config{}
 	err := yaml.Unmarshal(fileContent, &config)
-	if err != nil {
-		return config, err
-	}
-
-	return config, nil
+	return config, err
 }
 
 // GetConfig retrieves a new configuration from the given config file

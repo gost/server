@@ -54,5 +54,6 @@ func (c *Config) GetInternalServerURI() string {
 // GetExternalServerURI gets the external Http server address, trailing slash is removed when present in Config.Server.ExternalUri
 // for example "http://www.mysensorplatform"
 func (c *Config) GetExternalServerURI() string {
-	return fmt.Sprintf("%s", strings.Trim(c.Server.ExternalURI, "/"))
+	// return fmt.Sprintf("%s", strings.Trim(c.Server.ExternalURI, "/"))
+	return strings.Trim(c.Server.ExternalURI, "/")
 }

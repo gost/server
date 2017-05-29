@@ -61,7 +61,7 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 		hl.Time = time.Now().UTC().Format(time.RFC3339Nano)
 		hl.ContainsMandatoryParams()
 
-		hl, err = a.PostHistoricalLocation(hl)
+		_, err = a.PostHistoricalLocation(hl)
 		if len(err) > 0 {
 			err2 := a.DeleteHistoricalLocation(l.ID)
 			if err2 != nil {

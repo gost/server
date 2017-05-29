@@ -37,9 +37,5 @@ func (q *QueryCount) IsValid() (bool, error) {
 
 // IsNil checks if *QueryCount is nil
 func (q *QueryCount) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

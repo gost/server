@@ -175,26 +175,6 @@ func (gdb *GostDatabase) PatchSensor(id interface{}, s *entities.Sensor) (*entit
 // returns the Sensor
 func (gdb *GostDatabase) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
 	return gdb.PatchSensor(id, sensor)
-	/*var intID int
-	var ok bool
-
-	if intID, ok = ToIntID(id); !ok || !gdb.SensorExists(intID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
-	}
-	encoding, err1 := entities.CreateEncodingType(sensor.EncodingType)
-	if err1 != nil {
-		return nil, err1
-	}
-
-	// INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4)
-	sql := fmt.Sprintf("update %s.sensor set name=$1, description=$2,encodingtype=$3, metadata=$4 where id=$5", gdb.Schema)
-	_, err := gdb.Db.Exec(sql, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata, intID)
-	if err != nil {
-		return nil, err
-	}
-
-	ns, _ := gdb.GetSensor(intID, nil)
-	return ns, nil*/
 }
 
 // DeleteSensor tries to delete a Sensor by the given id

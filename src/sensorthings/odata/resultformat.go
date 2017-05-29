@@ -34,9 +34,5 @@ func (q *QueryResultFormat) GetQueryOptionType() QueryOptionType {
 
 // IsNil checks if *QueryResultFormat is nil
 func (q *QueryResultFormat) IsNil() bool {
-	if q == nil {
-		return true
-	}
-
-	return false
+	return (q == nil)
 }

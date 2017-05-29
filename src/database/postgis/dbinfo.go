@@ -149,35 +149,27 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}
 		q.ParamFactory = thingParamFactory
-		break
 	case entities.EntityTypeFeatureOfInterest:
 		q.Entity = &entities.FeatureOfInterest{}
 		q.ParamFactory = featureOfInterestParamFactory
-		break
 	case entities.EntityTypeLocation:
 		q.Entity = &entities.Location{}
 		q.ParamFactory = locationParamFactory
-		break
 	case entities.EntityTypeObservation:
 		q.Entity = &entities.Observation{}
 		q.ParamFactory = observationParamFactory
-		break
 	case entities.EntityTypeObservedProperty:
 		q.Entity = &entities.ObservedProperty{}
 		q.ParamFactory = observedPropertyParamFactory
-		break
 	case entities.EntityTypeDatastream:
 		q.Entity = &entities.Datastream{}
 		q.ParamFactory = datastreamParamFactory
-		break
 	case entities.EntityTypeHistoricalLocation:
 		q.Entity = &entities.HistoricalLocation{}
 		q.ParamFactory = historicalLocationParamFactory
-		break
 	case entities.EntityTypeSensor:
 		q.Entity = &entities.Sensor{}
 		q.ParamFactory = sensorParamFactory
-		break
 	}
 }
 

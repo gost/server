@@ -76,6 +76,8 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 }
 
 // GetLocationByDatastreamID returns a location linked to an observation
+// todo fix staticcheck error: 'argument qo is overwritten before first use'
+// remove qo parameter? or change function
 func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(datastreamID)
 	if !ok {
@@ -206,23 +208,6 @@ func (gdb *GostDatabase) DeleteLocation(id interface{}) error {
 // returns the adapted Location
 func (gdb *GostDatabase) PutLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
 	return gdb.PatchLocation(id, location)
-	/*var intID int
-	var ok bool
-	if intID, ok = ToIntID(id); !ok || !gdb.LocationExists(intID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
-	}
-
-	locationBytes, _ := json.Marshal(location.Location)
-	encoding, _ := entities.CreateEncodingType(location.EncodingType)
-
-	sql := fmt.Sprintf("update %s.location set name=$1, description=$2, encodingtype=$3, location=ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326) where id = $4", gdb.Schema, string(locationBytes[:]))
-	_, err := gdb.Db.Exec(sql, location.Name, location.Description, encoding.Code, intID)
-	if err != nil {
-		return nil, err
-	}
-
-	nt, _ := gdb.GetLocation(intID, nil)
-	return nt, nil*/
 }
 
 // LinkLocation links a thing with a location
@@ -240,9 +225,6 @@ func (gdb *GostDatabase) LinkLocation(thingID interface{}, locationID interface{
 
 	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
 	_, err3 := gdb.Db.Exec(sql, tid, lid)
-	if err3 != nil {
-		return err3
-	}
 
-	return nil
+	return err3
 }

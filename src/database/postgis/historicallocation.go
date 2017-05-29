@@ -152,64 +152,6 @@ func (gdb *GostDatabase) HistoricalLocationExists(id interface{}) bool {
 // PutHistoricalLocation updates a HistoricalLocation in the database
 func (gdb *GostDatabase) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
 	return gdb.PatchHistoricalLocation(id, hl)
-	/*
-		var ok bool
-		var intID int
-		if intID, ok = ToIntID(id); !ok || !gdb.HistoricalLocationExists(intID) {
-			return nil, gostErrors.NewRequestNotFound(errors.New("HistoricalLocation does not exist"))
-		}
-
-		if hl.Thing != nil {
-			tid, ok := ToIntID(hl.Thing.ID)
-			if !ok || !gdb.ThingExists(tid) {
-				return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
-			}
-
-			query := fmt.Sprintf("UPDATE %s.historicallocation set thing_id=$1 where id = $2", gdb.Schema)
-			_, err := gdb.Db.Exec(query, intID)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		if len(hl.Locations) > 0 {
-			for _, l := range hl.Locations {
-				lid, ok := ToIntID(l.ID)
-				if !ok || !gdb.LocationExists(lid) {
-					return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
-				}
-			}
-
-			query := fmt.Sprintf("DELETE FROM %s.location_to_historicallocation WHERE historicallocation_id = $1", gdb.Schema)
-			_, err := gdb.Db.Exec(query, intID)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, l := range hl.Locations {
-				query = fmt.Sprintf("INSERT INTO %s.location_to_historicallocation (location_id, historicallocation_id) VALUES ($1, $2)", gdb.Schema)
-				_, err = gdb.Db.Exec(query, l.ID, intID)
-				if err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		if len(hl.Time) > 0 {
-			t, _ := time.Parse(time.RFC3339Nano, hl.Time)
-			utcT := t.UTC().Format("2006-01-02T15:04:05.000Z")
-
-			query := fmt.Sprintf("UPDATE %s.historicallocation set time=$1 where id = $2", gdb.Schema)
-			_, err := gdb.Db.Exec(query, utcT, intID)
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		hl.ID = intID
-
-		return hl, nil
-	*/
 }
 
 // PatchHistoricalLocation updates a HistoricalLocation in the database

@@ -124,19 +124,6 @@ func (gdb *GostDatabase) PostObservedProperty(op *entities.ObservedProperty) (*e
 // PutObservedProperty updates a ObservedProperty in the database
 func (gdb *GostDatabase) PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
 	return gdb.PatchObservedProperty(id, op)
-	/*intID, _ := ToIntID(id)
-	if !gdb.ObservedPropertyExists(intID) {
-		return nil, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
-	}
-
-	sql := fmt.Sprintf("update %s.observedproperty set name=$1, definition=$2, description=$3 where id=$4", gdb.Schema)
-	_, err := gdb.Db.Exec(sql, op.Name, op.Definition, op.Description, intID)
-	if err != nil {
-		return nil, err
-	}
-
-	op.ID = intID
-	return op, nil*/
 }
 
 // ObservedPropertyExists checks if a ObservedProperty is present in the database based on a given id.
