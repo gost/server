@@ -16,7 +16,7 @@ func (a *APIv1) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path
 		return nil, err
 	}
 
-	a.ProcessGetRequest(op, qo)
+	a.SetLinks(op, qo)
 	return op, nil
 }
 
@@ -27,7 +27,7 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 		return nil, err
 	}
 
-	a.ProcessGetRequest(op, qo)
+	a.SetLinks(op, qo)
 	return op, nil
 }
 
@@ -40,7 +40,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*mod
 
 	for idx, item := range ops {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		ops[idx] = &i
 	}
 

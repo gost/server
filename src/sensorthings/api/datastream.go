@@ -16,7 +16,7 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 		return nil, err
 	}
 
-	a.ProcessGetRequest(ds, qo)
+	a.SetLinks(ds, qo)
 	return ds, nil
 }
 
@@ -39,7 +39,7 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 		return nil, err
 	}
 
-	a.ProcessGetRequest(ds, qo)
+	a.SetLinks(ds, qo)
 	return ds, nil
 }
 
@@ -62,7 +62,7 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 
 	for idx, item := range datastreams {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		datastreams[idx] = &i
 	}
 

@@ -17,7 +17,7 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, pa
 		return nil, err
 	}
 
-	a.ProcessGetRequest(hl, qo)
+	a.SetLinks(hl, qo)
 	return hl, nil
 }
 
@@ -42,7 +42,7 @@ func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.Que
 func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range historicalLocations {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		historicalLocations[idx] = &i
 	}
 

@@ -135,8 +135,8 @@ func (a *APIv1) GetTopics() *[]models.Topic {
 	return &a.topics
 }
 
-// ProcessGetRequest processes the entities by setting the necessary links before sending back
-func (a *APIv1) ProcessGetRequest(entity entities.Entity, qo *odata.QueryOptions) {
+// SetLinks processes the entities by setting the necessary links before sending back
+func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
 	// a $ref request, id's are selected to create selfLink, remove after setting self url
 	if qo != nil && qo.QueryOptionRef {
 		entity.SetSelfLink(a.config.GetExternalServerURI())

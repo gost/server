@@ -100,6 +100,7 @@ type API interface {
 	PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error)
 
 	LinkLocation(thingID interface{}, locationID interface{}) error
+	SetLinks(entity entities.Entity, qo *odata.QueryOptions)
 }
 
 // Database specifies the operations that the database provider needs to support

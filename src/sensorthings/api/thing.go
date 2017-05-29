@@ -19,7 +19,7 @@ func (a *APIv1) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*
 		return nil, err
 	}
 
-	a.ProcessGetRequest(t, qo)
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
@@ -30,7 +30,7 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, pat
 		return nil, err
 	}
 
-	a.ProcessGetRequest(t, qo)
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
@@ -47,7 +47,7 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 		return nil, err
 	}
 
-	a.ProcessGetRequest(t, qo)
+	a.SetLinks(t, qo)
 	return t, nil
 }
 
@@ -64,7 +64,7 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 
 	for idx, item := range things {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		things[idx] = &i
 	}
 

@@ -16,7 +16,7 @@ func (a *APIv1) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, pat
 		return nil, err
 	}
 
-	a.ProcessGetRequest(l, qo)
+	a.SetLinks(l, qo)
 	return l, nil
 }
 
@@ -27,7 +27,7 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 		return nil, err
 	}
 
-	a.ProcessGetRequest(l, qo)
+	a.SetLinks(l, qo)
 	return l, nil
 }
 
@@ -40,7 +40,7 @@ func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*mod
 func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		fois[idx] = &i
 	}
 

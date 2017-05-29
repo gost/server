@@ -84,7 +84,7 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string)
 		return nil, err
 	}
 
-	a.ProcessGetRequest(l, qo)
+	a.SetLinks(l, qo)
 	return l, nil
 }
 
@@ -109,7 +109,7 @@ func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions,
 func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		locations[idx] = &i
 	}
 

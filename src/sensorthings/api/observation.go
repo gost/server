@@ -18,7 +18,7 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions, path stri
 		return nil, err
 	}
 
-	a.ProcessGetRequest(o, qo)
+	a.SetLinks(o, qo)
 	return o, nil
 }
 
@@ -47,7 +47,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 
 	for idx, item := range observations {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		observations[idx] = &i
 	}
 

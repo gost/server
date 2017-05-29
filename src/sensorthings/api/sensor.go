@@ -17,7 +17,7 @@ func (a *APIv1) GetSensor(id interface{}, qo *odata.QueryOptions, path string) (
 		return nil, err
 	}
 
-	a.ProcessGetRequest(s, qo)
+	a.SetLinks(s, qo)
 	return s, nil
 }
 
@@ -28,7 +28,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, pa
 		return nil, err
 	}
 
-	a.ProcessGetRequest(s, qo)
+	a.SetLinks(s, qo)
 	return s, nil
 }
 
@@ -41,7 +41,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayRe
 
 	for idx, item := range sensors {
 		i := *item
-		a.ProcessGetRequest(&i, qo)
+		a.SetLinks(&i, qo)
 		sensors[idx] = &i
 	}
 
