@@ -45,7 +45,7 @@ func TestEndPointSort(t *testing.T) {
 	ep2.Operation.Path = "ep2"
 	ep2.Operation.OperationType = models.HTTPOperationPost
 
-	eps := Endpoints{ep1,ep2}
+	eps := Endpoints{ep1, ep2}
 
 	// act
 	sort.Sort(eps)
@@ -53,10 +53,9 @@ func TestEndPointSort(t *testing.T) {
 	// assert
 	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
 	// post becomes first after sorting
-	assert.True(t, eps[0].Operation.Path=="ep2")
-	assert.True(t, eps[1].Operation.Path=="ep1")
+	assert.True(t, eps[0].Operation.Path == "ep2")
+	assert.True(t, eps[1].Operation.Path == "ep1")
 }
-
 
 func TestEndPointSortDynamic(t *testing.T) {
 	// arrange
@@ -67,7 +66,7 @@ func TestEndPointSortDynamic(t *testing.T) {
 	httpep2.Operation.Path = "ep2{}longer"
 	httpep2.Operation.OperationType = models.HTTPOperationPost
 
-	eps := Endpoints{httpep1,httpep2}
+	eps := Endpoints{httpep1, httpep2}
 
 	// act
 	sort.Sort(eps)
@@ -75,8 +74,8 @@ func TestEndPointSortDynamic(t *testing.T) {
 	// assert
 	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
 	// when both urls are dynamic, the longer path comes first
-	assert.True(t, eps[0].Operation.Path=="ep2{}longer")
-	assert.True(t, eps[1].Operation.Path=="ep1{}")
+	assert.True(t, eps[0].Operation.Path == "ep2{}longer")
+	assert.True(t, eps[1].Operation.Path == "ep1{}")
 }
 
 func TestEndPointSortlength(t *testing.T) {
@@ -88,7 +87,7 @@ func TestEndPointSortlength(t *testing.T) {
 	httpep2.Operation.Path = "ep2longer"
 	httpep2.Operation.OperationType = models.HTTPOperationPost
 
-	eps := Endpoints{httpep1,httpep2}
+	eps := Endpoints{httpep1, httpep2}
 
 	// act
 	sort.Sort(eps)
@@ -96,6 +95,26 @@ func TestEndPointSortlength(t *testing.T) {
 	// assert
 	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
 	// when both urls are dynamic, the longer path comes first
-	assert.True(t, eps[0].Operation.Path=="ep2longer")
-	assert.True(t, eps[1].Operation.Path=="ep1")
+	assert.True(t, eps[0].Operation.Path == "ep2longer")
+	assert.True(t, eps[1].Operation.Path == "ep1")
+}
+
+func TestEndPointNotDynamic(t *testing.T) {
+	// arrange
+	httpep1 := &Endpoint{}
+	httpep1.Operation.Path = "ep1 {c:.*}"
+	httpep1.Operation.OperationType = models.HTTPOperationGet
+	httpep2 := &Endpoint{}
+	httpep2.Operation.Path = "ep2longer"
+	httpep2.Operation.OperationType = models.HTTPOperationGet
+	eps := Endpoints{httpep1, httpep2}
+
+	// act
+	sort.Sort(eps)
+
+	// assert
+	assert.True(t, eps[0].Operation.Path == "ep2longer")
+	assert.True(t, eps[1].Operation.Path == "ep1 {c:.*}")
+
+
 }
