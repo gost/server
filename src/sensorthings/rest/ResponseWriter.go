@@ -90,7 +90,13 @@ func sendError(w http.ResponseWriter, error []error) {
 	// Set te status code, default 500 for error, check if there is an ApiError an get
 	// the status code
 	var statusCode = http.StatusInternalServerError
+
 	if len(error) > 0 {
+		// if there is Encoding type error, sends bad request (400 range)
+		if strings.Contains(errors[0], "Encoding not supported") {
+			statusCode = http.StatusBadRequest
+		}
+
 		switch e := error[0].(type) {
 		case gostErrors.APIError:
 			statusCode = e.GetHTTPErrorStatusCode()
