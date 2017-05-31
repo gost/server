@@ -181,7 +181,7 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	}
 }
 
-// AppendSubEntity appends a sub entity to the SubEntityList
+// GetParent returns the parent entity for a given list of entity types
 func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 	cq := q
 	path := ""
@@ -192,17 +192,17 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 			}
 
 			if i == 0 {
-				path = fmt.Sprintf("%v", e)
+				path = fmt.Sprintf("%v", e.ToString())
 			} else {
-				path = fmt.Sprintf("%v/%v", path, e)
+				path = fmt.Sprintf("%v/%v", path, e.ToString())
 			}
-
 		}
 	}
 
 	if path != "" {
+		p := fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
 		for _, se := range q.SubEntities {
-			if se.getPath("") == path {
+			if se.getPath("") == p {
 				cq = se
 				break
 			}
@@ -210,6 +210,29 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 	}
 
 	return cq
+}
+
+// QueryInfoExists checks if there is already a QueryParseInfo added based on the entity list
+func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) bool {
+	path := ""
+	for i, e := range etl {
+		if i == 0 {
+			path = fmt.Sprintf("%v", e.ToString())
+		} else {
+			path = fmt.Sprintf("%v/%v", path, e.ToString())
+		}
+	}
+
+	if path != "" {
+		for _, se := range q.SubEntities {
+			p := fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
+			if se.getPath("") == p {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (q *QueryParseInfo) getPath(path string) string {
@@ -220,7 +243,7 @@ func (q *QueryParseInfo) getPath(path string) string {
 	}
 
 	if q.Parent != nil {
-		q.Parent.getPath(path)
+		path = q.Parent.getPath(path)
 	}
 
 	return path
