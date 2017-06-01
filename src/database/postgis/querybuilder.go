@@ -281,11 +281,6 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 			}
 		}
 	}
-
-	fmt.Print("sub query parse info\n")
-	for _, se := range main.SubEntities {
-		fmt.Printf("%s\n", se.getPath(""))
-	}
 }
 
 // createFilterQueryString converts an OData query string found in odata.QueryOptions.QueryFilter to a PostgreSQL query string
@@ -481,18 +476,28 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
 	}
 
+	if qo != nil && qo.Filter != nil {
+		if id != nil {
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
+		} else {
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
+		}
+	}
+
 	limit := ""
 	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
 		limit = fmt.Sprintf("LIMIT %s", qb.getLimit(qo))
 	}
-	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, qb.getOrderBy(et1, qo), limit, qb.getOffset(qo))
-	queryString = fmt.Sprintf("%s AS %s %s",
+	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
+	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
 		queryString,
 		qb.addAsPrefix(qpi, tableMappings[et1]),
 		qb.createJoin(e1, e2, id, false, qo, qpi, ""),
+		limit,
+		qb.getOffset(qo),
 	)
 
-	fmt.Printf("%s\n", queryString)
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 

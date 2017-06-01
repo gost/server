@@ -639,7 +639,7 @@ func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, b
 			case entities.EntityTypeLocation:
 				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
 					tableMap[entities.EntityTypeThingToLocation],
-					selectMappings[entities.EntityTypeLocation][locationID],
+					createWhereIs(entities.EntityTypeLocation, locationID, asPrefix),
 					selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID],
 					selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
 					selectMappings[entities.EntityTypeDatastream][datastreamThingID],
