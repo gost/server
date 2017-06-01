@@ -218,6 +218,7 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 	}
 
 	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
+	log.Println("sql:" + sql)
 	_, err := gdb.Db.Exec(sql, entityID)
 	if err != nil {
 		return err

@@ -122,6 +122,7 @@ func (a *APIv1) initRest() {
 		a.config.Server.MaxEntityResponse = configuration.DefaultMaxEntries
 	}
 
+	rest.ExternalURI = a.config.GetExternalServerURI()
 	rest.IndentJSON = a.config.Server.IndentedJSON
 	rest.MaxEntities = a.config.Server.MaxEntityResponse
 }
@@ -192,7 +193,7 @@ func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOpt
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$skip=%v", int(*qo.Skip)+int(*qo.Top)))
 	}
 
-	return fmt.Sprintf("%s/%s", incomingURL, queryString)
+	return fmt.Sprintf("%s%s", incomingURL, queryString)
 }
 
 func appendQueryPart(base string, q string) string {

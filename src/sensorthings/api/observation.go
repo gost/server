@@ -160,10 +160,21 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	s := string(json)
 
 	//ToDo: MQTT TEST
-	a.mqtt.Publish(fmt.Sprintf("Datastreams(%v)/Observations", datastreamID), s, 0)
-	a.mqtt.Publish("Observations", s, 0)
+	if a.config.MQTT.Enabled {
+		topics := []string{
+			fmt.Sprintf("Datastreams(%v)/Observations", datastreamID),
+			"Observations",
+		}
+		go a.MQTTPublish(topics, s, 0)
+	}
 
 	return no, nil
+}
+
+func (a *APIv1) MQTTPublish(topics []string, msg string, qos byte) {
+	for _, t := range topics {
+		a.mqtt.Publish(t, msg, qos)
+	}
 }
 
 func toStringID(id interface{}) string {

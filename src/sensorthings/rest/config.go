@@ -9,6 +9,7 @@ import (
 var Endpoints = map[entities.EntityType]models.Endpoint{}
 var MaxEntities int = 200
 var IndentJSON bool = true
+var ExternalURI = ""
 
 // CreateEndPoints creates the pre-defined endpoint config, the config contains all endpoint info
 // describing the SupportedQueryOptions (if needed) and EndpointOperation for each endpoint

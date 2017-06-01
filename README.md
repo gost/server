@@ -75,6 +75,10 @@ Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/detail
 
 [GOST configuration](docs/gost_configuration.md)
 
+## Security
+
+[GOST security](docs/gost_security.md)
+
 ## Samples
 
 HTTP Api: For sample requests (setting up sensors/datastreams/things and adding observations) see the tests in the [playground](test/playground_tests.md). 

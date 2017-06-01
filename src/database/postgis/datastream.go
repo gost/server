@@ -10,6 +10,7 @@ import (
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/now"
 )
 
 func datastreamParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -33,12 +34,12 @@ func datastreamParamFactory(values map[string]interface{}) (entities.Entity, err
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamDescription] {
 			ds.Description = value.(string)
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamResultTime] {
-			ds.ResultTime = value.(string)
+			ds.ResultTime = now.PostgresToIso8601Period(value.(string))
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamObservationType] {
 			obs, _ := entities.GetObservationTypeByID(value.(int64))
 			ds.ObservationType = obs.Value
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamPhenomenonTime] {
-			ds.PhenomenonTime = value.(string)
+			ds.PhenomenonTime = now.PostgresToIso8601Period(value.(string))
 		} else if as == asMappings[entities.EntityTypeDatastream][datastreamUnitOfMeasurement] {
 			t := value.(string)
 			unitOfMeasurementMap, err := JSONToMap(&t)
@@ -239,14 +240,12 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 
 	phenomenonTime := "NULL"
 	if len(d.PhenomenonTime) != 0 {
-		period := ParseTMPeriod(d.PhenomenonTime)
-		phenomenonTime = "'" + ToPostgresPeriodFormat(period) + "'"
+		phenomenonTime = "'" + now.Iso8601ToPostgresPeriod(d.PhenomenonTime) + "'"
 	}
 
 	resultTime := "NULL"
 	if len(d.ResultTime) != 0 {
-		periodResultTime := ParseTMPeriod(d.ResultTime)
-		resultTime = "'" + ToPostgresPeriodFormat(periodResultTime) + "'"
+		resultTime = "'" + now.Iso8601ToPostgresPeriod(d.ResultTime) + "'"
 	}
 	// get the ObservationType id in the lookup table
 	observationType, err := entities.GetObservationTypeByValue(d.ObservationType)
@@ -307,6 +306,16 @@ func (gdb *GostDatabase) PatchDatastream(id interface{}, ds *entities.Datastream
 	if len(ds.ObservedArea) > 0 {
 		observedAreaBytes, _ := json.Marshal(ds.ObservedArea)
 		updates["observedarea"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(observedAreaBytes[:]))
+	}
+
+	if len(ds.PhenomenonTime) > 0 {
+		phenomenonTime := now.Iso8601ToPostgresPeriod(ds.PhenomenonTime)
+		updates["phenomenontime"] = phenomenonTime
+	}
+
+	if len(ds.ResultTime) > 0 {
+		resultTime := now.Iso8601ToPostgresPeriod(ds.ResultTime)
+		updates["resulttime"] = resultTime
 	}
 
 	if err = gdb.updateEntityColumns("datastream", updates, intID); err != nil {

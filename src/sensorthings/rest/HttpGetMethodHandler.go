@@ -22,12 +22,7 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 
 	// Run the handler func such as Api.GetThingById
 	handler := *h
-	schema := "http://"
-	if r.TLS != nil {
-		schema = "https://"
-	}
-
-	data, err2 := handler(queryOptions, fmt.Sprintf(schema+r.Host+r.URL.Path))
+	data, err2 := handler(queryOptions, fmt.Sprintf(ExternalURI+r.URL.RawPath))
 	if err2 != nil {
 		sendError(w, []error{err2})
 		return
