@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/godata"
 	"strings"
 	"time"
 )
@@ -40,8 +41,8 @@ func (qb *QueryBuilder) removeSchema(table string) string {
 // getLimit returns the max entities to retrieve, this number is set by ODATA's
 // $top, if not provided use the global value
 func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryTop.IsNil() {
-		return fmt.Sprintf("%v", qo.QueryTop.Limit)
+	if qo != nil && qo.Top != nil {
+		return fmt.Sprintf("%v", *qo.Top)
 	}
 	return fmt.Sprintf("%v", qb.maxTop)
 }
@@ -49,8 +50,8 @@ func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions) string {
 // getOffset returns the offset, this number is set by ODATA's
 // $skip, if not provided do not skip anything = return "0"
 func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QuerySkip.IsNil() {
-		return fmt.Sprintf("%v", qo.QuerySkip.Index)
+	if qo != nil && qo.Skip != nil {
+		return fmt.Sprintf("%v", *qo.Skip)
 	}
 	return "0"
 }
@@ -58,14 +59,14 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 // getOrderBy returns the string that needs to be placed after ORDER BY, this is set using
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
 func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryOrderBy.IsNil() {
+	if qo != nil && qo.OrderBy != nil && len(qo.OrderBy.OrderByItems) > 0 {
 		obString := ""
-		for _, query := range qo.QueryOrderBy.Queries {
-			propertyName := selectMappings[et][strings.ToLower(query.Property)]
+		for _, obi := range qo.OrderBy.OrderByItems {
+			propertyName := selectMappings[et][strings.ToLower(obi.Field.Value)]
 			if len(obString) == 0 {
-				obString = fmt.Sprintf("%s %s", propertyName, query.OrderType.ToString())
+				obString = fmt.Sprintf("%s %s", propertyName, obi.Order)
 			} else {
-				obString = fmt.Sprintf("%s, %s %s", obString, propertyName, query.OrderType.ToString())
+				obString = fmt.Sprintf("%s, %s %s", obString, propertyName, obi.Order)
 			}
 		}
 
@@ -81,17 +82,20 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 // outputted with AS [name]
 func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qpi *QueryParseInfo, addID bool, addAs bool, fromAs bool, isExpand bool, selectString string) string {
 	var properties []string
-	if qo == nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
+	if qo == nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 {
 		properties = et.GetPropertyNames()
 	} else {
 		idAdded := false
-		for _, p := range qo.QuerySelect.Params {
-			if p == idField {
-				idAdded = true
+		for _, p := range qo.Select.SelectItems {
+			for _, s := range p.Segments {
+				if s.Value == idField {
+					idAdded = true
+				}
 			}
+
 			for _, pn := range et.GetPropertyNames() {
-				if strings.ToLower(p) == strings.ToLower(pn) {
-					if p == idField {
+				if strings.ToLower(p.Segments[0].Value) == strings.ToLower(pn) {
+					if p.Segments[0].Value == idField {
 						properties = append([]string{idField}, properties...)
 					} else {
 						properties = append(properties, pn)
@@ -150,7 +154,12 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 
 	if qpi != nil && len(qpi.SubEntities) > 0 {
 		for _, subQPI := range qpi.SubEntities {
-			selectString = qb.getSelect(subQPI.Entity, subQPI.ExpandOperation.QueryOptions, subQPI, true, true, true, false, selectString)
+			qo := &odata.QueryOptions{}
+			if subQPI.ExpandItem != nil {
+				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			}
+
+			selectString = qb.getSelect(subQPI.Entity, qo, subQPI, true, true, true, false, selectString)
 		}
 	}
 
@@ -167,20 +176,40 @@ func (qb *QueryBuilder) addAsPrefix(qpi *QueryParseInfo, as string) string {
 	return fmt.Sprintf("%v_%s", qpi.AsPrefix, as)
 }
 
-func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
+func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id interface{}, isExpand bool, qo *odata.QueryOptions, qpi *QueryParseInfo, joinString string) string {
 	if e2 != nil {
 		nqo := qo
 		et2 := e2.GetEntityType()
 
 		asPrefix := ""
-		if qpi != nil && qpi.Parent != nil && qpi.Parent.QueryIndex != 0 {
-			asPrefix = qpi.Parent.AsPrefix
+		if qpi != nil {
+			if qpi.Parent != nil {
+				asPrefix = qpi.Parent.AsPrefix
+			} else {
+				asPrefix = qpi.AsPrefix
+			}
 		}
 
 		if !isExpand {
-			nqo = &odata.QueryOptions{
-				QuerySelect: &odata.QuerySelect{Params: []string{"id"}},
+			nqo = &odata.QueryOptions{}
+			nqo.Select = &godata.GoDataSelectQuery{SelectItems: []*godata.SelectItem{{Segments: []*godata.Token{{Value: "id"}}}}}
+			if id != nil {
+				var err error
+				nqo.Filter, err = godata.ParseFilterString(fmt.Sprintf("id eq %v", id))
+				if err != nil {
+					fmt.Printf("\n\n ERROR %v \n\n", err)
+				}
 			}
+
+			join := getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix)
+			lowerJoin := strings.ToLower(join)
+			filterPrefix := "WHERE"
+			if strings.Contains(lowerJoin, "where") {
+				filterPrefix = "AND"
+			}
+
+			filter := qb.getFilterQueryString(et2, nqo, filterPrefix)
+
 			joinString = fmt.Sprintf("%s"+
 				"INNER JOIN LATERAL ("+
 				"SELECT %s FROM %s %s "+
@@ -188,8 +217,8 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 				"AS %s on true ", joinString,
 				qb.getSelect(e2, nqo, nil, true, true, false, false, ""),
 				qb.tables[et2],
-				getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix),
-				qb.getFilterQueryString(et2, nqo, true),
+				join,
+				filter,
 				tableMappings[et2])
 		} else {
 			joinString = fmt.Sprintf("%s"+
@@ -201,7 +230,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 				qb.getSelect(e2, nqo, qpi, true, true, false, true, ""),
 				qb.tables[et2],
 				getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix),
-				qb.getFilterQueryString(et2, nqo, true),
+				qb.getFilterQueryString(et2, nqo, "WHERE"),
 				qb.getOrderBy(et2, nqo),
 				qb.getLimit(nqo),
 				qb.getOffset(nqo),
@@ -211,21 +240,45 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, isExp
 
 	if qpi != nil && len(qpi.SubEntities) > 0 {
 		for _, subQPI := range qpi.SubEntities {
-			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, true, subQPI.ExpandOperation.QueryOptions, subQPI, joinString)
+			qo := &odata.QueryOptions{}
+			if subQPI.ExpandItem != nil {
+				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			}
+			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, qo, subQPI, joinString)
 		}
 	}
 
 	return joinString
 }
 
-func (qb *QueryBuilder) constructQueryParseInfo(operations []*odata.ExpandOperation, main *QueryParseInfo, from *QueryParseInfo) {
+func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem, main *QueryParseInfo) {
 	for _, o := range operations {
-		nQPI := &QueryParseInfo{}
-		nQPI.Init(o.Entity.GetEntityType(), main.GetNextQueryIndex(), from, o)
-		main.SubEntities = append(main.SubEntities, nQPI)
+		for i, t := range o.Path {
+			nQPI := &QueryParseInfo{}
+			et, _ := entities.EntityFromString(strings.ToLower(t.Value))
 
-		if len(o.ExpandOperations) > 0 {
-			qb.constructQueryParseInfo(o.ExpandOperations, main, nQPI)
+			path := make([]entities.EntityType, 0)
+			for p := 0; p < i+1; p++ {
+				etfs, _ := entities.EntityFromString(o.Path[p].Value)
+				path = append(path, etfs.GetEntityType())
+			}
+
+			parent := main.GetParent(path)
+			if main.QueryInfoExists(path) {
+				continue
+			}
+
+			if i == len(o.Path)-1 {
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), parent, o)
+				main.SubEntities = append(main.SubEntities, nQPI)
+
+				if o.Expand != nil && len(o.Expand.ExpandItems) > 0 {
+					qb.constructQueryParseInfo(o.Expand.ExpandItems, main)
+				}
+			} else {
+				nQPI.Init(et.GetEntityType(), main.GetNextQueryIndex(), parent, nil)
+				main.SubEntities = append(main.SubEntities, nQPI)
+			}
 		}
 	}
 }
@@ -234,101 +287,150 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*odata.ExpandOperat
 // ParamFactory is used for converting SensorThings parameter names to postgres field names
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
-func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, addWhere bool) string {
+func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string) string {
 	q := ""
-	if qo != nil && !qo.QueryFilter.IsNil() {
-		if addWhere {
-			q += " WHERE "
-		}
-		ps, ops := qo.QueryFilter.Predicate.Split()
-
-		for i, p := range ps {
-			qb.prepareFilterRight(p)
-			operator, _ := qb.odataOperatorToPostgreSQL(p.Operator)
-			leftString := fmt.Sprintf("%v", p.Left)
-			if strings.Contains(leftString, "/") {
-				parts := strings.Split(leftString, "/")
-				for i, p := range parts {
-					if i == 0 {
-						q += fmt.Sprintf("%v ", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p))])
-						continue
-					}
-
-					arrow := "->"
-					if i+1 == len(parts) {
-						arrow = "->>"
-					}
-					q += fmt.Sprintf("%v '%v'", arrow, p)
-				}
-				q += fmt.Sprintf("%v %v", operator, p.Right)
-			} else {
-				q += fmt.Sprintf("%v %v %v", selectMappings[et][strings.ToLower(fmt.Sprintf("%v", p.Left))], operator, fmt.Sprintf("%v", p.Right))
-			}
-
-			if len(ops)-1 >= i {
-				q += fmt.Sprintf(" %v ", ops[i])
-			}
-		}
-		q += " "
+	if qo != nil && qo.Filter != nil {
+		q += fmt.Sprintf("%s ", prefix)
+		q += qb.createFilter(et, qo.Filter.Tree)
 	}
 
 	return q
 }
 
-func (qb *QueryBuilder) prepareFilterRight(p *odata.Predicate) {
-	e := strings.Replace(fmt.Sprintf("%v", p.Right), "'", "", -1)
-	property := strings.ToLower(fmt.Sprintf("%v", p.Left))
+func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode) string {
+	output := ""
+	switch pn.Token.Type {
+	case godata.FilterTokenOpenParen:
+		return ""
+	case godata.FilterTokenCloseParen:
+		return ""
+	case godata.FilterTokenWhitespace:
+		return ""
+	case godata.FilterTokenNav:
+		q := ""
+		for i, part := range pn.Children {
+			if i == 0 {
+				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part)))
+				continue
+			}
+
+			arrow := "->"
+			if i+1 == len(pn.Children) {
+				arrow = "->>"
+			}
+			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part))
+		}
+		return q
+	case godata.FilterTokenColon:
+		return ""
+	case godata.FilterTokenComma: //5
+		return ""
+	case godata.FilterTokenLogical:
+		left := qb.createFilter(et, pn.Children[0])
+		right := qb.createFilter(et, pn.Children[1])
+
+		// do not change order
+		right = qb.prepareFilterRight(left, right)
+		left = qb.prepareFilterLeft(et, left)
+		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
+	case godata.FilterTokenOp:
+		return ""
+	case godata.FilterTokenFunc:
+		return ""
+	case godata.FilterTokenLambda:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenNull: // 10
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenIt:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenRoot:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenFloat:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenInteger:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenString: //15
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenDate:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenTime:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenDateTime:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenBoolean:
+		return fmt.Sprintf("%v", pn.Token.Value)
+	case godata.FilterTokenLiteral: // 20
+		return fmt.Sprintf("%v", pn.Token.Value)
+	}
+
+	return output
+}
+
+func (qb *QueryBuilder) prepareFilterLeft(et entities.EntityType, left string) string {
+	p := selectMappings[et][strings.ToLower(left)]
+	if p != "" {
+		return p
+	}
+
+	return left
+}
+
+func (qb *QueryBuilder) prepareFilterRight(left, right string) string {
+	e := strings.Replace(fmt.Sprintf("%v", right), "'", "", -1)
+	property := strings.ToLower(fmt.Sprintf("%v", left))
 
 	if property == "encodingtype" {
 		et, err := entities.CreateEncodingType(e)
 		if err == nil {
-			p.Right = et.Code
+			right = fmt.Sprintf("%v", et.Code)
 		}
-		return
+		return right
 	}
 
 	if property == "observationtype" {
 		et, err := entities.GetObservationTypeByValue(e)
 		if err == nil {
-			p.Right = et.Code
+			right = fmt.Sprintf("%v", et.Code)
 		}
-		return
+		return right
 	}
 
 	if property == "phenomenontime" || property == "resulttime" || property == "time" {
 		if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
-			p.Right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+			right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
 		}
-		return
+		return right
 	}
+
+	return right
 }
 
-// OdataOperatorToPostgreSQL converts an odata.OdataOperator to a PostgreSQL string representation
-func (qb *QueryBuilder) odataOperatorToPostgreSQL(o odata.OdataOperator) (string, error) {
+// odataLogicalOperatorToPostgreSQL converts a logical operator to a PostgreSQL string representation
+func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	switch o {
-	case odata.And:
-		return "AND", nil
-	case odata.Or:
-		return "OR", nil
-	case odata.Not:
-		return "NOT", nil
-	case odata.Equals:
-		return "=", nil
-	case odata.NotEquals:
-		return "!=", nil
-	case odata.GreaterThan:
-		return ">", nil
-	case odata.GreaterThanOrEquals:
-		return ">=", nil
-	case odata.LessThan:
-		return "<", nil
-	case odata.LessThanOrEquals:
-		return "<=", nil
-	case odata.IsNull:
-		return "IS NULL", nil
+	case "and":
+		return "AND"
+	case "or":
+		return "OR"
+	case "not":
+		return "NOT"
+	case "has":
+		return "HAS"
+	case "eq":
+		return "="
+	case "ne":
+		return "!="
+	case "gt":
+		return ">"
+	case "ge":
+		return ">="
+	case "lt":
+		return "<"
+	case "le":
+		return "<="
 	}
 
-	return "", fmt.Errorf("Operator %v not implemented", o.ToString())
+	return ""
 }
 
 // CreateQuery creates a new query based on given input
@@ -343,47 +445,59 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		et2 = e2.GetEntityType()
 	}
 
-	eo := &odata.ExpandOperation{
-		QueryOptions: qo,
+	eo := &godata.ExpandItem{}
+	if qo != nil {
+		eo.Filter = qo.Filter
+		eo.Expand = qo.Expand
+		eo.OrderBy = qo.OrderBy
+		eo.Search = qo.Search
+		eo.Select = qo.Select
+		eo.Skip = qo.Skip
+		eo.Top = qo.Top
 	}
+
 	qpi := &QueryParseInfo{}
 	qpi.Init(et1, 0, nil, eo)
 
-	if qo != nil && !qo.QueryExpand.IsNil() {
+	if qo != nil && qo.Expand != nil {
 		qpi.SubEntities = make([]*QueryParseInfo, 0)
-		if len(qo.QueryExpand.Operations) > 0 {
-			qb.constructQueryParseInfo(qo.QueryExpand.Operations, qpi, qpi)
+		if len(qo.Expand.ExpandItems) > 0 {
+			qb.constructQueryParseInfo(qo.Expand.ExpandItems, qpi)
 		}
 	}
 
-	etIdField := fmt.Sprintf("%s.id", tableMappings[et1])
-	orderBy := qb.getOrderBy(et1, qo)
-	queryString := fmt.Sprintf("SELECT %s FROM %s %s", qb.getSelect(e1, qo, qpi, true, true, false, false, ""), qb.tables[et1], qb.createJoin(e1, e2, false, qo, qpi, ""))
-	queryString = fmt.Sprintf("%s WHERE %s IN (SELECT %s FROM %s %s", queryString, etIdField, etIdField, qb.tables[et1], qb.createJoin(e1, e2, false, qo, qpi, ""))
+	queryString := fmt.Sprintf("SELECT %s FROM (SELECT %s FROM %s",
+		qb.getSelect(e1, qo, qpi, true, true, true, false, ""),
+		qb.getSelect(e1, qo, nil, true, true, false, true, ""),
+		qb.tables[et1],
+	)
 
-	if id != nil {
-		if e2 == nil {
-			queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
-		} else {
-			queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
-		}
+	if id != nil && e2 == nil {
+		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
 	}
 
-	if qo != nil && !qo.QueryFilter.IsNil() {
+	if qo != nil && qo.Filter != nil {
 		if id != nil {
-			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, false))
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
 		} else {
-			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, true))
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
 		}
 	}
 
 	limit := ""
-	if qo != nil && !qo.QueryTop.IsNil() && qo.QueryTop.Limit != -1 {
+	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
 		limit = fmt.Sprintf("LIMIT %s", qb.getLimit(qo))
 	}
-	queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s)", queryString, orderBy, limit, qb.getOffset(qo))
-	queryString = fmt.Sprintf("%s ORDER BY %s", queryString, orderBy)
+	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
+	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
+		queryString,
+		qb.addAsPrefix(qpi, tableMappings[et1]),
+		qb.createJoin(e1, e2, id, false, qo, qpi, ""),
+		limit,
+		qb.getOffset(qo),
+	)
 
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
@@ -394,7 +508,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
-	if qo != nil && !qo.QueryCount.IsNil() && !qo.QueryCount.Count {
+	if qo != nil && qo.Count != nil && bool(*qo.Count) == false {
 		return ""
 	}
 
@@ -404,16 +518,16 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 		et2 = e2.GetEntityType()
 	}
 
-	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, false, nil, nil, ""))
+	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, id, false, nil, nil, ""))
 	if id != nil {
 		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
 	}
 
-	if qo != nil && !qo.QueryFilter.IsNil() {
+	if qo != nil && qo.Filter != nil {
 		if id != nil {
-			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, false))
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
 		} else {
-			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, true))
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
 		}
 	}
 

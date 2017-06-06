@@ -201,12 +201,9 @@ type Endpoint interface {
 	GetName() string
 	GetURL() string
 	GetOperations() []EndpointOperation
-	GetSupportedQueryOptions() []odata.QueryOptionType
 	GetSupportedExpandParams() []string
 	GetSupportedSelectParams() []string
 	ShowOutputInfo() bool
-	SupportsQueryOptionType(queryOptionType odata.QueryOptionType) bool
-	AreQueryOptionsSupported(queryOptions *odata.QueryOptions) (bool, []error)
 }
 
 // HTTPHandler func defines the format of the handler to process the incoming request

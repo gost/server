@@ -3,7 +3,7 @@ package postgis
 import (
 	"fmt"
 	"github.com/geodan/gost/src/sensorthings/entities"
-	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/godata"
 )
 
 // tables as defined in postgis
@@ -130,21 +130,21 @@ var asPrefixArr = [...]string{
 // QueryParseInfo is constructed based on the input send to the QueryBuilder, with the help of QueryParseInfo
 // the response rows from the database can be parsed into the correct entities with their relations and sub entities
 type QueryParseInfo struct {
-	QueryIndex      int    // Order of quest
-	AsPrefix        string // Extra AS that gets added to the join string
-	Entity          entities.Entity
-	ExpandOperation *odata.ExpandOperation
-	ParamFactory    ParamFactory
-	Parent          *QueryParseInfo
-	SubEntities     []*QueryParseInfo
+	QueryIndex   int    // Order of quest
+	AsPrefix     string // Extra AS that gets added to the join string
+	Entity       entities.Entity
+	ExpandItem   *godata.ExpandItem
+	ParamFactory ParamFactory
+	Parent       *QueryParseInfo
+	SubEntities  []*QueryParseInfo
 }
 
 // Init initialises a QueryParseInfo object by setting al the needed info
-func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandOperation *odata.ExpandOperation) {
+func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, parent *QueryParseInfo, expandItem *godata.ExpandItem) {
 	q.Parent = parent
 	q.AsPrefix = asPrefixArr[queryIndex]
 	q.QueryIndex = queryIndex
-	q.ExpandOperation = expandOperation
+	q.ExpandItem = expandItem
 	switch e := entityType; e {
 	case entities.EntityTypeThing:
 		q.Entity = &entities.Thing{}
@@ -173,6 +173,84 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 	}
 }
 
+// GetParent returns the parent entity for a given list of entity types
+func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
+	cq := q
+	path := ""
+	if len(etl) > 1 {
+		for i, e := range etl {
+			if i+1 == len(etl) {
+				continue
+			}
+
+			if i == 0 {
+				path = fmt.Sprintf("%v", e.ToString())
+			} else {
+				path = fmt.Sprintf("%v/%v", path, e.ToString())
+			}
+		}
+	}
+
+	if path != "" {
+		p := fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
+		for _, se := range q.SubEntities {
+			if se.getPath("") == p {
+				cq = se
+				break
+			}
+		}
+	}
+
+	return cq
+}
+
+// QueryInfoExists checks if there is already a QueryParseInfo added based on the entity list
+func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) bool {
+	path := ""
+	for i, e := range etl {
+		if i == 0 {
+			path = fmt.Sprintf("%v", e.ToString())
+		} else {
+			path = fmt.Sprintf("%v/%v", path, e.ToString())
+		}
+	}
+
+	if path != "" {
+		for _, se := range q.SubEntities {
+			p := fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
+			if se.getPath("") == p {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (q *QueryParseInfo) getPath(path string) string {
+	if len(path) == 0 {
+		path = q.Entity.GetEntityType().ToString()
+	} else {
+		path = fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
+	}
+
+	if q.Parent != nil {
+		path = q.Parent.getPath(path)
+	}
+
+	return path
+}
+
+func (q *QueryParseInfo) getSubEntity(et entities.EntityType) *QueryParseInfo {
+	for i, se := range q.SubEntities {
+		if et == se.Entity.GetEntityType() {
+			return q.SubEntities[i]
+		}
+	}
+
+	return q
+}
+
 // GetQueryParseInfoByQueryIndex returns the QueryParseInfo by a given QueryID, this func should be called from the main
 // QueryParseInfo object
 func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
@@ -192,6 +270,19 @@ func (q *QueryParseInfo) GetQueryParseInfoByQueryIndex(id int) *QueryParseInfo {
 
 // GetNextQueryIndex returns the next query index number based on the added entities/sub entities
 func (q *QueryParseInfo) GetNextQueryIndex() int {
+	qpi := q.GetMainQueryParseInfo()
+
+	qi := qpi.QueryIndex
+	if len(qpi.SubEntities) > 0 {
+		lastSub := qpi.SubEntities[len(qpi.SubEntities)-1]
+		qi = lastSub.getNextQueryIndex() - 1
+	}
+
+	return qi + 1
+}
+
+// GetNextQueryIndex returns the next query index number based on the added entities/sub entities
+func (q *QueryParseInfo) getNextQueryIndex() int {
 	qi := q.QueryIndex
 	if len(q.SubEntities) > 0 {
 		lastSub := q.SubEntities[len(q.SubEntities)-1]
@@ -199,6 +290,16 @@ func (q *QueryParseInfo) GetNextQueryIndex() int {
 	}
 
 	return qi + 1
+}
+
+// GetMainQueryParseInfo returns the first QueryParseInfo from the tree
+func (q *QueryParseInfo) GetMainQueryParseInfo() *QueryParseInfo {
+	qpi := q
+	if qpi.Parent != nil {
+		qpi = qpi.Parent.GetMainQueryParseInfo()
+	}
+
+	return qpi
 }
 
 // GetQueryIDRelationMap returns the query index relations, ie QueryParseInfo with sub entity datastream thing qid = 0, datastream qid = 1
@@ -530,7 +631,7 @@ func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, b
 			case entities.EntityTypeLocation:
 				return fmt.Sprintf("INNER JOIN %s ON %s = %s AND %s = %s",
 					tableMap[entities.EntityTypeThingToLocation],
-					selectMappings[entities.EntityTypeLocation][locationID],
+					createWhereIs(entities.EntityTypeLocation, locationID, asPrefix),
 					selectMappings[entities.EntityTypeThingToLocation][thingToLocationLocationID],
 					selectMappings[entities.EntityTypeThingToLocation][thingToLocationThingID],
 					selectMappings[entities.EntityTypeDatastream][datastreamThingID],

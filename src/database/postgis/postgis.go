@@ -13,6 +13,7 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/models"
+	"github.com/gost/godata"
 	_ "github.com/lib/pq" // postgres driver
 )
 
@@ -102,10 +103,12 @@ func GetCreateDatabaseQuery(location string, schema string) (*string, error) {
 }
 
 // ContainsToLower checks a string array, array and given string are set to lower-case
-func ContainsToLower(s []string, e string) bool {
+func ContainsToLower(s []*godata.SelectItem, e string) bool {
 	for _, a := range s {
-		if strings.ToLower(a) == strings.ToLower(e) {
-			return true
+		for _, b := range a.Segments {
+			if strings.ToLower(b.Value) == strings.ToLower(e) {
+				return true
+			}
 		}
 	}
 	return false

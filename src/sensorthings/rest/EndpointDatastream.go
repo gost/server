@@ -5,7 +5,6 @@ import (
 
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/models"
-	"github.com/geodan/gost/src/sensorthings/odata"
 )
 
 func createDatastreamsEndpoint(externalURL string) *Endpoint {
@@ -14,10 +13,6 @@ func createDatastreamsEndpoint(externalURL string) *Endpoint {
 		EntityType: entities.EntityTypeDatastream,
 		OutputInfo: true,
 		URL:        fmt.Sprintf("%s/%s/%s", externalURL, models.APIPrefix, fmt.Sprintf("%v", "Datastreams")),
-		SupportedQueryOptions: []odata.QueryOptionType{
-			odata.QueryOptionTop, odata.QueryOptionSkip, odata.QueryOptionOrderBy, odata.QueryOptionCount, odata.QueryOptionResultFormat,
-			odata.QueryOptionExpand, odata.QueryOptionSelect, odata.QueryOptionFilter,
-		},
 		SupportedExpandParams: []string{
 			"thing",
 			"sensor",

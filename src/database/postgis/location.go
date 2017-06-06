@@ -11,6 +11,7 @@ import (
 
 	gostErrors "github.com/geodan/gost/src/errors"
 	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/godata"
 )
 
 func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -84,9 +85,9 @@ func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo 
 		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
-	qo = &odata.QueryOptions{
-		QueryTop: &odata.QueryTop{Limit: -1},
-	}
+	qo = &odata.QueryOptions{}
+	tq := godata.GoDataTopQuery(-1)
+	qo.Top = &tq
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Datastream{}, intID, qo)
 	return processLocation(gdb.Db, query, qi)

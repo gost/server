@@ -91,10 +91,10 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 	}
 
 	if qo != nil {
-		hasSelectQuery := (qo.QuerySelect != nil)
+		hasSelectQuery := (qo.Select != nil)
 		var containsObservedArea = true
 		if hasSelectQuery {
-			containsObservedArea = ContainsToLower(qo.QuerySelect.Params, "observedArea")
+			containsObservedArea = ContainsToLower(qo.Select.SelectItems, "observedArea")
 		}
 
 		// calculate observedArea on the fly when not present in database

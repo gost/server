@@ -25,20 +25,18 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 		}
 
 		// $value is requested only send back the value, ToDo: move to API code?
-		// need to check on qo.QuerySelect.Params[0] ?
-		if qo != nil && qo.QueryOptionValue {
-			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.QuerySelect.Params[0])
+		if qo != nil && qo.Value != nil && bool(*qo.Value) == true {
+			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems[0])
 			var m map[string]json.RawMessage
 			err = json.Unmarshal(b, &m)
-			if err != nil || qo.QuerySelect == nil || len(qo.QuerySelect.Params) == 0 {
-				// unreachable code?
+			if err != nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 {
 				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
 			}
 
 			// whats happening here?
 			mVal := []byte{}
 			for k, v := range m {
-				if strings.ToLower(k) == qo.QuerySelect.Params[0] {
+				if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
 					mVal = v
 				}
 			}
