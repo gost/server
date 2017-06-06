@@ -4,7 +4,7 @@ import (
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/database/postgis"
 	"github.com/geodan/gost/mqtt"
-	api "github.com/geodan/gost/sensorthings/api"
+	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/rest"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -33,7 +33,7 @@ func TestLowerCaseURI(t *testing.T) {
 	ts := httptest.NewServer(LowerCaseURI(n))
 	defer ts.Close()
 	res, err := http.Get(ts.URL + "/TEST")
-	if err != nil && res != nil {
+	if err == nil && res != nil {
 		defer res.Body.Close()
 		b, _ := ioutil.ReadAll(res.Body)
 		assert.NotNil(t, b)
@@ -55,7 +55,7 @@ func TestPostProcessHandler(t *testing.T) {
 	req, _ := http.NewRequest("GET", ts.URL+"/", nil)
 	req.Header.Set("X-Forwarded-For", "coffee")
 	res, err := client.Do(req)
-	if err != nil && res != nil {
+	if err == nil && res != nil {
 		defer res.Body.Close()
 		b, _ := ioutil.ReadAll(res.Body)
 		body := string(b)
