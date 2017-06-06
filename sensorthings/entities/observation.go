@@ -66,13 +66,13 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 
 	// When a SensorThings service receives a POST Observations without resultTime, the service SHALL assign a
 	// null value to the resultTime.
-	// todo: observation.go:75:4: this value of rt is never used (SA4006)
 	if o.ResultTime != nil {
 		rt := *o.ResultTime
 		if t, err := time.Parse(time.RFC3339Nano, rt); err != nil {
 			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid resultTime: %v", err.Error())))
 		} else {
 			rt = t.UTC().Format("2006-01-02T15:04:05.000Z")
+			t, _ = time.Parse(time.RFC3339Nano, rt)
 		}
 	}
 

@@ -29,14 +29,17 @@ func TestCreateServer(t *testing.T) {
 func TestLowerCaseURI(t *testing.T) {
 	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		assert.True(t, req.URL.Path == "/test")
-
 	})
 	ts := httptest.NewServer(LowerCaseURI(n))
 	defer ts.Close()
-	res, _ := http.Get(ts.URL + "/TEST")
-	defer res.Body.Close()
-	b, _ := ioutil.ReadAll(res.Body)
-	assert.NotNil(t, b)
+	res, err := http.Get(ts.URL + "/TEST")
+	if err != nil && res != nil {
+		defer res.Body.Close()
+		b, _ := ioutil.ReadAll(res.Body)
+		assert.NotNil(t, b)
+	} else {
+		t.Fail()
+	}
 }
 
 func TestPostProcessHandler(t *testing.T) {
@@ -51,13 +54,16 @@ func TestPostProcessHandler(t *testing.T) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", ts.URL+"/", nil)
 	req.Header.Set("X-Forwarded-For", "coffee")
-	res, _ := client.Do(req)
-	defer res.Body.Close()
-	b, _ := ioutil.ReadAll(res.Body)
-	body := string(b)
-	assert.NotNil(t, body)
-	assert.True(t, body == "hello coffeepot")
-	assert.True(t, res.StatusCode == http.StatusTeapot)
-	assert.True(t, res.Header.Get("Location") == "coffee location")
-
+	res, err := client.Do(req)
+	if err != nil && res != nil {
+		defer res.Body.Close()
+		b, _ := ioutil.ReadAll(res.Body)
+		body := string(b)
+		assert.NotNil(t, body)
+		assert.True(t, body == "hello coffeepot")
+		assert.True(t, res.StatusCode == http.StatusTeapot)
+		assert.True(t, res.Header.Get("Location") == "coffee location")
+	} else {
+		t.Fail()
+	}
 }

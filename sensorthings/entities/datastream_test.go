@@ -98,7 +98,7 @@ func TestContainsMandatoryParametersFails(t *testing.T) {
 	contains, _ := datastream.ContainsMandatoryParams()
 
 	// assert
-	assert.False(t, contains, "Datastream is expected not to have mandatory paramaters")
+	assert.False(t, contains, "Datastream is expected not to have mandatory parameters")
 }
 
 func TestContainsMandatoryParametersSucceeds(t *testing.T) {
@@ -132,5 +132,5 @@ func TestContainsMandatoryParametersSucceeds(t *testing.T) {
 	contains, _ := datastream.ContainsMandatoryParams()
 
 	// assert
-	assert.True(t, contains, "Datastream is expected to have mandatory paramaters")
+	assert.True(t, contains, "Datastream is expected to have mandatory parameters")
 }

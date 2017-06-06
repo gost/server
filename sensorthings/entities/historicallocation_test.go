@@ -119,5 +119,5 @@ func TestHistoricalLocationContainsMandatoryParameters(t *testing.T) {
 	contains, _ := historicalLocation.ContainsMandatoryParams()
 
 	// assert
-	assert.False(t, contains, "HistoricalLocation is expected not to have mandatory paramaters")
+	assert.False(t, contains, "HistoricalLocation is expected not to have mandatory parameters")
 }
