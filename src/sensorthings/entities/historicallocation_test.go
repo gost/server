@@ -100,7 +100,7 @@ func TestParseHistoricalLocationShouldSucceed(t *testing.T) {
 	assert.Equal(t, err, nil, "Historical parse from json should have succeeded")
 }
 
-func TestGetSupportedEncoding(t *testing.T){
+func TestGetSupportedEncoding(t *testing.T) {
 	//arrange
 	historicalLocation := &HistoricalLocation{}
 

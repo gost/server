@@ -116,5 +116,4 @@ func TestEndPointNotDynamic(t *testing.T) {
 	assert.True(t, eps[0].Operation.Path == "ep2longer")
 	assert.True(t, eps[1].Operation.Path == "ep1 {c:.*}")
 
-
 }

@@ -74,4 +74,3 @@ func (s *Sensor) SetSelfLink(externalURL string) {
 func (s *Sensor) SetLinks(externalURL string) {
 	s.NavDatastreams = CreateEntityLink(s.Datastreams == nil, externalURL, EntityLinkSensors.ToString(), EntityLinkDatastreams.ToString(), s.ID)
 }
-

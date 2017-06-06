@@ -2,7 +2,7 @@ package postgis
 
 import (
 	"github.com/geodan/gost/src/sensorthings/entities"
-	"github.com/geodan/gost/src/sensorthings/odata"
+	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -24,7 +24,7 @@ func TestQueryParseInfoInit(t *testing.T) {
 	qpi := QueryParseInfo{}
 	pqpi := &QueryParseInfo{}
 
-	eo := &odata.ExpandOperation{}
+	eo := &godata.ExpandItem{}
 
 	// act
 	qpi.Init(entities.EntityTypeThing, 0, pqpi, eo)
@@ -130,7 +130,7 @@ func TestQueryParseInfoParse(t *testing.T) {
 	// arrange
 	qpi := QueryParseInfo{}
 	pqpi := &QueryParseInfo{}
-	eo := &odata.ExpandOperation{}
+	eo := &godata.ExpandItem{}
 	qpi.Init(entities.EntityTypeThing, 0, pqpi, eo)
 
 	// act
@@ -254,7 +254,6 @@ func TestGetJoinForFoi(t *testing.T) {
 	assert.NotNil(t, result_foi_observation)
 }
 
-
 func TestGetJoinForDatastream(t *testing.T) {
 	// arrange
 	qb := QueryBuilder{}
@@ -275,7 +274,6 @@ func TestGetJoinForDatastream(t *testing.T) {
 	assert.NotNil(t, result_datastream_location)
 }
 
-
 func TestGetJoinForUnknown(t *testing.T) {
 	// arrange
 	qb := QueryBuilder{}
@@ -285,5 +283,5 @@ func TestGetJoinForUnknown(t *testing.T) {
 	result_unknown := getJoin(tables, entities.EntityTypeUnknown, entities.EntityTypeObservation, "prefix")
 
 	// assert
-	assert.True(t, result_unknown=="")
+	assert.True(t, result_unknown == "")
 }

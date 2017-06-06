@@ -17,7 +17,6 @@ var jsonObservation = ` {
          "resultTime": null
       }`
 
-
 func TestGetEntityTypeReturnsCorrectType(t *testing.T) {
 	//arrange
 	observation := &Observation{}
@@ -190,7 +189,7 @@ func TestMarshalPostgresJSONWithResultTime(t *testing.T) {
 	observation := &Observation{}
 	resultTime := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
 
-	observation.ResultTime= &resultTime
+	observation.ResultTime = &resultTime
 
 	// act
 	bytes, _ := observation.MarshalPostgresJSON()

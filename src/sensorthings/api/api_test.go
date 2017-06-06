@@ -7,6 +7,7 @@ import (
 	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/geodan/gost/src/sensorthings/odata"
 
+	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -88,8 +89,10 @@ func TestSetLinkWithQuery(t *testing.T) {
 	ds := entities.Datastream{}
 
 	qo := &odata.QueryOptions{}
-	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 2}
-	qo.QueryOptionRef = true
+	qt, _ := godata.ParseTopString("2")
+	qo.Top = qt
+	ref := odata.GoDataRefQuery(true)
+	qo.Ref = &ref
 	// act
 	stAPI.SetLinks(&ds, qo)
 
@@ -107,23 +110,31 @@ func TestCreateNextLink(t *testing.T) {
 	stAPI := NewAPI(database, cfg, mqttServer)
 	qo := &odata.QueryOptions{}
 
-	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 2}
-	qo.QuerySkip = &odata.QuerySkip{odata.QueryBase{"0"}, 1}
+	qt, _ := godata.ParseTopString("2")
+	qo.Top = qt
+	qs, _ := godata.ParseSkipString("1")
+	qo.Skip = qs
 
 	// act
 	result := stAPI.CreateNextLink(1, "http://www.nu.nl", qo)
 	assert.NotNil(t, result)
 	assert.True(t, result == "")
 
-	qo.QueryTop = &odata.QueryTop{odata.QueryBase{"0"}, 0}
-	filter := &odata.QueryFilter{}
-	filter.RawQuery = "a=a"
-	qo.QueryFilter = filter
+	qt, _ = godata.ParseTopString("1")
+	qo.Top = qt
+	filterString := "id eq 1"
+	qf, err := godata.ParseFilterString(filterString)
+	if err != nil {
+		t.Errorf("Error parsing filter string: %v", err)
+	}
+
+	qo.Filter = qf
+	qo.RawFilter = filterString
 	// add QueryCount, QueryExpand, QueryOrderBy, QueryResultFormat
 
 	result1 := stAPI.CreateNextLink(10, "http://www.nu.nl", qo)
-
+	t.Logf("%v", result1)
 	// assert
 	assert.NotNil(t, result1)
-	assert.True(t, strings.Contains(result1, "a=a"))
+	assert.True(t, strings.Contains(result1, "id eq 1"))
 }

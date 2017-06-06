@@ -41,7 +41,6 @@ func TestObservedPropertyGetPropertyNames(t *testing.T) {
 	assert.True(t, propertynames[0] == "id")
 }
 
-
 func TestMandatoryParametersExistObservedProperty(t *testing.T) {
 	//arrange
 	op := &ObservedProperty{

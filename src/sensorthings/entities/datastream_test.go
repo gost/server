@@ -126,7 +126,6 @@ func TestContainsMandatoryParametersSucceeds(t *testing.T) {
 		Description: "test",
 	}
 
-
 	datastream.ObservedProperty = op
 
 	// act

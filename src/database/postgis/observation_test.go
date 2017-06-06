@@ -1,9 +1,9 @@
 package postgis
 
 import (
+	"github.com/geodan/gost/src/sensorthings/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"github.com/geodan/gost/src/sensorthings/entities"
 )
 
 func TestObservationParamFactory(t *testing.T) {
@@ -15,10 +15,10 @@ func TestObservationParamFactory(t *testing.T) {
 	values := map[string]interface{}{
 		"observation_id":             4,
 		"observation_phenomenontime": phenomenonTime,
-		"observation_result": "!0.5",
-		"observation_resulttime": resultTime,
-		"observation_resultquality": "goed",
-		"observation_validtime": validTime,
+		"observation_result":         "!0.5",
+		"observation_resulttime":     resultTime,
+		"observation_resultquality":  "goed",
+		"observation_validtime":      validTime,
 		//"observation_parameters": "test",
 	}
 
@@ -31,7 +31,7 @@ func TestObservationParamFactory(t *testing.T) {
 	assert.True(t, entity != nil)
 	// entities..
 	assert.True(t, err == nil)
-	assert.True(t,entity.GetID() == 4)
-	assert.True(t,entitytype == entities.EntityTypeObservation)
+	assert.True(t, entity.GetID() == 4)
+	assert.True(t, entitytype == entities.EntityTypeObservation)
 	// assert.True(t,*observation.ResultTime == resultTime)
 }

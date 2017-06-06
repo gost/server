@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	"net/http/httptest"
 	"io/ioutil"
+	"net/http/httptest"
 )
 
 func TestGetEntityId(t *testing.T) {
@@ -30,7 +30,7 @@ func TestGetEntityId(t *testing.T) {
 	assert.True(t, http.StatusOK == resp.StatusCode)
 	body := resp.Body
 	result, _ := ioutil.ReadAll(body)
-	assert.True(t, string(result)=="35")
+	assert.True(t, string(result) == "35")
 }
 
 func TestGetQueryOptions(t *testing.T) {
@@ -42,17 +42,6 @@ func TestGetQueryOptions(t *testing.T) {
 
 	// assert
 	assert.True(t, qo != nil)
-}
-
-func TestGetQueryOptionsWithWrongOptions(t *testing.T) {
-	// arrange
-	req, _ := http.NewRequest("GET", "/v1.0/Things?$hoho", nil)
-
-	// act
-	qo, _ := getQueryOptions(req)
-
-	// assert
-	assert.Nil(t, qo)
 }
 
 func TestCheckContentTypeWithoutHeadersShouldReturnFalse(t *testing.T) {

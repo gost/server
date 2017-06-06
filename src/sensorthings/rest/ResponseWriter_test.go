@@ -3,6 +3,7 @@ package rest
 import (
 	"errors"
 	"github.com/geodan/gost/src/sensorthings/entities"
+	"github.com/geodan/gost/src/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -78,7 +79,9 @@ func TestSendJsonResponseWithDataAndQueryOptions(t *testing.T) {
 	thing.Name = "yo"
 	req, _ := http.NewRequest("GET", "/v1.0/Things?$top=1&$select=name,id,description", nil)
 	qo, _ := getQueryOptions(req)
-	qo.QueryOptionValue = true
+
+	val := odata.GoDataValueQuery(true)
+	qo.Value = &val
 
 	// act
 	sendJSONResponse(rr, http.StatusTeapot, thing, qo)
