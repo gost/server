@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// CurrentConfig
+// CurrentConfig will be set after loading so it can be accessed from outside
 var CurrentConfig Config
 
 // Config contains the settings for the Http server, databases and mqtt

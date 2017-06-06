@@ -151,6 +151,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 	return no, nil
 }
 
+// MQTTPublish publishes a message to a set of given topics
 func (a *APIv1) MQTTPublish(topics []string, msg string, qos byte) {
 	for _, t := range topics {
 		a.mqtt.Publish(t, msg, qos)

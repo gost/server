@@ -5,7 +5,10 @@ import (
 	"net/url"
 )
 
+// SupportedExpandParameters contains a list of endpoints with their supported expand parameters
 var SupportedExpandParameters map[string][]string
+
+// SupportedSelectParameters contains a list of endpoints with their supported select parameters
 var SupportedSelectParameters map[string][]string
 
 // QueryOptions extents upon godata.GoDataQuery to implement extra
@@ -19,17 +22,25 @@ type QueryOptions struct {
 	RawOrderBy string
 }
 
+// ExpandParametersSupported returns if the QueryOptions expand request is supported by the endpoints
+// todo: implement check
 func (q *QueryOptions) ExpandParametersSupported() bool {
 	return true
 }
 
+// SelectParametersSupported returns if the QueryOptions select request is supported by the endpoints
+// todo: implement check
 func (q *QueryOptions) SelectParametersSupported() bool {
 	return true
 }
 
+// GoDataValueQuery true when $value is requested false if not
 type GoDataValueQuery bool
+
+// GoDataRefQuery true when $ref is requested false if not
 type GoDataRefQuery bool
 
+// ExpandItemToQueryOptions converts an ExpandItem into QueryOptions
 func ExpandItemToQueryOptions(ei *godata.ExpandItem) *QueryOptions {
 	qo := QueryOptions{}
 	qo.Top = ei.Top
@@ -42,7 +53,8 @@ func ExpandItemToQueryOptions(ei *godata.ExpandItem) *QueryOptions {
 	return &qo
 }
 
-func ParseUrlQuery(query url.Values) (*QueryOptions, error) {
+// ParseURLQuery parses an incoming url query into QueryOptions
+func ParseURLQuery(query url.Values) (*QueryOptions, error) {
 	if query == nil || len(query) == 0 {
 		return nil, nil
 	}

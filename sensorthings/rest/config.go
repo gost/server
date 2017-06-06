@@ -7,8 +7,14 @@ import (
 
 // Endpoints contains the current set-up of the endpoints
 var Endpoints = map[entities.EntityType]models.Endpoint{}
-var MaxEntities int = 200
-var IndentJSON bool = true
+
+// MaxEntities is used to determine the max entities to return to the client
+var MaxEntities = 200
+
+// IndentJSON is used to determine if the JSON response should be indented or not
+var IndentJSON = true
+
+// ExternalURI is used for defining an external url which is shown to the requester instead of the internal uri
 var ExternalURI = ""
 
 // CreateEndPoints creates the pre-defined endpoint config, the config contains all endpoint info

@@ -45,11 +45,11 @@ func TestGetQueryParseInfoByQueryIndex(t *testing.T) {
 	qpi := QueryParseInfo{}
 
 	// act
-	qpi_return := qpi.GetQueryParseInfoByQueryIndex(0)
+	qpiReturn := qpi.GetQueryParseInfoByQueryIndex(0)
 
 	// assert
-	assert.NotNil(t, qpi_return)
-	assert.NotNil(t, qpi_return.QueryIndex == 0)
+	assert.NotNil(t, qpiReturn)
+	assert.NotNil(t, qpiReturn.QueryIndex == 0)
 
 }
 
@@ -61,10 +61,10 @@ func TestGetQueryParseInfoByQueryIndexWithSubEntities(t *testing.T) {
 	qpi.SubEntities = []*QueryParseInfo{subqpi}
 
 	// act
-	qpi_return := qpi.GetQueryParseInfoByQueryIndex(1)
+	qpiReturn := qpi.GetQueryParseInfoByQueryIndex(1)
 
 	// assert
-	assert.True(t, qpi_return.QueryIndex == 1)
+	assert.True(t, qpiReturn.QueryIndex == 1)
 }
 
 func TestGetQueryParseInfoByQueryIndexNotFound(t *testing.T) {
@@ -75,10 +75,10 @@ func TestGetQueryParseInfoByQueryIndexNotFound(t *testing.T) {
 	qpi.SubEntities = []*QueryParseInfo{subqpi}
 
 	// act
-	qpi_return := qpi.GetQueryParseInfoByQueryIndex(2)
+	qpiReturn := qpi.GetQueryParseInfoByQueryIndex(2)
 
 	// assert
-	assert.Nil(t, qpi_return)
+	assert.Nil(t, qpiReturn)
 }
 
 func TestGetNextQueryIndex(t *testing.T) {
@@ -167,15 +167,15 @@ func TestGetJoinForThings(t *testing.T) {
 	qb := QueryBuilder{}
 	tables := qb.tables
 	// act
-	result_thing_datastream := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeDatastream, "prefix")
-	result_thing_historicallocation := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeHistoricalLocation, "prefix")
-	result_thing_location := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeLocation, "prefix")
+	resultThingDatastream := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeDatastream, "prefix")
+	resultThingHistoricalLocation := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeHistoricalLocation, "prefix")
+	resultThingLocation := getJoin(tables, entities.EntityTypeThing, entities.EntityTypeLocation, "prefix")
 
 	// assert
-	assert.NotNil(t, result_thing_datastream)
-	assert.True(t, result_thing_datastream == "WHERE thing.id = prefix_datastream.datastream_thing_id")
-	assert.True(t, result_thing_historicallocation == "WHERE thing.id = prefix_historicallocation.historicallocation_thing_id")
-	assert.True(t, result_thing_location == "INNER JOIN  ON thing.id = thing_to_location.thing_id AND prefix_location.location_id = thing_to_location.location_id")
+	assert.NotNil(t, resultThingDatastream)
+	assert.True(t, resultThingDatastream == "WHERE thing.id = prefix_datastream.datastream_thing_id")
+	assert.True(t, resultThingHistoricalLocation == "WHERE thing.id = prefix_historicallocation.historicallocation_thing_id")
+	assert.True(t, resultThingLocation == "INNER JOIN  ON thing.id = thing_to_location.thing_id AND prefix_location.location_id = thing_to_location.location_id")
 }
 
 func TestGetJoinForLocation(t *testing.T) {
@@ -183,12 +183,12 @@ func TestGetJoinForLocation(t *testing.T) {
 	qb := QueryBuilder{}
 	tables := qb.tables
 	// act
-	result_location_historicallocation := getJoin(tables, entities.EntityTypeLocation, entities.EntityTypeHistoricalLocation, "prefix")
-	result_location_thing := getJoin(tables, entities.EntityTypeLocation, entities.EntityTypeThing, "prefix")
+	resultLocationHistoricalHocation := getJoin(tables, entities.EntityTypeLocation, entities.EntityTypeHistoricalLocation, "prefix")
+	resultLocationThing := getJoin(tables, entities.EntityTypeLocation, entities.EntityTypeThing, "prefix")
 
 	// assert
-	assert.NotNil(t, result_location_historicallocation)
-	assert.NotNil(t, result_location_thing)
+	assert.NotNil(t, resultLocationHistoricalHocation)
+	assert.NotNil(t, resultLocationThing)
 }
 
 func TestGetJoinForHistoricalLocation(t *testing.T) {
@@ -196,12 +196,12 @@ func TestGetJoinForHistoricalLocation(t *testing.T) {
 	qb := QueryBuilder{}
 	tables := qb.tables
 	// act
-	result_historicallocation_location := getJoin(tables, entities.EntityTypeHistoricalLocation, entities.EntityTypeLocation, "prefix")
-	result_historicallocation_thing := getJoin(tables, entities.EntityTypeHistoricalLocation, entities.EntityTypeThing, "prefix")
+	resultHistoricalHocationLocation := getJoin(tables, entities.EntityTypeHistoricalLocation, entities.EntityTypeLocation, "prefix")
+	resultHistoricalLocationThing := getJoin(tables, entities.EntityTypeHistoricalLocation, entities.EntityTypeThing, "prefix")
 
 	// assert
-	assert.NotNil(t, result_historicallocation_location)
-	assert.NotNil(t, result_historicallocation_thing)
+	assert.NotNil(t, resultHistoricalHocationLocation)
+	assert.NotNil(t, resultHistoricalLocationThing)
 }
 
 func TestGetJoinForSensor(t *testing.T) {
@@ -210,10 +210,10 @@ func TestGetJoinForSensor(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_sensor_datastream := getJoin(tables, entities.EntityTypeSensor, entities.EntityTypeDatastream, "prefix")
+	resultSensorDatastream := getJoin(tables, entities.EntityTypeSensor, entities.EntityTypeDatastream, "prefix")
 
 	// assert
-	assert.NotNil(t, result_sensor_datastream)
+	assert.NotNil(t, resultSensorDatastream)
 }
 
 func TestGetJoinForObservedProperty(t *testing.T) {
@@ -222,10 +222,10 @@ func TestGetJoinForObservedProperty(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_observedproperty_datastream := getJoin(tables, entities.EntityTypeObservedProperty, entities.EntityTypeDatastream, "prefix")
+	resultObservedPropertyDatastream := getJoin(tables, entities.EntityTypeObservedProperty, entities.EntityTypeDatastream, "prefix")
 
 	// assert
-	assert.NotNil(t, result_observedproperty_datastream)
+	assert.NotNil(t, resultObservedPropertyDatastream)
 }
 
 func TestGetJoinForObservation(t *testing.T) {
@@ -234,12 +234,12 @@ func TestGetJoinForObservation(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_observation_datastream := getJoin(tables, entities.EntityTypeObservation, entities.EntityTypeDatastream, "prefix")
-	result_observation_foi := getJoin(tables, entities.EntityTypeObservation, entities.EntityTypeFeatureOfInterest, "prefix")
+	resultObservationDatastream := getJoin(tables, entities.EntityTypeObservation, entities.EntityTypeDatastream, "prefix")
+	resultObservationFoi := getJoin(tables, entities.EntityTypeObservation, entities.EntityTypeFeatureOfInterest, "prefix")
 
 	// assert
-	assert.NotNil(t, result_observation_datastream)
-	assert.NotNil(t, result_observation_foi)
+	assert.NotNil(t, resultObservationDatastream)
+	assert.NotNil(t, resultObservationFoi)
 }
 
 func TestGetJoinForFoi(t *testing.T) {
@@ -248,10 +248,10 @@ func TestGetJoinForFoi(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_foi_observation := getJoin(tables, entities.EntityTypeFeatureOfInterest, entities.EntityTypeObservation, "prefix")
+	resultFoiObservation := getJoin(tables, entities.EntityTypeFeatureOfInterest, entities.EntityTypeObservation, "prefix")
 
 	// assert
-	assert.NotNil(t, result_foi_observation)
+	assert.NotNil(t, resultFoiObservation)
 }
 
 func TestGetJoinForDatastream(t *testing.T) {
@@ -260,18 +260,18 @@ func TestGetJoinForDatastream(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_datastream_thing := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeThing, "prefix")
-	result_datastream_sensor := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeSensor, "prefix")
-	result_datastream_observedproperty := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeObservedProperty, "prefix")
-	result_datastream_observation := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeObservation, "prefix")
-	result_datastream_location := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeLocation, "prefix")
+	resultDatastreamThing := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeThing, "prefix")
+	resultDatastreamSensor := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeSensor, "prefix")
+	resultDatastreamObservedProperty := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeObservedProperty, "prefix")
+	resultDatastreamObservation := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeObservation, "prefix")
+	resultDatastreamLocation := getJoin(tables, entities.EntityTypeDatastream, entities.EntityTypeLocation, "prefix")
 
 	// assert
-	assert.NotNil(t, result_datastream_thing)
-	assert.NotNil(t, result_datastream_sensor)
-	assert.NotNil(t, result_datastream_observedproperty)
-	assert.NotNil(t, result_datastream_observation)
-	assert.NotNil(t, result_datastream_location)
+	assert.NotNil(t, resultDatastreamThing)
+	assert.NotNil(t, resultDatastreamSensor)
+	assert.NotNil(t, resultDatastreamObservedProperty)
+	assert.NotNil(t, resultDatastreamObservation)
+	assert.NotNil(t, resultDatastreamLocation)
 }
 
 func TestGetJoinForUnknown(t *testing.T) {
@@ -280,8 +280,8 @@ func TestGetJoinForUnknown(t *testing.T) {
 	tables := qb.tables
 
 	// act
-	result_unknown := getJoin(tables, entities.EntityTypeUnknown, entities.EntityTypeObservation, "prefix")
+	resultUnknown := getJoin(tables, entities.EntityTypeUnknown, entities.EntityTypeObservation, "prefix")
 
 	// assert
-	assert.True(t, result_unknown == "")
+	assert.True(t, resultUnknown == "")
 }

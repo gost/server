@@ -122,8 +122,8 @@ func LowerCaseURI(h http.Handler) http.Handler {
 // write to response. Is this a right approach?
 func PostProcessHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		orig_uri := rest.ExternalURI
-		forwarded_uri := r.Header.Get("X-Forwarded-For")
+		origURI := rest.ExternalURI
+		forwardedURI := r.Header.Get("X-Forwarded-For")
 
 		rec := httptest.NewRecorder()
 
@@ -134,8 +134,8 @@ func PostProcessHandler(h http.Handler) http.Handler {
 		bytes := rec.Body.Bytes()
 		s := string(bytes)
 		if len(s) > 0 {
-			if len(forwarded_uri) > 0 {
-				s = strings.Replace(s, orig_uri, forwarded_uri, -1)
+			if len(forwardedURI) > 0 {
+				s = strings.Replace(s, origURI, forwardedURI, -1)
 			}
 
 		}
@@ -145,8 +145,8 @@ func PostProcessHandler(h http.Handler) http.Handler {
 
 			// if there is a location header and a proxy running, change
 			// the location url too
-			if k == "Location" && len(forwarded_uri) > 0 {
-				val = strings.Replace(val, orig_uri, forwarded_uri, -1)
+			if k == "Location" && len(forwardedURI) > 0 {
+				val = strings.Replace(val, origURI, forwardedURI, -1)
 			}
 
 			// add the header to response

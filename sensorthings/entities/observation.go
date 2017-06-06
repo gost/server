@@ -87,6 +87,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	return true, nil
 }
 
+// MarshalJSON marshalls the observation into a JSON byte array
 func (o *Observation) MarshalJSON() ([]byte, error) {
 	if o.ResultTime != nil {
 		rt := o.ResultTime
@@ -101,13 +102,13 @@ func (o *Observation) MarshalJSON() ([]byte, error) {
 			Observation: *o,
 			ResultTime:  rt,
 		})
-	} else {
-		return json.Marshal(struct {
-			Observation
-		}{
-			Observation: *o,
-		})
 	}
+
+	return json.Marshal(struct {
+		Observation
+	}{
+		Observation: *o,
+	})
 }
 
 // SetAllLinks sets the self link and relational links

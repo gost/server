@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var historicalLocationJson = `{
+var historicalLocationJSON = `{
 	"@iot.id": 89,
 	"@iot.selfLink": "http://gost.geodan.nl/v1.0/HistoricalLocations(89)",
 	"time": "2017-05-04T14:22:04.646Z",
@@ -94,7 +94,7 @@ func TestParseHistoricalLocationShouldSucceed(t *testing.T) {
 	historicalLocation := &HistoricalLocation{}
 
 	//act
-	err := historicalLocation.ParseEntity([]byte(historicalLocationJson))
+	err := historicalLocation.ParseEntity([]byte(historicalLocationJSON))
 
 	//assert
 	assert.Equal(t, err, nil, "Historical parse from json should have succeeded")

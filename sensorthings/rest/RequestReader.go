@@ -57,7 +57,7 @@ func getQueryOptions(r *http.Request) (*odata.QueryOptions, []error) {
 		values["$skip"] = []string{"0"}
 	}
 
-	qo, e := odata.ParseUrlQuery(values)
+	qo, e := odata.ParseURLQuery(values)
 	if e != nil {
 		return nil, []error{e}
 	}
