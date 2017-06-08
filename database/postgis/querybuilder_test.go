@@ -25,6 +25,29 @@ func TestRemoveSchema(t *testing.T) {
 	assert.True(t, res == "hallo")
 }
 
+func TestGetOffset(t *testing.T){
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	qo := &odata.QueryOptions{}
+	qo.Skip, _ = godata.ParseSkipString("2")
+
+	// act
+	offset := qb.getOffset(qo)
+
+	// assert
+	assert.True(t, offset == "2")
+}
+
+func TestRemoveSchemaWithoutSchema(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+
+	// act
+	res := qb.removeSchema("hallo")
+	// assert
+	assert.True(t, res == "hallo")
+}
+
 func TestGetLimit(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
@@ -83,12 +106,45 @@ func TestGetLimitWithQueryTop(t *testing.T) {
 func TestCreateCountQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
-	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 1) AS thing on true  WHERE thing.thing_id = 1"
-	res := qb.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, 1, nil)
+	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 1) AS thing on true  WHERE thing.thing_id = 1 AND  datastream.name = 'Milk' AND Price < 2.55"
+	qo := &odata.QueryOptions{}
+	input := "Name eq 'Milk' and Price lt 2.55"
+	filter, _ :=  godata.ParseFilterString(input)
+	qo.Filter = filter
+
+	res := qb.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, 1, qo)
 
 	// assert
 	assert.NotNil(t, res)
 	assert.True(t, expected == res)
+}
+
+func TestCreateCountQueryWithoutId(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id ) AS thing on true  WHERE datastream.name = 'Milk' AND Price < 2.55"
+	qo := &odata.QueryOptions{}
+	input := "Name eq 'Milk' and Price lt 2.55"
+	filter, _ :=  godata.ParseFilterString(input)
+	qo.Filter = filter
+
+	res := qb.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, nil, qo)
+
+	// assert
+	assert.NotNil(t, res)
+	assert.True(t, expected == res)
+}
+
+func TestCreateCountQueryEmpty(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	qo := &odata.QueryOptions{}
+	countquery := godata.GoDataCountQuery(false)
+	qo.Count = &countquery
+	res := qb.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, 1, qo)
+
+	// assert
+	assert.True(t, res=="")
 }
 
 func TestCreateQuery(t *testing.T) {
@@ -103,3 +159,22 @@ func TestCreateQuery(t *testing.T) {
 	assert.NotNil(t, query)
 	assert.True(t, expected == query)
 }
+
+func TestConstructQueryParseInfo(t *testing.T){
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	expandItem1 := &godata.ExpandItem{}
+	token := &godata.Token{}
+	token.Value = "thing"
+	tokens:=[]*godata.Token{token}
+	expandItem1.Path = tokens
+	expandItems:=[]*godata.ExpandItem{expandItem1}
+	qpi := &QueryParseInfo{}
+
+	// act
+	qb.constructQueryParseInfo(expandItems,qpi)
+
+	// assert
+}
+
+
