@@ -300,12 +300,6 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode) string {
 	output := ""
 	switch pn.Token.Type {
-	case godata.FilterTokenOpenParen:
-		return ""
-	case godata.FilterTokenCloseParen:
-		return ""
-	case godata.FilterTokenWhitespace:
-		return ""
 	case godata.FilterTokenNav:
 		q := ""
 		for i, part := range pn.Children {
@@ -321,10 +315,6 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part))
 		}
 		return q
-	case godata.FilterTokenColon:
-		return ""
-	case godata.FilterTokenComma: //5
-		return ""
 	case godata.FilterTokenLogical:
 		left := qb.createFilter(et, pn.Children[0])
 		right := qb.createFilter(et, pn.Children[1])
@@ -333,10 +323,6 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		right = qb.prepareFilterRight(left, right)
 		left = qb.prepareFilterLeft(et, left)
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
-	case godata.FilterTokenOp:
-		return ""
-	case godata.FilterTokenFunc:
-		return ""
 	case godata.FilterTokenLambda:
 		return fmt.Sprintf("%v", pn.Token.Value)
 	case godata.FilterTokenNull: // 10
