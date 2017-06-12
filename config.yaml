@@ -3,14 +3,13 @@ server:
     host:
     port: 8080
     externalUri: http://localhost:8080/
-    clientContent: ./client/
     maxEntityResponse: 20
     indentedJson: true
     https: false
     httpsCert:
     httpsKey:
 database:
-    host: 192.168.99.100
+    host: localhost
     port: 5432
     user: postgres
     password: postgres
@@ -18,8 +17,8 @@ database:
     schema: v1
     ssl: false
     maxIdleConns: 30
-    maxOpenConns: 60
+    maxOpenConns: 100
 mqtt:
     enabled: true
-    host: 192.168.99.100
+    host: localhost
     port: 1883
