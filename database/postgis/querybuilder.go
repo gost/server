@@ -331,6 +331,14 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		// End workaround
 
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
+	case godata.FilterTokenFunc:
+		if pn.Token.Value == "st_within" || pn.Token.Value == "geo.within" {
+			left := qb.createFilter(et, pn.Children[0])
+			right := qb.createFilter(et, pn.Children[1])
+			return fmt.Sprintf("ST_WITHIN(%v, ST_GeomFromText(%v, 4326))", fmt.Sprintf("%s.%s", et.ToString(), left), right)
+		}
+	case godata.FilterTokenGeography:
+		return fmt.Sprintf("%v", pn.Children[0].Token.Value)
 	case godata.FilterTokenLambda:
 		return fmt.Sprintf("%v", pn.Token.Value)
 	case godata.FilterTokenNull: // 10
