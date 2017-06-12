@@ -332,6 +332,14 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		// do not change order
 		right = qb.prepareFilterRight(left, right)
 		left = qb.prepareFilterLeft(et, left)
+
+		// Workaround for faulty OGC test
+		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 && strings.Index(right, "'") == 0 && left == "observation.data -> 'result'" {
+			//filtering observation.result on string, convert the observation.data -> 'result' to observation.data ->> 'result' to handle it as a string
+			left = "observation.data ->> 'result'"
+		}
+		// End workaround
+
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenOp:
 		return ""
@@ -478,7 +486,11 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 
 	if qo != nil && qo.Filter != nil {
 		if id != nil {
-			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
+			if e2 == nil {
+				queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
+			} else {
+				queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
+			}
 		} else {
 			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
 		}
