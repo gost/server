@@ -15,37 +15,37 @@ func TestCreateQueryBuilder(t *testing.T) {
 	assert.NotNil(t, qb)
 }
 
-func TestCreateFilter(t *testing.T){
+func TestCreateFilter(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenOpenParen}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenCloseParen}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenWhitespace}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenColon}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenComma}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenOp}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenFunc}})=="")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenLambda, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenNull, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenIt, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenRoot, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenFloat, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenInteger, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenString, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenDate, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenTime, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenDateTime, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenBoolean, Value:"ho"}})=="ho")
-	assert.True(t, qb.createFilter(entities.EntityTypeThing,&godata.ParseNode{Token:&godata.Token{Type: godata.FilterTokenLiteral, Value:"ho"}})=="ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOpenParen}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenCloseParen}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenWhitespace}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenColon}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenComma}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenOp}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFunc}}) == "")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLambda, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenNull, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenIt, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenRoot, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenFloat, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenInteger, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenString, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDate, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenTime, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenDateTime, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenBoolean, Value: "ho"}}) == "ho")
+	assert.True(t, qb.createFilter(entities.EntityTypeThing, &godata.ParseNode{Token: &godata.Token{Type: godata.FilterTokenLiteral, Value: "ho"}}) == "ho")
 }
 
-func TestPrepareFilterRight(t *testing.T){
+func TestPrepareFilterRight(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
 
-	assert.True(t, qb.prepareFilterRight("ho","ha") == "ha")
-	assert.True(t, qb.prepareFilterRight("encodingtype","application/vnd.geo+json") == "1")
-	assert.True(t, qb.prepareFilterRight("observationtype","http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation") == "1")
-	ti := qb.prepareFilterRight("resulttime","2006-01-02T15:04:05.000Z")
+	assert.True(t, qb.prepareFilterRight("ho", "ha") == "ha")
+	assert.True(t, qb.prepareFilterRight("encodingtype", "application/vnd.geo+json") == "1")
+	assert.True(t, qb.prepareFilterRight("observationtype", "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_CategoryObservation") == "1")
+	ti := qb.prepareFilterRight("resulttime", "2006-01-02T15:04:05.000Z")
 	assert.True(t, ti == "'2006-01-02T15:04:05.000Z'")
 }
 
@@ -105,24 +105,24 @@ func TestGetOrderByWithNilOptions(t *testing.T) {
 	assert.True(t, res == "datastream.id DESC")
 }
 
-func TestCreateJoin(t *testing.T){
+func TestCreateJoin(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
 	thing := &entities.Thing{}
 	location := &entities.Location{}
 
-	join := qb.createJoin(thing, location, 1,false,nil,nil,"")
-	assert.True(t, join=="INNER JOIN LATERAL (SELECT location.id AS location_id FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id WHERE location.id = 1) AS location on true ")
+	join := qb.createJoin(thing, location, 1, false, nil, nil, "")
+	assert.True(t, join == "INNER JOIN LATERAL (SELECT location.id AS location_id FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id WHERE location.id = 1) AS location on true ")
 }
 
-func TestCreateJoinWithExpand(t *testing.T){
+func TestCreateJoinWithExpand(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
 	thing := &entities.Thing{}
 	location := &entities.Location{}
 
-	join := qb.createJoin(thing, location, 1,true,nil,nil,"")
-	assert.True(t, join=="LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ")
+	join := qb.createJoin(thing, location, 1, true, nil, nil, "")
+	assert.True(t, join == "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ")
 }
 func TestCreateCountQuery(t *testing.T) {
 	// arrange
