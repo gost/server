@@ -135,7 +135,10 @@ func PostProcessHandler(h http.Handler) http.Handler {
 		s := string(bytes)
 		if len(s) > 0 {
 			if len(forwardedURI) > 0 {
-				s = strings.Replace(s, origURI, forwardedURI, -1)
+				// if both are changed (X-Forwarded-For and External uri environment variabele) use the last one
+				if origURI == "http://localhost:8080/" {
+					s = strings.Replace(s, origURI, forwardedURI, -1)
+				}
 			}
 
 		}
