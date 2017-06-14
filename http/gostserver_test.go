@@ -60,9 +60,9 @@ func TestPostProcessHandler(t *testing.T) {
 		b, _ := ioutil.ReadAll(res.Body)
 		body := string(b)
 		assert.NotNil(t, body)
-		assert.True(t, body == "hello coffeepot")
+		assert.True(t, body == "hello teapot")
 		assert.True(t, res.StatusCode == http.StatusTeapot)
-		assert.True(t, res.Header.Get("Location") == "coffee location")
+		assert.True(t, res.Header.Get("Location") == "tea location")
 	} else {
 		t.Fail()
 	}
