@@ -538,6 +538,12 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	},
 }
 
+var selectMappingsIgnore = map[entities.EntityType]map[string]bool{
+	entities.EntityTypeLocation: {
+		locationLocation: true,
+	},
+}
+
 func getJoin(tableMap map[entities.EntityType]string, get entities.EntityType, by entities.EntityType, asPrefix string) string {
 	switch get {
 	case entities.EntityTypeThing:

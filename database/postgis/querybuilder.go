@@ -291,20 +291,20 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 	q := ""
 	if qo != nil && qo.Filter != nil {
 		q += fmt.Sprintf("%s ", prefix)
-		q += qb.createFilter(et, qo.Filter.Tree)
+		q += qb.createFilter(et, qo.Filter.Tree, false)
 	}
 
 	return q
 }
 
-func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode) string {
+func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode, ignoreSelectAs bool) string {
 	output := ""
 	switch pn.Token.Type {
 	case godata.FilterTokenNav:
 		q := ""
 		for i, part := range pn.Children {
 			if i == 0 {
-				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part)))
+				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part, false)))
 				continue
 			}
 
@@ -312,19 +312,17 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			if i+1 == len(pn.Children) {
 				arrow = "->>"
 			}
-			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part))
+			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part, false))
 		}
 		return q
 	case godata.FilterTokenLogical:
-		left := qb.createFilter(et, pn.Children[0])
-		right := qb.createFilter(et, pn.Children[1])
+		left := qb.createFilter(et, pn.Children[0], false)
+		right := qb.createFilter(et, pn.Children[1], false)
 
-		// do not change order
-		right = qb.prepareFilterRight(left, right)
-		left = qb.prepareFilterLeft(et, left)
+		left, right = qb.prepareFilter(et, pn.Children[0].Token.Value, left, pn.Children[1].Token.Value, right)
 
 		// Workaround for faulty OGC test
-		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 && strings.Index(right, "'") == 0 && left == "observation.data -> 'result'" {
+		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 && ((strings.Index(right, "'") == 0 && left == "observation.data -> 'result'") || (strings.Index(left, "'") == 0 && right == "observation.data -> 'result'")) {
 			//filtering observation.result on string, convert the observation.data -> 'result' to observation.data ->> 'result' to handle it as a string
 			left = "observation.data ->> 'result'"
 		}
@@ -332,13 +330,43 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenFunc:
+		if pn.Token.Value == "substringof" {
+
+		}
+		if pn.Token.Value == "endswith" {
+
+		}
+		if pn.Token.Value == "startswith" {
+
+		}
+		if pn.Token.Value == "length" {
+
+		}
+		if pn.Token.Value == "indexof" {
+
+		}
+		if pn.Token.Value == "substring" {
+
+		}
+		if pn.Token.Value == "tolower" {
+
+		}
+		if pn.Token.Value == "toupper" {
+
+		}
+		if pn.Token.Value == "trim" {
+
+		}
+		if pn.Token.Value == "concat" {
+
+		}
 		if pn.Token.Value == "st_within" || pn.Token.Value == "geo.within" {
-			left := qb.createFilter(et, pn.Children[0])
-			right := qb.createFilter(et, pn.Children[1])
-			return fmt.Sprintf("ST_WITHIN(%v, ST_GeomFromText(%v, 4326))", fmt.Sprintf("%s.%s", et.ToString(), left), right)
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("ST_WITHIN(%v, %v)", left, right)
 		}
 	case godata.FilterTokenGeography:
-		return fmt.Sprintf("%v", pn.Children[0].Token.Value)
+		return fmt.Sprintf("ST_GeomFromText(%v, 4326)", pn.Children[0].Token.Value)
 	case godata.FilterTokenLambda:
 		return fmt.Sprintf("%v", pn.Token.Value)
 	case godata.FilterTokenNull: // 10
@@ -362,49 +390,63 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 	case godata.FilterTokenBoolean:
 		return fmt.Sprintf("%v", pn.Token.Value)
 	case godata.FilterTokenLiteral: // 20
-		return fmt.Sprintf("%v", pn.Token.Value)
+		p := selectMappings[et][strings.ToLower(pn.Token.Value)]
+		if p != "" {
+			return p
+		}
+
+		if ignoreSelectAs && selectMappingsIgnore[et][pn.Token.Value] {
+			return fmt.Sprintf("%s.%v", et.ToString(), pn.Token.Value)
+		}
+
+		return pn.Token.Value
 	}
 
 	return output
 }
 
-func (qb *QueryBuilder) prepareFilterLeft(et entities.EntityType, left string) string {
-	p := selectMappings[et][strings.ToLower(left)]
-	if p != "" {
-		return p
-	}
-
-	return left
-}
-
-func (qb *QueryBuilder) prepareFilterRight(left, right string) string {
-	e := strings.Replace(fmt.Sprintf("%v", right), "'", "", -1)
-	property := strings.ToLower(fmt.Sprintf("%v", left))
-
-	if property == "encodingtype" {
-		et, err := entities.CreateEncodingType(e)
-		if err == nil {
-			right = fmt.Sprintf("%v", et.Code)
+func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left, originalRight, right string) (string, string) {
+	for i := 0; i < 2; i++ {
+		var oStr []*string
+		var str []*string
+		if i == 0 {
+			oStr = []*string{&originalLeft, &originalRight}
+			str = []*string{&left, &right}
+		} else {
+			oStr = []*string{&originalRight, &originalLeft}
+			str = []*string{&right, &left}
 		}
-		return right
-	}
 
-	if property == "observationtype" {
-		et, err := entities.GetObservationTypeByValue(e)
-		if err == nil {
-			right = fmt.Sprintf("%v", et.Code)
+		e := strings.Replace(fmt.Sprintf("%v", *oStr[1]), "'", "", -1)
+		property := strings.ToLower(fmt.Sprintf("%v", *oStr[0]))
+
+		if property == "encodingtype" {
+			et, err := entities.CreateEncodingType(e)
+			if err == nil {
+				*str[1] = fmt.Sprintf("%v", et.Code)
+			}
+			return left, right
 		}
-		return right
-	}
 
-	if property == "phenomenontime" || property == "resulttime" || property == "time" {
-		if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
-			right = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+		if property == "observationtype" {
+			et, err := entities.GetObservationTypeByValue(e)
+			if err == nil {
+				*str[1] = fmt.Sprintf("%v", et.Code)
+			}
+			return left, right
 		}
-		return right
+
+		if property == "phenomenontime" || property == "resulttime" || property == "time" {
+			if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
+				*str[1] = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+			} else {
+			}
+
+			return left, right
+		}
 	}
 
-	return right
+	return left, right
 }
 
 // odataLogicalOperatorToPostgreSQL converts a logical operator to a PostgreSQL string representation
