@@ -135,7 +135,10 @@ func PostProcessHandler(h http.Handler) http.Handler {
 		s := string(bytes)
 		if len(s) > 0 {
 			if len(forwardedURI) > 0 {
-				s = strings.Replace(s, origURI, forwardedURI, -1)
+				// if both are changed (X-Forwarded-For and External uri environment variabele) use the last one
+				if origURI == "http://localhost:8080/" {
+					s = strings.Replace(s, origURI, forwardedURI, -1)
+				}
 			}
 
 		}
@@ -146,7 +149,9 @@ func PostProcessHandler(h http.Handler) http.Handler {
 			// if there is a location header and a proxy running, change
 			// the location url too
 			if k == "Location" && len(forwardedURI) > 0 {
-				val = strings.Replace(val, origURI, forwardedURI, -1)
+				if origURI == "http://localhost:8080/" {
+					val = strings.Replace(val, origURI, forwardedURI, -1)
+				}
 			}
 
 			// add the header to response

@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"log"
 	"os"
 	"strconv"
 )
@@ -30,6 +31,8 @@ func SetEnvironmentVariables(conf *Config) {
 	gostServerExternalURI := os.Getenv("gost_server_external_uri")
 	if gostServerExternalURI != "" {
 		conf.Server.ExternalURI = gostServerExternalURI
+		log.Println("External uri environment variable discovered: " + conf.Server.ExternalURI)
+
 	}
 
 	gostServerMaxEntities := os.Getenv("gost_server_max_entities")
