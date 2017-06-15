@@ -9,8 +9,6 @@ RUN go get github.com/eclipse/paho.mqtt.golang
 RUN go get github.com/gost/now
 RUN go get github.com/gost/godata
 RUN go build -o /goroot1.5/bin/gost/gost github.com/geodan/gost
-RUN mkdir -p /goroot1.5/bin/gost/client/
-RUN cp -avr /goroot1.5/src/github.com/geodan/gost/client /goroot1.5/bin/gost
 RUN cp /goroot1.5/src/github.com/geodan/gost/config.yaml /goroot1.5/bin/gost/config.yaml
 WORKDIR /goroot1.5/bin/gost
 ENTRYPOINT ["/goroot1.5/bin/gost/gost"]
