@@ -13,7 +13,7 @@ func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reque
 	if !checkContentType(w, r) {
 		return
 	}
-	w.Header().Add("Access-Control-Allow-Origin", "*")
+
 	byteData, _ := ioutil.ReadAll(r.Body)
 	err := entity.ParseEntity(byteData)
 	if err != nil {
