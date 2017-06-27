@@ -11,7 +11,7 @@ import (
 
 // handleGetRequest is the default function to handle incoming GET requests
 func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request, h *func(q *odata.QueryOptions, path string) (interface{}, error)) {
-
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	// Parse query options from request
 	queryOptions, err := getQueryOptions(r)
 	if err != nil && len(err) > 0 {
