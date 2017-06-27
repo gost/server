@@ -163,6 +163,7 @@ func PostProcessHandler(h http.Handler) http.Handler {
 
 		// now add CORS response header
 		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
 
 		// write modified response
 		w.Write([]byte(s))

@@ -330,40 +330,68 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenFunc:
+		//"year|month|day|hour|minute|second|fractionalseconds|date|"+
+		//	"time\b|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds|round|"+
+		//	"floor|ceiling|isof|cast|geo.distance|geo.intersects|geo.length)",)
+		//t.Add("^(st_disjoint|st_touches|st_within|st_overlaps|st_crosses|st_intersects|st_contains|st_relate)", FilterTokenFunc)
+		if pn.Token.Value == "contains" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
+		}
 		if pn.Token.Value == "substringof" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
 		}
 		if pn.Token.Value == "endswith" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeEndsWith), qb.createLike(right, LikeEndsWith))
 		}
 		if pn.Token.Value == "startswith" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeStartsWith), qb.createLike(right, LikeStartsWith))
 		}
 		if pn.Token.Value == "length" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("LENGTH(%s)", left)
 		}
 		if pn.Token.Value == "indexof" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("STRPOS(%s, %s) -1", left, right)
 		}
 		if pn.Token.Value == "substring" {
 
 		}
 		if pn.Token.Value == "tolower" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("LOWER(%s)", left)
 		}
 		if pn.Token.Value == "toupper" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("UPPER(%s)", left)
 		}
 		if pn.Token.Value == "trim" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("TRIM(both ' ' from %s)", left)
 		}
 		if pn.Token.Value == "concat" {
-
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("CONCAT(%s, %s)", left, right)
 		}
 		if pn.Token.Value == "st_within" || pn.Token.Value == "geo.within" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("ST_WITHIN(%v, %v)", left, right)
+		}
+		if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			right := qb.createFilter(et, pn.Children[1], true)
+			return fmt.Sprintf("ST_INTERSECTS(%v, %v)", left, right)
 		}
 	case godata.FilterTokenGeography:
 		return fmt.Sprintf("ST_GeomFromText(%v, 4326)", pn.Children[0].Token.Value)
@@ -477,6 +505,41 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	return ""
 }
 
+// LikeType describes the type of like
+type LikeType int
+
+// LikeType is a "enumeration" of the Like types, LikeStartsWith = startsWith input%, LikeEndsWith = endsWith %input, LikeContains = contains %input%
+const (
+	LikeStartsWith LikeType = 0
+	LikeEndsWith   LikeType = 1
+	LikeContains   LikeType = 2
+)
+
+func (qb *QueryBuilder) createLike(input string, like LikeType) string {
+	if !strings.HasPrefix(input, "'") || !strings.HasSuffix(input, "'") {
+		return input
+	}
+
+	input = input[1 : len(input)-1]
+
+	switch like {
+	case LikeStartsWith:
+		{
+			return fmt.Sprintf("%s%s%s", "'", input, "%'")
+		}
+	case LikeEndsWith:
+		{
+			return fmt.Sprintf("%s%s%s", "'%", input, "'")
+		}
+	case LikeContains:
+		{
+			return fmt.Sprintf("%s%s%s", "'%", input, "%'")
+		}
+	}
+
+	return input
+}
+
 // CreateQuery creates a new query based on given input
 //   e1: entity to get
 //   e2: from entity
@@ -545,7 +608,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
