@@ -608,7 +608,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	fmt.Printf("%s\n", queryString)
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
