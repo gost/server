@@ -331,9 +331,9 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenFunc:
 		//"year|month|day|hour|minute|second|fractionalseconds|date|"+
-		//	"time\b|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds|round|"+
-		//	"floor|ceiling|isof|cast|geo.distance|geo.intersects|geo.length)",)
-		//t.Add("^(st_disjoint|st_touches|st_within|st_overlaps|st_crosses|st_intersects|st_contains|st_relate)", FilterTokenFunc)
+		//	"|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds|round|"+
+		//	"floor|ceiling|isof|cast|geo.distance|geo.length)",)
+		//t.Add("^(st_disjoint|st_touches|st_overlaps|st_crosses|st_relate)", FilterTokenFunc)
 		if pn.Token.Value == "contains" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
@@ -364,7 +364,15 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			return fmt.Sprintf("STRPOS(%s, %s) -1", left, right)
 		}
 		if pn.Token.Value == "substring" {
-
+			left, right, right2 := "", "", ""
+			left = qb.createFilter(et, pn.Children[0], true)
+			right = qb.createFilter(et, pn.Children[1], true)
+			if len(pn.Children) > 2 {
+				right2 = qb.createFilter(et, pn.Children[2], true)
+				return fmt.Sprintf("SUBSTRING(%s from (%v + 1) for %s)", left, right, right2)
+			} else {
+				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
+			}
 		}
 		if pn.Token.Value == "tolower" {
 			left := qb.createFilter(et, pn.Children[0], true)
