@@ -331,9 +331,9 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenFunc:
 		//"year|month|day|hour|minute|second|fractionalseconds|date|"+
-		//	"|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds|round|"+
-		//	"floor|ceiling|isof|cast|geo.distance|geo.length)",)
-		//t.Add("^(st_disjoint|st_touches|st_overlaps|st_crosses|st_relate)", FilterTokenFunc)
+		//	"|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds||"+
+		//	"|isof|cast|geo.distance|geo.length)",)
+		//t.Add("^(st_disjoint|st_touches|st_overlaps|st_crosses|st_relate)")
 		if pn.Token.Value == "contains" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
@@ -369,7 +369,7 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			right = qb.createFilter(et, pn.Children[1], true)
 			if len(pn.Children) > 2 {
 				right2 = qb.createFilter(et, pn.Children[2], true)
-				return fmt.Sprintf("SUBSTRING(%s from (%v + 1) for %s)", left, right, right2)
+				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for %s)", left, right, right2)
 			} else {
 				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
 			}
@@ -391,17 +391,50 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("CONCAT(%s, %s)", left, right)
 		}
-		if pn.Token.Value == "st_within" || pn.Token.Value == "geo.within" {
+		if pn.Token.Value == "round" {
 			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			left, right = qb.addGeomFromGeoJSON(pn, left, right)
-			return fmt.Sprintf("ST_WITHIN(%v, %v)", left, right)
+			return fmt.Sprintf("ROUND(%s)", left)
+		}
+		if pn.Token.Value == "floor" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("FLOOR(%s)", left)
+		}
+		if pn.Token.Value == "ceiling" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("CEILING(%s)", left)
+		}
+		if pn.Token.Value == "geo.distance" {
+			return qb.createSpatialQuery(pn, et, "ST_DISTANCE(%s, %s)", 2)
+		}
+		if pn.Token.Value == "geo.length" {
+			return qb.createSpatialQuery(pn, et, "ST_LENGTH(%s)", 1)
+		}
+		if pn.Token.Value == "st_equals" {
+			return qb.createSpatialQuery(pn, et, "ST_EQUALS(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_touches" {
+			return qb.createSpatialQuery(pn, et, "ST_TOUCHES(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_overlaps" {
+			return qb.createSpatialQuery(pn, et, "ST_OVERLAPS(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_crosses" {
+			return qb.createSpatialQuery(pn, et, "ST_CROSSES(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_contains" {
+			return qb.createSpatialQuery(pn, et, "ST_CONTAINS(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_disjoint" {
+			return qb.createSpatialQuery(pn, et, "ST_DISJOINT(%s, %s)", 2)
+		}
+		if pn.Token.Value == "st_relate" {
+			return qb.createSpatialQuery(pn, et, "ST_RELATE(%s, %s, %s)", 3)
+		}
+		if pn.Token.Value == "st_within" {
+			return qb.createSpatialQuery(pn, et, "ST_WITHIN(%s, %s)", 2)
 		}
 		if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			left, right = qb.addGeomFromGeoJSON(pn, left, right)
-			return fmt.Sprintf("ST_INTERSECTS(%v, %v)", left, right)
+			return qb.createSpatialQuery(pn, et, "ST_INTERSECTS(%s, %s)", 2)
 		}
 	case godata.FilterTokenGeography:
 		return fmt.Sprintf("ST_GeomFromText(%v)", pn.Children[0].Token.Value)
@@ -515,14 +548,29 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	return ""
 }
 
-func (qb *QueryBuilder) addGeomFromGeoJSON(pn *godata.ParseNode, left, right string) (string, string) {
-	if pn.Children[0].Token.Type == godata.FilterTokenGeography {
-		right = fmt.Sprintf("ST_GeomFromGeoJSON(%s)", right)
-	} else {
-		left = fmt.Sprintf("ST_GeomFromGeoJSON(%s)", left)
+func (qb *QueryBuilder) createSpatialQuery(pn *godata.ParseNode, et entities.EntityType, function string, params int) string {
+	if params == 1 {
+		return fmt.Sprintf(function, qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)))
+	} else if params == 2 {
+		return fmt.Sprintf(function,
+			qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)),
+			qb.addGeomFromGeoJSON(pn.Children[1].Token, qb.createFilter(et, pn.Children[1], true)))
+	} else if params == 3 {
+		return fmt.Sprintf(function,
+			qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)),
+			qb.addGeomFromGeoJSON(pn.Children[1].Token, qb.createFilter(et, pn.Children[1], true)),
+			qb.addGeomFromGeoJSON(pn.Children[2].Token, qb.createFilter(et, pn.Children[2], true)))
 	}
 
-	return left, right
+	return function
+}
+
+func (qb *QueryBuilder) addGeomFromGeoJSON(token *godata.Token, input string) string {
+	if token.Type != godata.FilterTokenGeography {
+		input = fmt.Sprintf("ST_GeomFromGeoJSON(%s)", input)
+	}
+
+	return input
 }
 
 // LikeType describes the type of like
@@ -628,7 +676,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	fmt.Printf("%s\n", queryString)
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
