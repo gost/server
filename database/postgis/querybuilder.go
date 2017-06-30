@@ -394,15 +394,17 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		if pn.Token.Value == "st_within" || pn.Token.Value == "geo.within" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
+			left, right = qb.addGeomFromGeoJSON(pn, left, right)
 			return fmt.Sprintf("ST_WITHIN(%v, %v)", left, right)
 		}
 		if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
+			left, right = qb.addGeomFromGeoJSON(pn, left, right)
 			return fmt.Sprintf("ST_INTERSECTS(%v, %v)", left, right)
 		}
 	case godata.FilterTokenGeography:
-		return fmt.Sprintf("ST_GeomFromText(%v, 4326)", pn.Children[0].Token.Value)
+		return fmt.Sprintf("ST_GeomFromText(%v)", pn.Children[0].Token.Value)
 	case godata.FilterTokenLambda:
 		return fmt.Sprintf("%v", pn.Token.Value)
 	case godata.FilterTokenNull: // 10
@@ -513,6 +515,16 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	return ""
 }
 
+func (qb *QueryBuilder) addGeomFromGeoJSON(pn *godata.ParseNode, left, right string) (string, string) {
+	if pn.Children[0].Token.Type == godata.FilterTokenGeography {
+		right = fmt.Sprintf("ST_GeomFromGeoJSON(%s)", right)
+	} else {
+		left = fmt.Sprintf("ST_GeomFromGeoJSON(%s)", left)
+	}
+
+	return left, right
+}
+
 // LikeType describes the type of like
 type LikeType int
 
@@ -616,7 +628,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
