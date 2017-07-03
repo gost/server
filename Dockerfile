@@ -1,5 +1,5 @@
-FROM golang:latest
-RUN apt-get update
+FROM golang:1.8-alpine
+RUN apk update && apk upgrade && apk add --no-cache bash git openssh
 RUN mkdir -p /go/src/github.com/geodan/gost/
 ADD . /go/src/github.com/geodan/gost
 RUN go get github.com/gorilla/mux
