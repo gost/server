@@ -330,26 +330,19 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 
 		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
 	case godata.FilterTokenFunc:
-		//"year|month|day|hour|minute|second|fractionalseconds|date|"+
-		//	"|totaloffsetminutes|now|maxdatetime|mindatetime|totalseconds||"+
-		//	"|isof|cast|geo.distance|geo.length)",)
-		//t.Add("^(st_disjoint|st_touches|st_overlaps|st_crosses|st_relate)")
 		if pn.Token.Value == "contains" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
-		}
-		if pn.Token.Value == "substringof" {
+		} else if pn.Token.Value == "substringof" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
-		}
-		if pn.Token.Value == "endswith" {
+		} else if pn.Token.Value == "endswith" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeEndsWith), qb.createLike(right, LikeEndsWith))
-		}
-		if pn.Token.Value == "startswith" {
+		} else if pn.Token.Value == "startswith" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeStartsWith), qb.createLike(right, LikeStartsWith))
@@ -357,13 +350,11 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		if pn.Token.Value == "length" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("LENGTH(%s)", left)
-		}
-		if pn.Token.Value == "indexof" {
+		} else if pn.Token.Value == "indexof" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("STRPOS(%s, %s) -1", left, right)
-		}
-		if pn.Token.Value == "substring" {
+		} else if pn.Token.Value == "substring" {
 			left, right, right2 := "", "", ""
 			left = qb.createFilter(et, pn.Children[0], true)
 			right = qb.createFilter(et, pn.Children[1], true)
@@ -373,67 +364,81 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			} else {
 				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
 			}
-		}
-		if pn.Token.Value == "tolower" {
+		} else if pn.Token.Value == "tolower" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("LOWER(%s)", left)
-		}
-		if pn.Token.Value == "toupper" {
+		} else if pn.Token.Value == "toupper" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("UPPER(%s)", left)
-		}
-		if pn.Token.Value == "trim" {
+		} else if pn.Token.Value == "trim" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("TRIM(both ' ' from %s)", left)
-		}
-		if pn.Token.Value == "concat" {
+		} else if pn.Token.Value == "concat" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
 			return fmt.Sprintf("CONCAT(%s, %s)", left, right)
-		}
-		if pn.Token.Value == "round" {
+		} else if pn.Token.Value == "round" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("ROUND(%s)", left)
-		}
-		if pn.Token.Value == "floor" {
+		} else if pn.Token.Value == "floor" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("FLOOR(%s)", left)
-		}
-		if pn.Token.Value == "ceiling" {
+		} else if pn.Token.Value == "ceiling" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("CEILING(%s)", left)
-		}
-		if pn.Token.Value == "geo.distance" {
+		} else if pn.Token.Value == "year" {
+			return qb.createExtractDateQuery(pn, et, "YEAR")
+		} else if pn.Token.Value == "month" {
+			return qb.createExtractDateQuery(pn, et, "MONTH")
+		} else if pn.Token.Value == "day" {
+			return qb.createExtractDateQuery(pn, et, "DAY")
+		} else if pn.Token.Value == "hour" {
+			return qb.createExtractDateQuery(pn, et, "HOUR")
+		} else if pn.Token.Value == "minute" {
+			return qb.createExtractDateQuery(pn, et, "MINUTE")
+		} else if pn.Token.Value == "second" {
+			return qb.createExtractDateQuery(pn, et, "SECOND")
+		} else if pn.Token.Value == "fractionalseconds" {
+			return qb.createExtractDateQuery(pn, et, "MICROSECONDS")
+		} else if pn.Token.Value == "date" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("(%s)::date", left)
+		} else if pn.Token.Value == "time" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("(%s)::timestamp", left)
+		} else if pn.Token.Value == "totaloffsetminutes" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("EXTRACT(TIMEZONE_MINUTE FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", left)
+		} else if pn.Token.Value == "now" {
+			return fmt.Sprint("to_char(now()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')")
+		} else if pn.Token.Value == "maxdatetime" {
+			return fmt.Sprint("'9999-12-31T23:59:59.9999Z'")
+		} else if pn.Token.Value == "mindatetime" {
+			return fmt.Sprint("'0001-01-01T00:00:00.0000Z'")
+		} else if pn.Token.Value == "totalseconds" {
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("SELECT extract(epoch from (%s)::timestamp)", left)
+		} else if pn.Token.Value == "geo.distance" {
 			return qb.createSpatialQuery(pn, et, "ST_DISTANCE(%s, %s)", 2)
-		}
-		if pn.Token.Value == "geo.length" {
+		} else if pn.Token.Value == "geo.length" {
 			return qb.createSpatialQuery(pn, et, "ST_LENGTH(%s)", 1)
-		}
-		if pn.Token.Value == "st_equals" {
+		} else if pn.Token.Value == "st_equals" {
 			return qb.createSpatialQuery(pn, et, "ST_EQUALS(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_touches" {
+		} else if pn.Token.Value == "st_touches" {
 			return qb.createSpatialQuery(pn, et, "ST_TOUCHES(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_overlaps" {
+		} else if pn.Token.Value == "st_overlaps" {
 			return qb.createSpatialQuery(pn, et, "ST_OVERLAPS(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_crosses" {
+		} else if pn.Token.Value == "st_crosses" {
 			return qb.createSpatialQuery(pn, et, "ST_CROSSES(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_contains" {
+		} else if pn.Token.Value == "st_contains" {
 			return qb.createSpatialQuery(pn, et, "ST_CONTAINS(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_disjoint" {
+		} else if pn.Token.Value == "st_disjoint" {
 			return qb.createSpatialQuery(pn, et, "ST_DISJOINT(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_relate" {
+		} else if pn.Token.Value == "st_relate" {
 			return qb.createSpatialQuery(pn, et, "ST_RELATE(%s, %s, %s)", 3)
-		}
-		if pn.Token.Value == "st_within" {
+		} else if pn.Token.Value == "st_within" {
 			return qb.createSpatialQuery(pn, et, "ST_WITHIN(%s, %s)", 2)
-		}
-		if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
+		} else if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
 			return qb.createSpatialQuery(pn, et, "ST_INTERSECTS(%s, %s)", 2)
 		}
 	case godata.FilterTokenGeography:
@@ -546,6 +551,11 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	}
 
 	return ""
+}
+
+func (qb *QueryBuilder) createExtractDateQuery(pn *godata.ParseNode, et entities.EntityType, function string) string {
+	left := qb.createFilter(et, pn.Children[0], true)
+	return fmt.Sprintf("EXTRACT(%s FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", function, left)
 }
 
 func (qb *QueryBuilder) createSpatialQuery(pn *godata.ParseNode, et entities.EntityType, function string, params int) string {
@@ -676,7 +686,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
