@@ -379,13 +379,13 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			return fmt.Sprintf("CONCAT(%s, %s)", left, right)
 		} else if pn.Token.Value == "round" {
 			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("ROUND(%s)", left)
+			return fmt.Sprintf("ROUND(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
 		} else if pn.Token.Value == "floor" {
 			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("FLOOR(%s)", left)
+			return fmt.Sprintf("FLOOR(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
 		} else if pn.Token.Value == "ceiling" {
 			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("CEILING(%s)", left)
+			return fmt.Sprintf("CEILING(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
 		} else if pn.Token.Value == "year" {
 			return qb.createExtractDateQuery(pn, et, "YEAR")
 		} else if pn.Token.Value == "month" {
@@ -686,7 +686,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
