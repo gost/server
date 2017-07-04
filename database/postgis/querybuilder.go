@@ -322,9 +322,19 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		left, right = qb.prepareFilter(et, pn.Children[0].Token.Value, left, pn.Children[1].Token.Value, right)
 
 		// Workaround for faulty OGC test
-		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 && ((strings.Index(right, "'") == 0 && left == "observation.data -> 'result'") || (strings.Index(left, "'") == 0 && right == "observation.data -> 'result'")) {
-			//filtering observation.result on string, convert the observation.data -> 'result' to observation.data ->> 'result' to handle it as a string
-			left = "observation.data ->> 'result'"
+		result := "observation.data -> 'result'"
+		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 {
+			if left == result {
+				left = "observation.data ->> 'result'"
+				if strings.Index(right, "'") != 0 {
+					left = "(observation.data ->> 'result')::double precision"
+				}
+			} else if right == result {
+				right = "observation.data ->> 'result'"
+				if strings.Index(left, "'") != 0 {
+					right = "(observation.data ->> 'result')::double precision"
+				}
+			}
 		}
 		// End workaround
 
@@ -686,7 +696,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	fmt.Printf("%s\n", queryString)
+	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
 
