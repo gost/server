@@ -317,6 +317,11 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		return q
 	case godata.FilterTokenLogical:
 		left := qb.createFilter(et, pn.Children[0], false)
+
+		if len(pn.Children) == 1 && strings.ToLower(pn.Token.Value) == "not" {
+			return fmt.Sprintf("%v %v", qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), left)
+		}
+
 		right := qb.createFilter(et, pn.Children[1], false)
 
 		left, right = qb.prepareFilter(et, pn.Children[0].Token.Value, left, pn.Children[1].Token.Value, right)
