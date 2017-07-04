@@ -330,14 +330,16 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		result := "observation.data -> 'result'"
 		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 {
 			if left == result {
-				left = "observation.data ->> 'result'"
 				if strings.Index(right, "'") != 0 {
 					left = qb.ObservationResultToDouble(left, "double precision")
+				} else {
+					left = "observation.data ->> 'result'"
 				}
 			} else if right == result {
-				right = "observation.data ->> 'result'"
 				if strings.Index(left, "'") != 0 {
 					right = qb.ObservationResultToDouble(right, "double precision")
+				} else {
+					right = "observation.data ->> 'result'"
 				}
 			}
 		}
