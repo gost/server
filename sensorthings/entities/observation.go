@@ -10,6 +10,10 @@ import (
 	gostErrors "github.com/geodan/gost/errors"
 )
 
+const (
+	ISO8601 = "2006-01-02T15:04:05.999Z07:00"
+)
+
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends
 // Observations to a specified Datastream. An Observation requires a FeatureOfInterest entity, if none is provided in the request,
 // the Location of the Thing associated with the Datastream, will be assigned to the new Observation as the FeaturOfInterest.
@@ -55,9 +59,9 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	var errors []error
 
 	if len(o.PhenomenonTime) == 0 {
-		o.PhenomenonTime = time.Now().UTC().Format(time.RFC3339Nano)
+		o.PhenomenonTime = time.Now().UTC().Format(ISO8601)
 	} else {
-		if t, err := time.Parse(time.RFC3339Nano, o.PhenomenonTime); err != nil {
+		if t, err := time.Parse(ISO8601, o.PhenomenonTime); err != nil {
 			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid phenomenonTime: %v", err.Error())))
 		} else {
 			o.PhenomenonTime = t.UTC().Format("2006-01-02T15:04:05.000Z")
@@ -68,11 +72,11 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	// null value to the resultTime.
 	if o.ResultTime != nil {
 		rt := *o.ResultTime
-		if t, err := time.Parse(time.RFC3339Nano, rt); err != nil {
+		if t, err := time.Parse(ISO8601, rt); err != nil {
 			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid resultTime: %v", err.Error())))
 		} else {
 			rt = t.UTC().Format("2006-01-02T15:04:05.000Z")
-			t, _ = time.Parse(time.RFC3339Nano, rt)
+			t, _ = time.Parse(ISO8601, rt)
 		}
 	}
 
