@@ -332,12 +332,12 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			if left == result {
 				left = "observation.data ->> 'result'"
 				if strings.Index(right, "'") != 0 {
-					left = "(observation.data ->> 'result')::double precision"
+					left = qb.ObservationResultToDouble(left, "double precision")
 				}
 			} else if right == result {
 				right = "observation.data ->> 'result'"
 				if strings.Index(left, "'") != 0 {
-					right = "(observation.data ->> 'result')::double precision"
+					right = qb.ObservationResultToDouble(right, "double precision")
 				}
 			}
 		}
@@ -456,6 +456,18 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		} else if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
 			return qb.createSpatialQuery(pn, et, "ST_INTERSECTS(%s, %s)", 2)
 		}
+	case godata.FilterTokenOp:
+		if pn.Token.Value == "add" {
+			return qb.createArithmetic(et, pn, "+", "double precision")
+		} else if pn.Token.Value == "sub" {
+			return qb.createArithmetic(et, pn, "-", "double precision")
+		} else if pn.Token.Value == "mul" {
+			return qb.createArithmetic(et, pn, "*", "double precision")
+		} else if pn.Token.Value == "div" {
+			return qb.createArithmetic(et, pn, "/", "double precision")
+		} else if pn.Token.Value == "mod" {
+			return qb.createArithmetic(et, pn, "%", "integer")
+		}
 	case godata.FilterTokenGeography:
 		return fmt.Sprintf("ST_GeomFromText(%v)", pn.Children[0].Token.Value)
 	case godata.FilterTokenLambda:
@@ -566,6 +578,21 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 	}
 
 	return ""
+}
+
+func (qb *QueryBuilder) createArithmetic(et entities.EntityType, pn *godata.ParseNode, operator, castTo string) string {
+	left := qb.ObservationResultToDouble(qb.createFilter(et, pn.Children[0], true), castTo)
+	right := qb.ObservationResultToDouble(qb.createFilter(et, pn.Children[1], true), castTo)
+
+	return fmt.Sprintf("%s %s %s", left, operator, right)
+}
+
+func (qb *QueryBuilder) ObservationResultToDouble(input string, castTo string) string {
+	if input == "observation.data -> 'result'" {
+		return fmt.Sprintf("(observation.data ->> 'result')::%s", castTo)
+	}
+
+	return input
 }
 
 func (qb *QueryBuilder) createExtractDateQuery(pn *godata.ParseNode, et entities.EntityType, function string) string {
