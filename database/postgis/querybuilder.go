@@ -323,7 +323,6 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		}
 
 		right := qb.createFilter(et, pn.Children[1], false)
-
 		left, right = qb.prepareFilter(et, pn.Children[0].Token.Value, left, pn.Children[1].Token.Value, right)
 
 		// Workaround for faulty OGC test
@@ -422,16 +421,20 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			return fmt.Sprintf("(%s)::date", left)
 		} else if pn.Token.Value == "time" {
 			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("(%s)::timestamp", left)
+			if strings.Contains(strings.ToLower(left), "time") {
+				return fmt.Sprintf("((%s)::timestamp)::time", left)
+			} else {
+				return fmt.Sprintf("(%s)::time", left)
+			}
 		} else if pn.Token.Value == "totaloffsetminutes" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("EXTRACT(TIMEZONE_MINUTE FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", left)
 		} else if pn.Token.Value == "now" {
 			return fmt.Sprint("to_char(now()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')")
 		} else if pn.Token.Value == "maxdatetime" {
-			return fmt.Sprint("'9999-12-31T23:59:59.9999Z'")
+			return fmt.Sprint("'9999-12-31T23:59:59.999Z'")
 		} else if pn.Token.Value == "mindatetime" {
-			return fmt.Sprint("'0001-01-01T00:00:00.0000Z'")
+			return fmt.Sprint("'0001-01-01T00:00:00.000Z'")
 		} else if pn.Token.Value == "totalseconds" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("SELECT extract(epoch from (%s)::timestamp)", left)
