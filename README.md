@@ -49,7 +49,7 @@ or on Raspberry Pi (experimental):
 ```
 $ wget https://raw.githubusercontent.com/gost/docker-compose/master/docker-compose-rpi.yml
 
-$ docker-compose -f docker-compose-rpi.yml up
+$ sudo docker-compose -f docker-compose-rpi.yml up
 ```
 
 ## OGC Compliance testing status
