@@ -415,7 +415,8 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		} else if pn.Token.Value == "second" {
 			return qb.createExtractDateQuery(pn, et, "SECOND")
 		} else if pn.Token.Value == "fractionalseconds" {
-			return qb.createExtractDateQuery(pn, et, "MICROSECONDS")
+			left := qb.createFilter(et, pn.Children[0], true)
+			return fmt.Sprintf("EXTRACT(MICROSECONDS FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')) / 1000000", left)
 		} else if pn.Token.Value == "date" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("(%s)::date", left)
