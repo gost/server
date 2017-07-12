@@ -14,16 +14,30 @@ import (
 )
 
 func TestCreateServer(t *testing.T) {
+	// arrange
+	server := createTestServer(8080, false)
+
 	// act
-	cfg := configuration.Config{}
-	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
-	stAPI := api.NewAPI(database, cfg, mqttServer)
-	server := CreateServer("localhost", 8000, &stAPI, false, "", "")
 	server.Stop()
 
 	// assert
 	assert.NotNil(t, server)
+}
+
+func TestFailRunServerHttp(t *testing.T) {
+	// arrange
+	server := createTestServer(789456456, false)
+
+	//assert
+	assert.Panics(t, func() { server.Start() })
+}
+
+func TestFailRunServerHttps(t *testing.T) {
+	// arrange
+	server := createTestServer(8080, true)
+
+	//assert
+	assert.Panics(t, func() { server.Start() })
 }
 
 func TestLowerCaseURI(t *testing.T) {
@@ -43,7 +57,7 @@ func TestLowerCaseURI(t *testing.T) {
 }
 
 func TestPostProcessHandler(t *testing.T) {
-	rest.ExternalURI = "tea"
+	rest.ExternalURI = "http://localhost:8080/"
 	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusTeapot)
 		rw.Header().Add("Location", "tea location")
@@ -66,4 +80,14 @@ func TestPostProcessHandler(t *testing.T) {
 	} else {
 		t.Fail()
 	}
+}
+
+func createTestServer(port int, https bool) Server {
+	cfg := configuration.Config{
+		Server: configuration.ServerConfig{ExternalURI: "http://localhost:8080/"},
+	}
+	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
+	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
+	stAPI := api.NewAPI(database, cfg, mqttServer)
+	return CreateServer("localhost", port, &stAPI, https, "", "")
 }

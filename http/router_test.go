@@ -5,37 +5,42 @@ import (
 	"github.com/geodan/gost/database/postgis"
 	"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
-// Test the router functionality
-func TestCreateRouter(t *testing.T) {
+var router *mux.Router
+var req *http.Request
+var respRec *httptest.ResponseRecorder
+
+func setup() {
 	// arrange
 	cfg := configuration.Config{}
 	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
 	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
 	a := api.NewAPI(database, cfg, mqttServer)
+	router = CreateRouter(&a)
 
-	// act
-	router := CreateRouter(&a)
+	//The response recorder used to record HTTP responses
+	respRec = httptest.NewRecorder()
+}
+
+// Test the router functionality
+func TestCreateRouter(t *testing.T) {
+	// arrange
+	setup()
 
 	// assert
 	assert.NotNil(t, router, "Router should be created")
 }
 
-/**
-func TestDashboardRedirects(t *testing.T) {
-	// arrange
-	cfg := configuration.Config{}
-	mqttServer := mqtt.CreateMQTTClient(configuration.MQTTConfig{})
-	database := postgis.NewDatabase("", 123, "", "", "", "", false, 50, 100, 200)
-	a := api.NewAPI(database, cfg, mqttServer)
-	router := CreateRouter(&a)
-
-	// act
-	setDashboardRedirects(router)
-
-	// assert
-	assert.NotNil(t, router.Methods, "router should have methods for dasthboard redirects")
-}*/
+func TestEndpoints(t *testing.T) {
+	reqVersion, _ := http.NewRequest("GET", "/v1.0", nil)
+	router.ServeHTTP(respRec, reqVersion)
+	if respRec.Code != http.StatusOK {
+		t.Fatal("Server endpoint /v1.0 error: Returned ", respRec.Code, " instead of ", http.StatusOK)
+	}
+}

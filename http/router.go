@@ -32,10 +32,6 @@ func CreateRouter(api *models.API) *mux.Router {
 		op := e
 		operation := op.Operation
 		method := fmt.Sprintf("%s", operation.OperationType)
-		if operation.Handler == nil {
-			continue
-		}
-
 		router.Methods(method).
 			Path(operation.Path).
 			HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

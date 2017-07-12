@@ -66,8 +66,7 @@ func (s *GostServer) Start() {
 	}
 
 	if err != nil {
-		log.Fatal(err)
-		return
+		panic(err)
 	}
 }
 
