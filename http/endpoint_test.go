@@ -7,21 +7,6 @@ import (
 	"testing"
 )
 
-func TestEndPointLength(t *testing.T) {
-	// arrange
-	ep1 := &Endpoint{}
-	ep2 := &Endpoint{}
-	eps := Endpoints{}
-	eps = append(eps, ep1)
-	eps = append(eps, ep2)
-
-	// act
-	l := eps.Len()
-
-	// assert
-	assert.True(t, l == 2, "Number of Endpoints should be 2")
-}
-
 func TestIsDynamic(t *testing.T) {
 	// arrange
 	urlDynamic := "http://www.{}.nl"
@@ -36,6 +21,16 @@ func TestIsDynamic(t *testing.T) {
 	assert.True(t, resultDynamic)
 }
 
+func TestEndPointSortDuplicate(t *testing.T) {
+	// arrange
+	ep1 := &Endpoint{Operation: models.EndpointOperation{Path: "ep1", OperationType: models.HTTPOperationGet}}
+	ep2 := &Endpoint{Operation: models.EndpointOperation{Path: "ep1", OperationType: models.HTTPOperationGet}}
+	eps := Endpoints{ep1, ep2}
+
+	// assert
+	assert.Panics(t, func() { sort.Sort(eps) })
+}
+
 func TestEndPointSort(t *testing.T) {
 	// arrange
 	ep1 := &Endpoint{}
@@ -44,17 +39,37 @@ func TestEndPointSort(t *testing.T) {
 	ep2 := &Endpoint{}
 	ep2.Operation.Path = "ep2"
 	ep2.Operation.OperationType = models.HTTPOperationPost
+	ep3 := &Endpoint{}
+	ep3.Operation.Path = "{c:.*}ep3"
+	ep3.Operation.OperationType = models.HTTPOperationGet
+	ep4 := &Endpoint{}
+	ep4.Operation.Path = "ep4{c:.*}"
+	ep4.Operation.OperationType = models.HTTPOperationGet
+	ep5 := &Endpoint{}
+	ep5.Operation.Path = "{c:.*}ep5{test}"
+	ep5.Operation.OperationType = models.HTTPOperationGet
+	ep6 := &Endpoint{}
+	ep6.Operation.Path = "ep6{test}"
+	ep6.Operation.OperationType = models.HTTPOperationGet
+	ep7 := &Endpoint{}
+	ep7.Operation.Path = "ep7"
+	ep7.Operation.OperationType = models.HTTPOperationGet
 
-	eps := Endpoints{ep1, ep2}
+	eps := Endpoints{ep1, ep2, ep3, ep4, ep5, ep6, ep7}
 
 	// act
 	sort.Sort(eps)
 
 	// assert
-	assert.True(t, len(eps) == 2, "Number of Endpoints should be 2")
+	assert.True(t, len(eps) == 7, "Number of Endpoints should be 7")
 	// post becomes first after sorting
 	assert.True(t, eps[0].Operation.Path == "ep2")
 	assert.True(t, eps[1].Operation.Path == "ep1")
+	assert.True(t, eps[2].Operation.Path == "ep7")
+	assert.True(t, eps[3].Operation.Path == "ep6{test}")
+	assert.True(t, eps[4].Operation.Path == "{c:.*}ep3")
+	assert.True(t, eps[5].Operation.Path == "ep4{c:.*}")
+	assert.True(t, eps[6].Operation.Path == "{c:.*}ep5{test}")
 }
 
 func TestEndPointSortDynamic(t *testing.T) {
