@@ -11,7 +11,7 @@ import (
 	"net/http/httptest"
 )
 
-func TestReadRef(t *testing.T) {
+func TestReadRefFromWildcard(t *testing.T) {
 	// arrange
 	router := mux.NewRouter()
 	router.HandleFunc("/v1.0/Things{id}/{params}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -31,6 +31,18 @@ func TestReadRef(t *testing.T) {
 	body := resp.Body
 	result, _ := ioutil.ReadAll(body)
 	assert.True(t, string(result) == "true")
+}
+
+func TestReturnNoQueryOptionsOnFailedParse(t *testing.T) {
+	// arrange
+	req, _ := http.NewRequest("GET", "/v1.0/Things?$count=none", nil)
+
+	// act
+	qo, err := getQueryOptions(req)
+
+	// assert
+	assert.Nil(t, qo)
+	assert.NotNil(t, err)
 }
 
 func TestGetEntityId(t *testing.T) {
