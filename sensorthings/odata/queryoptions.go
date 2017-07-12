@@ -3,6 +3,7 @@ package odata
 import (
 	"github.com/gost/godata"
 	"net/url"
+	"strings"
 )
 
 // SupportedExpandParameters contains a list of endpoints with their supported expand parameters
@@ -23,15 +24,29 @@ type QueryOptions struct {
 }
 
 // ExpandParametersSupported returns if the QueryOptions expand request is supported by the endpoints
-// todo: implement check
-func (q *QueryOptions) ExpandParametersSupported() bool {
-	return true
+func (q *QueryOptions) ExpandParametersSupported(endpoint, expand string) bool {
+	return q.checkMap(SupportedExpandParameters, endpoint, expand)
 }
 
 // SelectParametersSupported returns if the QueryOptions select request is supported by the endpoints
-// todo: implement check
-func (q *QueryOptions) SelectParametersSupported() bool {
-	return true
+func (q *QueryOptions) SelectParametersSupported(endpoint, selectString string) bool {
+	return q.checkMap(SupportedSelectParameters, endpoint, selectString)
+}
+
+func (q *QueryOptions) checkMap(mapToCheck map[string][]string, endpoint, request string) bool {
+	// endpoint is not registered
+	if _, ok := mapToCheck[endpoint]; !ok {
+		return false
+	}
+
+	// return true if not found for registered endpoint
+	for _, supported := range mapToCheck[endpoint] {
+		if strings.ToLower(supported) == strings.ToLower(request) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // GoDataValueQuery true when $value is requested false if not
@@ -49,6 +64,7 @@ func ExpandItemToQueryOptions(ei *godata.ExpandItem) *QueryOptions {
 	qo.Search = ei.Search
 	qo.Select = ei.Select
 	qo.Skip = ei.Skip
+	qo.Expand = ei.Expand
 
 	return &qo
 }
