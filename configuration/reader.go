@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// readfile reads the bytes from a given file
+// readFile reads the bytes from a given file
 func readFile(cfgFile string) ([]byte, error) {
 	source, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
