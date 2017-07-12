@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -56,7 +57,7 @@ func TestSendJsonResponseWithNoData(t *testing.T) {
 	sendJSONResponse(rr, http.StatusTeapot, nil, nil)
 
 	// assert
-	assert.True(t, rr.Code == http.StatusTeapot)
+	assert.True(t, rr.Code == http.StatusOK)
 }
 
 func TestSendJsonResponseWithData(t *testing.T) {
@@ -88,4 +89,58 @@ func TestSendJsonResponseWithDataAndQueryOptions(t *testing.T) {
 
 	// assert
 	assert.True(t, rr.Code == http.StatusTeapot)
+}
+
+func TestSendJsonResponseErrorOnMarshalError(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	c := make(chan int)
+	m := map[string]interface{}{"chan": c}
+
+	// assert
+	assert.Panics(t, func() { sendJSONResponse(rr, http.StatusTeapot, m, nil) })
+}
+
+func TestSendJsonResponseWithRefAndNovalueError(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	thing := &entities.Thing{Name: "yo"}
+	qo := &odata.QueryOptions{}
+	valQuery := odata.GoDataValueQuery(true)
+	qo.Value = &valQuery
+	qo.Select = &godata.GoDataSelectQuery{SelectItems: nil}
+
+	// act
+	sendJSONResponse(rr, http.StatusTeapot, thing, qo)
+
+	// assert
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+}
+
+func TestRequestValueWithNonexistingParam(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	thing := &entities.Thing{Name: "yo"}
+	qo := &odata.QueryOptions{}
+	valQuery := odata.GoDataValueQuery(true)
+	qo.Value = &valQuery
+	qo.Select = &godata.GoDataSelectQuery{SelectItems: []*godata.SelectItem{{Segments: []*godata.Token{{Value: "nonexistingparam"}}}}}
+
+	// act
+	sendJSONResponse(rr, http.StatusTeapot, thing, qo)
+
+	// assert
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestEncodingNotSupported(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	err := []error{errors.New("Encoding not supported")}
+
+	// act
+	sendError(rr, err)
+
+	// assert
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }

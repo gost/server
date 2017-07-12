@@ -38,8 +38,8 @@ func TestCreateRouter(t *testing.T) {
 }
 
 func TestEndpoints(t *testing.T) {
-	reqVersion, _ := http.NewRequest("GET", "/v1.0", nil)
-	router.ServeHTTP(respRec, reqVersion)
+	req, _ = http.NewRequest("GET", "/v1.0", nil)
+	router.ServeHTTP(respRec, req)
 	if respRec.Code != http.StatusOK {
 		t.Fatal("Server endpoint /v1.0 error: Returned ", respRec.Code, " instead of ", http.StatusOK)
 	}

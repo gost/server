@@ -16,7 +16,6 @@ import (
 // the message will be marshalled into an indented JSON format
 func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *odata.QueryOptions) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(status)
 
 	if data != nil {
 		b, err := JSONMarshal(data, true)
@@ -26,14 +25,15 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 
 		// $value is requested only send back the value, ToDo: move to API code?
 		if qo != nil && qo.Value != nil && bool(*qo.Value) == true {
-			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems[0])
+			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems)
 			var m map[string]json.RawMessage
 			err = json.Unmarshal(b, &m)
-			if err != nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 {
+			if err != nil || qo.Select == nil || qo.Select.SelectItems == nil || len(qo.Select.SelectItems) == 0 {
 				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+				return
 			}
 
-			// whats happening here?
+			// if selected equals the key in json add to mVal
 			mVal := []byte{}
 			for k, v := range m {
 				if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
@@ -42,7 +42,8 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 			}
 
 			if len(mVal) == 0 {
-				sendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)})
+				sendError(w, []error{gostErrors.NewBadRequestError(errMessage)})
+				return
 			}
 
 			value := string(mVal[:])
@@ -51,7 +52,7 @@ func sendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 
 			b = []byte(value)
 		}
-
+		w.WriteHeader(status)
 		w.Write(b)
 	}
 }
@@ -85,8 +86,7 @@ func sendError(w http.ResponseWriter, error []error) {
 		errors[idx] = value.Error()
 	}
 
-	// Set te status code, default 500 for error, check if there is an ApiError an get
-	// the status code
+	// Set the status code, default 500 for error, check if there is an ApiError an get
 	var statusCode = http.StatusInternalServerError
 
 	if len(error) > 0 {
