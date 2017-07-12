@@ -5,10 +5,33 @@ import (
 	"net/http"
 	"testing"
 
+	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http/httptest"
 )
+
+func TestReadRef(t *testing.T) {
+	// arrange
+	router := mux.NewRouter()
+	router.HandleFunc("/v1.0/Things{id}/{params}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		qo, _ := getQueryOptions(r)
+		w.Write([]byte(fmt.Sprintf("%v", *qo.Ref)))
+	}))
+
+	ts := httptest.NewServer(router)
+	defer ts.Close()
+
+	// act
+	resp, _ := http.Get(ts.URL + "/v1.0/Things(35)/$ref")
+
+	// assert
+	assert.True(t, resp != nil)
+	assert.True(t, http.StatusOK == resp.StatusCode)
+	body := resp.Body
+	result, _ := ioutil.ReadAll(body)
+	assert.True(t, string(result) == "true")
+}
 
 func TestGetEntityId(t *testing.T) {
 	// arrange
