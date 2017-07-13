@@ -263,6 +263,12 @@ type ArrayResponse struct {
 	Data     *interface{} `json:"value"`
 }
 
+// ArrayResponseEndpoint can be used to parse an array response containing endpoint information
+type ArrayResponseEndpoint struct {
+	ArrayResponse
+	Data []*entities.Endpoint `json:"value"`
+}
+
 // ArrayResponseThings can be used to parse an array response containing things
 type ArrayResponseThings struct {
 	ArrayResponse

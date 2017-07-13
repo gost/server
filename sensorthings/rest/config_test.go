@@ -117,10 +117,26 @@ func NewMockAPI() models.API {
 	return &api
 }
 
-func (a *MockAPI) Start()                                 {}
-func (a *MockAPI) GetConfig() *configuration.Config       { return nil }
-func (a *MockAPI) GetAcceptedPaths() []string             { return []string{} }
-func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse { return nil }
+func (a *MockAPI) Start()                           {}
+func (a *MockAPI) GetConfig() *configuration.Config { return nil }
+func (a *MockAPI) GetAcceptedPaths() []string       { return []string{} }
+func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse {
+	bpi := []models.Endpoint{}
+	ep := *a.GetEndpoints()
+	for _, e := range ep {
+		if e.ShowOutputInfo() {
+			bpi = append(bpi, e)
+		}
+	}
+
+	var i interface{} = bpi
+	basePathInfo := models.ArrayResponse{
+		Data: &i,
+	}
+
+	return &basePathInfo
+}
+
 func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 	eps := CreateEndPoints("http://localhost")
 	return &eps
