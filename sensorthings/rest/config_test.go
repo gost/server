@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/geodan/gost/configuration"
@@ -13,6 +15,7 @@ import (
 	"github.com/geodan/gost/sensorthings/odata"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -35,6 +38,10 @@ func TestCreateEndPointVersion(t *testing.T) {
 	assert.Equal(t, true, containsVersionPath, "Version endpoint needs to contain an endpoint containing the path Version")
 }
 
+func assertStatusCode(expectedStatusCode int, r *http.Response, t *testing.T) {
+	assert.Equal(t, expectedStatusCode, r.StatusCode)
+}
+
 func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
 	for _, o := range eps {
 		if strings.Contains(o.Path, epName) {
@@ -43,6 +50,20 @@ func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
 	}
 
 	return false
+}
+
+func request(method, url string, body interface{}) *http.Response {
+	var reader io.Reader
+	if body != nil {
+		b, _ := json.Marshal(body)
+		reader = bytes.NewReader(b)
+	}
+
+	client := &http.Client{}
+	request, _ := http.NewRequest(method, getServer().URL+url, reader)
+	r, _ := client.Do(request)
+
+	return r
 }
 
 var testServer *httptest.Server
@@ -79,6 +100,12 @@ func NewMockThing(id int) *entities.Thing {
 	thing := &entities.Thing{Name: fmt.Sprintf("thing %v", id), Description: fmt.Sprintf("description of thing %v", id), Properties: map[string]interface{}{"type": "none"}}
 	thing.ID = id
 	return thing
+}
+
+func NewMockSensor(id int) *entities.Sensor {
+	sensor := &entities.Sensor{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), EncodingType: "PDF", Metadata: "none"}
+	sensor.ID = id
+	return sensor
 }
 
 type MockAPI struct {
@@ -130,8 +157,24 @@ func getMockThing(id interface{}) (*entities.Thing, error) {
 	return NewMockThing(intID), nil
 }
 
+func getMockSensor(id interface{}) (*entities.Sensor, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Sensor does not exist"))
+	}
+	return NewMockSensor(intID), nil
+}
+
 func getMockThings() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{NewMockThing(1), NewMockThing(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockSensors() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.Sensor{NewMockSensor(1), NewMockSensor(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -298,21 +341,21 @@ func (a *MockAPI) PutObservedProperty(id interface{}, op *entities.ObservedPrope
 func (a *MockAPI) DeleteObservedProperty(id interface{}) error { return nil }
 
 func (a *MockAPI) GetSensor(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error) {
-	return nil, nil
+	return getMockSensor(id)
 }
 func (a *MockAPI) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error) {
-	return nil, nil
+	return getMockSensor(id)
 }
 func (a *MockAPI) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockSensors()
 }
-func (a *MockAPI) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) { return nil, nil }
+func (a *MockAPI) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) { return sensor, nil }
 func (a *MockAPI) PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error) {
-	return nil, nil
+	return sensor, nil
 }
 func (a *MockAPI) DeleteSensor(id interface{}) error { return nil }
 func (a *MockAPI) PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error) {
-	return nil, nil
+	return sensor, nil
 }
 
 func (a *MockAPI) LinkLocation(thingID interface{}, locationID interface{}) error { return nil }
