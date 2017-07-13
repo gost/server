@@ -11,7 +11,10 @@ import (
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
 )
 
@@ -42,12 +45,39 @@ func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
 	return false
 }
 
-func NewMockThing() *entities.Thing {
-	thing := &entities.Thing{}
-	thing.ID = 1
-	thing.Name = "thing 1"
-	thing.Description = "description of thing 1"
-	thing.Properties = map[string]interface{}{"type": "none"}
+var testServer *httptest.Server
+
+func getRouter() *mux.Router {
+	a := NewMockAPI()
+	eps := EndpointsToSortedList(a.GetEndpoints())
+	router := mux.NewRouter().StrictSlash(false)
+
+	for _, e := range eps {
+		op := e
+		operation := op.Operation
+		method := fmt.Sprintf("%s", operation.OperationType)
+		router.Methods(method).
+			Path(operation.Path).
+			HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				operation.Handler(w, r, &op.Endpoint, &a)
+			})
+	}
+
+	return router
+}
+
+func getServer() *httptest.Server {
+	if testServer == nil {
+		router := getRouter()
+		testServer = httptest.NewServer(router)
+	}
+
+	return testServer
+}
+
+func NewMockThing(id int) *entities.Thing {
+	thing := &entities.Thing{Name: fmt.Sprintf("thing %v", id), Description: fmt.Sprintf("description of thing %v", id), Properties: map[string]interface{}{"type": "none"}}
+	thing.ID = id
 	return thing
 }
 
@@ -65,7 +95,7 @@ func (a *MockAPI) GetConfig() *configuration.Config       { return nil }
 func (a *MockAPI) GetAcceptedPaths() []string             { return []string{} }
 func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse { return nil }
 func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint {
-	eps := CreateEndPoints("localhost/v1.0")
+	eps := CreateEndPoints("http://localhost")
 	return &eps
 }
 
@@ -77,31 +107,46 @@ func (a *MockAPI) CreateNextLink(count int, incomingURL string, qo *odata.QueryO
 }
 
 func (a *MockAPI) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
+	return getMockThing(id)
+}
+func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+	return getMockThings()
+}
+func (a *MockAPI) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
+	return getMockThing(id)
+}
+func (a *MockAPI) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+	return getMockThings()
+}
+func (a *MockAPI) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
+	return getMockThing(id)
+}
+
+func getMockThing(id interface{}) (*entities.Thing, error) {
 	intID, ok := toIntID(id)
 	if !ok || intID != 1 {
 		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
-	return NewMockThing(), nil
-}
-func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
-}
-func (a *MockAPI) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
-	return nil, nil
-}
-func (a *MockAPI) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
-}
-func (a *MockAPI) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
-	return nil, nil
+	return NewMockThing(intID), nil
 }
 
-func (a *MockAPI) PostThing(thing *entities.Thing) (*entities.Thing, []error) { return nil, nil }
+func getMockThings() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.Thing{NewMockThing(1), NewMockThing(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func (a *MockAPI) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
+	return thing, nil
+}
+
 func (a *MockAPI) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
-	return nil, nil
+	return thing, nil
 }
 func (a *MockAPI) PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, []error) {
-	return nil, nil
+	return thing, nil
 }
 func (a *MockAPI) DeleteThing(id interface{}) error { return nil }
 

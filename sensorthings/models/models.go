@@ -256,11 +256,59 @@ type APIVersion struct {
 	Version string `json:"version"`
 }
 
-// ArrayResponse is the default response format for sending content back
+// ArrayResponse is the default response format for sending content back used by the server
 type ArrayResponse struct {
 	Count    int          `json:"@iot.count,omitempty"`
 	NextLink string       `json:"@iot.nextLink,omitempty"`
 	Data     *interface{} `json:"value"`
+}
+
+// ArrayResponseThings can be used to parse an array response containing things
+type ArrayResponseThings struct {
+	ArrayResponse
+	Data []*entities.Thing `json:"value"`
+}
+
+// ArrayResponseLocations can be used to parse an array response containing locations
+type ArrayResponseLocations struct {
+	ArrayResponse
+	Data []*entities.Location `json:"value"`
+}
+
+// ArrayResponseHistoricalLocations can be used to parse an array response containing historical locations
+type ArrayResponseHistoricalLocations struct {
+	ArrayResponse
+	Data []*entities.HistoricalLocation `json:"value"`
+}
+
+// ArrayResponseDatastreams can be used to parse an array response containing datastreams
+type ArrayResponseDatastreams struct {
+	ArrayResponse
+	Data []*entities.Datastream `json:"value"`
+}
+
+// ArrayResponseSensors can be used to parse an array response containing sensors
+type ArrayResponseSensors struct {
+	ArrayResponse
+	Data []*entities.Sensor `json:"value"`
+}
+
+// ArrayResponseObservedProperty can be used to parse an array response containing observed properties
+type ArrayResponseObservedProperty struct {
+	ArrayResponse
+	Data []*entities.ObservedProperty `json:"value"`
+}
+
+// ArrayResponseObservations can be used to parse an array response containing observations
+type ArrayResponseObservations struct {
+	ArrayResponse
+	Data []*entities.Observation `json:"value"`
+}
+
+// ArrayResponseFeaturesOfInterest can be used to parse an array response containing features of interest
+type ArrayResponseFeaturesOfInterest struct {
+	ArrayResponse
+	Data []*entities.FeatureOfInterest `json:"value"`
 }
 
 // ErrorResponse is the default response format for sending errors back
