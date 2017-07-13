@@ -4,11 +4,15 @@ import (
 	"strings"
 	"testing"
 
+	"errors"
+	"fmt"
 	"github.com/geodan/gost/configuration"
+	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
+	"strconv"
 )
 
 func TestCreateEndPoints(t *testing.T) {
@@ -38,20 +42,33 @@ func containsEndpoint(epName string, eps []models.EndpointOperation) bool {
 	return false
 }
 
+func NewMockThing() *entities.Thing {
+	thing := &entities.Thing{}
+	thing.ID = 1
+	thing.Name = "thing 1"
+	thing.Description = "description of thing 1"
+	thing.Properties = map[string]interface{}{"type": "none"}
+	return thing
+}
+
 type MockAPI struct {
 }
 
 // NewAPI Initialise a new SensorThings API
 func NewMockAPI() models.API {
-	api := &MockAPI{}
-	return api
+	api := MockAPI{}
+	return &api
 }
 
-func (a *MockAPI) Start()                                                  {}
-func (a *MockAPI) GetConfig() *configuration.Config                        { return nil }
-func (a *MockAPI) GetAcceptedPaths() []string                              { return []string{} }
-func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse                  { return nil }
-func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint  { return nil }
+func (a *MockAPI) Start()                                 {}
+func (a *MockAPI) GetConfig() *configuration.Config       { return nil }
+func (a *MockAPI) GetAcceptedPaths() []string             { return []string{} }
+func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse { return nil }
+func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint {
+	eps := CreateEndPoints("localhost/v1.0")
+	return &eps
+}
+
 func (a *MockAPI) initRest()                                               {}
 func (a *MockAPI) GetTopics() *[]models.Topic                              { return nil }
 func (a *MockAPI) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {}
@@ -60,6 +77,13 @@ func (a *MockAPI) CreateNextLink(count int, incomingURL string, qo *odata.QueryO
 }
 
 func (a *MockAPI) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+	}
+	return NewMockThing(), nil
+}
+func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
 	return nil, nil
 }
 func (a *MockAPI) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
@@ -71,9 +95,7 @@ func (a *MockAPI) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, pa
 func (a *MockAPI) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	return nil, nil
 }
-func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
-}
+
 func (a *MockAPI) PostThing(thing *entities.Thing) (*entities.Thing, []error) { return nil, nil }
 func (a *MockAPI) PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error) {
 	return nil, nil
@@ -257,4 +279,27 @@ func (a *MockAPI) GetVersionInfo() *models.VersionInfo {
 	}
 
 	return &versionInfo
+}
+
+// ToIntID converts an interface to int id used for the id's in the database
+func toIntID(id interface{}) (int, bool) {
+	switch t := id.(type) {
+	case string:
+		intID, err := strconv.Atoi(t)
+		if err != nil {
+			return 0, false
+		}
+		return intID, true
+	case float64:
+		return int(t), true
+	}
+
+	intID, err := strconv.Atoi(fmt.Sprintf("%v", id))
+	if err != nil {
+		// why not return:  0, err
+		return 0, false
+	}
+
+	// why not return: intID, nil
+	return intID, true
 }

@@ -70,7 +70,7 @@ func (s *GostServer) Start() {
 	}
 }
 
-// Stop command to stop the GOST HTTP server, currently not supported
+// Stop command to stop the GOST HTTP server
 func (s *GostServer) Stop() {
 	if s.httpServer != nil {
 		log.Print("Stopping HTTP(S) Server")

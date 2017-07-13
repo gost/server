@@ -20,11 +20,8 @@ func TestVersionResponse(t *testing.T) {
 	HandleVersion(rr, nil, nil, &a)
 	version := models.VersionInfo{}
 	json.Unmarshal(rr.Body.Bytes(), &version)
-	decoder := json.NewDecoder(rr.Body)
-	err := decoder.Decode(&version)
 
 	// assert
-	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Equal(t, configuration.SensorThingsAPIVersion, version.APIVersion.Version)
 	assert.Equal(t, configuration.ServerVersion, version.GostServerVersion.Version)
