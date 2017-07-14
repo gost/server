@@ -95,6 +95,12 @@ func newMockSensor(id int) *entities.Sensor {
 	return sensor
 }
 
+func newMockObservedProperty(id int) *entities.ObservedProperty {
+	op := &entities.ObservedProperty{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), Definition: "none"}
+	op.ID = id
+	return op
+}
+
 type MockAPI struct {
 	config *configuration.Config
 }
@@ -190,6 +196,14 @@ func getMockSensor(id interface{}) (*entities.Sensor, error) {
 	return newMockSensor(intID), nil
 }
 
+func getMockObservedProperty(id interface{}) (*entities.ObservedProperty, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("ObservedProperty does not exist"))
+	}
+	return newMockObservedProperty(intID), nil
+}
+
 func getMockThings() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{newMockThing(1), newMockThing(2)}
 	return &models.ArrayResponse{
@@ -200,6 +214,14 @@ func getMockThings() (*models.ArrayResponse, error) {
 
 func getMockSensors() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Sensor{newMockSensor(1), newMockSensor(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockObservedProperties() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.ObservedProperty{newMockObservedProperty(1), newMockObservedProperty(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -346,22 +368,22 @@ func (a *MockAPI) PutObservation(id interface{}, observation *entities.Observati
 func (a *MockAPI) DeleteObservation(id interface{}) error { return nil }
 
 func (a *MockAPI) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
-	return nil, nil
+	return getMockObservedProperty(id)
 }
 func (a *MockAPI) GetObservedProperties(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockObservedProperties()
 }
 func (a *MockAPI) GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
-	return nil, nil
+	return getMockObservedProperty(datastreamID)
 }
 func (a *MockAPI) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
-	return nil, nil
+	return op, nil
 }
 func (a *MockAPI) PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error) {
-	return nil, nil
+	return op, nil
 }
 func (a *MockAPI) PutObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
-	return nil, nil
+	return op, nil
 }
 func (a *MockAPI) DeleteObservedProperty(id interface{}) error { return nil }
 
