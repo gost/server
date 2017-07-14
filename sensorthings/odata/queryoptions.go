@@ -1,8 +1,11 @@
 package odata
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/gost/godata"
+	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -104,4 +107,49 @@ func ParseURLQuery(query url.Values) (*QueryOptions, error) {
 	result.RawOrderBy = query.Get("$orderby")
 
 	return result, err
+}
+
+// GetQueryOptions creates QueryOptions based upon the incoming request
+// QueryOptions = nil when no query was found, errors != nil if something
+// went wrong with parsing the query into QueryOptions and will contain information
+// on what went wrong
+func GetQueryOptions(r *http.Request, maxEntities int) (*QueryOptions, []error) {
+	//If request contains parameters from route wildcard convert it to a select query
+	vars := mux.Vars(r)
+	value := vars["params"]
+
+	values := r.URL.Query()
+	if len(vars["params"]) > 0 {
+		//If $ref found create select query with id
+		if vars["params"] == "$ref" {
+			value = "id"
+			values["$ref"] = []string{"true"}
+		}
+
+		values["$select"] = []string{value}
+	}
+
+	if strings.HasSuffix(r.URL.Path, "$value") {
+		values["$value"] = []string{"true"}
+	}
+
+	if t, ok := r.URL.Query()["$top"]; !ok {
+		values["$top"] = []string{strconv.Itoa(maxEntities)}
+	} else {
+		top, err := strconv.Atoi(t[0])
+		if err != nil || top > maxEntities {
+			values["$top"] = []string{strconv.Itoa(maxEntities)}
+		}
+	}
+
+	if _, ok := values["$skip"]; !ok {
+		values["$skip"] = []string{"0"}
+	}
+
+	qo, e := ParseURLQuery(values)
+	if e != nil {
+		return nil, []error{e}
+	}
+
+	return qo, nil
 }

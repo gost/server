@@ -5,7 +5,6 @@ import (
 	"github.com/geodan/gost/database/postgis"
 	"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
-	"github.com/geodan/gost/sensorthings/rest"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -57,13 +56,12 @@ func TestLowerCaseURI(t *testing.T) {
 }
 
 func TestPostProcessHandler(t *testing.T) {
-	rest.ExternalURI = "http://localhost:8080/"
 	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusTeapot)
 		rw.Header().Add("Location", "tea location")
 		rw.Write([]byte("hello teapot"))
 	})
-	ts := httptest.NewServer(PostProcessHandler(n))
+	ts := httptest.NewServer(PostProcessHandler(n, "localhost"))
 	defer ts.Close()
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", ts.URL+"/", nil)

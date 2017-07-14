@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/rest"
+	"github.com/geodan/gost/sensorthings/rest/endpoint"
 	"github.com/gorilla/mux"
 )
 
@@ -14,7 +14,7 @@ func CreateRouter(api *models.API) *mux.Router {
 	// Note: tried julienschmidt/httprouter instead of gorilla/mux but had some
 	// problems with interfering endpoints cause of the wildcard used for the (id) in requests
 	a := *api
-	eps := rest.EndpointsToSortedList(a.GetEndpoints())
+	eps := endpoint.EndpointsToSortedList(a.GetEndpoints())
 	router := mux.NewRouter().StrictSlash(false)
 
 	for _, e := range eps {

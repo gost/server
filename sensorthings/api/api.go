@@ -9,7 +9,7 @@ import (
 	"github.com/geodan/gost/sensorthings/models"
 	"github.com/geodan/gost/sensorthings/mqtt"
 	"github.com/geodan/gost/sensorthings/odata"
-	"github.com/geodan/gost/sensorthings/rest"
+	"github.com/geodan/gost/sensorthings/rest/config"
 )
 
 // APIv1 is the default implementation of SensorThingsApi, API needs a database
@@ -111,7 +111,7 @@ func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
 // GetEndpoints returns all configured endpoints for the HTTP server
 func (a *APIv1) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 	if a.endPoints == nil {
-		a.endPoints = rest.CreateEndPoints(a.config.GetExternalServerURI())
+		a.endPoints = config.CreateEndPoints(a.config.GetExternalServerURI())
 	}
 
 	return &a.endPoints
@@ -121,10 +121,6 @@ func (a *APIv1) initRest() {
 	if a.config.Server.MaxEntityResponse == 0 {
 		a.config.Server.MaxEntityResponse = configuration.DefaultMaxEntries
 	}
-
-	rest.ExternalURI = a.config.GetExternalServerURI()
-	rest.IndentJSON = a.config.Server.IndentedJSON
-	rest.MaxEntities = a.config.Server.MaxEntityResponse
 }
 
 // GetTopics returns all configured topics for the MQTT client

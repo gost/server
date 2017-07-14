@@ -2,9 +2,9 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/rest"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -23,8 +23,8 @@ type Server interface {
 // up the GOST HTTP Server
 type GostServer struct {
 	host       string      // Hostname for example "localhost" or "192.168.1.14"
-	port       int         // Portnumber where you want to run your http server on
-	api        *models.API // Sensorthings api to interact with from the HttpServer
+	port       int         // Port number where you want to run your http server on
+	api        *models.API // SensorThings api to interact with from the HttpServer
 	https      bool
 	httpsCert  string
 	httpsKey   string
@@ -33,6 +33,7 @@ type GostServer struct {
 
 // CreateServer initialises a new GOST HTTPServer based on the given parameters
 func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
+	a := *api
 	router := CreateRouter(api)
 	return &GostServer{
 		host:      host,
@@ -43,7 +44,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      PostProcessHandler(LowerCaseURI(router)),
+			Handler:      PostProcessHandler(LowerCaseURI(router), a.GetConfig().Server.ExternalURI),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},
@@ -66,7 +67,7 @@ func (s *GostServer) Start() {
 	}
 
 	if err != nil {
-		panic(err)
+		panic(errors.New(fmt.Sprintf("GOST server not properly stopped: %v", err)))
 	}
 }
 
@@ -119,9 +120,9 @@ func LowerCaseURI(h http.Handler) http.Handler {
 // the response. In this case modify links (due to proxy running) or handle CORS functionality
 // Basically we catch all the response using httptest.NewRecorder (headers + body), modify and
 // write to response. Is this a right approach?
-func PostProcessHandler(h http.Handler) http.Handler {
+func PostProcessHandler(h http.Handler, externalUri string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		origURI := rest.ExternalURI
+		origURI := externalUri
 		forwardedURI := r.Header.Get("X-Forwarded-For")
 
 		rec := httptest.NewRecorder()

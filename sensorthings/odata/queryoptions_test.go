@@ -2,8 +2,12 @@ package odata
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 )
@@ -127,4 +131,49 @@ func TestExpandItemToQueryOptions(t *testing.T) {
 
 	// assert
 	assert.Equal(t, ei.Filter, qo.Filter)
+}
+
+func TestGetQueryOptions(t *testing.T) {
+	// arrange
+	req, _ := http.NewRequest("GET", "/v1.0/Things/$value?$top=201", nil)
+
+	// act
+	qo, _ := GetQueryOptions(req, 20)
+
+	// assert
+	assert.True(t, qo != nil)
+}
+
+func TestReturnNoQueryOptionsOnFailedParse(t *testing.T) {
+	// arrange
+	req, _ := http.NewRequest("GET", "/v1.0/Things?$count=none", nil)
+
+	// act
+	qo, err := GetQueryOptions(req, 20)
+
+	// assert
+	assert.Nil(t, qo)
+	assert.NotNil(t, err)
+}
+
+func TestReadRefFromWildcard(t *testing.T) {
+	// arrange
+	router := mux.NewRouter()
+	router.HandleFunc("/v1.0/Things{id}/{params}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		qo, _ := GetQueryOptions(r, 20)
+		w.Write([]byte(fmt.Sprintf("%v", *qo.Ref)))
+	}))
+
+	ts := httptest.NewServer(router)
+	defer ts.Close()
+
+	// act
+	resp, _ := http.Get(ts.URL + "/v1.0/Things(35)/$ref")
+
+	// assert
+	assert.True(t, resp != nil)
+	assert.True(t, http.StatusOK == resp.StatusCode)
+	body := resp.Body
+	result, _ := ioutil.ReadAll(body)
+	assert.True(t, string(result) == "true")
 }
