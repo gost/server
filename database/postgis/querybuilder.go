@@ -260,6 +260,13 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 			path := make([]entities.EntityType, 0)
 			for p := 0; p < i+1; p++ {
 				etfs, _ := entities.EntityFromString(o.Path[p].Value)
+				/*
+					if etfs == nil {
+						fmt.Printf("%v\n", o.Path)
+						fmt.Printf("%v\n", o.Path[p].Value)
+					}
+				*/
+
 				path = append(path, etfs.GetEntityType())
 			}
 
@@ -617,7 +624,7 @@ func (qb *QueryBuilder) createSpatialQuery(pn *godata.ParseNode, et entities.Ent
 		return fmt.Sprintf(function,
 			qb.addGeomFromGeoJSON(pn.Children[0].Token, qb.createFilter(et, pn.Children[0], true)),
 			qb.addGeomFromGeoJSON(pn.Children[1].Token, qb.createFilter(et, pn.Children[1], true)),
-			qb.addGeomFromGeoJSON(pn.Children[2].Token, qb.createFilter(et, pn.Children[2], true)))
+			qb.createFilter(et, pn.Children[2], true))
 	}
 
 	return function
@@ -666,12 +673,116 @@ func (qb *QueryBuilder) createLike(input string, like LikeType) string {
 	return input
 }
 
+/*
+func (qb *QueryBuilder) sortQueryOptions(qo *odata.QueryOptions) {
+	// Check filters for query on expanded item (FilterTokenNAV) and move it to the desired expand
+	// if expand is not requested create inner query
+	if qo.Filter != nil {
+		ce := make([]string, 0)
+		qb.sortFilter(qo, qo.Filter.Tree, qo.Filter.Tree, 0, nil, &ce)
+	}
+
+	DebugSortFilter(qo)
+}
+
+func DebugSortFilter(qo *odata.QueryOptions) {
+	PrintFilter(qo.Filter.Tree, "")
+}
+
+func PrintFilter(pn *godata.ParseNode, indent string) {
+	fmt.Printf("%s%v\n", indent, pn.Token.Value)
+	if pn.Parent != nil {
+		fmt.Printf("PARENT %s\n", pn.Parent.Token.Value)
+	}
+	for _, c := range pn.Children {
+		PrintFilter(c, fmt.Sprintf("%s   ", indent))
+	}
+}
+
+func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode, parentNode *godata.ParseNode, parentNodeIdx int, startNavNode *godata.ParseNode, currentExpand *[]string) {
+	// navigational filter found
+	if pn.Token.Type == godata.FilterTokenNav {
+		if startNavNode == nil {
+			startNavNode = pn
+		}
+		if pn.Children[0].Token.Type == godata.FilterTokenNav {
+			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
+			qb.sortFilter(qo, pn.Children[0], parentNode, parentNodeIdx, startNavNode, currentExpand)
+		} else {
+			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
+			*currentExpand = append([]string{pn.Children[0].Token.Value}, *currentExpand...)
+
+			// Complete navigational filter found
+			fmt.Printf("FOUND %v\n", *currentExpand)
+			fmt.Printf("startNode %v\n", *startNavNode)
+			fmt.Printf("parentNode %v\n", parentNode.Token.Value)
+
+			// remove navigational nodes
+			*startNavNode = godata.ParseNode{}
+
+			// set startNavNode to something that can be used Datastreams/Observations/id = id if expand exists
+			// check if expand exist
+			for _, e := range qo.Expand.ExpandItems {
+
+				for _, ep := range(e.Path) {
+
+				}
+			}
+
+			//remove parentnode from filter and add to expand inner query if exist
+			*parentNode = godata.ParseNode{}
+		}
+	} else {
+		// look for more navigational filters
+		for i, c := range pn.Children {
+			ne := make([]string, 0)
+			qb.sortFilter(qo, c, pn, i, nil, &ne)
+		}
+	}
+}
+*/
+
 // CreateQuery creates a new query based on given input
 //   e1: entity to get
 //   e2: from entity
 //   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
+func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
+	if qo != nil && qo.Count != nil && bool(*qo.Count) == false {
+		return ""
+	}
+
+	et1 := e1.GetEntityType()
+	et2 := e1.GetEntityType()
+	if e2 != nil { // 2nd entity is given, this means get e1 by e2
+		et2 = e2.GetEntityType()
+	}
+
+	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, id, false, nil, nil, ""))
+	if id != nil {
+		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+	}
+
+	if qo != nil && qo.Filter != nil {
+		if id != nil {
+			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
+		} else {
+			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
+		}
+	}
+
+	return queryString
+}
+
+// CreateCountQuery creates the correct count query based on the given info
+//   e1: entity to get
+//   e2: from entity
+//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
+// Returns an empty string if ODATA Query Count is set to false.
+// example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo) {
+	//qb.sortQueryOptions(qo)
+
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
@@ -736,37 +847,4 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 
 	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
-}
-
-// CreateCountQuery creates the correct count query based on the given info
-//   e1: entity to get
-//   e2: from entity
-//   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
-// Returns an empty string if ODATA Query Count is set to false.
-// example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
-func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
-	if qo != nil && qo.Count != nil && bool(*qo.Count) == false {
-		return ""
-	}
-
-	et1 := e1.GetEntityType()
-	et2 := e1.GetEntityType()
-	if e2 != nil { // 2nd entity is given, this means get e1 by e2
-		et2 = e2.GetEntityType()
-	}
-
-	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, id, false, nil, nil, ""))
-	if id != nil {
-		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
-	}
-
-	if qo != nil && qo.Filter != nil {
-		if id != nil {
-			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
-		} else {
-			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
-		}
-	}
-
-	return queryString
 }
