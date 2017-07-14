@@ -21,7 +21,7 @@ var mqttClient models.MQTTClient
 
 func main() {
 	stop := make(chan os.Signal, 2)
-	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(stop, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		<-stop
 		cleanup()
