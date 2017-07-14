@@ -61,7 +61,7 @@ func TestPostProcessHandler(t *testing.T) {
 		rw.Header().Add("Location", "tea location")
 		rw.Write([]byte("hello teapot"))
 	})
-	ts := httptest.NewServer(PostProcessHandler(n, "localhost"))
+	ts := httptest.NewServer(PostProcessHandler(n, "http://localhost:8080/"))
 	defer ts.Close()
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", ts.URL+"/", nil)
