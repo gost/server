@@ -1,9 +1,9 @@
 <img src="https://raw.githubusercontent.com/gost/dashboard/master/content/assets/img/icon.png" width="353"><br />
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Geodan/gost/blob/master/LICENSE)
-[![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/gost/server)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/gost/server/blob/master/LICENSE)
+[![GoDoc](https://godoc.org/github.com/gost/server?status.svg)](https://godoc.org/github.com/gost/server)
 [![Build Status](https://travis-ci.org/Geodan/gost.svg?branch=master)](https://travis-ci.org/gost/server)
-[![Go Report Card](https://goreportcard.com/badge/geodan/gost)](https://goreportcard.com/report/gost/server)
-[![Coverage Status](https://coveralls.io/repos/github/Geodan/gost/badge.svg?branch=master)](https://coveralls.io/github/gost/server?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/gost/server)](https://goreportcard.com/report/gost/server)
+[![Coverage Status](https://coveralls.io/repos/github/gost/server/badge.svg?branch=master)](https://coveralls.io/github/gost/server?branch=master)
 [![Join the chat at https://gitter.im/gost/server](https://badges.gitter.im/Geodan/gost.svg)](https://gitter.im/gost/server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)<br />
 
 GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
@@ -20,7 +20,7 @@ GOST is alpha software and is not (yet) considered appropriate for customer use.
 
 ## Binaries
 
-Current release [V0.4](https://github.com/gost/server/releases/tag/0.4): 2016-03-31
+Current release [V0.5](https://github.com/gost/server/releases/tag/0.5): 2017-07-17
 
 Binaries are build for Windows, Ubuntu and OSX.
 
@@ -29,8 +29,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	|
 |------------	|---------------------	|-----------------------------------------------------------------	|
-| 2017-05-06 	| 0.5                 	| TBD                                                             	|
-| 2017-06-03 	| 0.6                 	| TBD                                                             	|
+| 2017-09-17 	| 0.6                 	| TBD                                                             	|
 
 
 ## Docker support
