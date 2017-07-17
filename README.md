@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/gost/dashboard/master/content/assets/img/icon.png" width="353"><br />
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/gost/server/blob/master/LICENSE)
 [![GoDoc](https://godoc.org/github.com/gost/server?status.svg)](https://godoc.org/github.com/gost/server)
-[![Build Status](https://travis-ci.org/Geodan/gost.svg?branch=master)](https://travis-ci.org/gost/server)
+[![Build Status](https://travis-ci.org/gost/server.svg?branch=master)](https://travis-ci.org/gost/server)
 [![Go Report Card](https://goreportcard.com/badge/gost/server)](https://goreportcard.com/report/gost/server)
 [![Coverage Status](https://coveralls.io/repos/github/Geodan/gost/badge.svg?branch=master)](https://coveralls.io/github/Geodan/gost?branch=master)
 [![Join the chat at https://gitter.im/gost/Lobby](https://badges.gitter.im/gost/gost.svg)](https://gitter.im/gost/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)<br />
