@@ -38,6 +38,17 @@ func TestPostObservation(t *testing.T) {
 	parseAndAssertObservation(*mockObs, r, http.StatusCreated, t)
 }
 
+func TestPostObservationByDatastream(t *testing.T) {
+	// arrange
+	mockObs := newMockObservation(1)
+
+	// act
+	r := request("POST", "/v1.0/datastreams(1)/observations", mockObs)
+
+	// arrange
+	parseAndAssertObservation(*mockObs, r, http.StatusCreated, t)
+}
+
 func TestPutObservation(t *testing.T) {
 	// arrange
 	mockObs := newMockObservation(1)
