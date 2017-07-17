@@ -3,8 +3,8 @@
 [![GoDoc](https://godoc.org/github.com/Geodan/gost?status.svg)](https://godoc.org/github.com/gost/server)
 [![Build Status](https://travis-ci.org/Geodan/gost.svg?branch=master)](https://travis-ci.org/gost/server)
 [![Go Report Card](https://goreportcard.com/badge/geodan/gost)](https://goreportcard.com/report/gost/server)
-[![Coverage Status](https://coveralls.io/repos/github/Geodan/gost/badge.svg?branch=master)](https://coveralls.io/github/Geodan/gost?branch=master)
-[![Join the chat at https://gitter.im/Geodan/gost](https://badges.gitter.im/Geodan/gost.svg)](https://gitter.im/gost/server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)<br />
+[![Coverage Status](https://coveralls.io/repos/github/Geodan/gost/badge.svg?branch=master)](https://coveralls.io/github/gost/server?branch=master)
+[![Join the chat at https://gitter.im/gost/server](https://badges.gitter.im/Geodan/gost.svg)](https://gitter.im/gost/server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)<br />
 
 GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
 
@@ -20,7 +20,7 @@ GOST is alpha software and is not (yet) considered appropriate for customer use.
 
 ## Binaries
 
-Current release [V0.4](https://github.com/Geodan/gost/releases/tag/0.4): 2016-03-31
+Current release [V0.4](https://github.com/gost/server/releases/tag/0.4): 2016-03-31
 
 Binaries are build for Windows, Ubuntu and OSX.
 
