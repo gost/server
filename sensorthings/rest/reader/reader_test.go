@@ -70,3 +70,30 @@ func TestCheckContentTypeWithoutContentTypeHeaderShouldReturnFalse(t *testing.T)
 	// assert
 	assert.False(t, res)
 }
+
+func TestCheckAndGetBodyWithNoBody(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/bla", nil)
+
+	// act
+	CheckAndGetBody(rr, req, false)
+
+	// assert
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+/*func TestCheckAndGetBodyWithWrongBody(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	var reader io.Reader
+	b, _ := json.Marshal("")
+	reader = bytes.NewReader(b)
+	req, _ := http.NewRequest("GET", "/bla", reader)
+
+	// act
+	CheckAndGetBody(rr, req, false)
+
+	// assert
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}*/

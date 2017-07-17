@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/geodan/gost/sensorthings/entities"
@@ -16,7 +15,11 @@ func handlePutRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 		return
 	}
 
-	byteData, _ := ioutil.ReadAll(r.Body)
+	byteData := reader.CheckAndGetBody(w, r, indentJSON)
+	if byteData == nil {
+		return
+	}
+
 	err := entity.ParseEntity(byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)

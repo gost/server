@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 
 	"github.com/geodan/gost/configuration"
 	"github.com/geodan/gost/database/postgis"
@@ -10,6 +9,7 @@ import (
 	"github.com/geodan/gost/mqtt"
 	"github.com/geodan/gost/sensorthings/api"
 	"github.com/geodan/gost/sensorthings/models"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,6 +30,8 @@ func main() {
 	}()
 
 	log.Println("Starting GOST....")
+	log.Println("Showing debug logs")
+
 	cfgFlag := flag.String("config", "config.yaml", "path of the config file")
 	installFlag := flag.String("install", "", "path to the database creation file")
 	flag.Parse()

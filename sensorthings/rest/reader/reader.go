@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strings"
 
+	"fmt"
 	gostErrors "github.com/geodan/gost/errors"
 	"github.com/geodan/gost/sensorthings/rest/writer"
 	"github.com/gorilla/mux"
+	"io/ioutil"
 )
 
 // GetEntityID retrieves the id from the request, for example
@@ -29,4 +31,20 @@ func CheckContentType(w http.ResponseWriter, r *http.Request, indentJSON bool) b
 	}
 
 	return true
+}
+
+// CheckAndGetBody checks if the request body is not nil and tries to read it in a byte slice
+// when an error occurs an error will be send back using the ResponseWriter
+func CheckAndGetBody(w http.ResponseWriter, r *http.Request, indentJSON bool) []byte {
+	if r.Body == nil {
+		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New("No body found in request"))}, indentJSON)
+		return nil
+	}
+	byteData, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New(fmt.Sprintf("Error reading body: %v", err)))}, indentJSON)
+		return nil
+	}
+
+	return byteData
 }

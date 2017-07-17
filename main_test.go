@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestVersionHandler(t *testing.T) {
 	//arrange
