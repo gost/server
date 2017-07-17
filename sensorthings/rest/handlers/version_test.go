@@ -101,6 +101,12 @@ func newMockObservedProperty(id int) *entities.ObservedProperty {
 	return op
 }
 
+func newMockObservation(id int) *entities.Observation {
+	op := &entities.Observation{Result: 35, PhenomenonTime: "2017-07-17T07:03:09.194Z", ResultQuality: "high"}
+	op.ID = id
+	return op
+}
+
 type MockAPI struct {
 	config *configuration.Config
 }
@@ -204,6 +210,14 @@ func getMockObservedProperty(id interface{}) (*entities.ObservedProperty, error)
 	return newMockObservedProperty(intID), nil
 }
 
+func getMockObservation(id interface{}) (*entities.Observation, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Observation does not exist"))
+	}
+	return newMockObservation(intID), nil
+}
+
 func getMockThings() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{newMockThing(1), newMockThing(2)}
 	return &models.ArrayResponse{
@@ -222,6 +236,14 @@ func getMockSensors() (*models.ArrayResponse, error) {
 
 func getMockObservedProperties() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.ObservedProperty{newMockObservedProperty(1), newMockObservedProperty(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockObservations() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.Observation{newMockObservation(1), newMockObservation(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -342,28 +364,28 @@ func (a *MockAPI) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfIn
 func (a *MockAPI) DeleteFeatureOfInterest(id interface{}) error { return nil }
 
 func (a *MockAPI) GetObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Observation, error) {
-	return nil, nil
+	return getMockObservation(id)
 }
 func (a *MockAPI) GetObservations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockObservations()
 }
 func (a *MockAPI) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockObservations()
 }
 func (a *MockAPI) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockObservations()
 }
 func (a *MockAPI) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
-	return nil, nil
+	return observation, nil
 }
 func (a *MockAPI) PostObservationByDatastream(datastreamID interface{}, observation *entities.Observation) (*entities.Observation, []error) {
-	return nil, nil
+	return observation, nil
 }
 func (a *MockAPI) PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error) {
-	return nil, nil
+	return observation, nil
 }
 func (a *MockAPI) PutObservation(id interface{}, observation *entities.Observation) (*entities.Observation, []error) {
-	return nil, nil
+	return observation, nil
 }
 func (a *MockAPI) DeleteObservation(id interface{}) error { return nil }
 
