@@ -3,7 +3,7 @@ package entities
 import (
 	"encoding/json"
 	"errors"
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 // Thing in SensorThings represents a physical object in the real world. A Thing is a good starting

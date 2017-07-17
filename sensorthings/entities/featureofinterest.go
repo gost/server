@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 // FeatureOfInterest in SensorThings represents the phenomena an Observation is detecting. In some cases a FeatureOfInterest

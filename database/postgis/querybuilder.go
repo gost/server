@@ -2,9 +2,9 @@ package postgis
 
 import (
 	"fmt"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/odata"
 	"github.com/gost/godata"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/odata"
 	"strings"
 	"time"
 )

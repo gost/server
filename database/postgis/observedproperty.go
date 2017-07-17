@@ -3,13 +3,13 @@ package postgis
 import (
 	"fmt"
 
-	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/gost/server/sensorthings/entities"
 
 	"database/sql"
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/odata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 func observedPropertyParamFactory(values map[string]interface{}) (entities.Entity, error) {

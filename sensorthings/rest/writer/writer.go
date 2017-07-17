@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/odata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 // sendJSONResponse sends the desired message to the user

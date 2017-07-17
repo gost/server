@@ -2,8 +2,8 @@ package postgis
 
 import (
 	"fmt"
-	"github.com/geodan/gost/sensorthings/entities"
 	"github.com/gost/godata"
+	"github.com/gost/server/sensorthings/entities"
 )
 
 // tables as defined in postgis

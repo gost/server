@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"github.com/geodan/gost/configuration"
+	"github.com/gost/server/configuration"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 const (

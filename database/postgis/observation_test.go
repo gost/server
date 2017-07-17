@@ -1,7 +1,7 @@
 package postgis
 
 import (
-	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/gost/server/sensorthings/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

@@ -3,8 +3,8 @@ package endpoint
 import (
 	"testing"
 
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"sort"
 )

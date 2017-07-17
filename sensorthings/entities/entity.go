@@ -3,7 +3,7 @@ package entities
 import (
 	"fmt"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 	"strings"
 )
 

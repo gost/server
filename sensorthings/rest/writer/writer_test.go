@@ -2,9 +2,9 @@ package writer
 
 import (
 	"errors"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/odata"
 	"github.com/gost/godata"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

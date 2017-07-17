@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/database/postgis"
-	"github.com/geodan/gost/mqtt"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/gost/server/configuration"
+	"github.com/gost/server/database/postgis"
+	"github.com/gost/server/mqtt"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/odata"
 
 	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"

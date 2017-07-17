@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/database/postgis"
-	"github.com/geodan/gost/http"
-	"github.com/geodan/gost/mqtt"
-	"github.com/geodan/gost/sensorthings/api"
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/configuration"
+	"github.com/gost/server/database/postgis"
+	"github.com/gost/server/http"
+	"github.com/gost/server/mqtt"
+	"github.com/gost/server/sensorthings/api"
+	"github.com/gost/server/sensorthings/models"
 	"log"
 	"os"
 	"os/signal"

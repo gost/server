@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/sensorthings/models"
 )
 
 // CreateTopics creates the pre-defined MQTT Topics

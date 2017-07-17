@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/models"
 	"github.com/gost/godata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
 )
 

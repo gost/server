@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"fmt"
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/rest/writer"
 	"github.com/gorilla/mux"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/rest/writer"
 	"io/ioutil"
 )
 

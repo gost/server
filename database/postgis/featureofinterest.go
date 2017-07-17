@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/odata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 func featureOfInterestParamFactory(values map[string]interface{}) (entities.Entity, error) {

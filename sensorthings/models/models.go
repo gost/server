@@ -3,9 +3,9 @@ package models
 import (
 	"net/http"
 
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/gost/server/configuration"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 const (

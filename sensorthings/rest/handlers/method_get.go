@@ -5,9 +5,9 @@ import (
 
 	"fmt"
 
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/odata"
-	"github.com/geodan/gost/sensorthings/rest/writer"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/odata"
+	"github.com/gost/server/sensorthings/rest/writer"
 )
 
 // handleGetRequest is the default function to handle incoming GET requests

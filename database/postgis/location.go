@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/gost/server/sensorthings/entities"
 
 	"database/sql"
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/odata"
 	"github.com/gost/godata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 func locationParamFactory(values map[string]interface{}) (entities.Entity, error) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/sensorthings/models"
 	"log"
 	"net/http"
 	"net/http/httptest"

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/configuration"
+	"github.com/gost/server/sensorthings/models"
 )
 
 // MQTT is the implementation of the MQTT server

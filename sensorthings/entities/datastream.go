@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 // Datastream in SensorThings represents a collection of Observations from a Sensor. A physical Sensor will send its

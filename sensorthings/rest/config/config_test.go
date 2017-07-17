@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/geodan/gost/sensorthings/models"
+	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"

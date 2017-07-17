@@ -3,11 +3,11 @@ package api
 import (
 	"errors"
 
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/odata"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/odata"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 // GetSensor retrieves a sensor by id and given query

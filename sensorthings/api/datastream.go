@@ -3,10 +3,10 @@ package api
 import (
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/odata"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/odata"
 )
 
 // GetDatastream retrieves a sensor by id and given query

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	gostErrors "github.com/geodan/gost/errors"
+	gostErrors "github.com/gost/server/errors"
 )
 
 // ObservedProperty in SensorThings represents the physical phenomenon being observed by the Sensor. An ObserveProperty is

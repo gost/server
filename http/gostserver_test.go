@@ -1,10 +1,10 @@
 package http
 
 import (
-	"github.com/geodan/gost/configuration"
-	"github.com/geodan/gost/database/postgis"
-	"github.com/geodan/gost/mqtt"
-	"github.com/geodan/gost/sensorthings/api"
+	"github.com/gost/server/configuration"
+	"github.com/gost/server/database/postgis"
+	"github.com/gost/server/mqtt"
+	"github.com/gost/server/sensorthings/api"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"

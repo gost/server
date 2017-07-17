@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/rest/endpoint"
-	"github.com/geodan/gost/sensorthings/rest/handlers"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/rest/endpoint"
+	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
 func CreateVersionEndpoint(externalURL string) *endpoint.Endpoint {

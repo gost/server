@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/odata"
-	"github.com/geodan/gost/sensorthings/rest/reader"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/odata"
+	"github.com/gost/server/sensorthings/rest/reader"
 )
 
 // HandleGetDatastreams retrieves datastreams based on Query Parameters

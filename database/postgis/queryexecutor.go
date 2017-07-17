@@ -3,7 +3,7 @@ package postgis
 import (
 	"database/sql"
 	"fmt"
-	"github.com/geodan/gost/sensorthings/entities"
+	"github.com/gost/server/sensorthings/entities"
 
 	"sort"
 	"strings"

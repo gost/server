@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/rest/endpoint"
 	"github.com/gorilla/mux"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/rest/endpoint"
 )
 
 // CreateRouter creates a new mux.Router and sets up all endpoints defined in the SensorThings api

@@ -3,10 +3,10 @@ package config
 import (
 	"fmt"
 
-	"github.com/geodan/gost/sensorthings/entities"
-	"github.com/geodan/gost/sensorthings/models"
-	"github.com/geodan/gost/sensorthings/rest/endpoint"
-	"github.com/geodan/gost/sensorthings/rest/handlers"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/gost/server/sensorthings/models"
+	"github.com/gost/server/sensorthings/rest/endpoint"
+	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
 func CreateDatastreamsEndpoint(externalURL string) *endpoint.Endpoint {
