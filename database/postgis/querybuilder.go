@@ -360,7 +360,7 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		} else if pn.Token.Value == "substringof" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
+			return fmt.Sprintf("%s LIKE %s", qb.createLike(right, LikeContains), qb.createLike(left, LikeContains))
 		} else if pn.Token.Value == "endswith" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			right := qb.createFilter(et, pn.Children[1], true)
