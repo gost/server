@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http/httptest"
+	"bytes"
 )
 
 func TestGetEntityId(t *testing.T) {
@@ -83,17 +84,15 @@ func TestCheckAndGetBodyWithNoBody(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
-/*func TestCheckAndGetBodyWithWrongBody(t *testing.T) {
+
+func TestCheckAndGetBody(t *testing.T) {
 	// arrange
 	rr := httptest.NewRecorder()
-	var reader io.Reader
-	b, _ := json.Marshal("")
-	reader = bytes.NewReader(b)
-	req, _ := http.NewRequest("GET", "/bla", reader)
+	req, _ := http.NewRequest("GET", "/bla", bytes.NewReader([]byte("")))
 
 	// act
 	CheckAndGetBody(rr, req, false)
 
 	// assert
-	assert.Equal(t, http.StatusBadRequest, rr.Code)
-}*/
+	assert.Equal(t, http.StatusOK, rr.Code)
+}

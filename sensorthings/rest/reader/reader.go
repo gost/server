@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"fmt"
 	"github.com/gorilla/mux"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/rest/writer"
@@ -40,11 +39,7 @@ func CheckAndGetBody(w http.ResponseWriter, r *http.Request, indentJSON bool) []
 		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New("No body found in request"))}, indentJSON)
 		return nil
 	}
-	byteData, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New(fmt.Sprintf("Error reading body: %v", err)))}, indentJSON)
-		return nil
-	}
 
+	byteData, _ := ioutil.ReadAll(r.Body)
 	return byteData
 }
