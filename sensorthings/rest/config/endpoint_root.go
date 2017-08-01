@@ -8,6 +8,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateRootEndpoint creates the Root endpoint configuration
 func CreateRootEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "Root",

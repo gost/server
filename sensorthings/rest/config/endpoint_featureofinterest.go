@@ -9,6 +9,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateFeaturesOfInterestEndpoint constructs the featuresOfInterest endpoint configuration
 func CreateFeaturesOfInterestEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "FeaturesOfInterest",

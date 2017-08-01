@@ -9,6 +9,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateThingsEndpoint creates the Things endpoint configuration
 func CreateThingsEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "Things",

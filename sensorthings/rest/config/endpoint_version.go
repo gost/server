@@ -8,6 +8,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateVersionEndpoint creates the Version endpoint configuration
 func CreateVersionEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "Version",

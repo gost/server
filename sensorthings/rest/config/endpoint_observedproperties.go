@@ -9,6 +9,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateObservedPropertiesEndpoint constructs the ObservedProperties endpoint configuration
 func CreateObservedPropertiesEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "ObservedProperties",

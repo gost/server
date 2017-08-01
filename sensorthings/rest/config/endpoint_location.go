@@ -9,6 +9,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateLocationsEndpoint constructs the Locations endpoint configuration
 func CreateLocationsEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "Locations",

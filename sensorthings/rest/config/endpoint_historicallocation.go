@@ -9,6 +9,7 @@ import (
 	"github.com/gost/server/sensorthings/rest/handlers"
 )
 
+// CreateHistoricalLocationsEndpoint constructs the HistoricalLocations endpoint configuration
 func CreateHistoricalLocationsEndpoint(externalURL string) *endpoint.Endpoint {
 	return &endpoint.Endpoint{
 		Name:       "HistoricalLocations",

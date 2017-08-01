@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	ISO8601 = "2006-01-02T15:04:05.999Z07:00"
+	ISO8601 = "2006-01-02T15:04:05.999Z07:00" // ISO8601 defines the ISO8601 date time format
 )
 
 // Observation in SensorThings represents a single Sensor reading of an ObservedProperty. A physical device, a Sensor, sends

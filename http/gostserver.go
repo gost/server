@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/gost/server/sensorthings/models"
 	"log"
@@ -67,7 +66,7 @@ func (s *GostServer) Start() {
 	}
 
 	if err != nil {
-		panic(errors.New(fmt.Sprintf("GOST server not properly stopped: %v", err)))
+		panic(fmt.Errorf("GOST server not properly stopped: %v", err))
 	}
 }
 

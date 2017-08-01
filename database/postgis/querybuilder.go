@@ -337,13 +337,13 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 {
 			if left == result {
 				if strings.Index(right, "'") != 0 {
-					left = qb.ObservationResultToDouble(left, "double precision")
+					left = qb.CastObservationResult(left, "double precision")
 				} else {
 					left = "observation.data ->> 'result'"
 				}
 			} else if right == result {
 				if strings.Index(left, "'") != 0 {
-					right = qb.ObservationResultToDouble(right, "double precision")
+					right = qb.CastObservationResult(right, "double precision")
 				} else {
 					right = "observation.data ->> 'result'"
 				}
@@ -384,9 +384,9 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			if len(pn.Children) > 2 {
 				right2 = qb.createFilter(et, pn.Children[2], true)
 				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for %s)", left, right, right2)
-			} else {
-				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
 			}
+
+			return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
 		} else if pn.Token.Value == "tolower" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("LOWER(%s)", left)
@@ -431,9 +431,9 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			left := qb.createFilter(et, pn.Children[0], true)
 			if strings.Contains(strings.ToLower(left), "time") {
 				return fmt.Sprintf("((%s)::timestamp)::time", left)
-			} else {
-				return fmt.Sprintf("(%s)::time", left)
 			}
+
+			return fmt.Sprintf("(%s)::time", left)
 		} else if pn.Token.Value == "totaloffsetminutes" {
 			left := qb.createFilter(et, pn.Children[0], true)
 			return fmt.Sprintf("EXTRACT(TIMEZONE_MINUTE FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", left)
@@ -594,13 +594,14 @@ func (qb *QueryBuilder) odataLogicalOperatorToPostgreSQL(o string) string {
 }
 
 func (qb *QueryBuilder) createArithmetic(et entities.EntityType, pn *godata.ParseNode, operator, castTo string) string {
-	left := qb.ObservationResultToDouble(qb.createFilter(et, pn.Children[0], true), castTo)
-	right := qb.ObservationResultToDouble(qb.createFilter(et, pn.Children[1], true), castTo)
+	left := qb.CastObservationResult(qb.createFilter(et, pn.Children[0], true), castTo)
+	right := qb.CastObservationResult(qb.createFilter(et, pn.Children[1], true), castTo)
 
 	return fmt.Sprintf("%s %s %s", left, operator, right)
 }
 
-func (qb *QueryBuilder) ObservationResultToDouble(input string, castTo string) string {
+// CastObservationResult converts an observation result query to a specified type (castTo)
+func (qb *QueryBuilder) CastObservationResult(input string, castTo string) string {
 	if input == "observation.data -> 'result'" {
 		return fmt.Sprintf("(observation.data ->> 'result')::%s", castTo)
 	}
@@ -742,11 +743,12 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 }
 */
 
-// CreateQuery creates a new query based on given input
+// CreateCountQuery creates the correct count query based on the given info
 //   e1: entity to get
 //   e2: from entity
 //   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
-// example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
+// Returns an empty string if ODATA Query Count is set to false.
+// example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
 	if qo != nil && qo.Count != nil && bool(*qo.Count) == false {
 		return ""
@@ -774,12 +776,11 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 	return queryString
 }
 
-// CreateCountQuery creates the correct count query based on the given info
+// CreateQuery creates a new count query based on given input
 //   e1: entity to get
 //   e2: from entity
 //   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
-// Returns an empty string if ODATA Query Count is set to false.
-// example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
+// example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo) {
 	//qb.sortQueryOptions(qo)
 

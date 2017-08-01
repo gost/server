@@ -12,7 +12,7 @@ import (
 	"github.com/gost/server/sensorthings/odata"
 )
 
-// sendJSONResponse sends the desired message to the user
+// SendJSONResponse sends the desired message to the user
 // the message will be marshalled into an indented JSON format
 func SendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *odata.QueryOptions, indentJSON bool) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

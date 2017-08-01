@@ -9,6 +9,7 @@ import (
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/rest/writer"
 	"io/ioutil"
+	"fmt"
 )
 
 // GetEntityID retrieves the id from the request, for example
@@ -20,6 +21,8 @@ func GetEntityID(r *http.Request) string {
 	return substring
 }
 
+// CheckContentType checks if there is a content-type header, if so check if it is of type
+// application/json, if not return an error, SensorThings server only accepts application/json
 func CheckContentType(w http.ResponseWriter, r *http.Request, indentJSON bool) bool {
 	// maybe needs to add case-insentive check?
 	if len(r.Header.Get("Content-Type")) > 0 {
@@ -36,7 +39,7 @@ func CheckContentType(w http.ResponseWriter, r *http.Request, indentJSON bool) b
 // when an error occurs an error will be send back using the ResponseWriter
 func CheckAndGetBody(w http.ResponseWriter, r *http.Request, indentJSON bool) []byte {
 	if r.Body == nil {
-		writer.SendError(w, []error{gostErrors.NewBadRequestError(errors.New("No body found in request"))}, indentJSON)
+		writer.SendError(w, []error{gostErrors.NewBadRequestError(fmt.Errorf("No body found in request"))}, indentJSON)
 		return nil
 	}
 

@@ -55,7 +55,7 @@ func (e *Endpoint) GetSupportedSelectParams() []string {
 // sort the slice
 type SortedEndpoints []*EndpointWrapper
 
-// HttpEndpoint combines a SensorThings endpoint and operation in preparation to add
+// EndpointWrapper combines a SensorThings endpoint and operation in preparation to add
 // it to the router
 type EndpointWrapper struct {
 	Endpoint  models.Endpoint
