@@ -95,6 +95,15 @@ func newMockSensor(id int) *entities.Sensor {
 	return sensor
 }
 
+func newMockLocation(id int) *entities.Location {
+	location := &entities.Location{Name: fmt.Sprintf("location %v", id),
+		Description: fmt.Sprintf("description of location %v", id),
+		EncodingType: "application/vnd.geo+json",
+		Location: map[string]interface{}{ "coordinates": "test"}}
+	location.ID = id
+	return location
+}
+
 func newMockObservedProperty(id int) *entities.ObservedProperty {
 	op := &entities.ObservedProperty{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), Definition: "none"}
 	op.ID = id
@@ -194,6 +203,14 @@ func getMockThing(id interface{}) (*entities.Thing, error) {
 	return newMockThing(intID), nil
 }
 
+func getMockLocation(id interface{}) (*entities.Location, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+	}
+	return newMockLocation(intID), nil
+}
+
 func getMockSensor(id interface{}) (*entities.Sensor, error) {
 	intID, ok := toIntID(id)
 	if !ok || intID != 1 {
@@ -220,6 +237,14 @@ func getMockObservation(id interface{}) (*entities.Observation, error) {
 
 func getMockThings() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{newMockThing(1), newMockThing(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockLocations() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.Location{newMockLocation(1), newMockLocation(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -263,28 +288,28 @@ func (a *MockAPI) PutThing(id interface{}, thing *entities.Thing) (*entities.Thi
 func (a *MockAPI) DeleteThing(id interface{}) error { return nil }
 
 func (a *MockAPI) GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error) {
-	return nil, nil
+	return getMockLocation(id)
 }
 func (a *MockAPI) GetLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockLocations()
 }
 func (a *MockAPI) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockLocations()
 }
 func (a *MockAPI) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockLocations()
 }
 func (a *MockAPI) PostLocation(location *entities.Location) (*entities.Location, []error) {
-	return nil, nil
+	return location, nil
 }
 func (a *MockAPI) PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error) {
-	return nil, nil
+	return location, nil
 }
 func (a *MockAPI) PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error) {
-	return nil, nil
+	return location, nil
 }
 func (a *MockAPI) PutLocation(id interface{}, location *entities.Location) (*entities.Location, []error) {
-	return nil, nil
+	return location, nil
 }
 func (a *MockAPI) DeleteLocation(id interface{}) error { return nil }
 
