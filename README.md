@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/gost/dashboard/master/content/assets/img/icon.png" width="353"><br />
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/gost/server/blob/master/LICENSE)
+[![API DOC](https://img.shields.io/badge/api%20doc-reference-blue.svg)](http://docs.gost1.apiary.io/#)
 [![GoDoc](https://godoc.org/github.com/gost/server?status.svg)](https://godoc.org/github.com/gost/server)
 [![Build Status](https://travis-ci.org/gost/server.svg?branch=master)](https://travis-ci.org/gost/server)
 [![Go Report Card](https://goreportcard.com/badge/gost/server)](https://goreportcard.com/report/gost/server)
@@ -13,7 +14,7 @@ GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements 
 
 Implementation of the Tasking profile (part 2) and Rules Engine profile (part 3) of the OGC SensorThings API is planned as a future work activity.
 
-The GOST website and blog can be found at [www.gostserver.xyz](https://www.gostserver.xyz).
+The GOST website and blog can be found at [www.gostserver.xyz](https://www.gostserver.xyz)
 
 ## Disclaimer
 
