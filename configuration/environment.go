@@ -8,19 +8,18 @@ import (
 
 // SetEnvironmentVariables changes config settings when certain environment variables are found
 func SetEnvironmentVariables(conf *Config) {
-
 	// Server settings
-	gostServerName := os.Getenv("gost_server_name")
+	gostServerName := os.Getenv("GOST_SERVER_NAME")
 	if gostServerName != "" {
 		conf.Server.Name = gostServerName
 	}
 
-	gostServerHost := os.Getenv("gost_server_host")
+	gostServerHost := os.Getenv("GOST_SERVER_HOST")
 	if gostServerHost != "" {
 		conf.Server.Host = gostServerHost
 	}
 
-	gostServerPort := os.Getenv("gost_server_port")
+	gostServerPort := os.Getenv("GOST_SERVER_PORT")
 	if gostServerPort != "" {
 		port, err := strconv.Atoi(gostServerPort)
 		if err == nil {
@@ -28,14 +27,14 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostServerExternalURI := os.Getenv("gost_server_external_uri")
+	gostServerExternalURI := os.Getenv("GOST_SERVER_EXTERNAL_URI")
 	if gostServerExternalURI != "" {
 		conf.Server.ExternalURI = gostServerExternalURI
 		log.Println("External uri environment variable discovered: " + conf.Server.ExternalURI)
 
 	}
 
-	gostServerMaxEntities := os.Getenv("gost_server_max_entities")
+	gostServerMaxEntities := os.Getenv("GOST_SERVER_MAX_ENTITIES")
 	if gostServerMaxEntities != "" {
 		port, err := strconv.Atoi(gostServerMaxEntities)
 		if err == nil {
@@ -43,7 +42,7 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostServerIndentJSON := os.Getenv("gost_server_indent_json")
+	gostServerIndentJSON := os.Getenv("GOST_SERVER_INDENT_JSON")
 	if gostServerIndentJSON != "" {
 		h, err := strconv.ParseBool(gostServerIndentJSON)
 		if err == nil {
@@ -51,7 +50,7 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostServerHTTPS := os.Getenv("gost_server_https")
+	gostServerHTTPS := os.Getenv("GOST_SERVER_HTTPS")
 	if gostServerHTTPS != "" {
 		h, err := strconv.ParseBool(gostServerHTTPS)
 		if err == nil {
@@ -59,18 +58,18 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostServerHTTPSKey := os.Getenv("gost_server_https_key")
+	gostServerHTTPSKey := os.Getenv("GOST_SERVER_HTTPS_KEY")
 	if gostServerHTTPSKey != "" {
 		conf.Server.HTTPSKey = gostServerHTTPSKey
 	}
 
-	gostServerHTTPSCert := os.Getenv("gost_server_https_cert")
+	gostServerHTTPSCert := os.Getenv("GOST_SERVER_HTTPS_CERT")
 	if gostServerHTTPSCert != "" {
 		conf.Server.HTTPSCert = gostServerHTTPSCert
 	}
 
 	// MQTT settings
-	gostMQTTEnabled := os.Getenv("gost_mqtt_enabled")
+	gostMQTTEnabled := os.Getenv("GOST_MQTT_ENABLED")
 	if gostMQTTEnabled != "" {
 		h, err := strconv.ParseBool(gostMQTTEnabled)
 		if err == nil {
@@ -78,12 +77,12 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostMQTTHost := os.Getenv("gost_mqtt_host")
+	gostMQTTHost := os.Getenv("GOST_MQTT_HOST")
 	if gostMQTTHost != "" {
 		conf.MQTT.Host = gostMQTTHost
 	}
 
-	gostMQTTPort := os.Getenv("gost_mqtt_port")
+	gostMQTTPort := os.Getenv("GOST_MQTT_PORT")
 	if gostMQTTPort != "" {
 		port, err := strconv.Atoi(gostMQTTPort)
 		if err == nil {
@@ -92,12 +91,12 @@ func SetEnvironmentVariables(conf *Config) {
 	}
 
 	// Database settings
-	gostDbHost := os.Getenv("gost_db_host")
+	gostDbHost := os.Getenv("GOST_DB_HOST")
 	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
 	}
 
-	gostDbPort := os.Getenv("gost_db_port")
+	gostDbPort := os.Getenv("GOST_DB_PORT")
 	if gostDbPort != "" {
 		port, err := strconv.Atoi(gostDbPort)
 		if err == nil {
@@ -105,27 +104,27 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostDbUser := os.Getenv("gost_db_user")
+	gostDbUser := os.Getenv("GOST_DB_USER")
 	if gostDbUser != "" {
 		conf.Database.User = gostDbUser
 	}
 
-	gostDbPassword := os.Getenv("gost_db_password")
+	gostDbPassword := os.Getenv("GOST_DB_PASSWORD")
 	if gostDbPassword != "" {
 		conf.Database.Password = gostDbPassword
 	}
 
-	gostDbDatabase := os.Getenv("gost_db_database")
+	gostDbDatabase := os.Getenv("GOST_DB_DATABASE")
 	if gostDbDatabase != "" {
 		conf.Database.Database = gostDbDatabase
 	}
 
-	gostDbSchema := os.Getenv("gost_db_schema")
+	gostDbSchema := os.Getenv("GOST_DB_SCHEMA")
 	if gostDbSchema != "" {
 		conf.Database.Schema = gostDbSchema
 	}
 
-	gostDbSSL := os.Getenv("gost_mqtt_ssl_enabled")
+	gostDbSSL := os.Getenv("GOST_MQTT_SSL_ENABLED")
 	if gostDbSSL != "" {
 		h, err := strconv.ParseBool(gostDbSSL)
 		if err == nil {
@@ -133,7 +132,7 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostDbMaxIdle := os.Getenv("gost_db_max_idle_cons")
+	gostDbMaxIdle := os.Getenv("GOST_DB_MAX_IDLE_CONS")
 	if gostDbMaxIdle != "" {
 		idle, err := strconv.Atoi(gostDbMaxIdle)
 		if err == nil {
@@ -141,7 +140,7 @@ func SetEnvironmentVariables(conf *Config) {
 		}
 	}
 
-	gostDbMaxCons := os.Getenv("gost_db_max_open_cons")
+	gostDbMaxCons := os.Getenv("GOST_DB_MAX_OPEN_CONS")
 	if gostDbMaxCons != "" {
 		open, err := strconv.Atoi(gostDbMaxCons)
 		if err == nil {
