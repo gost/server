@@ -77,7 +77,7 @@ func JSONMarshal(data interface{}, safeEncoding, indentJSON bool) ([]byte, error
 	return b, err
 }
 
-// sendError creates an ErrorResponse message and sets it to the user
+// SendError creates an ErrorResponse message and sets it to the user
 // using SendJSONResponse
 func SendError(w http.ResponseWriter, error []error, indentJSON bool) {
 	//errors cannot be marshalled, create strings
