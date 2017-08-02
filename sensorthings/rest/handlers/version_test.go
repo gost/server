@@ -124,6 +124,12 @@ func newMockObservation(id int) *entities.Observation {
 	return op
 }
 
+func newMockFeatureOfInterest(id int) *entities.FeatureOfInterest {
+	foi := &entities.FeatureOfInterest{Name: fmt.Sprintf("foi %v", id), Description: fmt.Sprintf("description of foi %v", id), EncodingType: "application/vnd.geo+json" }
+	foi.ID = id
+	return foi
+}
+
 type MockAPI struct {
 	config *configuration.Config
 }
@@ -227,6 +233,14 @@ func getMockHistoricalLocation(id interface{}) (*entities.HistoricalLocation, er
 	return newMockHistoricalLocation(intID), nil
 }
 
+func getMockFeatureOfInterest(id interface{}) (*entities.FeatureOfInterest, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("featureOfInterest does not exist"))
+	}
+	return newMockFeatureOfInterest(intID), nil
+}
+
 func getMockSensor(id interface{}) (*entities.Sensor, error) {
 	intID, ok := toIntID(id)
 	if !ok || intID != 1 {
@@ -269,6 +283,14 @@ func getMockLocations() (*models.ArrayResponse, error) {
 
 func getMockHistoricalLocations() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.HistoricalLocation{newMockHistoricalLocation(1), newMockHistoricalLocation(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockfeaturesOfInterest() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.FeatureOfInterest{newMockFeatureOfInterest(1), newMockFeatureOfInterest(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -393,22 +415,22 @@ func (a *MockAPI) PutDatastream(id interface{}, datastream *entities.Datastream)
 func (a *MockAPI) DeleteDatastream(id interface{}) error { return nil }
 
 func (a *MockAPI) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
-	return nil, nil
+	return getMockFeatureOfInterest(id)
 }
 func (a *MockAPI) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
-	return nil, nil
+	return getMockFeatureOfInterest(1)
 }
 func (a *MockAPI) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockfeaturesOfInterest()
 }
 func (a *MockAPI) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
-	return nil, nil
+	return foi, nil
 }
 func (a *MockAPI) PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error) {
-	return nil, nil
+	return foi, nil
 }
 func (a *MockAPI) PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
-	return nil, nil
+	return foi, nil
 }
 func (a *MockAPI) DeleteFeatureOfInterest(id interface{}) error { return nil }
 
