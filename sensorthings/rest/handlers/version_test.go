@@ -104,6 +104,14 @@ func newMockLocation(id int) *entities.Location {
 	return location
 }
 
+func newMockHistoricalLocation(id int) *entities.HistoricalLocation {
+	historicalLocation := &entities.HistoricalLocation{
+		Time: "2017-07-17T07:03:09.194Z",
+	}
+	historicalLocation.ID = id
+	return historicalLocation
+}
+
 func newMockObservedProperty(id int) *entities.ObservedProperty {
 	op := &entities.ObservedProperty{Name: fmt.Sprintf("sensor %v", id), Description: fmt.Sprintf("description of sensor %v", id), Definition: "none"}
 	op.ID = id
@@ -211,6 +219,14 @@ func getMockLocation(id interface{}) (*entities.Location, error) {
 	return newMockLocation(intID), nil
 }
 
+func getMockHistoricalLocation(id interface{}) (*entities.HistoricalLocation, error) {
+	intID, ok := toIntID(id)
+	if !ok || intID != 1 {
+		return nil, gostErrors.NewRequestNotFound(errors.New("HsitoricalLocation does not exist"))
+	}
+	return newMockHistoricalLocation(intID), nil
+}
+
 func getMockSensor(id interface{}) (*entities.Sensor, error) {
 	intID, ok := toIntID(id)
 	if !ok || intID != 1 {
@@ -245,6 +261,14 @@ func getMockThings() (*models.ArrayResponse, error) {
 
 func getMockLocations() (*models.ArrayResponse, error) {
 	var data interface{} = []*entities.Location{newMockLocation(1), newMockLocation(2)}
+	return &models.ArrayResponse{
+		Count: 2,
+		Data:  &data,
+	}, nil
+}
+
+func getMockHistoricalLocations() (*models.ArrayResponse, error) {
+	var data interface{} = []*entities.HistoricalLocation{newMockHistoricalLocation(1), newMockHistoricalLocation(2)}
 	return &models.ArrayResponse{
 		Count: 2,
 		Data:  &data,
@@ -314,25 +338,25 @@ func (a *MockAPI) PutLocation(id interface{}, location *entities.Location) (*ent
 func (a *MockAPI) DeleteLocation(id interface{}) error { return nil }
 
 func (a *MockAPI) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.HistoricalLocation, error) {
-	return nil, nil
+	return getMockHistoricalLocation(id)
 }
 func (a *MockAPI) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockHistoricalLocations()
 }
 func (a *MockAPI) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockHistoricalLocations()
 }
 func (a *MockAPI) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
-	return nil, nil
+	return getMockHistoricalLocations()
 }
 func (a *MockAPI) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
-	return nil, nil
+	return hl, nil
 }
 func (a *MockAPI) PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
-	return nil, nil
+	return hl, nil
 }
 func (a *MockAPI) PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error) {
-	return nil, nil
+	return hl, nil
 }
 func (a *MockAPI) DeleteHistoricalLocation(id interface{}) error { return nil }
 
