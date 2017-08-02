@@ -6,7 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/gost/server)](https://goreportcard.com/report/gost/server)
 [![Coverage Status](https://coveralls.io/repos/github/gost/server/badge.svg?branch=master)](https://coveralls.io/github/gost/server?branch=master)
 [![Join the chat at https://gitter.im/gost/Lobby](https://badges.gitter.im/gost/gost.svg)](https://gitter.im/gost/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Join Slack at https://slackinvitergost.herokuapp.com/](https://slackinvitergost.herokuapp.com/badge.svg)](https://slackinvitergost.herokuapp.com/)<br />
+[![Join Slack](https://slackinvitergost.herokuapp.com/badge.svg)](https://slackinvitergost.herokuapp.com/)<br />
 
 GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
 
