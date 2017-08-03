@@ -69,11 +69,7 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 	}
 
 	var data interface{} = things
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostThing checks if a posted thing entity is valid and adds it to the database

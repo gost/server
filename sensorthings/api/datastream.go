@@ -67,11 +67,7 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 	}
 
 	var data interface{} = datastreams
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostDatastream adds a new datastream to the database

@@ -47,11 +47,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 	}
 
 	var data interface{} = historicalLocations
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostHistoricalLocation adds a new HistoricalLocation to the database

@@ -45,13 +45,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*mod
 	}
 
 	var data interface{} = ops
-	response := models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}
-
-	return &response, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostObservedProperty todo

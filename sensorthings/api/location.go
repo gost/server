@@ -114,11 +114,7 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 	}
 
 	var data interface{} = locations
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PatchLocation updates the given location in the database

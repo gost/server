@@ -46,11 +46,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayRe
 	}
 
 	var data interface{} = sensors
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostSensor adds a new sensor to the database

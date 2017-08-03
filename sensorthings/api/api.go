@@ -185,6 +185,20 @@ func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOpt
 	return fmt.Sprintf("%s%s", incomingURL, queryString)
 }
 
+// createArrayResponse creates the ArrayResponse to send back to the user
+func (a *APIv1) createArrayResponse(count int, path string, qo *odata.QueryOptions, data interface{}) *models.ArrayResponse {
+	ar := &models.ArrayResponse{
+		NextLink: a.CreateNextLink(count, path, qo),
+		Data:     &data,
+	}
+
+	if qo != nil && qo.Count != nil && bool(*qo.Count) == true {
+		ar.Count = count
+	}
+
+	return ar
+}
+
 func appendQueryPart(base string, q string) string {
 	prefix := "?"
 	if strings.Contains(base, "?") {

@@ -52,11 +52,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}
 
 	var data interface{} = observations
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // ConvertLocationToFoi converts a location to FOI

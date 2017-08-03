@@ -45,11 +45,7 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 	}
 
 	var data interface{} = fois
-	return &models.ArrayResponse{
-		Count:    count,
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
-	}, nil
+	return a.createArrayResponse(count, path, qo, data), nil
 }
 
 // PostFeatureOfInterest adds a FeatureOfInterest to the database

@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+	"fmt"
 )
 
 func TestCreateApi(t *testing.T) {
@@ -137,4 +138,36 @@ func TestCreateNextLink(t *testing.T) {
 	// assert
 	assert.NotNil(t, result1)
 	assert.True(t, strings.Contains(result1, "id eq 1"))
+}
+
+func TestCreateArrayResponseWithCount(t *testing.T){
+	// arrange
+	testAPI := &APIv1{}
+	count := 1
+	path := "testPath"
+	data := "test"
+	countQuery := godata.GoDataCountQuery(true)
+	qo := &odata.QueryOptions{}
+	qo.Count = &countQuery
+
+	// act
+	arrayResponse := testAPI.createArrayResponse(count, path, qo, data)
+
+	// assert
+	assert.Equal(t, count, arrayResponse.Count)
+	assert.Equal(t, data, fmt.Sprintf("%v", *arrayResponse.Data))
+	assert.Equal(t, testAPI.CreateNextLink(count, path, qo), arrayResponse.NextLink)
+}
+
+func TestCreateArrayResponseWithoutCount(t *testing.T){
+	// arrange
+	testAPI := &APIv1{}
+	count := 10
+	qo := &odata.QueryOptions{}
+
+	// act
+	arrayResponse := testAPI.createArrayResponse(count, "", qo, "")
+
+	// assert
+	assert.Equal(t, 0, arrayResponse.Count)
 }

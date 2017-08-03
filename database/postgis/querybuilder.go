@@ -750,10 +750,6 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) string {
-	if qo != nil && qo.Count != nil && bool(*qo.Count) == false {
-		return ""
-	}
-
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
