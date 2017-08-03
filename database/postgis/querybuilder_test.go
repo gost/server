@@ -205,18 +205,6 @@ func TestCreateCountQueryWithoutId(t *testing.T) {
 	assert.True(t, expected == res)
 }
 
-func TestCreateCountQueryEmpty(t *testing.T) {
-	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
-	qo := &odata.QueryOptions{}
-	countquery := godata.GoDataCountQuery(false)
-	qo.Count = &countquery
-	res := qb.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, 1, qo)
-
-	// assert
-	assert.True(t, res == "")
-}
-
 func TestCreateQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
