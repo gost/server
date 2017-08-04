@@ -9,6 +9,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/gost/server/sensorthings/models"
+	"fmt"
+	"io/ioutil"
 )
 
 func TestSendErrorWithNoError(t *testing.T) {
@@ -139,6 +142,38 @@ func TestEncodingNotSupported(t *testing.T) {
 
 	// act
 	SendError(rr, err, false)
+
+	// assert
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
+}
+
+func TestCountCollection(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	qo := &odata.QueryOptions{}
+	c := odata.GoDataCollectionCountQuery(true)
+	qo.CollectionCount = &c
+	ar := models.ArrayResponse{ Count: 10 }
+
+	// act
+	SendJSONResponse(rr, http.StatusOK, ar, qo, false)
+	body, _ := ioutil.ReadAll(rr.Body)
+
+	// assert
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, string(body), fmt.Sprintf("%v", ar.Count))
+}
+
+func TestCountCollectionError(t *testing.T) {
+	// arrange
+	rr := httptest.NewRecorder()
+	qo := &odata.QueryOptions{}
+	c := odata.GoDataCollectionCountQuery(true)
+	qo.CollectionCount = &c
+	ar := models.ArrayResponse{}
+
+	// act
+	SendJSONResponse(rr, http.StatusOK, ar, qo, false)
 
 	// assert
 	assert.Equal(t, http.StatusBadRequest, rr.Code)

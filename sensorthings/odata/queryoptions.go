@@ -19,11 +19,12 @@ var SupportedSelectParameters map[string][]string
 // odata functions not found in the godata package
 type QueryOptions struct {
 	godata.GoDataQuery
-	Value      *GoDataValueQuery
-	Ref        *GoDataRefQuery
-	RawExpand  string
-	RawFilter  string
-	RawOrderBy string
+	Value           *GoDataValueQuery
+	Ref             *GoDataRefQuery
+	CollectionCount *GoDataCollectionCountQuery
+	RawExpand       string
+	RawFilter       string
+	RawOrderBy      string
 }
 
 // ExpandParametersSupported returns if the QueryOptions expand request is supported by the endpoints
@@ -57,6 +58,9 @@ type GoDataValueQuery bool
 
 // GoDataRefQuery true when $ref is requested false if not
 type GoDataRefQuery bool
+
+// GoDataCollectionCountQuery true when addressing the count of a collection
+type GoDataCollectionCountQuery bool
 
 // ExpandItemToQueryOptions converts an ExpandItem into QueryOptions
 func ExpandItemToQueryOptions(ei *godata.ExpandItem) *QueryOptions {
@@ -101,6 +105,13 @@ func ParseURLQuery(query url.Values) (*QueryOptions, error) {
 	}
 	result.Ref = &ref
 
+	value = query.Get("$collectioncount")
+	cc := GoDataCollectionCountQuery(false)
+	if value != "" {
+		cc = GoDataCollectionCountQuery(true)
+	}
+	result.CollectionCount = &cc
+
 	//store raw queries
 	result.RawExpand = query.Get("$expand")
 	result.RawFilter = query.Get("$filter")
@@ -124,9 +135,13 @@ func GetQueryOptions(r *http.Request, maxEntities int) (*QueryOptions, []error) 
 		if vars["params"] == "$ref" {
 			value = "id"
 			values["$ref"] = []string{"true"}
+			values["$select"] = []string{value}
+		} else if vars["params"] == "$count" {
+			values["$collectioncount"] = []string{"true"}
+			values["$count"] = []string{"true"}
+		} else {
+			values["$select"] = []string{value}
 		}
-
-		values["$select"] = []string{value}
 	}
 
 	if strings.HasSuffix(r.URL.Path, "$value") {

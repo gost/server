@@ -10,10 +10,11 @@ import (
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
+	"errors"
 )
 
 // SendJSONResponse sends the desired message to the user
-// the message will be marshalled into an indented JSON format
+// the message will be marshalled into JSON
 func SendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *odata.QueryOptions, indentJSON bool) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
@@ -23,35 +24,48 @@ func SendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 			panic(err)
 		}
 
-		// $value is requested only send back the value, ToDo: move to API code?
-		if qo != nil && qo.Value != nil && bool(*qo.Value) == true {
-			errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems)
-			var m map[string]json.RawMessage
-			err = json.Unmarshal(b, &m)
-			if err != nil || qo.Select == nil || qo.Select.SelectItems == nil || len(qo.Select.SelectItems) == 0 {
-				SendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)}, indentJSON)
-				return
-			}
-
-			// if selected equals the key in json add to mVal
-			mVal := []byte{}
-			for k, v := range m {
-				if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
-					mVal = v
+		if qo != nil {
+			// $count for collection is requested url/$count and not the query ?$count=true, ToDo: move to API code?e
+			if qo.CollectionCount != nil && bool(*qo.CollectionCount) == true {
+				var m map[string]json.RawMessage
+				json.Unmarshal(b, &m)
+				if count, ok := m["@iot.count"]; ok {
+					b = []byte(string(count))
+				} else {
+					SendError(w, []error{gostErrors.NewBadRequestError(errors.New("/$count not available for endpoint"))}, indentJSON)
+					return
 				}
+			} else if qo.Value != nil && bool(*qo.Value) == true {
+				// $value is requested only send back the value
+				errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems)
+				var m map[string]json.RawMessage
+				err = json.Unmarshal(b, &m)
+				if err != nil || qo.Select == nil || qo.Select.SelectItems == nil || len(qo.Select.SelectItems) == 0 {
+					SendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)}, indentJSON)
+					return
+				}
+
+				// if selected equals the key in json add to mVal
+				mVal := []byte{}
+				for k, v := range m {
+					if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
+						mVal = v
+					}
+				}
+
+				if len(mVal) == 0 {
+					SendError(w, []error{gostErrors.NewBadRequestError(errMessage)}, indentJSON)
+					return
+				}
+
+				value := string(mVal[:])
+				value = strings.TrimPrefix(value, "\"")
+				value = strings.TrimSuffix(value, "\"")
+
+				b = []byte(value)
 			}
-
-			if len(mVal) == 0 {
-				SendError(w, []error{gostErrors.NewBadRequestError(errMessage)}, indentJSON)
-				return
-			}
-
-			value := string(mVal[:])
-			value = strings.TrimPrefix(value, "\"")
-			value = strings.TrimSuffix(value, "\"")
-
-			b = []byte(value)
 		}
+
 		w.WriteHeader(status)
 		w.Write(b)
 	}

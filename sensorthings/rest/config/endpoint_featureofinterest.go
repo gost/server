@@ -45,7 +45,7 @@ func CreateFeaturesOfInterestEndpoint(externalURL string) *endpoint.Endpoint {
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}", handlers.HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/{params}", handlers.HandleGetFeatureOfInterest},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest{id}/{params}/$value", handlers.HandleGetFeatureOfInterest},
-			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofInterest", handlers.HandleGetFeatureOfInterestByObservation},
+			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofinterest", handlers.HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofinterest/{params}", handlers.HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/observations{id}/featureofinterest/{params}/$value", handlers.HandleGetFeatureOfInterestByObservation},
 			{models.HTTPOperationGet, "/v1.0/{c:.*}/featuresofinterest/{params}", handlers.HandleGetFeatureOfInterests},
