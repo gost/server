@@ -319,7 +319,7 @@ func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNod
 			if i+1 == len(pn.Children) {
 				arrow = "->>"
 			}
-			q += fmt.Sprintf("%v '%v'", arrow, qb.createFilter(et, part, false))
+			q += fmt.Sprintf("%v '%v'", arrow, part.Token.Value)
 		}
 		return q
 	case godata.FilterTokenLogical:
