@@ -8,23 +8,44 @@ import (
 	"os/signal"
 	"syscall"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gost/server/configuration"
 	"github.com/gost/server/database/postgis"
 	"github.com/gost/server/http"
+	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/mqtt"
 	"github.com/gost/server/sensorthings/api"
 	"github.com/gost/server/sensorthings/models"
 )
 
 var (
-	stAPI      models.API
-	gostServer http.Server
-	mqttClient models.MQTTClient
-	file       *os.File
-	gostLogger = log.New()
+	stAPI       models.API
+	gostServer  http.Server
+	mqttClient  models.MQTTClient
+	file        *os.File
+	logger      *log.Logger
+	conf        configuration.Config
+	cfgFlag     = flag.String("config", "config.yaml", "path of the config file")
+	installFlag = flag.String("install", "", "path to the database creation file")
 )
+
+func init() {
+	flag.Parse()
+
+	cfg := *cfgFlag
+	conf, err := configuration.GetConfig(cfg)
+	if err != nil {
+		log.Fatal("config read error: ", err)
+		return
+	}
+
+	configuration.SetEnvironmentVariables(&conf)
+	logger, err = gostLog.InitializeLogger(file, conf.Logger.FileName, new(log.TextFormatter), conf.Logger.Verbose)
+	if err != nil {
+		fmt.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
+	}
+}
 
 func main() {
 	stop := make(chan os.Signal, 2)
@@ -39,22 +60,6 @@ func main() {
 	log.Println("Starting GOST....")
 	log.Println("Showing debug logs")
 
-	cfgFlag := flag.String("config", "config.yaml", "path of the config file")
-	installFlag := flag.String("install", "", "path to the database creation file")
-	flag.Parse()
-
-	cfg := *cfgFlag
-	conf, err := configuration.GetConfig(cfg)
-	if err != nil {
-		log.Fatal("config read error: ", err)
-		return
-	}
-
-	configuration.SetEnvironmentVariables(&conf)
-	err = initializeLogger(file, conf.Logger.FileName, gostLogger, new(log.TextFormatter), conf.Logger.Verbose)
-	if err != nil {
-		fmt.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
-	}
 	database := postgis.NewDatabase(
 		conf.Database.Host,
 		conf.Database.Port,
@@ -116,28 +121,5 @@ func cleanup() {
 		gostServer.Stop()
 	}
 
-	file.Close()
-}
-
-func initializeLogger(file *os.File, logFileName string, logger *log.Logger, format log.Formatter, verboseFlag bool) error {
-
-	file, err := os.OpenFile(logFileName+".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
-	if err != nil {
-		fmt.Println("Log file cannot be opened")
-		file.Close()
-		file = os.Stdout
-	}
-
-	logger.Out = file
-	if format != nil {
-		logger.Formatter = format
-	}
-
-	if verboseFlag {
-		logger.Level = log.DebugLevel
-	} else {
-		logger.Level = log.WarnLevel
-	}
-
-	return err
+	gostLog.CleanUp()
 }
