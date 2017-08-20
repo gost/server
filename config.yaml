@@ -22,3 +22,7 @@ mqtt:
     enabled: true
     host: localhost
     port: 1883
+logger:
+    fileName: gost
+    verbose: false
+ 

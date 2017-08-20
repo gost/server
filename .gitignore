@@ -36,3 +36,6 @@ _cgo_export.*
 # Results
 *.test
 *.prof
+
+# Logs
+*.log
