@@ -15,6 +15,7 @@ debug/
 bin/
 /out/
 debug
+vendor
 
 # IDE / Editor exceptions
 .idea/
