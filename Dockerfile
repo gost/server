@@ -1,10 +1,6 @@
 FROM golang:latest
-RUN apt-get update
-RUN mkdir -p /go/src/github.com/gost/server/
+RUN mkdir -p /go/src/github.com/gost/server/ && mkdir -p /gostserver/config/
 ADD . /go/src/github.com/gost/server
-RUN go get ./...
-RUN go build -o /go/bin/gost/gost github.com/gost/server
-RUN cp /go/src/github.com/gost/server/config.yaml /go/bin/gost/config.yaml
-WORKDIR /go/bin/gost
-ENTRYPOINT ["/go/bin/gost/gost"]
+RUN go get ./... && go build -o /gostserver/gost github.com/gost/server && cp /go/src/github.com/gost/server/config.yaml /gostserver/config/config.yaml
+ENTRYPOINT ["/gostserver/gost", "-config", "/gostserver/config/config.yaml"]
 EXPOSE 8080
