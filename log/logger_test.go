@@ -9,6 +9,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func TestGetInstanceWithoutInitialization(t *testing.T) {
+	testLogger, err := GetInstance()
+
+	assert.Error(t, err, "Function must throw error")
+	assert.EqualError(t, err, ErrLoggerNotInitialized.Error(), "Error should be logger not initialized")
+
+	assert.NotNil(t, testLogger, "Logger should not be nil")
+}
+
 func TestLoggerLifecycle(t *testing.T) {
 
 	//Setup
@@ -38,15 +47,6 @@ func TestLoggerLifecycle(t *testing.T) {
 	//Cleanup
 	CleanUp()
 	assert.Nil(t, testFile, "Test file should be Nil")
-}
-
-func TestGetInstanceWithoutInitialization(t *testing.T) {
-	testLogger, err := GetInstance()
-
-	assert.Error(t, err, "Function must throw error")
-	assert.EqualError(t, err, ErrLoggerNotInitialized.Error(), "Error should be logger not initialized")
-
-	assert.NotNil(t, testLogger, "Logger should not be nil")
 }
 
 func TestCleanUpWithoutInitialization(t *testing.T) {
