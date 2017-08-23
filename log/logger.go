@@ -18,8 +18,8 @@ var (
 	ErrLoggerNotInitialized = errors.New("LoggerNotInitialized")
 )
 
-// GetInstance returns singleton instance of the logger
-func GetInstance() (*log.Logger, error) {
+// GetLoggerInstance returns singleton instance of the logger
+func GetLoggerInstance() (*log.Logger, error) {
 
 	if gostLogger == nil {
 		return log.New(), ErrLoggerNotInitialized

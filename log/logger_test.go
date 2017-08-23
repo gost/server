@@ -10,7 +10,7 @@ import (
 )
 
 func TestGetInstanceWithoutInitialization(t *testing.T) {
-	testLogger, err := GetInstance()
+	testLogger, err := GetLoggerInstance()
 
 	assert.Error(t, err, "Function must throw error")
 	assert.EqualError(t, err, ErrLoggerNotInitialized.Error(), "Error should be logger not initialized")
@@ -34,7 +34,7 @@ func TestLoggerLifecycle(t *testing.T) {
 	assert.NotNil(t, testLogger, "Logger must have been initialized")
 
 	//GetInstance
-	loggerInstance, err := GetInstance()
+	loggerInstance, err := GetLoggerInstance()
 	assert.NoError(t, err, "GetInstance should not return error")
 	assert.NotNil(t, loggerInstance, "Logger instance should not be nil")
 	loggerInstance.Debug("Debug")
