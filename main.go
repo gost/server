@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	"os"
 	"os/signal"
@@ -44,7 +43,7 @@ func init() {
 	configuration.SetEnvironmentVariables(&conf)
 	logger, err = gostLog.InitializeLogger(file, conf.Logger.FileName, new(log.TextFormatter), conf.Logger.Verbose)
 	if err != nil {
-		fmt.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
+		log.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
 	}
 
 	//Setting default fieleds for main logger
@@ -99,7 +98,7 @@ func createDatabase(db models.Database, sqlFile string) {
 
 	err := db.CreateSchema(sqlFile)
 	if err != nil {
-		log.Fatal(err)
+		mainLogger.Fatal(err)
 	}
 
 	mainLogger.Info("Database created successfully, you can start your server now")
