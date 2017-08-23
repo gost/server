@@ -25,6 +25,7 @@ var (
 	mqttClient  models.MQTTClient
 	file        *os.File
 	logger      *log.Logger
+	mainLogger  *log.Entry
 	conf        configuration.Config
 	cfgFlag     = flag.String("config", "config.yaml", "path of the config file")
 	installFlag = flag.String("install", "", "path to the database creation file")
@@ -45,6 +46,9 @@ func init() {
 	if err != nil {
 		fmt.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
 	}
+
+	//Setting default fieleds for main logger
+	mainLogger = logger.WithFields(log.Fields{"package": "main"})
 }
 
 func main() {
@@ -54,11 +58,12 @@ func main() {
 		<-stop
 		cleanup()
 		log.Print("GOST stopped gracefully")
+		mainLogger.Info("GOST stopped gracefully")
 		os.Exit(1)
 	}()
 
 	log.Println("Starting GOST....")
-	log.Println("Showing debug logs")
+	mainLogger.Info("Starting GOST")
 
 	database := postgis.NewDatabase(
 		conf.Database.Host,
@@ -90,14 +95,14 @@ func main() {
 }
 
 func createDatabase(db models.Database, sqlFile string) {
-	log.Println("--CREATING DATABASE--")
+	mainLogger.Info("--CREATING DATABASE--")
 
 	err := db.CreateSchema(sqlFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("Database created successfully, you can start your server now")
+	mainLogger.Info("Database created successfully, you can start your server now")
 }
 
 // createAndStartServer creates the GOST HTTPServer and starts it
