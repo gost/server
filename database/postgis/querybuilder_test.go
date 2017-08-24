@@ -6,6 +6,7 @@ import (
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"net/url"
 )
 
 func TestCreateQueryBuilder(t *testing.T) {
@@ -233,4 +234,90 @@ func TestConstructQueryParseInfo(t *testing.T) {
 	qb.constructQueryParseInfo(expandItems, qpi)
 
 	// assert
+}
+
+func TestSortQueryOptionsScenario1(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	uri, _ := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1")
+	qo, _ := odata.ParseURLQuery(uri.Query())
+
+	// act
+	qb.sortQueryOptions(qo)
+
+	// assert
+	assert.Equal(t, "Datastream", qo.Expand.ExpandItems[0].Path[0].Value)
+	assert.Equal(t, "eq", qo.Expand.ExpandItems[0].Filter.Tree.Token.Value)
+	assert.Equal(t, "id", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Token.Value)
+	assert.Equal(t, "1", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Token.Value)
+}
+
+func TestSortQueryOptionsScenario2(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	uri, _ := url.Parse("localhost/v1.0/Things?$filter=Datastreams/Observations/result ge 20")
+	qo, _ := odata.ParseURLQuery(uri.Query())
+
+	// act
+	qb.sortQueryOptions(qo)
+
+	// assert
+	assert.Equal(t, "Datastreams", qo.Expand.ExpandItems[0].Path[0].Value)
+	assert.Equal(t, "Observations", qo.Expand.ExpandItems[0].Path[1].Value)
+	assert.Equal(t, "ge", qo.Expand.ExpandItems[0].Filter.Tree.Token.Value)
+	assert.Equal(t, "result", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Token.Value)
+	assert.Equal(t, "20", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Token.Value)
+}
+
+func TestSortQueryOptionsScenario3(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	uri, _ := url.Parse("localhost/v1.0/Things?$expand=Locations,Datastreams/Observations&$filter=length(Datastreams/name) eq 10 and Datastreams/Observations/result ge 20")
+	qo, _ := odata.ParseURLQuery(uri.Query())
+
+	// act
+	qb.sortQueryOptions(qo)
+
+	// assert
+	assert.Equal(t, "Locations", qo.Expand.ExpandItems[0].Path[0].Value)
+
+	assert.Equal(t, "Datastreams", qo.Expand.ExpandItems[1].Path[0].Value)
+	assert.Equal(t, "Observations", qo.Expand.ExpandItems[1].Path[1].Value)
+	assert.Equal(t, "ge", qo.Expand.ExpandItems[1].Filter.Tree.Token.Value)
+	assert.Equal(t, "result", qo.Expand.ExpandItems[1].Filter.Tree.Children[0].Token.Value)
+	assert.Equal(t, "20", qo.Expand.ExpandItems[1].Filter.Tree.Children[1].Token.Value)
+
+	assert.Equal(t, "Datastreams", qo.Expand.ExpandItems[2].Path[0].Value)
+	assert.Equal(t, "eq", qo.Expand.ExpandItems[2].Filter.Tree.Token.Value)
+	assert.Equal(t, "length", qo.Expand.ExpandItems[2].Filter.Tree.Children[0].Token.Value)
+	assert.Equal(t, "name", qo.Expand.ExpandItems[2].Filter.Tree.Children[0].Children[0].Token.Value)
+	assert.Equal(t, "10", qo.Expand.ExpandItems[2].Filter.Tree.Children[1].Token.Value)
+}
+
+func TestSortQueryOptionsScenario4(t *testing.T) {
+	// arrange
+	qb := CreateQueryBuilder("v1.0", 1)
+	uri, _ := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1 and Datastream/name eq test or length(Datastream/name) eq 10")
+	qo, _ := odata.ParseURLQuery(uri.Query())
+
+	// act
+	qb.sortQueryOptions(qo)
+
+	// assert
+	assert.Equal(t, "Datastream", qo.Expand.ExpandItems[0].Path[0].Value)
+	assert.Equal(t, "or", qo.Expand.ExpandItems[0].Filter.Tree.Token.Value)
+	assert.Equal(t, "and", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Token.Value)
+
+	assert.Equal(t, "eq", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[0].Token.Value)
+	assert.Equal(t, "id", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[0].Children[0].Token.Value)
+	assert.Equal(t, "1", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[0].Children[1].Token.Value)
+
+	assert.Equal(t, "eq", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[1].Token.Value)
+	assert.Equal(t, "name", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[1].Children[0].Token.Value)
+	assert.Equal(t, "test", qo.Expand.ExpandItems[0].Filter.Tree.Children[0].Children[1].Children[1].Token.Value)
+
+	assert.Equal(t, "eq", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Token.Value)
+	assert.Equal(t, "length", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Children[0].Token.Value)
+	assert.Equal(t, "name", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Children[0].Children[0].Token.Value)
+	assert.Equal(t, "10", qo.Expand.ExpandItems[0].Filter.Tree.Children[1].Children[1].Token.Value)
 }

@@ -260,13 +260,6 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 			path := make([]entities.EntityType, 0)
 			for p := 0; p < i+1; p++ {
 				etfs, _ := entities.EntityFromString(o.Path[p].Value)
-				/*
-					if etfs == nil {
-						fmt.Printf("%v\n", o.Path)
-						fmt.Printf("%v\n", o.Path[p].Value)
-					}
-				*/
-
 				path = append(path, etfs.GetEntityType())
 			}
 
@@ -297,8 +290,13 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string) string {
 	q := ""
 	if qo != nil && qo.Filter != nil {
+		filterString := qb.createFilter(et, qo.Filter.Tree, false)
+		if filterString == "" {
+			return q
+		}
+
 		q += fmt.Sprintf("%s ", prefix)
-		q += qb.createFilter(et, qo.Filter.Tree, false)
+		q += filterString
 	}
 
 	return q
@@ -306,6 +304,10 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 
 func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode, ignoreSelectAs bool) string {
 	output := ""
+	if pn == nil || pn.Token == nil {
+		return output
+	}
+
 	switch pn.Token.Type {
 	case godata.FilterTokenNav:
 		q := ""
@@ -674,29 +676,12 @@ func (qb *QueryBuilder) createLike(input string, like LikeType) string {
 	return input
 }
 
-/*
 func (qb *QueryBuilder) sortQueryOptions(qo *odata.QueryOptions) {
 	// Check filters for query on expanded item (FilterTokenNAV) and move it to the desired expand
 	// if expand is not requested create inner query
 	if qo.Filter != nil {
 		ce := make([]string, 0)
 		qb.sortFilter(qo, qo.Filter.Tree, qo.Filter.Tree, 0, nil, &ce)
-	}
-
-	DebugSortFilter(qo)
-}
-
-func DebugSortFilter(qo *odata.QueryOptions) {
-	PrintFilter(qo.Filter.Tree, "")
-}
-
-func PrintFilter(pn *godata.ParseNode, indent string) {
-	fmt.Printf("%s%v\n", indent, pn.Token.Value)
-	if pn.Parent != nil {
-		fmt.Printf("PARENT %s\n", pn.Parent.Token.Value)
-	}
-	for _, c := range pn.Children {
-		PrintFilter(c, fmt.Sprintf("%s   ", indent))
 	}
 }
 
@@ -713,35 +698,122 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
 			*currentExpand = append([]string{pn.Children[0].Token.Value}, *currentExpand...)
 
-			// Complete navigational filter found
-			fmt.Printf("FOUND %v\n", *currentExpand)
-			fmt.Printf("startNode %v\n", *startNavNode)
-			fmt.Printf("parentNode %v\n", parentNode.Token.Value)
+			cp := *currentExpand
+			field := cp[len(cp)-1]
+			cp = cp[:len(cp)-1]
+			afterCouplingNode := findParseNodeAfterCoupling(parentNode)
 
-			// remove navigational nodes
-			*startNavNode = godata.ParseNode{}
+			// set navigation node to literal with last item from path (which should be the fieldname i.e Datastreams/Observations/id)
+			*startNavNode = godata.ParseNode{
+				Token: &godata.Token{
+					Value: field,
+					Type:  godata.FilterTokenLiteral,
+				},
+				Parent: parentNode,
+			}
 
-			// set startNavNode to something that can be used Datastreams/Observations/id = id if expand exists
-			// check if expand exist
-			for _, e := range qo.Expand.ExpandItems {
+			// check if expand exist for current path, if so add a new filter to it
+			addExpand := true
+			if qo.Expand != nil {
+				for _, e := range qo.Expand.ExpandItems {
+					if len(cp) != len(e.Path) {
+						continue
+					}
 
-				for _, ep := range(e.Path) {
-
+					for i := 0; i < len(cp); i++ {
+						if cp[i] == e.Path[i].Value {
+							if i == len(cp)-1 {
+								addFilterToExpandItem(afterCouplingNode, e)
+								addExpand = false
+							}
+						} else {
+							break
+						}
+					}
 				}
 			}
 
+			// expand is not defined, create an expand with filter and define that the data should not be return to the requester
+			if addExpand {
+				// Add new expand and set to not export since this data was not requested by the user
+				if qo.Expand == nil {
+					qo.Expand = &godata.GoDataExpandQuery{}
+					qo.Expand.ExpandItems = make([]*godata.ExpandItem, 0)
+				}
+
+				expandString := ""
+				for _, s := range cp {
+					if len(expandString) != 0 {
+						expandString += "/"
+					}
+					expandString += s
+				}
+
+				expand, _ := godata.ParseExpandString(expandString)
+				newExpandItem := &godata.ExpandItem{
+					Path: expand.ExpandItems[0].Path,
+				}
+
+				addFilterToExpandItem(afterCouplingNode, newExpandItem)
+				qo.Expand.ExpandItems = append(qo.Expand.ExpandItems, newExpandItem)
+			}
+
 			//remove parentnode from filter and add to expand inner query if exist
-			*parentNode = godata.ParseNode{}
+
+			*afterCouplingNode = godata.ParseNode{}
 		}
 	} else {
 		// look for more navigational filters
 		for i, c := range pn.Children {
 			ne := make([]string, 0)
+			c.Parent = pn
 			qb.sortFilter(qo, c, pn, i, nil, &ne)
 		}
 	}
 }
-*/
+
+func addFilterToExpandItem(pn *godata.ParseNode, ei *godata.ExpandItem) {
+	copyParseNode := &godata.ParseNode{}
+	*copyParseNode = *pn
+
+	//add filter to tree, if there is already a filter get if there is an and or or in front
+	if ei.Filter == nil {
+		ei.Filter = &godata.GoDataFilterQuery{Tree: copyParseNode}
+	} else {
+		temp := *ei.Filter.Tree
+		cpn := findFirstCouplingParseNode(copyParseNode)
+		cpn.Children = make([]*godata.ParseNode, 2)
+		cpn.Children[0] = &temp
+		cpn.Children[1] = copyParseNode
+		ei.Filter = &godata.GoDataFilterQuery{Tree: cpn}
+	}
+}
+
+func findParseNodeAfterCoupling(pn *godata.ParseNode) *godata.ParseNode {
+	if pn.Parent == nil {
+		return pn
+	}
+
+	tokenValue := strings.ToLower(pn.Parent.Token.Value)
+	if tokenValue == "and" || tokenValue == "or" {
+		return pn
+	} else {
+		return findParseNodeAfterCoupling(pn.Parent)
+	}
+}
+
+func findFirstCouplingParseNode(pn *godata.ParseNode) *godata.ParseNode {
+	if pn.Parent == nil {
+		return pn
+	}
+
+	tokenValue := strings.ToLower(pn.Parent.Token.Value)
+	if tokenValue == "and" || tokenValue == "or" {
+		return pn.Parent
+	} else {
+		return findFirstCouplingParseNode(pn.Parent)
+	}
+}
 
 // CreateCountQuery creates the correct count query based on the given info
 //   e1: entity to get
@@ -779,7 +851,6 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, qo *odata.QueryOptions) (string, *QueryParseInfo) {
 	//qb.sortQueryOptions(qo)
-
 	et1 := e1.GetEntityType()
 	et2 := e1.GetEntityType()
 	if e2 != nil { // 2nd entity is given, this means get e1 by e2
@@ -842,6 +913,6 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
+	fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
