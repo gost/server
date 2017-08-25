@@ -147,4 +147,17 @@ func SetEnvironmentVariables(conf *Config) {
 			conf.Database.MaxOpenConns = open
 		}
 	}
+
+	//Logger settings
+	gostLoggerFileName := os.Getenv("GOST_LOG_FILENAME")
+	if gostLoggerFileName != "" {
+		conf.Logger.FileName = gostLoggerFileName
+	}
+
+	gostLoggerVerbose := os.Getenv("GOST_LOG_VERBOSE_FLAG")
+	if gostLoggerVerbose != "" {
+		if verboseFlag, err := strconv.ParseBool(gostLoggerVerbose); err == nil {
+			conf.Logger.Verbose = verboseFlag
+		}
+	}
 }

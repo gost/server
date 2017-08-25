@@ -13,6 +13,7 @@ type Config struct {
 	Server   ServerConfig   `yaml:"server"`
 	Database DatabaseConfig `yaml:"database"`
 	MQTT     MQTTConfig     `yaml:"mqtt"`
+	Logger   LoggerConfig   `yaml:"logger"`
 }
 
 // ServerConfig contains the general server information
@@ -46,6 +47,12 @@ type MQTTConfig struct {
 	Enabled bool   `yaml:"enabled"`
 	Host    string `yaml:"host"`
 	Port    int    `yaml:"port"`
+}
+
+// LoggerConfig contains the logging configuration used to initialize the logger
+type LoggerConfig struct {
+	FileName string `yaml:"fileName"`
+	Verbose  bool   `yaml:"verbose"`
 }
 
 // GetInternalServerURI gets the internal Http server address
