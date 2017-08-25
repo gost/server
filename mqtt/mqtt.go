@@ -2,13 +2,16 @@ package mqtt
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gost/server/configuration"
+	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
+	log "github.com/sirupsen/logrus"
 )
+
+var logger *log.Entry
 
 // MQTT is the implementation of the MQTT server
 type MQTT struct {
@@ -19,8 +22,18 @@ type MQTT struct {
 	api        *models.API
 }
 
+func setupLogger() {
+	l, err := gostLog.GetLoggerInstance()
+	if err != nil {
+		log.Error(err)
+	}
+
+	logger = l.WithFields(log.Fields{"package": "gost.server.mqtt"})
+}
+
 // CreateMQTTClient creates a new MQTT client
 func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
+	setupLogger()
 	opts := paho.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%v", config.Host, config.Port)).SetClientID("gost")
 	opts.SetCleanSession(true)
 	opts.SetKeepAlive(300 * time.Second)
@@ -40,7 +53,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 // Start running the MQTT client
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
-	log.Printf("Starting MQTT client on %s", fmt.Sprintf("tcp://%s:%v", m.host, m.port))
+	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("tcp://%s:%v", m.host, m.port))
 	m.connect()
 
 	a := *m.api
@@ -48,7 +61,7 @@ func (m *MQTT) Start(api *models.API) {
 	for _, t := range topics {
 		topic := t
 		if token := m.client.Subscribe(topic.Path, 0, func(client paho.Client, msg paho.Message) { go topic.Handler(m.api, msg.Topic(), msg.Payload()) }); token.Wait() && token.Error() != nil {
-			fmt.Println(token.Error())
+			logger.Error(token.Error())
 		}
 	}
 
@@ -73,7 +86,7 @@ func (m *MQTT) Publish(topic string, message string, qos byte) {
 func (m *MQTT) connect() {
 	if token := m.client.Connect(); token.Wait() && token.Error() != nil {
 		if !m.connecting {
-			log.Printf("MQTT client %v", token.Error())
+			logger.Errorf("MQTT client %v", token.Error())
 			m.retryConnect()
 		}
 	}
@@ -83,8 +96,7 @@ func (m *MQTT) connect() {
 // when a connection is established. This is useful when MQTT Broker and GOST are hosted on the same
 // machine and GOST is started before mosquito
 func (m *MQTT) retryConnect() {
-	log.Printf("MQTT client starting reconnect procedure in background")
-
+	logger.Infof("MQTT client starting reconnect procedure in background")
 	m.connecting = true
 	ticker := time.NewTicker(time.Second * 5)
 	go func() {
@@ -99,10 +111,10 @@ func (m *MQTT) retryConnect() {
 }
 
 func connectHandler(c paho.Client) {
-	log.Printf("MQTT client connected")
+	logger.Infof("MQTT client connected")
 }
 
 //ToDo: bubble up and call retryConnect?
 func connectionLostHandler(c paho.Client, err error) {
-	log.Printf("MQTT client lost connection: %v", err)
+	logger.Warnf("MQTT client lost connection: %v", err)
 }

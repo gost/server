@@ -41,7 +41,7 @@ func init() {
 	}
 
 	configuration.SetEnvironmentVariables(&conf)
-	logger, err = gostLog.InitializeLogger(file, conf.Logger.FileName, new(log.TextFormatter), conf.Logger.Verbose)
+	logger, err := gostLog.InitializeLogger(file, conf.Logger.FileName, new(log.TextFormatter), conf.Logger.Verbose)
 	if err != nil {
 		log.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
 	}
@@ -56,12 +56,10 @@ func main() {
 	go func() {
 		<-stop
 		cleanup()
-		log.Print("GOST stopped gracefully")
 		mainLogger.Info("GOST stopped gracefully")
 		os.Exit(1)
 	}()
 
-	log.Println("Starting GOST....")
 	mainLogger.Info("Starting GOST")
 
 	database := postgis.NewDatabase(
@@ -94,7 +92,7 @@ func main() {
 }
 
 func createDatabase(db models.Database, sqlFile string) {
-	mainLogger.Info("--CREATING DATABASE--")
+	mainLogger.Info("CREATING DATABASE")
 
 	err := db.CreateSchema(sqlFile)
 	if err != nil {

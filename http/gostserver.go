@@ -14,19 +14,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var (
-	logger     *log.Logger
-	httpLogger *log.Entry
-)
+var logger *log.Entry
 
 func setupLogger() {
-	logger, err := gostLog.GetLoggerInstance()
+	l, err := gostLog.GetLoggerInstance()
 	if err != nil {
 		log.Error(err)
 	}
 
 	//Setting default fields for main logger
-	httpLogger = logger.WithFields(log.Fields{"package": "http"})
+	logger = l.WithFields(log.Fields{"package": "gost.server.http"})
 }
 
 // Server interface for starting and stopping the HTTP server
@@ -74,8 +71,8 @@ func (s *GostServer) Start() {
 	if s.https {
 		t = "HTTPS"
 	}
-	log.Printf("Started GOST %v Server on %v:%v", t, s.host, s.port)
-	httpLogger.Infof("Started GOST %v Server on %v:%v", t, s.host, s.port)
+
+	logger.Infof("Started GOST %v Server on %v:%v", t, s.host, s.port)
 
 	var err error
 	if s.https {
@@ -85,16 +82,14 @@ func (s *GostServer) Start() {
 	}
 
 	if err != nil {
-		httpLogger.Errorf("GOST server not properly stopped: %v", err)
-		panic(fmt.Errorf("GOST server not properly stopped: %v", err))
+		logger.Panicf("GOST server not properly stopped: %v", err)
 	}
 }
 
 // Stop command to stop the GOST HTTP server
 func (s *GostServer) Stop() {
 	if s.httpServer != nil {
-		log.Print("Stopping HTTP(S) Server")
-		httpLogger.Info("Stopping HTTP(S) Server")
+		logger.Info("Stopping HTTP(S) Server")
 		s.httpServer.Shutdown(context.Background())
 	}
 }

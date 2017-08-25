@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 
 	"encoding/json"
 	"strconv"
@@ -13,14 +12,18 @@ import (
 
 	"github.com/gost/godata"
 	gostErrors "github.com/gost/server/errors"
+	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
 	_ "github.com/lib/pq" // postgres driver
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	//TimeFormat describes the format in which we want our DateTime to display
 	TimeFormat = "YYYY-MM-DD\"T\"HH24:MI:SS.MSZ"
 )
+
+var logger *log.Entry
 
 // GostDatabase implementation
 type GostDatabase struct {
@@ -37,6 +40,15 @@ type GostDatabase struct {
 	QueryBuilder *QueryBuilder
 }
 
+func setupLogger() {
+	l, err := gostLog.GetLoggerInstance()
+	if err != nil {
+		log.Error(err)
+	}
+
+	logger = l.WithFields(log.Fields{"package": "gost.server.database.postgis"})
+}
+
 // NewDatabase initialises the PostgreSQL database
 //	host = TCP host:port or Unix socket depending on Network.
 //	user = database user
@@ -44,6 +56,7 @@ type GostDatabase struct {
 //	database = name of database
 //	ssl = Whether to use secure TCP/IP connections (TLS).
 func NewDatabase(host string, port int, user string, password string, database string, schema string, ssl bool, maxIdeConns int, maxOpenConns int, maxTop int) models.Database {
+	setupLogger()
 	return &GostDatabase{
 		Host:         host,
 		Port:         port,
@@ -63,19 +76,18 @@ func (gdb *GostDatabase) Start() {
 	//gdb.QueryBuilder.Test()
 
 	//ToDo: implement SSL
-	log.Printf("Creating database connection, host: \"%v\", port: \"%v\" user: \"%v\", database: \"%v\", schema: \"%v\" ssl: \"%v\"", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
-
+	logger.Infof("Creating database connection, host: %v, port: %v user: %v, database: %v, schema: %v ssl: %v", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
 	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", gdb.Host, gdb.User, gdb.Password, gdb.Database)
 	db, err := sql.Open("postgres", dbInfo)
 	db.SetMaxIdleConns(gdb.MaxIdeConns)
 	db.SetMaxOpenConns(gdb.MaxOpenConns)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	gdb.Db = db
-	log.Println("Connected to database")
+	logger.Infof("Connected to database")
 }
 
 // CreateSchema creates the needed schema in the database
@@ -207,7 +219,6 @@ func (gdb *GostDatabase) updateEntityColumns(table string, updates map[string]in
 	}
 
 	sql := fmt.Sprintf("update %s.%s set %s where id = $1", gdb.Schema, table, columns)
-	log.Println("sql:" + sql)
 	_, err := gdb.Db.Exec(sql, entityID)
 	return err
 }
