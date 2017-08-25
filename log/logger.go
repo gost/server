@@ -30,14 +30,19 @@ func GetLoggerInstance() (*log.Logger, error) {
 
 // InitializeLogger with various properties
 func InitializeLogger(file *os.File, logFileName string, format log.Formatter, verboseFlag bool) (*log.Logger, error) {
-
+	var err error
 	gostLogger = log.New()
 	gostFile = file
 
-	gostFile, err := os.OpenFile(logFileName+".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
-	if err != nil {
-		fmt.Println("Log file cannot be opened")
-		gostFile.Close()
+	if logFileName != "" {
+		gostFile, err = os.OpenFile(logFileName+".log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+		if err != nil {
+			fmt.Println("Log file cannot be opened")
+			gostFile.Close()
+		}
+	}
+
+	if logFileName == "" || err != nil {
 		gostFile = os.Stdout
 	}
 
