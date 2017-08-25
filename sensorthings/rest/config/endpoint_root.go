@@ -15,7 +15,7 @@ func CreateRootEndpoint(externalURL string) *endpoint.Endpoint {
 		OutputInfo: false,
 		URL:        fmt.Sprintf("%s/%s", externalURL, "v1.0"),
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/v1.0", handlers.HandleAPIRoot},
+			{OperationType: models.HTTPOperationGet, Path: "/v1.0", Handler: handlers.HandleAPIRoot},
 		},
 	}
 }

@@ -5,6 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	"github.com/gorilla/mux"
 	"github.com/gost/server/configuration"
 	gostErrors "github.com/gost/server/errors"
@@ -13,12 +20,6 @@ import (
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/gost/server/sensorthings/rest/endpoint"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 func TestVersionResponse(t *testing.T) {
@@ -97,9 +98,9 @@ func newMockSensor(id int) *entities.Sensor {
 
 func newMockLocation(id int) *entities.Location {
 	location := &entities.Location{Name: fmt.Sprintf("location %v", id),
-		Description: fmt.Sprintf("description of location %v", id),
+		Description:  fmt.Sprintf("description of location %v", id),
 		EncodingType: "application/vnd.geo+json",
-		Location: map[string]interface{}{ "coordinates": "test"}}
+		Location:     map[string]interface{}{"coordinates": "test"}}
 	location.ID = id
 	return location
 }
@@ -125,13 +126,13 @@ func newMockObservation(id int) *entities.Observation {
 }
 
 func newMockFeatureOfInterest(id int) *entities.FeatureOfInterest {
-	foi := &entities.FeatureOfInterest{Name: fmt.Sprintf("foi %v", id), Description: fmt.Sprintf("description of foi %v", id), EncodingType: "application/vnd.geo+json" }
+	foi := &entities.FeatureOfInterest{Name: fmt.Sprintf("foi %v", id), Description: fmt.Sprintf("description of foi %v", id), EncodingType: "application/vnd.geo+json"}
 	foi.ID = id
 	return foi
 }
 
 func newMockDatastream(id int) *entities.Datastream {
-	ds := &entities.Datastream{Name: fmt.Sprintf("datastream %v", id), Description: fmt.Sprintf("description of datastream %v", id) }
+	ds := &entities.Datastream{Name: fmt.Sprintf("datastream %v", id), Description: fmt.Sprintf("description of datastream %v", id)}
 	ds.ID = id
 	return ds
 }
@@ -560,14 +561,14 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			Name:       "Version",
 			OutputInfo: false,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/version", HandleVersion},
+				{OperationType: models.HTTPOperationGet, Path: "/version", Handler: HandleVersion},
 			},
 		},
 		entities.EntityTypeUnknown: &endpoint.Endpoint{
 			Name:       "Root",
 			OutputInfo: false,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0", HandleAPIRoot},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0", Handler: HandleAPIRoot},
 			},
 		},
 		entities.EntityTypeThing: &endpoint.Endpoint{
@@ -575,16 +576,16 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeThing,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/things", HandleGetThings},
-				{models.HTTPOperationGet, "/v1.0/things{id}", HandleGetThing},
-				{models.HTTPOperationGet, "/v1.0/historicallocations{id}/thing", HandleGetThingByHistoricalLocation},
-				{models.HTTPOperationGet, "/v1.0/datastreams{id}/thing", HandleGetThingByDatastream},
-				{models.HTTPOperationGet, "/v1.0/locations{id}/things", HandleGetThingsByLocation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/things", Handler: HandleGetThings},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/things{id}", Handler: HandleGetThing},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/historicallocations{id}/thing", Handler: HandleGetThingByHistoricalLocation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams{id}/thing", Handler: HandleGetThingByDatastream},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/locations{id}/things", Handler: HandleGetThingsByLocation},
 
-				{models.HTTPOperationPost, "/v1.0/things", HandlePostThing},
-				{models.HTTPOperationDelete, "/v1.0/things{id}", HandleDeleteThing},
-				{models.HTTPOperationPatch, "/v1.0/things{id}", HandlePatchThing},
-				{models.HTTPOperationPut, "/v1.0/things{id}", HandlePutThing},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/things", Handler: HandlePostThing},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/things{id}", Handler: HandleDeleteThing},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/things{id}", Handler: HandlePatchThing},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/things{id}", Handler: HandlePutThing},
 			},
 		},
 		entities.EntityTypeDatastream: &endpoint.Endpoint{
@@ -592,18 +593,18 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeDatastream,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/datastreams", HandleGetDatastreams},
-				{models.HTTPOperationGet, "/v1.0/datastreams{id}", HandleGetDatastream},
-				{models.HTTPOperationGet, "/v1.0/observedproperties{id}/datastreams", HandleGetDatastreamsByObservedProperty},
-				{models.HTTPOperationGet, "/v1.0/observations{id}/datastream", HandleGetDatastreamByObservation},
-				{models.HTTPOperationGet, "/v1.0/sensors{id}/datastreams", HandleGetDatastreamsBySensor},
-				{models.HTTPOperationGet, "/v1.0/things{id}/datastreams", HandleGetDatastreamsByThing},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams", Handler: HandleGetDatastreams},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams{id}", Handler: HandleGetDatastream},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observedproperties{id}/datastreams", Handler: HandleGetDatastreamsByObservedProperty},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observations{id}/datastream", Handler: HandleGetDatastreamByObservation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/sensors{id}/datastreams", Handler: HandleGetDatastreamsBySensor},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/things{id}/datastreams", Handler: HandleGetDatastreamsByThing},
 
-				{models.HTTPOperationPost, "/v1.0/datastreams", HandlePostDatastream},
-				{models.HTTPOperationPost, "/v1.0/things{id}/datastreams", HandlePostDatastreamByThing},
-				{models.HTTPOperationDelete, "/v1.0/datastreams{id}", HandleDeleteDatastream},
-				{models.HTTPOperationPatch, "/v1.0/datastreams{id}", HandlePatchDatastream},
-				{models.HTTPOperationPut, "/v1.0/datastreams{id}", HandlePutDatastream},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/datastreams", Handler: HandlePostDatastream},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/things{id}/datastreams", Handler: HandlePostDatastreamByThing},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/datastreams{id}", Handler: HandleDeleteDatastream},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/datastreams{id}", Handler: HandlePatchDatastream},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/datastreams{id}", Handler: HandlePutDatastream},
 			},
 		},
 		entities.EntityTypeObservedProperty: &endpoint.Endpoint{
@@ -611,14 +612,14 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeObservedProperty,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/observedproperties", HandleGetObservedProperties},
-				{models.HTTPOperationGet, "/v1.0/observedproperties{id}", HandleGetObservedProperty},
-				{models.HTTPOperationGet, "/v1.0/datastreams{id}/observedproperty", HandleGetObservedPropertyByDatastream},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observedproperties", Handler: HandleGetObservedProperties},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observedproperties{id}", Handler: HandleGetObservedProperty},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams{id}/observedproperty", Handler: HandleGetObservedPropertyByDatastream},
 
-				{models.HTTPOperationPost, "/v1.0/observedproperties", HandlePostObservedProperty},
-				{models.HTTPOperationDelete, "/v1.0/observedproperties{id}", HandleDeleteObservedProperty},
-				{models.HTTPOperationPatch, "/v1.0/observedproperties{id}", HandlePatchObservedProperty},
-				{models.HTTPOperationPut, "/v1.0/observedproperties{id}", HandlePutObservedProperty},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/observedproperties", Handler: HandlePostObservedProperty},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/observedproperties{id}", Handler: HandleDeleteObservedProperty},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/observedproperties{id}", Handler: HandlePatchObservedProperty},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/observedproperties{id}", Handler: HandlePutObservedProperty},
 			},
 		},
 		entities.EntityTypeLocation: &endpoint.Endpoint{
@@ -626,16 +627,16 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeLocation,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/locations", HandleGetLocations},
-				{models.HTTPOperationGet, "/v1.0/locations{id}", HandleGetLocation},
-				{models.HTTPOperationGet, "/v1.0/historicallocations{id}/locations", HandleGetLocationsByHistoricalLocations},
-				{models.HTTPOperationGet, "/v1.0/things{id}/locations", HandleGetLocationsByThing},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/locations", Handler: HandleGetLocations},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/locations{id}", Handler: HandleGetLocation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/historicallocations{id}/locations", Handler: HandleGetLocationsByHistoricalLocations},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/things{id}/locations", Handler: HandleGetLocationsByThing},
 
-				{models.HTTPOperationPost, "/v1.0/locations", HandlePostLocation},
-				{models.HTTPOperationPost, "/v1.0/things{id}/locations", HandlePostLocationByThing},
-				{models.HTTPOperationDelete, "/v1.0/locations{id}", HandleDeleteLocation},
-				{models.HTTPOperationPatch, "/v1.0/locations{id}", HandlePatchLocation},
-				{models.HTTPOperationPut, "/v1.0/locations{id}", HandlePutLocation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/locations", Handler: HandlePostLocation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/things{id}/locations", Handler: HandlePostLocationByThing},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/locations{id}", Handler: HandleDeleteLocation},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/locations{id}", Handler: HandlePatchLocation},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/locations{id}", Handler: HandlePutLocation},
 			},
 		},
 		entities.EntityTypeSensor: &endpoint.Endpoint{
@@ -643,14 +644,14 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeSensor,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/sensors", HandleGetSensors},
-				{models.HTTPOperationGet, "/v1.0/sensors{id}", HandleGetSensor},
-				{models.HTTPOperationGet, "/v1.0/datastreams{id}/sensor", HandleGetSensorByDatastream},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/sensors", Handler: HandleGetSensors},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/sensors{id}", Handler: HandleGetSensor},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams{id}/sensor", Handler: HandleGetSensorByDatastream},
 
-				{models.HTTPOperationPost, "/v1.0/sensors", HandlePostSensors},
-				{models.HTTPOperationDelete, "/v1.0/sensors{id}", HandleDeleteSensor},
-				{models.HTTPOperationPatch, "/v1.0/sensors{id}", HandlePatchSensor},
-				{models.HTTPOperationPut, "/v1.0/sensors{id}", HandlePutSensor},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/sensors", Handler: HandlePostSensors},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/sensors{id}", Handler: HandleDeleteSensor},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/sensors{id}", Handler: HandlePatchSensor},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/sensors{id}", Handler: HandlePutSensor},
 			},
 		},
 		entities.EntityTypeObservation: &endpoint.Endpoint{
@@ -658,17 +659,17 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeObservation,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/observations", HandleGetObservations},
-				{models.HTTPOperationGet, "/v1.0/observations{id}", HandleGetObservation},
-				{models.HTTPOperationGet, "/v1.0/datastreams{id}/observations", HandleGetObservationsByDatastream},
-				{models.HTTPOperationGet, "/v1.0/featureofinterest{id}/observations", HandleGetObservationsByFeatureOfInterest},
-				{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}/observations", HandleGetObservationsByFeatureOfInterest},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observations", Handler: HandleGetObservations},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observations{id}", Handler: HandleGetObservation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/datastreams{id}/observations", Handler: HandleGetObservationsByDatastream},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/featureofinterest{id}/observations", Handler: HandleGetObservationsByFeatureOfInterest},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/featuresofinterest{id}/observations", Handler: HandleGetObservationsByFeatureOfInterest},
 
-				{models.HTTPOperationPost, "/v1.0/observations", HandlePostObservation},
-				{models.HTTPOperationPost, "/v1.0/datastreams{id}/observations", HandlePostObservationByDatastream},
-				{models.HTTPOperationDelete, "/v1.0/observations{id}", HandleDeleteObservation},
-				{models.HTTPOperationPatch, "/v1.0/observations{id}", HandlePatchObservation},
-				{models.HTTPOperationPut, "/v1.0/observations{id}", HandlePutObservation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/observations", Handler: HandlePostObservation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/datastreams{id}/observations", Handler: HandlePostObservationByDatastream},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/observations{id}", Handler: HandleDeleteObservation},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/observations{id}", Handler: HandlePatchObservation},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/observations{id}", Handler: HandlePutObservation},
 			},
 		},
 		entities.EntityTypeFeatureOfInterest: &endpoint.Endpoint{
@@ -676,13 +677,13 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeFeatureOfInterest,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/featuresofinterest", HandleGetFeatureOfInterests},
-				{models.HTTPOperationGet, "/v1.0/featuresofinterest{id}", HandleGetFeatureOfInterest},
-				{models.HTTPOperationGet, "/v1.0/observations{id}/featureofinterest", HandleGetFeatureOfInterestByObservation},
-				{models.HTTPOperationPost, "/v1.0/featuresofinterest", HandlePostFeatureOfInterest},
-				{models.HTTPOperationDelete, "/v1.0/featuresofinterest{id}", HandleDeleteFeatureOfInterest},
-				{models.HTTPOperationPatch, "/v1.0/featuresofinterest{id}", HandlePatchFeatureOfInterest},
-				{models.HTTPOperationPut, "/v1.0/featuresofinterest{id}", HandlePutFeatureOfInterest},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/featuresofinterest", Handler: HandleGetFeatureOfInterests},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/featuresofinterest{id}", Handler: HandleGetFeatureOfInterest},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/observations{id}/featureofinterest", Handler: HandleGetFeatureOfInterestByObservation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/featuresofinterest", Handler: HandlePostFeatureOfInterest},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/featuresofinterest{id}", Handler: HandleDeleteFeatureOfInterest},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/featuresofinterest{id}", Handler: HandlePatchFeatureOfInterest},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/featuresofinterest{id}", Handler: HandlePutFeatureOfInterest},
 			},
 		},
 		entities.EntityTypeHistoricalLocation: &endpoint.Endpoint{
@@ -690,15 +691,15 @@ func createEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 			EntityType: entities.EntityTypeHistoricalLocation,
 			OutputInfo: true,
 			Operations: []models.EndpointOperation{
-				{models.HTTPOperationGet, "/v1.0/historicallocations", HandleGetHistoricalLocations},
-				{models.HTTPOperationGet, "/v1.0/historicallocations{id}", HandleGetHistoricalLocation},
-				{models.HTTPOperationGet, "/v1.0/things{id}/historicallocations", HandleGetHistoricalLocationsByThing},
-				{models.HTTPOperationGet, "/v1.0/locations{id}/historicallocations", HandleGetHistoricalLocationsByLocation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/historicallocations", Handler: HandleGetHistoricalLocations},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/historicallocations{id}", Handler: HandleGetHistoricalLocation},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/things{id}/historicallocations", Handler: HandleGetHistoricalLocationsByThing},
+				{OperationType: models.HTTPOperationGet, Path: "/v1.0/locations{id}/historicallocations", Handler: HandleGetHistoricalLocationsByLocation},
 
-				{models.HTTPOperationPost, "/v1.0/historicallocations", HandlePostHistoricalLocation},
-				{models.HTTPOperationDelete, "/v1.0/historicallocations{id}", HandleDeleteHistoricalLocations},
-				{models.HTTPOperationPatch, "/v1.0/historicallocations{id}", HandlePatchHistoricalLocations},
-				{models.HTTPOperationPut, "/v1.0/historicallocations{id}", HandlePutHistoricalLocation},
+				{OperationType: models.HTTPOperationPost, Path: "/v1.0/historicallocations", Handler: HandlePostHistoricalLocation},
+				{OperationType: models.HTTPOperationDelete, Path: "/v1.0/historicallocations{id}", Handler: HandleDeleteHistoricalLocations},
+				{OperationType: models.HTTPOperationPatch, Path: "/v1.0/historicallocations{id}", Handler: HandlePatchHistoricalLocations},
+				{OperationType: models.HTTPOperationPut, Path: "/v1.0/historicallocations{id}", Handler: HandlePutHistoricalLocation},
 			},
 		},
 	}

@@ -15,7 +15,7 @@ func CreateVersionEndpoint(externalURL string) *endpoint.Endpoint {
 		OutputInfo: false,
 		URL:        fmt.Sprintf("%s/%s", externalURL, "Version"),
 		Operations: []models.EndpointOperation{
-			{models.HTTPOperationGet, "/version", handlers.HandleVersion},
+			{OperationType: models.HTTPOperationGet, Path: "/version", Handler: handlers.HandleVersion},
 		},
 	}
 }
