@@ -3,14 +3,31 @@ package http
 import (
 	"context"
 	"fmt"
-	"github.com/gost/server/sensorthings/models"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"time"
+
+	gostLog "github.com/gost/server/log"
+	"github.com/gost/server/sensorthings/models"
+	log "github.com/sirupsen/logrus"
 )
+
+var (
+	logger     *log.Logger
+	httpLogger *log.Entry
+)
+
+func setupLogger() {
+	logger, err := gostLog.GetLoggerInstance()
+	if err != nil {
+		log.Error(err)
+	}
+
+	//Setting default fields for main logger
+	httpLogger = logger.WithFields(log.Fields{"package": "http"})
+}
 
 // Server interface for starting and stopping the HTTP server
 type Server interface {
@@ -32,6 +49,7 @@ type GostServer struct {
 
 // CreateServer initialises a new GOST HTTPServer based on the given parameters
 func CreateServer(host string, port int, api *models.API, https bool, httpsCert, httpsKey string) Server {
+	setupLogger()
 	a := *api
 	router := CreateRouter(api)
 	return &GostServer{
@@ -57,6 +75,7 @@ func (s *GostServer) Start() {
 		t = "HTTPS"
 	}
 	log.Printf("Started GOST %v Server on %v:%v", t, s.host, s.port)
+	httpLogger.Infof("Started GOST %v Server on %v:%v", t, s.host, s.port)
 
 	var err error
 	if s.https {
@@ -66,6 +85,7 @@ func (s *GostServer) Start() {
 	}
 
 	if err != nil {
+		httpLogger.Errorf("GOST server not properly stopped: %v", err)
 		panic(fmt.Errorf("GOST server not properly stopped: %v", err))
 	}
 }
@@ -74,6 +94,7 @@ func (s *GostServer) Start() {
 func (s *GostServer) Stop() {
 	if s.httpServer != nil {
 		log.Print("Stopping HTTP(S) Server")
+		httpLogger.Info("Stopping HTTP(S) Server")
 		s.httpServer.Shutdown(context.Background())
 	}
 }
