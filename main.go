@@ -32,9 +32,9 @@ var (
 
 func init() {
 	flag.Parse()
-
 	cfg := *cfgFlag
-	conf, err := configuration.GetConfig(cfg)
+	var err error
+	conf, err = configuration.GetConfig(cfg)
 	if err != nil {
 		log.Fatal("config read error: ", err)
 		return
@@ -46,7 +46,7 @@ func init() {
 		log.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
 	}
 
-	//Setting default fieleds for main logger
+	// Setting default fields for main logger
 	mainLogger = logger.WithFields(log.Fields{"package": "main"})
 }
 
