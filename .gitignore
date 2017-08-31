@@ -6,7 +6,6 @@
 *.bin
 *.db
 *.db.lock
-Gopkg.lock
 
 # Folders
 _obj/
