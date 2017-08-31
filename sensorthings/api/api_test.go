@@ -3,15 +3,17 @@ package api
 import (
 	"github.com/gost/server/configuration"
 	"github.com/gost/server/database/postgis"
+	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/mqtt"
 	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/odata"
 
-	"github.com/gost/godata"
-	"github.com/stretchr/testify/assert"
+	"fmt"
 	"strings"
 	"testing"
-	"fmt"
+
+	"github.com/gost/godata"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateApi(t *testing.T) {
@@ -140,7 +142,7 @@ func TestCreateNextLink(t *testing.T) {
 	assert.True(t, strings.Contains(result1, "id eq 1"))
 }
 
-func TestCreateArrayResponseWithCount(t *testing.T){
+func TestCreateArrayResponseWithCount(t *testing.T) {
 	// arrange
 	testAPI := &APIv1{}
 	count := 1
@@ -159,7 +161,7 @@ func TestCreateArrayResponseWithCount(t *testing.T){
 	assert.Equal(t, testAPI.CreateNextLink(count, path, qo), arrayResponse.NextLink)
 }
 
-func TestCreateArrayResponseWithoutCount(t *testing.T){
+func TestCreateArrayResponseWithoutCount(t *testing.T) {
 	// arrange
 	testAPI := &APIv1{}
 	count := 10
@@ -170,4 +172,45 @@ func TestCreateArrayResponseWithoutCount(t *testing.T){
 
 	// assert
 	assert.Equal(t, 0, arrayResponse.Count)
+}
+
+func TestContainsMandatoryParamsReturningBadRequest(t *testing.T) {
+	// arrange
+	thing := &entities.Thing{}
+	location := &entities.Location{}
+	historicalLocation := &entities.HistoricalLocation{}
+	datastream := &entities.Datastream{}
+	sensor := &entities.Sensor{}
+	observedProperty := &entities.ObservedProperty{}
+	observation := &entities.Observation{}
+	featureOfinterest := &entities.FeatureOfInterest{}
+
+	// act
+	_, tErr := containsMandatoryParams(thing)
+	_, lErr := containsMandatoryParams(location)
+	_, hlErr := containsMandatoryParams(historicalLocation)
+	_, dErr := containsMandatoryParams(datastream)
+	_, sErr := containsMandatoryParams(sensor)
+	_, opErr := containsMandatoryParams(observedProperty)
+	_, oErr := containsMandatoryParams(observation)
+	_, fErr := containsMandatoryParams(featureOfinterest)
+
+	// assert
+	assert.Equal(t, 400, getStatusCode(tErr))
+	assert.Equal(t, 400, getStatusCode(lErr))
+	assert.Equal(t, 400, getStatusCode(hlErr))
+	assert.Equal(t, 400, getStatusCode(dErr))
+	assert.Equal(t, 400, getStatusCode(sErr))
+	assert.Equal(t, 400, getStatusCode(opErr))
+	assert.Equal(t, 400, getStatusCode(oErr))
+	assert.Equal(t, 400, getStatusCode(fErr))
+}
+
+func getStatusCode(error []error) int {
+	switch e := error[0].(type) {
+	case gostErrors.APIError:
+		return e.GetHTTPErrorStatusCode()
+	}
+
+	return 0
 }

@@ -77,7 +77,7 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	var err []error
 	var err2 error
-	_, err = thing.ContainsMandatoryParams()
+	_, err = containsMandatoryParams(thing)
 	if len(err) > 0 {
 		return nil, err
 	}

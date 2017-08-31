@@ -51,7 +51,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayRe
 
 // PostSensor adds a new sensor to the database
 func (a *APIv1) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) {
-	_, err := sensor.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(sensor)
 	if err != nil {
 		return nil, err
 	}

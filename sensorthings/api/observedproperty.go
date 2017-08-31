@@ -50,7 +50,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*mod
 
 // PostObservedProperty todo
 func (a *APIv1) PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, []error) {
-	_, err := op.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(op)
 	if err != nil {
 		return nil, err
 	}

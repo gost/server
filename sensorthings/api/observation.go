@@ -99,7 +99,7 @@ func CopyLocationToFoi(gdb *models.Database, datastreamID interface{}) (string, 
 
 // PostObservation checks for correctness of the observation and calls PostObservation on the database
 func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
-	_, err := observation.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(observation)
 	if err != nil {
 		return nil, err
 	}

@@ -1,12 +1,13 @@
 package odata
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/gost/godata"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
+	"github.com/gost/godata"
 )
 
 // SupportedExpandParameters contains a list of endpoints with their supported expand parameters

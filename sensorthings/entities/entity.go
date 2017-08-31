@@ -3,7 +3,6 @@ package entities
 import (
 	"fmt"
 
-	gostErrors "github.com/gost/server/errors"
 	"strings"
 )
 
@@ -252,7 +251,7 @@ func CheckMandatoryParam(errorList *[]error, param interface{}, entityType Entit
 
 	err := *errorList
 	if isNil {
-		*errorList = append(err, gostErrors.NewBadRequestError(fmt.Errorf("Missing mandatory parameter: %s.%s", entityType, paramName)))
+		*errorList = append(err, fmt.Errorf("Missing mandatory parameter: %s.%s", entityType, paramName))
 	}
 }
 

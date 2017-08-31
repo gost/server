@@ -50,7 +50,7 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 
 // PostFeatureOfInterest adds a FeatureOfInterest to the database
 func (a *APIv1) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
-	_, err := foi.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(foi)
 	if err != nil {
 		return nil, err
 	}
