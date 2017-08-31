@@ -13,7 +13,7 @@ import (
 
 // PostLocation tries to add a new location
 func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, []error) {
-	_, err := location.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(location)
 	if err != nil {
 		return nil, err
 	}

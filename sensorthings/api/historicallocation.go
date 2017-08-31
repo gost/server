@@ -52,7 +52,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 
 // PostHistoricalLocation adds a new HistoricalLocation to the database
 func (a *APIv1) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
-	_, err := hl.ContainsMandatoryParams()
+	_, err := containsMandatoryParams(hl)
 	if err != nil {
 		return nil, err
 	}

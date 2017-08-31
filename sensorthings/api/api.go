@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gost/server/configuration"
+	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/mqtt"
@@ -183,6 +184,41 @@ func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOpt
 	}
 
 	return fmt.Sprintf("%s%s", incomingURL, queryString)
+}
+
+func containsMandatoryParams(entity interface{}) (bool, []error) {
+	contains := false
+	var errors []error
+
+	if entity != nil {
+		switch e := entity.(type) {
+		case *entities.Thing:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.Location:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.HistoricalLocation:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.Datastream:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.Sensor:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.ObservedProperty:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.Observation:
+			contains, errors = e.ContainsMandatoryParams()
+		case *entities.FeatureOfInterest:
+			contains, errors = e.ContainsMandatoryParams()
+		}
+	}
+
+	// Wrap errors in BadRequest
+	if errors != nil {
+		for i := range errors {
+			errors[i] = gostErrors.NewBadRequestError(errors[i])
+		}
+	}
+
+	return contains, errors
 }
 
 // createArrayResponse creates the ArrayResponse to send back to the user

@@ -78,7 +78,7 @@ func (a *APIv1) PostDatastream(datastream *entities.Datastream) (*entities.Datas
 	var postedSensor *entities.Sensor
 	var postedObservations []*entities.Observation
 
-	_, errors = datastream.ContainsMandatoryParams()
+	_, errors = containsMandatoryParams(datastream)
 	if len(errors) > 0 {
 		a.revertPostDatastream(postedObservedProperty, postedSensor, postedObservations)
 		return nil, errors
