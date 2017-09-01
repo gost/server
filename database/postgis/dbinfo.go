@@ -2,6 +2,7 @@ package postgis
 
 import (
 	"fmt"
+
 	"github.com/gost/godata"
 	"github.com/gost/server/sensorthings/entities"
 )
@@ -205,7 +206,7 @@ func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
 }
 
 // QueryInfoExists checks if there is already a QueryParseInfo added based on the entity list
-func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) bool {
+func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) (bool, *QueryParseInfo) {
 	path := ""
 	for i, e := range etl {
 		if i == 0 {
@@ -216,15 +217,15 @@ func (q *QueryParseInfo) QueryInfoExists(etl []entities.EntityType) bool {
 	}
 
 	if path != "" {
-		for _, se := range q.SubEntities {
+		for i, se := range q.SubEntities {
 			p := fmt.Sprintf("%s/%s", q.Entity.GetEntityType().ToString(), path)
 			if se.getPath("") == p {
-				return true
+				return true, q.SubEntities[i]
 			}
 		}
 	}
 
-	return false
+	return false, nil
 }
 
 func (q *QueryParseInfo) getPath(path string) string {

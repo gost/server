@@ -1,12 +1,13 @@
 package postgis
 
 import (
+	"net/url"
+	"testing"
+
 	"github.com/gost/godata"
 	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"net/url"
 )
 
 func TestCreateQueryBuilder(t *testing.T) {
@@ -118,7 +119,7 @@ func TestCreateJoin(t *testing.T) {
 	thing := &entities.Thing{}
 	location := &entities.Location{}
 
-	join := qb.createJoin(thing, location, 1, false, nil, nil, "")
+	join := qb.createJoin(thing, location, 1, false, false, nil, nil, "")
 	assert.True(t, join == "INNER JOIN LATERAL (SELECT location.id AS location_id FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id WHERE location.id = 1) AS location on true ")
 }
 
@@ -128,8 +129,8 @@ func TestCreateJoinWithExpand(t *testing.T) {
 	thing := &entities.Thing{}
 	location := &entities.Location{}
 
-	join := qb.createJoin(thing, location, 1, true, nil, nil, "")
-	assert.True(t, join == "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ")
+	join := qb.createJoin(thing, location, 1, true, false, nil, nil, "")
+	assert.True(t, join == "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id  ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ")
 }
 func TestCreateCountQuery(t *testing.T) {
 	// arrange
@@ -238,7 +239,7 @@ func TestConstructQueryParseInfo(t *testing.T) {
 
 func TestSortQueryOptionsScenario1(t *testing.T) {
 	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
+	qb := CreateQueryBuilder("v1", 1)
 	uri, _ := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1")
 	qo, _ := odata.ParseURLQuery(uri.Query())
 
@@ -254,7 +255,7 @@ func TestSortQueryOptionsScenario1(t *testing.T) {
 
 func TestSortQueryOptionsScenario2(t *testing.T) {
 	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
+	qb := CreateQueryBuilder("v1", 1)
 	uri, _ := url.Parse("localhost/v1.0/Things?$filter=Datastreams/Observations/result ge 20")
 	qo, _ := odata.ParseURLQuery(uri.Query())
 
@@ -271,7 +272,7 @@ func TestSortQueryOptionsScenario2(t *testing.T) {
 
 func TestSortQueryOptionsScenario3(t *testing.T) {
 	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
+	qb := CreateQueryBuilder("v1", 1)
 	uri, _ := url.Parse("localhost/v1.0/Things?$expand=Locations,Datastreams/Observations&$filter=length(Datastreams/name) eq 10 and Datastreams/Observations/result ge 20")
 	qo, _ := odata.ParseURLQuery(uri.Query())
 
@@ -279,6 +280,8 @@ func TestSortQueryOptionsScenario3(t *testing.T) {
 	qb.sortQueryOptions(qo)
 
 	// assert
+	assert.Equal(t, 0, len(qo.Filter.Tree.Children))
+
 	assert.Equal(t, "Locations", qo.Expand.ExpandItems[0].Path[0].Value)
 
 	assert.Equal(t, "Datastreams", qo.Expand.ExpandItems[1].Path[0].Value)
@@ -296,7 +299,7 @@ func TestSortQueryOptionsScenario3(t *testing.T) {
 
 func TestSortQueryOptionsScenario4(t *testing.T) {
 	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
+	qb := CreateQueryBuilder("v1", 1)
 	uri, _ := url.Parse("localhost/v1.0/Observations?$filter=Datastream/id eq 1 and Datastream/name eq test or length(Datastream/name) eq 10")
 	qo, _ := odata.ParseURLQuery(uri.Query())
 
