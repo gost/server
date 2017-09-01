@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
-	gostErrors "github.com/gost/server/errors"
 )
 
 const (
@@ -47,7 +45,7 @@ func (o *Observation) ParseEntity(data []byte) error {
 	observation := &o
 	err := json.Unmarshal(data, observation)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse Observation"))
+		return errors.New("Unable to parse Observation")
 	}
 
 	return nil
@@ -63,7 +61,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 		o.PhenomenonTime = time.Now().UTC().Format(ISO8601)
 	} else {
 		if t, err := time.Parse(ISO8601, o.PhenomenonTime); err != nil {
-			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid phenomenonTime: %v", err.Error())))
+			errors = append(errors, fmt.Errorf("Invalid phenomenonTime: %v", err.Error()))
 		} else {
 			o.PhenomenonTime = t.UTC().Format("2006-01-02T15:04:05.000Z")
 		}
@@ -74,7 +72,7 @@ func (o *Observation) ContainsMandatoryParams() (bool, []error) {
 	if o.ResultTime != nil {
 		rt := *o.ResultTime
 		if t, err := time.Parse(ISO8601, rt); err != nil {
-			errors = append(errors, gostErrors.NewBadRequestError(fmt.Errorf("Invalid resultTime: %v", err.Error())))
+			errors = append(errors, fmt.Errorf("Invalid resultTime: %v", err.Error()))
 		} else {
 			rt = t.UTC().Format("2006-01-02T15:04:05.000Z")
 			t, _ = time.Parse(ISO8601, rt)

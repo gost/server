@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"strings"
 
+	"fmt"
+	"io/ioutil"
+
 	"github.com/gorilla/mux"
 	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/rest/writer"
-	"io/ioutil"
-	"fmt"
 )
 
 // GetEntityID retrieves the id from the request, for example
@@ -45,4 +47,18 @@ func CheckAndGetBody(w http.ResponseWriter, r *http.Request, indentJSON bool) []
 
 	byteData, _ := ioutil.ReadAll(r.Body)
 	return byteData
+}
+
+// ParseEntity tries to convert the byte data into the given interface of type entity
+// if an error returns it will be wraped inside an gosterror
+func ParseEntity(entity entities.Entity, data []byte) error {
+	var err error
+
+	err = entity.ParseEntity(data)
+
+	if err != nil {
+		err = gostErrors.NewBadRequestError(err)
+	}
+
+	return err
 }

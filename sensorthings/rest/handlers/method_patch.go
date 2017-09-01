@@ -20,7 +20,7 @@ func handlePatchRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reque
 		return
 	}
 
-	err := entity.ParseEntity(byteData)
+	err := reader.ParseEntity(entity, byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)
 		return

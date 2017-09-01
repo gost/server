@@ -3,8 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"errors"
-
-	gostErrors "github.com/gost/server/errors"
 )
 
 // Datastream in SensorThings represents a collection of Observations from a Sensor. A physical Sensor will send its
@@ -44,7 +42,7 @@ func (d *Datastream) ParseEntity(data []byte) error {
 	datastream := &d
 	err := json.Unmarshal(data, datastream)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse Datastream"))
+		return errors.New("Unable to parse Datastream")
 	}
 
 	return nil

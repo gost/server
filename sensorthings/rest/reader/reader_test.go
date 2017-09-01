@@ -1,14 +1,18 @@
 package reader
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
 
-	"github.com/gorilla/mux"
+	gostErrors "github.com/gost/server/errors"
+	"github.com/gost/server/sensorthings/entities"
+	"github.com/stretchr/testify/assert"
+
+	"bytes"
 	"io/ioutil"
 	"net/http/httptest"
-	"bytes"
+
+	"github.com/gorilla/mux"
 )
 
 func TestGetEntityId(t *testing.T) {
@@ -84,7 +88,6 @@ func TestCheckAndGetBodyWithNoBody(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
-
 func TestCheckAndGetBody(t *testing.T) {
 	// arrange
 	rr := httptest.NewRecorder()
@@ -95,4 +98,49 @@ func TestCheckAndGetBody(t *testing.T) {
 
 	// assert
 	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
+func TestParseEntity(t *testing.T) {
+	// arrange
+	thing := &entities.Thing{}
+	thingBytes := []byte("{\"name\": \"thing1\", \"description\": \"test thing 1\"}")
+
+	location := &entities.Location{}
+	historicalLocation := &entities.HistoricalLocation{}
+	datastream := &entities.Datastream{}
+	sensor := &entities.Sensor{}
+	observedProperty := &entities.ObservedProperty{}
+	observation := &entities.Observation{}
+	featureOfinterest := &entities.FeatureOfInterest{}
+
+	// act
+	tErr := ParseEntity(thing, thingBytes)
+	lErr := ParseEntity(location, nil)
+	hlErr := ParseEntity(historicalLocation, nil)
+	dErr := ParseEntity(datastream, nil)
+	sErr := ParseEntity(sensor, nil)
+	opErr := ParseEntity(observedProperty, nil)
+	oErr := ParseEntity(observation, nil)
+	fErr := ParseEntity(featureOfinterest, nil)
+
+	// assert
+	assert.Nil(t, tErr)
+	assert.Equal(t, thing.Name, "thing1")
+	assert.Equal(t, thing.Description, "test thing 1")
+	assert.Equal(t, 400, getStatusCode(lErr))
+	assert.Equal(t, 400, getStatusCode(hlErr))
+	assert.Equal(t, 400, getStatusCode(dErr))
+	assert.Equal(t, 400, getStatusCode(sErr))
+	assert.Equal(t, 400, getStatusCode(opErr))
+	assert.Equal(t, 400, getStatusCode(oErr))
+	assert.Equal(t, 400, getStatusCode(fErr))
+}
+
+func getStatusCode(err error) int {
+	switch e := err.(type) {
+	case gostErrors.APIError:
+		return e.GetHTTPErrorStatusCode()
+	}
+
+	return 0
 }

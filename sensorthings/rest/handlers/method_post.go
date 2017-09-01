@@ -20,7 +20,7 @@ func handlePostRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Reques
 		return
 	}
 
-	err := entity.ParseEntity(byteData)
+	err := reader.ParseEntity(entity, byteData)
 	if err != nil {
 		writer.SendError(w, []error{err}, indentJSON)
 		return

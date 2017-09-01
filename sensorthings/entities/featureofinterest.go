@@ -3,8 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"errors"
-
-	gostErrors "github.com/gost/server/errors"
 )
 
 // FeatureOfInterest in SensorThings represents the phenomena an Observation is detecting. In some cases a FeatureOfInterest
@@ -35,7 +33,7 @@ func (f *FeatureOfInterest) ParseEntity(data []byte) error {
 	foi := &f
 	err := json.Unmarshal(data, foi)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse FeatureOfInterest"))
+		return errors.New("Unable to parse FeatureOfInterest")
 	}
 
 	return nil

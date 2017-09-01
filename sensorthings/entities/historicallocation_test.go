@@ -86,7 +86,7 @@ func TestParseHistoricalLocationShouldFail(t *testing.T) {
 	err := historicalLocation.ParseEntity([]byte("hallo"))
 
 	//assert
-	assert.NotEqual(t, err, nil, "Historical parse from json should have failed")
+	assert.NotNil(t, err, "Historical parse from json should have failed")
 }
 
 func TestParseHistoricalLocationShouldSucceed(t *testing.T) {

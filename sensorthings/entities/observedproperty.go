@@ -3,8 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"errors"
-
-	gostErrors "github.com/gost/server/errors"
 )
 
 // ObservedProperty in SensorThings represents the physical phenomenon being observed by the Sensor. An ObserveProperty is
@@ -33,7 +31,7 @@ func (o *ObservedProperty) ParseEntity(data []byte) error {
 	op := &o
 	err := json.Unmarshal(data, op)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse ObservedProperty"))
+		return errors.New("Unable to parse ObservedProperty")
 	}
 
 	return nil

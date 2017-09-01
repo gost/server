@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 
-	gostErrors "github.com/gost/server/errors"
 	"time"
 )
 
@@ -33,10 +32,10 @@ func (h *HistoricalLocation) ParseEntity(data []byte) error {
 	hl := &h
 	err := json.Unmarshal(data, hl)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse HistoricalLocation"))
+		err = errors.New("Unable to parse HistoricalLocation")
 	}
 
-	return nil
+	return err
 }
 
 // ContainsMandatoryParams checks if all mandatory params for a HistoricalLocation are available before posting
@@ -55,7 +54,7 @@ func (h *HistoricalLocation) ContainsMandatoryParams() (bool, []error) {
 
 	CheckMandatoryParam(&err, h.Locations, h.GetEntityType(), "Location")
 	if len(h.Locations) == 0 {
-		err = append(err, gostErrors.NewBadRequestError(errors.New("Missing location")))
+		err = append(err, errors.New("Missing location"))
 	} else {
 		CheckMandatoryParam(&err, h.Locations[0].ID, h.GetEntityType(), "Location.ID")
 	}

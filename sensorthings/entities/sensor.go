@@ -3,8 +3,6 @@ package entities
 import (
 	"encoding/json"
 	"errors"
-
-	gostErrors "github.com/gost/server/errors"
 )
 
 // Sensor in SensorThings represents the physical device capable of observing a physical property and converting
@@ -34,7 +32,7 @@ func (s *Sensor) ParseEntity(data []byte) error {
 	sensor := &s
 	err := json.Unmarshal(data, sensor)
 	if err != nil {
-		return gostErrors.NewBadRequestError(errors.New("Unable to parse Sensor"))
+		return errors.New("Unable to parse Sensor")
 	}
 
 	return nil
