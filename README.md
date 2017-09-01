@@ -53,6 +53,8 @@ $ wget https://raw.githubusercontent.com/gost/docker-compose/master/docker-compo
 $ sudo docker-compose -f docker-compose-rpi.yml up
 ```
 
+For a complete tutorial about installing GOST on Raspberry Pi see https://github.com/gost/docs/blob/master/gost_raspberrypi.md
+
 ## OGC Compliance testing status
 
 GOST is being tested against the OGC SensorThings API Test Suite 1.0 [https://github.com/opengeospatial/ets-sta10](https://github.com/opengeospatial/ets-sta10)
