@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 )
 
 // tables as defined in postgis

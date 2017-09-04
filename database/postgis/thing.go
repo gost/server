@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 
 	"database/sql"
 	"errors"

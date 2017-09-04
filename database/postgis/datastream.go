@@ -9,7 +9,7 @@ import (
 
 	"github.com/gost/now"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -57,8 +57,8 @@ func datastreamParamFactory(values map[string]interface{}) (entities.Entity, err
 // GetObservedArea returns the observed area of all observations of datastream
 func (gdb *GostDatabase) GetObservedArea(id int) (map[string]interface{}, error) {
 	sqlString := "select ST_AsGeoJSON(ST_ConvexHull(ST_Collect(feature))) as geom from %s.featureofinterest where id in (select distinct featureofinterest_id from %s.observation where stream_id=%v)"
-	sql := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
-	rows, err := gdb.Db.Query(sql)
+	sql2 := fmt.Sprintf(sqlString, gdb.Schema, gdb.Schema, id)
+	rows, err := gdb.Db.Query(sql2)
 	var geom string
 	var propMap map[string]interface{}
 	defer rows.Close()
@@ -252,8 +252,8 @@ func (gdb *GostDatabase) PostDatastream(d *entities.Datastream) (*entities.Datas
 		return nil, gostErrors.NewBadRequestError(errors.New("ObservationType does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime, resulttime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s, %s) RETURNING id", gdb.Schema, geom, phenomenonTime, resultTime)
-	err = gdb.Db.QueryRow(sql, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.datastream (name, description, unitofmeasurement, observedarea, thing_id, sensor_id, observedproperty_id, observationtype, phenomenonTime, resulttime) VALUES ($1, $2, $3, %s, $4, $5, $6, $7, %s, %s) RETURNING id", gdb.Schema, geom, phenomenonTime, resultTime)
+	err = gdb.Db.QueryRow(sql2, d.Name, d.Description, unitOfMeasurement, tID, sID, oID, observationType.Code).Scan(&dsID)
 	if err != nil {
 		return nil, err
 	}

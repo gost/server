@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 )

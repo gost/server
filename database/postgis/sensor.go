@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -120,8 +120,8 @@ func (gdb *GostDatabase) PostSensor(sensor *entities.Sensor) (*entities.Sensor, 
 		return nil, err1
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4) RETURNING id", gdb.Schema)
-	err2 := gdb.Db.QueryRow(sql, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.sensor (name, description, encodingtype, metadata) VALUES ($1, $2, $3, $4) RETURNING id", gdb.Schema)
+	err2 := gdb.Db.QueryRow(sql2, sensor.Name, sensor.Description, encoding.Code, sensor.Metadata).Scan(&sensorID)
 	if err2 != nil {
 		return nil, err2
 	}

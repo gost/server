@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/gost/server/sensorthings/rest/reader"

@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -38,7 +38,7 @@ func TestPostLocation(t *testing.T) {
 	parseAndAssertLocation(*mockLocation, r, http.StatusCreated, t)
 }
 
-func TestPostLocationByThing(t *testing.T){
+func TestPostLocationByThing(t *testing.T) {
 	// arrange
 	mockLocation := newMockLocation(1)
 

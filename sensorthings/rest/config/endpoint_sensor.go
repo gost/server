@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/rest/endpoint"
 	"github.com/gost/server/sensorthings/rest/handlers"

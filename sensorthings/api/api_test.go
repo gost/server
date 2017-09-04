@@ -1,11 +1,11 @@
 package api
 
 import (
+	entities "github.com/gost/core"
 	"github.com/gost/server/configuration"
 	"github.com/gost/server/database/postgis"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/mqtt"
-	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/odata"
 
 	"fmt"

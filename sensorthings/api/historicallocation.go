@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 

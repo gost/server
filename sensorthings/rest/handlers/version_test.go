@@ -13,9 +13,9 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
+	entities "github.com/gost/core"
 	"github.com/gost/server/configuration"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/gost/server/sensorthings/rest/endpoint"

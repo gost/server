@@ -3,7 +3,7 @@ package endpoint
 import (
 	"testing"
 
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"sort"

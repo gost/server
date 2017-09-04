@@ -8,7 +8,7 @@ import (
 	"database/sql"
 
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/odata"
 	"strconv"
 )
@@ -174,9 +174,9 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 
 	json, _ := o.MarshalPostgresJSON()
 	obs := fmt.Sprintf("'%s'", string(json[:]))
-	sql := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
 
-	err := gdb.Db.QueryRow(sql).Scan(&oID)
+	err := gdb.Db.QueryRow(sql2).Scan(&oID)
 	if err != nil {
 		errString := fmt.Sprintf("%v", err.Error())
 		if strings.Contains(errString, "violates foreign key constraint \"fk_datastream\"") {

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

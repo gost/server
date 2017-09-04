@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 
 	"database/sql"
 	"errors"
@@ -148,8 +148,8 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
 
-	sql := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, location) VALUES ($1, $2, $3, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql, location.Name, location.Description, encoding.Code).Scan(&locationID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, location) VALUES ($1, $2, $3, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql2, location.Name, location.Description, encoding.Code).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
@@ -224,8 +224,8 @@ func (gdb *GostDatabase) LinkLocation(thingID interface{}, locationID interface{
 		return gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
-	sql := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
-	_, err3 := gdb.Db.Exec(sql, tid, lid)
+	sql2 := fmt.Sprintf("INSERT INTO %s.thing_to_location (thing_id, location_id) VALUES ($1, $2)", gdb.Schema)
+	_, err3 := gdb.Db.Exec(sql2, tid, lid)
 
 	return err3
 }

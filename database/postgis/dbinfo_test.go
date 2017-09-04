@@ -1,8 +1,8 @@
 package postgis
 
 import (
+	entities "github.com/gost/core"
 	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/entities"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

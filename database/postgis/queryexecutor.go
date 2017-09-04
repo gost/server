@@ -3,8 +3,7 @@ package postgis
 import (
 	"database/sql"
 	"fmt"
-	"github.com/gost/server/sensorthings/entities"
-
+	entities "github.com/gost/core"
 	"sort"
 	"strings"
 )

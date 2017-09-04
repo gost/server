@@ -27,6 +27,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/gost/core"
+  packages = ["."]
+  revision = "a84adc2024a340402dcb0f9abae6a75b3d00e387"
+
+[[projects]]
+  branch = "master"
   name = "github.com/gost/godata"
   packages = ["."]
   revision = "eb127307756fd2bc7431198f9d14d9efe9904c6d"
@@ -88,6 +94,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "80296184d04328d4c2184d73b7255c86314f9d96815a04561c034631f14b32aa"
+  inputs-digest = "513889b1a7a539a7adcd58a1959a7290bacf20c81644b8d3f8d7396930c3cf49"
   solver-name = "gps-cdcl"
   solver-version = 1

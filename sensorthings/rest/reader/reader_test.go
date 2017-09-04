@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/entities"
+	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 
 	"bytes"

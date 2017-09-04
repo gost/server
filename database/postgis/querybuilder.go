@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
+	entities "github.com/gost/core"
 	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/entities"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -856,9 +856,9 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 				// add a select of nil, if set to nil the QueryBuilder knows that the expand is generated
 				newExpandItem.Select = &godata.GoDataSelectQuery{
 					SelectItems: []*godata.SelectItem{
-						&godata.SelectItem{
+						{
 							Segments: []*godata.Token{
-								&godata.Token{
+								{
 									Value: "nil",
 								},
 							},
