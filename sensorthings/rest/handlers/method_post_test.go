@@ -1,12 +1,12 @@
 package handlers
 
 import (
+	"bytes"
 	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
 )
 
 func TestHandlePostTestWithWrongDataType(t *testing.T) {
@@ -21,7 +21,7 @@ func TestHandlePostTestWithWrongDataType(t *testing.T) {
 	handlePostRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePostTestWithNoBody(t *testing.T) {
@@ -36,7 +36,7 @@ func TestHandlePostTestWithNoBody(t *testing.T) {
 	handlePostRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePostTestWithWrongBody(t *testing.T) {
@@ -51,7 +51,7 @@ func TestHandlePostTestWithWrongBody(t *testing.T) {
 	handlePostRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePostTestWithError(t *testing.T) {
@@ -66,7 +66,7 @@ func TestHandlePostTestWithError(t *testing.T) {
 	handlePostRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandlePostTestWithGoodBody(t *testing.T) {
@@ -84,6 +84,6 @@ func TestHandlePostTestWithGoodBody(t *testing.T) {
 
 	// assert
 
-	assert.Equal(t,  http.StatusCreated, rr.Code)
-	assert.Equal(t,  thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
+	assert.Equal(t, http.StatusCreated, rr.Code)
+	assert.Equal(t, thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
 }

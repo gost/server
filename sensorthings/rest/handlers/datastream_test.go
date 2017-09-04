@@ -37,7 +37,7 @@ func TestGetDatastreamsByObservedProperty(t *testing.T) {
 
 func TestPostDatastream(t *testing.T) {
 	// arrange
-	mockDatastream:= newMockDatastream(1)
+	mockDatastream := newMockDatastream(1)
 
 	// act
 	r := request("POST", "/v1.0/datastreams", mockDatastream)
@@ -48,7 +48,7 @@ func TestPostDatastream(t *testing.T) {
 
 func TestPostDatastreamByThing(t *testing.T) {
 	// arrange
-	mockDatastream:= newMockDatastream(1)
+	mockDatastream := newMockDatastream(1)
 
 	// act
 	r := request("POST", "/v1.0/things(1)/datastreams", mockDatastream)

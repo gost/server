@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/gost/godata"
 	entities "github.com/gost/core"
+	"github.com/gost/godata"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 )

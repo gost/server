@@ -3,8 +3,8 @@ package postgis
 import (
 	"fmt"
 
-	"github.com/gost/godata"
 	entities "github.com/gost/core"
+	"github.com/gost/godata"
 )
 
 // tables as defined in postgis

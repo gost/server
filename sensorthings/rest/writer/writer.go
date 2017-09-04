@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"strings"
 
+	"errors"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
-	"errors"
 )
 
 // SendJSONResponse sends the desired message to the user

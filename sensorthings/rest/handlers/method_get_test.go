@@ -1,13 +1,13 @@
 package handlers
 
 import (
+	"errors"
 	entities "github.com/gost/core"
+	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"errors"
-	"github.com/gost/server/sensorthings/odata"
 )
 
 func testHandlerGet() (*entities.Thing, error) {
@@ -28,7 +28,7 @@ func TestHandleGetTestWithQueroOptionsError(t *testing.T) {
 	handleGetRequest(rr, nil, req, &handle, false, 10, "")
 
 	// assert
-	assert.Equal(t,  http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandleGetTestWithError(t *testing.T) {
@@ -42,7 +42,7 @@ func TestHandleGetTestWithError(t *testing.T) {
 	handleGetRequest(rr, nil, req, &handle, false, 10, "")
 
 	// assert
-	assert.Equal(t,  http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandleGetTestOk(t *testing.T) {
@@ -57,5 +57,5 @@ func TestHandleGetTestOk(t *testing.T) {
 
 	// assert
 
-	assert.Equal(t,  http.StatusOK, rr.Code)
+	assert.Equal(t, http.StatusOK, rr.Code)
 }

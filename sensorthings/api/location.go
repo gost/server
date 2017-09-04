@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	gostErrors "github.com/gost/server/errors"
 	entities "github.com/gost/core"
+	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	entities "github.com/gost/core"
 	"github.com/gost/server/configuration"
 	gostErrors "github.com/gost/server/errors"
-	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/mqtt"
 	"github.com/gost/server/sensorthings/odata"

@@ -2,16 +2,16 @@ package writer
 
 import (
 	"errors"
-	"github.com/gost/godata"
+	"fmt"
 	entities "github.com/gost/core"
+	"github.com/gost/godata"
+	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/gost/server/sensorthings/models"
-	"fmt"
-	"io/ioutil"
 )
 
 func TestSendErrorWithNoError(t *testing.T) {
@@ -153,7 +153,7 @@ func TestCountCollection(t *testing.T) {
 	qo := &odata.QueryOptions{}
 	c := odata.GoDataCollectionCountQuery(true)
 	qo.CollectionCount = &c
-	ar := models.ArrayResponse{ Count: 10 }
+	ar := models.ArrayResponse{Count: 10}
 
 	// act
 	SendJSONResponse(rr, http.StatusOK, ar, qo, false)

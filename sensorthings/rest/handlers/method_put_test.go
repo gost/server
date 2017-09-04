@@ -1,13 +1,13 @@
 package handlers
 
 import (
+	"bytes"
+	"errors"
 	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
-	"errors"
 )
 
 func testHandler() (*entities.Thing, []error) {
@@ -15,7 +15,7 @@ func testHandler() (*entities.Thing, []error) {
 }
 
 func testHandlerError() (*entities.Thing, []error) {
-	return nil, []error {errors.New("Test error")}
+	return nil, []error{errors.New("Test error")}
 }
 
 func TestHandlePutTestWithWrongDataType(t *testing.T) {
@@ -30,7 +30,7 @@ func TestHandlePutTestWithWrongDataType(t *testing.T) {
 	handlePutRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePutTestWithNoBody(t *testing.T) {
@@ -45,7 +45,7 @@ func TestHandlePutTestWithNoBody(t *testing.T) {
 	handlePutRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePutTestWithWrongBody(t *testing.T) {
@@ -60,7 +60,7 @@ func TestHandlePutTestWithWrongBody(t *testing.T) {
 	handlePutRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePutTestWithPutError(t *testing.T) {
@@ -75,7 +75,7 @@ func TestHandlePutTestWithPutError(t *testing.T) {
 	handlePutRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandlePutTestWithGoodBody(t *testing.T) {
@@ -93,6 +93,6 @@ func TestHandlePutTestWithGoodBody(t *testing.T) {
 
 	// assert
 
-	assert.Equal(t,  http.StatusOK, rr.Code)
-	assert.Equal(t,  thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
 }

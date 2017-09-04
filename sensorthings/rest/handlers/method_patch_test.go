@@ -1,13 +1,13 @@
 package handlers
 
 import (
+	"bytes"
+	"errors"
 	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"bytes"
-	"errors"
 )
 
 func testHandlerPatch() (*entities.Thing, error) {
@@ -30,7 +30,7 @@ func TestHandlePatchTestWithWrongDataType(t *testing.T) {
 	handlePatchRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePatchTestWithNoBody(t *testing.T) {
@@ -45,7 +45,7 @@ func TestHandlePatchTestWithNoBody(t *testing.T) {
 	handlePatchRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePatchTestWithWrongBody(t *testing.T) {
@@ -60,7 +60,7 @@ func TestHandlePatchTestWithWrongBody(t *testing.T) {
 	handlePatchRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusBadRequest, rr.Code)
 }
 
 func TestHandlePatchTestWithPutError(t *testing.T) {
@@ -75,7 +75,7 @@ func TestHandlePatchTestWithPutError(t *testing.T) {
 	handlePatchRequest(rr, nil, req, thing, &handle, false)
 
 	// assert
-	assert.Equal(t,  http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandlePatchTestWithGoodBody(t *testing.T) {
@@ -93,6 +93,6 @@ func TestHandlePatchTestWithGoodBody(t *testing.T) {
 
 	// assert
 
-	assert.Equal(t,  http.StatusOK, rr.Code)
-	assert.Equal(t,  thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, thing.GetSelfLink(), rr.HeaderMap.Get("Location"), "Expected header with Location to entity")
 }

@@ -3,8 +3,8 @@ package models
 import (
 	"net/http"
 
-	"github.com/gost/server/configuration"
 	entities "github.com/gost/core"
+	"github.com/gost/server/configuration"
 	"github.com/gost/server/sensorthings/odata"
 )
 

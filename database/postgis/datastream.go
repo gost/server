@@ -7,9 +7,9 @@ import (
 
 	"database/sql"
 
+	entities "github.com/gost/core"
 	"github.com/gost/now"
 	gostErrors "github.com/gost/server/errors"
-	entities "github.com/gost/core"
 	"github.com/gost/server/sensorthings/odata"
 )
 

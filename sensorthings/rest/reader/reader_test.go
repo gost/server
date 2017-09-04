@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	gostErrors "github.com/gost/server/errors"
 	entities "github.com/gost/core"
+	gostErrors "github.com/gost/server/errors"
 	"github.com/stretchr/testify/assert"
 
 	"bytes"
