@@ -82,7 +82,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo *odata.QueryOptions) (*entities.Location, error) {
 	intID, ok := ToIntID(datastreamID)
 	if !ok {
-		return nil, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+		return nil, gostErrors.NewRequestNotFound(errors.New("datastream does not exist"))
 	}
 
 	qo = &odata.QueryOptions{}
@@ -134,7 +134,7 @@ func processLocations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL strin
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, fmt.Errorf("error executing count %v", err)
 		}
 	}
 
