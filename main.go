@@ -41,7 +41,7 @@ func init() {
 	}
 
 	configuration.SetEnvironmentVariables(&conf)
-	logger, err := gostLog.InitializeLogger(file, conf.Logger.FileName, new(log.TextFormatter), conf.Logger.Verbose)
+	logger, err := gostLog.InitializeLogger(file, conf.Logger.FileName, &log.TextFormatter{FullTimestamp: true}, conf.Logger.Verbose)
 	if err != nil {
 		log.Println("Error initializing logger, defaulting to stdout. Error: " + err.Error())
 	}

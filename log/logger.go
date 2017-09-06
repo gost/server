@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -53,10 +54,26 @@ func InitializeLogger(file *os.File, logFileName string, format log.Formatter, v
 	if verboseFlag {
 		gostLogger.Level = log.DebugLevel
 	} else {
-		gostLogger.Level = log.WarnLevel
+		gostLogger.Level = log.InfoLevel
 	}
 
 	return gostLogger, err
+}
+
+// DebugWithElapsedTime writes a new debug line, including a field with elapsed time
+// call with defer at the start of a function: defer DebugWithElapsedTime(logger, time.Now(), "test")
+func DebugWithElapsedTime(entry *log.Entry, start time.Time, args ...interface{}) {
+	elapsed := time.Since(start)
+	l := entry.WithFields(log.Fields{"elapsed": elapsed})
+	l.Debug(args)
+}
+
+// DebugfWithElapsedTime writes a new debug format line, including a field with elapsed time
+// call with defer at the start of a function: defer DebugWithElapsedTime(logger, time.Now(), "test %v", "test")
+func DebugfWithElapsedTime(entry *log.Entry, start time.Time, format string, args ...interface{}) {
+	elapsed := time.Since(start)
+	l := entry.WithFields(log.Fields{"elapsed": elapsed})
+	l.Debugf(format, args...)
 }
 
 // CleanUp after the logger is closed

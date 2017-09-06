@@ -3,15 +3,23 @@ package postgis
 import (
 	"database/sql"
 	"fmt"
-	entities "github.com/gost/core"
 	"sort"
 	"strings"
+	"time"
+
+	entities "github.com/gost/core"
+	gostLog "github.com/gost/server/log"
+	log "github.com/sirupsen/logrus"
 )
 
 var idAsSuffix = fmt.Sprintf("%s%s", asSeparator, idField)
 
 // ExecuteSelectCount runs a given count query and returns the value
 func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
+	if logger.Logger.Level == log.DebugLevel {
+		defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "execute count query: %s", sql)
+	}
+
 	var count int
 	db.QueryRow(sql).Scan(&count)
 
@@ -20,6 +28,10 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 
 // ExecuteSelect executes the select query and creates the retrieved entities
 func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity, error) {
+	if logger.Logger.Level == log.DebugLevel {
+		defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "execute select query: %s", sql)
+	}
+
 	rows, err := db.Query(sql)
 	if err != nil {
 		return nil, err

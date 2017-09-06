@@ -1,12 +1,23 @@
 package log
 
 import (
+	"bytes"
+	"io"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	testFile        *os.File
+	testLogger      *log.Logger
+	err             error
+	testLogFileName = "testLog"
+	testVerboseFlag = true
 )
 
 func TestGetInstanceWithoutInitialization(t *testing.T) {
@@ -19,17 +30,8 @@ func TestGetInstanceWithoutInitialization(t *testing.T) {
 }
 
 func TestLoggerLifecycle(t *testing.T) {
-
 	//Setup
-	var (
-		testFile        *os.File
-		testLogger      *log.Logger
-		testLogFileName = "testLog"
-		testVerboseFlag = true
-	)
-
-	//Initialize
-	testLogger, err := InitializeLogger(testFile, testLogFileName, new(log.TextFormatter), testVerboseFlag)
+	testLogger, err = InitializeLogger(testFile, testLogFileName, new(log.TextFormatter), testVerboseFlag)
 	assert.NoError(t, err, "Initialization error should be nil")
 	assert.NotNil(t, testLogger, "Logger must have been initialized")
 
@@ -51,4 +53,43 @@ func TestLoggerLifecycle(t *testing.T) {
 
 func TestCleanUpWithoutInitialization(t *testing.T) {
 	assert.NotPanics(t, func() { CleanUp() }, "Must not panic")
+}
+
+func TestDebugWithElapsedTime(t *testing.T) {
+	testLogger, err = InitializeLogger(testFile, "", new(log.TextFormatter), true)
+	entry := testLogger.WithFields(log.Fields{"package": "gost.server.log"})
+
+	f := func() { DebugWithElapsedTime(entry, time.Now(), "test") }
+	message := captureStdout(f)
+
+	//assert
+	assert.Contains(t, message, "elapsed")
+	assert.Contains(t, message, "test")
+}
+
+func TestDebugfWithElapsedTime(t *testing.T) {
+	testLogger, err = InitializeLogger(testFile, "", new(log.TextFormatter), true)
+	entry := testLogger.WithFields(log.Fields{"package": "gost.server.log"})
+
+	f := func() { DebugfWithElapsedTime(entry, time.Now(), "test %s", "1") }
+	message := captureStdout(f)
+
+	//assert
+	assert.Contains(t, message, "elapsed")
+	assert.Contains(t, message, "test 1")
+}
+
+func captureStdout(f func()) string {
+	old := testLogger.Out
+	r, w, _ := os.Pipe()
+	testLogger.Out = w
+
+	f()
+
+	w.Close()
+	testLogger.Out = old
+
+	var buf bytes.Buffer
+	io.Copy(&buf, r)
+	return buf.String()
 }
