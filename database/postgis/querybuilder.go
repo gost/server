@@ -7,7 +7,9 @@ import (
 
 	entities "github.com/gost/core"
 	"github.com/gost/godata"
+	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/odata"
+	log "github.com/sirupsen/logrus"
 )
 
 // QueryBuilder can construct queries based on entities and QueryOptions
@@ -973,6 +975,10 @@ func findFirstCouplingParseNode(pn *godata.ParseNode) *godata.ParseNode {
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) string {
+	if logger.Logger.Level == log.DebugLevel {
+		defer gostLog.DebugWithElapsedTime(logger, time.Now(), "constructing count query")
+	}
+
 	var qo *odata.QueryOptions
 
 	if queryOptions != nil {
@@ -1009,6 +1015,10 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 //   id: e2 == nil: where e1.id = ... | e2 != nil: where e2.id = ...
 // example: Datastreams(1)/Thing = CreateQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) (string, *QueryParseInfo) {
+	if logger.Logger.Level == log.DebugLevel {
+		defer gostLog.DebugWithElapsedTime(logger, time.Now(), "constructing select query")
+	}
+
 	var qo *odata.QueryOptions
 	qo = nil
 
@@ -1080,6 +1090,5 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		qb.getOffset(qo),
 	)
 
-	//fmt.Printf("%s\n", queryString)
 	return queryString, qpi
 }
