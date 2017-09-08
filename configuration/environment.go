@@ -8,7 +8,13 @@ import (
 
 // SetEnvironmentVariables changes config settings when certain environment variables are found
 func SetEnvironmentVariables(conf *Config) {
-	// Server settings
+	setEnvironmentServerSettings(conf)
+	setEnvironmentDatabaseSettings(conf)
+	setEnvironmentMQTTSettings(conf)
+	setEnvironmentLoggerSettings(conf)
+}
+
+func setEnvironmentServerSettings(conf *Config) {
 	gostServerName := os.Getenv("GOST_SERVER_NAME")
 	if gostServerName != "" {
 		conf.Server.Name = gostServerName
@@ -67,30 +73,9 @@ func SetEnvironmentVariables(conf *Config) {
 	if gostServerHTTPSCert != "" {
 		conf.Server.HTTPSCert = gostServerHTTPSCert
 	}
+}
 
-	// MQTT settings
-	gostMQTTEnabled := os.Getenv("GOST_MQTT_ENABLED")
-	if gostMQTTEnabled != "" {
-		h, err := strconv.ParseBool(gostMQTTEnabled)
-		if err == nil {
-			conf.MQTT.Enabled = h
-		}
-	}
-
-	gostMQTTHost := os.Getenv("GOST_MQTT_HOST")
-	if gostMQTTHost != "" {
-		conf.MQTT.Host = gostMQTTHost
-	}
-
-	gostMQTTPort := os.Getenv("GOST_MQTT_PORT")
-	if gostMQTTPort != "" {
-		port, err := strconv.Atoi(gostMQTTPort)
-		if err == nil {
-			conf.MQTT.Port = int(port)
-		}
-	}
-
-	// Database settings
+func setEnvironmentDatabaseSettings(conf *Config) {
 	gostDbHost := os.Getenv("GOST_DB_HOST")
 	if gostDbHost != "" {
 		conf.Database.Host = gostDbHost
@@ -147,8 +132,32 @@ func SetEnvironmentVariables(conf *Config) {
 			conf.Database.MaxOpenConns = open
 		}
 	}
+}
 
-	//Logger settings
+func setEnvironmentMQTTSettings(conf *Config) {
+	gostMQTTEnabled := os.Getenv("GOST_MQTT_ENABLED")
+	if gostMQTTEnabled != "" {
+		h, err := strconv.ParseBool(gostMQTTEnabled)
+		if err == nil {
+			conf.MQTT.Enabled = h
+		}
+	}
+
+	gostMQTTHost := os.Getenv("GOST_MQTT_HOST")
+	if gostMQTTHost != "" {
+		conf.MQTT.Host = gostMQTTHost
+	}
+
+	gostMQTTPort := os.Getenv("GOST_MQTT_PORT")
+	if gostMQTTPort != "" {
+		port, err := strconv.Atoi(gostMQTTPort)
+		if err == nil {
+			conf.MQTT.Port = int(port)
+		}
+	}
+}
+
+func setEnvironmentLoggerSettings(conf *Config) {
 	gostLoggerFileName := os.Getenv("GOST_LOG_FILENAME")
 	if gostLoggerFileName != "" {
 		conf.Logger.FileName = gostLoggerFileName
