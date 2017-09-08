@@ -135,9 +135,15 @@ func LowerCaseURI(h http.Handler) http.Handler {
 // the response. In this case modify links (due to proxy running) or handle CORS functionality
 // Basically we catch all the response using httptest.NewRecorder (headers + body), modify and
 // write to response. Is this a right approach?
-func PostProcessHandler(h http.Handler, externalUri string) http.Handler {
+func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		origURI := externalUri
+
+		if logger.Logger.Level == log.DebugLevel {
+			logger.Debugf("%s start: %s", r.Method, r.URL.Path)
+			defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "%s done: %s", r.Method, r.URL.Path)
+		}
+
+		origURI := externalURI
 		forwardedURI := r.Header.Get("X-Forwarded-For")
 
 		rec := httptest.NewRecorder()

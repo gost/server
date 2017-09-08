@@ -65,7 +65,7 @@ func InitializeLogger(file *os.File, logFileName string, format log.Formatter, v
 func DebugWithElapsedTime(entry *log.Entry, start time.Time, args ...interface{}) {
 	elapsed := time.Since(start)
 	l := entry.WithFields(log.Fields{"elapsed": elapsed})
-	l.Debug(args)
+	l.Debug(args...)
 }
 
 // DebugfWithElapsedTime writes a new debug format line, including a field with elapsed time
