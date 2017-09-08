@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"errors"
+
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
@@ -27,42 +28,13 @@ func SendJSONResponse(w http.ResponseWriter, status int, data interface{}, qo *o
 		if qo != nil {
 			// $count for collection is requested url/$count and not the query ?$count=true, ToDo: move to API code?e
 			if qo.CollectionCount != nil && bool(*qo.CollectionCount) == true {
-				var m map[string]json.RawMessage
-				json.Unmarshal(b, &m)
-				if count, ok := m["@iot.count"]; ok {
-					b = []byte(string(count))
-				} else {
-					SendError(w, []error{gostErrors.NewBadRequestError(errors.New("/$count not available for endpoint"))}, indentJSON)
-					return
-				}
+				b, err = convertForCountResponse(b, qo)
 			} else if qo.Value != nil && bool(*qo.Value) == true {
-				// $value is requested only send back the value
-				errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems)
-				var m map[string]json.RawMessage
-				err = json.Unmarshal(b, &m)
-				if err != nil || qo.Select == nil || qo.Select.SelectItems == nil || len(qo.Select.SelectItems) == 0 {
-					SendError(w, []error{gostErrors.NewRequestInternalServerError(errMessage)}, indentJSON)
-					return
-				}
+				b, err = convertForValueResponse(b, qo)
+			}
 
-				// if selected equals the key in json add to mVal
-				mVal := []byte{}
-				for k, v := range m {
-					if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
-						mVal = v
-					}
-				}
-
-				if len(mVal) == 0 {
-					SendError(w, []error{gostErrors.NewBadRequestError(errMessage)}, indentJSON)
-					return
-				}
-
-				value := string(mVal[:])
-				value = strings.TrimPrefix(value, "\"")
-				value = strings.TrimSuffix(value, "\"")
-
-				b = []byte(value)
+			if err != nil {
+				SendError(w, []error{err}, indentJSON)
 			}
 		}
 
@@ -125,4 +97,46 @@ func SendError(w http.ResponseWriter, error []error, indentJSON bool) {
 	}
 
 	SendJSONResponse(w, statusCode, errorResponse, nil, indentJSON)
+}
+
+func convertForValueResponse(b []byte, qo *odata.QueryOptions) ([]byte, error) {
+	// $value is requested only send back the value
+	errMessage := fmt.Errorf("Unable to retrieve $value for %v", qo.Select.SelectItems)
+	var m map[string]json.RawMessage
+	err := json.Unmarshal(b, &m)
+	if err != nil || qo.Select == nil || qo.Select.SelectItems == nil || len(qo.Select.SelectItems) == 0 {
+		return nil, gostErrors.NewRequestInternalServerError(errMessage)
+	}
+
+	// if selected equals the key in json add to mVal
+	mVal := []byte{}
+	for k, v := range m {
+		if strings.ToLower(k) == qo.Select.SelectItems[0].Segments[0].Value {
+			mVal = v
+		}
+	}
+
+	if len(mVal) == 0 {
+		return nil, gostErrors.NewBadRequestError(errMessage)
+	}
+
+	value := string(mVal[:])
+	value = strings.TrimPrefix(value, "\"")
+	value = strings.TrimSuffix(value, "\"")
+
+	b = []byte(value)
+
+	return b, nil
+}
+
+func convertForCountResponse(b []byte, qo *odata.QueryOptions) ([]byte, error) {
+	var m map[string]json.RawMessage
+	json.Unmarshal(b, &m)
+	if count, ok := m["@iot.count"]; ok {
+		b = []byte(string(count))
+	} else {
+		return nil, gostErrors.NewBadRequestError(errors.New("/$count not available for endpoint"))
+	}
+
+	return b, nil
 }
