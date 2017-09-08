@@ -1,10 +1,15 @@
 package postgis
 
 import (
+	"testing"
+
 	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
+
+func init() {
+	setupLogger()
+}
 
 func TestToIntIDForString(t *testing.T) {
 	// arrange
