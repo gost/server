@@ -297,8 +297,8 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 		for i, t := range o.Path {
 			nQPI := &QueryParseInfo{}
 			et, _ := entities.EntityFromString(strings.ToLower(t.Value))
-
 			path := make([]entities.EntityType, 0)
+
 			for p := 0; p < i+1; p++ {
 				etfs, _ := entities.EntityFromString(o.Path[p].Value)
 				path = append(path, etfs.GetEntityType())
@@ -793,6 +793,12 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 		} else {
 			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
 			*currentExpand = append([]string{pn.Children[0].Token.Value}, *currentExpand...)
+
+			// if [0] is not an entity do nothing
+			_, err := entities.EntityFromString(pn.Children[0].Token.Value)
+			if err != nil {
+				return
+			}
 
 			cp := *currentExpand
 			field := cp[len(cp)-1]

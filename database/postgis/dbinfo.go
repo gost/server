@@ -176,6 +176,10 @@ func (q *QueryParseInfo) Init(entityType entities.EntityType, queryIndex int, pa
 
 // GetParent returns the parent entity for a given list of entity types
 func (q *QueryParseInfo) GetParent(etl []entities.EntityType) *QueryParseInfo {
+	if len(etl) == 0 {
+		return q
+	}
+
 	cq := q
 	path := ""
 	if len(etl) > 1 {
