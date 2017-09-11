@@ -92,7 +92,7 @@ func (a *APIv1) GetVersionInfo() *models.VersionInfo {
 }
 
 // GetBasePathInfo when navigating to the base resource path will return a JSON array of the available SensorThings resource endpoints.
-func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
+func (a *APIv1) GetBasePathInfo() *entities.ArrayResponse {
 	bpi := []models.Endpoint{}
 	ep := *a.GetEndpoints()
 	for _, e := range ep {
@@ -102,7 +102,7 @@ func (a *APIv1) GetBasePathInfo() *models.ArrayResponse {
 	}
 
 	var i interface{} = bpi
-	basePathInfo := models.ArrayResponse{
+	basePathInfo := entities.ArrayResponse{
 		Data: &i,
 	}
 
@@ -222,8 +222,8 @@ func containsMandatoryParams(entity interface{}) (bool, []error) {
 }
 
 // createArrayResponse creates the ArrayResponse to send back to the user
-func (a *APIv1) createArrayResponse(count int, path string, qo *odata.QueryOptions, data interface{}) *models.ArrayResponse {
-	ar := &models.ArrayResponse{
+func (a *APIv1) createArrayResponse(count int, path string, qo *odata.QueryOptions, data interface{}) *entities.ArrayResponse {
+	ar := &entities.ArrayResponse{
 		NextLink: a.CreateNextLink(count, path, qo),
 		Data:     &data,
 	}

@@ -55,8 +55,8 @@ func main() {
 	signal.Notify(stop, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		<-stop
+		// mainLogger.Info("GOST stopped gracefully")
 		cleanup()
-		mainLogger.Info("GOST stopped gracefully")
 		os.Exit(1)
 	}()
 

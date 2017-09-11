@@ -5,7 +5,6 @@ import (
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -32,7 +31,7 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 }
 
 // GetObservedProperties todo
-func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	ops, count, err := a.db.GetObservedProperties(qo)
 	if err != nil {
 		return nil, err

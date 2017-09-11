@@ -5,7 +5,6 @@ import (
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -32,12 +31,12 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 }
 
 // GetFeatureOfInterests return FeaturesOfInterest based on the given QueryOptions
-func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	fois, count, err := a.db.GetFeatureOfInterests(qo)
 	return processFeatureOfInterest(a, fois, qo, path, count, err)
 }
 
-func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
 		a.SetLinks(&i, qo)

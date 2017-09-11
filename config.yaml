@@ -23,6 +23,6 @@ mqtt:
     host: localhost
     port: 1883
 logger:
-    fileName: 
-    verbose: false
+    fileName:
+    verbose: true
  

@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 
 	gostErrors "github.com/gost/server/errors"
@@ -33,7 +32,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, pa
 }
 
 // GetSensors retrieves an array of sensors based on the given query
-func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	sensors, count, err := a.db.GetSensors(qo)
 	if err != nil {
 		return nil, err

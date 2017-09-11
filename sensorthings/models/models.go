@@ -20,24 +20,24 @@ type API interface {
 
 	GetAcceptedPaths() []string
 	GetVersionInfo() *VersionInfo
-	GetBasePathInfo() *ArrayResponse
+	GetBasePathInfo() *entities.ArrayResponse
 	GetEndpoints() *map[entities.EntityType]Endpoint
 	GetTopics() *[]Topic
 
 	GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
 	GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
-	GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
-	GetThings(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetThings(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostThing(thing *entities.Thing) (*entities.Thing, []error)
 	PatchThing(id interface{}, thing *entities.Thing) (*entities.Thing, error)
 	PutThing(id interface{}, thing *entities.Thing) (*entities.Thing, []error)
 	DeleteThing(id interface{}) error
 
 	GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error)
-	GetLocations(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostLocation(location *entities.Location) (*entities.Location, []error)
 	PostLocationByThing(thingID interface{}, location *entities.Location) (*entities.Location, []error)
 	PatchLocation(id interface{}, location *entities.Location) (*entities.Location, error)
@@ -45,20 +45,20 @@ type API interface {
 	DeleteLocation(id interface{}) error
 
 	GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.HistoricalLocation, error)
-	GetHistoricalLocations(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetHistoricalLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error)
 	PutHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error)
 	PatchHistoricalLocation(id interface{}, hl *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	DeleteHistoricalLocation(id interface{}) error
 
 	GetDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error)
-	GetDatastreams(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetDatastreams(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	GetDatastreamByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error)
-	GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetDatastreamsByObservedProperty(sensorID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetDatastreamsByObservedProperty(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error)
 	PostDatastreamByThing(thingID interface{}, datastream *entities.Datastream) (*entities.Datastream, []error)
 	PatchDatastream(id interface{}, datastream *entities.Datastream) (*entities.Datastream, error)
@@ -67,16 +67,16 @@ type API interface {
 
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error)
-	GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	PatchFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	PutFeatureOfInterest(id interface{}, foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error)
 	DeleteFeatureOfInterest(id interface{}) error
 
 	GetObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Observation, error)
-	GetObservations(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
-	GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetObservations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
+	GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostObservation(observation *entities.Observation) (*entities.Observation, []error)
 	PostObservationByDatastream(datastreamID interface{}, observation *entities.Observation) (*entities.Observation, []error)
 	PatchObservation(id interface{}, observation *entities.Observation) (*entities.Observation, error)
@@ -84,7 +84,7 @@ type API interface {
 	DeleteObservation(id interface{}) error
 
 	GetObservedProperty(id interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error)
-	GetObservedProperties(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetObservedProperties(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error)
 	PostObservedProperty(op *entities.ObservedProperty) (*entities.ObservedProperty, []error)
 	PatchObservedProperty(id interface{}, op *entities.ObservedProperty) (*entities.ObservedProperty, error)
@@ -93,7 +93,7 @@ type API interface {
 
 	GetSensor(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error)
 	GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error)
-	GetSensors(qo *odata.QueryOptions, path string) (*ArrayResponse, error)
+	GetSensors(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error)
 	PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error)
 	PatchSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
@@ -254,67 +254,6 @@ type GostServerVersion struct {
 // APIVersion contains version information on the supported SensorThings API version
 type APIVersion struct {
 	Version string `json:"version"`
-}
-
-// ArrayResponse is the default response format for sending content back used by the server
-type ArrayResponse struct {
-	Count    int          `json:"@iot.count,omitempty"`
-	NextLink string       `json:"@iot.nextLink,omitempty"`
-	Data     *interface{} `json:"value"`
-}
-
-// ArrayResponseEndpoint can be used to parse an array response containing endpoint information
-type ArrayResponseEndpoint struct {
-	ArrayResponse
-	Data []*entities.Endpoint `json:"value"`
-}
-
-// ArrayResponseThings can be used to parse an array response containing things
-type ArrayResponseThings struct {
-	ArrayResponse
-	Data []*entities.Thing `json:"value"`
-}
-
-// ArrayResponseLocations can be used to parse an array response containing locations
-type ArrayResponseLocations struct {
-	ArrayResponse
-	Data []*entities.Location `json:"value"`
-}
-
-// ArrayResponseHistoricalLocations can be used to parse an array response containing historical locations
-type ArrayResponseHistoricalLocations struct {
-	ArrayResponse
-	Data []*entities.HistoricalLocation `json:"value"`
-}
-
-// ArrayResponseDatastreams can be used to parse an array response containing datastreams
-type ArrayResponseDatastreams struct {
-	ArrayResponse
-	Data []*entities.Datastream `json:"value"`
-}
-
-// ArrayResponseSensors can be used to parse an array response containing sensors
-type ArrayResponseSensors struct {
-	ArrayResponse
-	Data []*entities.Sensor `json:"value"`
-}
-
-// ArrayResponseObservedProperty can be used to parse an array response containing observed properties
-type ArrayResponseObservedProperty struct {
-	ArrayResponse
-	Data []*entities.ObservedProperty `json:"value"`
-}
-
-// ArrayResponseObservations can be used to parse an array response containing observations
-type ArrayResponseObservations struct {
-	ArrayResponse
-	Data []*entities.Observation `json:"value"`
-}
-
-// ArrayResponseFeaturesOfInterest can be used to parse an array response containing features of interest
-type ArrayResponseFeaturesOfInterest struct {
-	ArrayResponse
-	Data []*entities.FeatureOfInterest `json:"value"`
 }
 
 // ErrorResponse is the default response format for sending errors back

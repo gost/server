@@ -2,7 +2,6 @@ package api
 
 import (
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 
 	"errors"
@@ -22,24 +21,24 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, pa
 }
 
 // GetHistoricalLocations retrieves all HistoricalLocations
-func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, err := a.db.GetHistoricalLocations(qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
-func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
-func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	hl, count, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
 	return processHistoricalLocations(a, hl, qo, path, count, err)
 }
 
-func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range historicalLocations {
 		i := *item
 		a.SetLinks(&i, qo)

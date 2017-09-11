@@ -7,7 +7,6 @@ import (
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -35,7 +34,7 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, pat
 }
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
-func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	things, count, err := a.db.GetThingsByLocation(id, qo)
 	return processThings(a, things, qo, path, count, err)
 }
@@ -52,12 +51,12 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 }
 
 // GetThings returns an array of thing entities based on the QueryOptions
-func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	things, count, err := a.db.GetThings(qo)
 	return processThings(a, things, qo, path, count, err)
 }
 
-func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}

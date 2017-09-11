@@ -23,24 +23,24 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions, path stri
 }
 
 // GetObservations return all observations by given QueryOptions
-func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, err := a.db.GetObservations(qo)
 	return processObservations(a, observations, qo, path, count, err)
 }
 
 // GetObservationsByFeatureOfInterest returns all observation by given FeatureOfInterest end QueryOptions
-func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
 	return processObservations(a, observations, qo, path, count, err)
 }
 
 // GetObservationsByDatastream returns all observations by given Datastream and QueryOptions
-func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	observations, count, err := a.db.GetObservationsByDatastream(datastreamID, qo)
 	return processObservations(a, observations, qo, path, count, err)
 }
 
-func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}

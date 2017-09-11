@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/gost/core"
   packages = ["."]
-  revision = "f2e6126fd07ba1e4aeee33dbb241c41f94448dbc"
+  revision = "ca780faeb481a25bc67faaf5d4c7272681a998e3"
 
 [[projects]]
   branch = "master"

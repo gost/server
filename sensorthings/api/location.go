@@ -7,7 +7,6 @@ import (
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -89,24 +88,24 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string)
 }
 
 // GetLocations retrieves all locations from the database and returns it as and ArrayResponse
-func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, err := a.db.GetLocations(qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
-func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
-func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	locations, count, err := a.db.GetLocationsByThing(thingID, qo)
 	return processLocations(a, locations, qo, path, count, err)
 }
 
-func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
 		a.SetLinks(&i, qo)

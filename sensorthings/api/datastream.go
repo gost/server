@@ -5,7 +5,6 @@ import (
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 )
 
@@ -21,13 +20,13 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 }
 
 // GetDatastreams retrieves an array of sensors based on the given query
-func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, err := a.db.GetDatastreams(qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
-func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, err := a.db.GetDatastreamsByThing(thingID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
@@ -44,18 +43,18 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 }
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
-func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, err := a.db.GetDatastreamsBySensor(sensorID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
-func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	datastreams, count, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
 	return processDatastreams(a, datastreams, qo, path, count, err)
 }
 
-func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, count int, err error) (*models.ArrayResponse, error) {
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
