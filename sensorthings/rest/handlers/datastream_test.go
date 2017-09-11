@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -111,7 +110,7 @@ func assertDatastream(created, returned entities.Datastream, t *testing.T) {
 func getAndAssertDatastreams(url string, t *testing.T) {
 	// act
 	r, _ := http.Get(getServer().URL + url)
-	ar := models.ArrayResponseDatastreams{}
+	ar := entities.ArrayResponseDatastreams{}
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &ar)
 

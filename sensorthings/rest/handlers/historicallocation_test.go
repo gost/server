@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -91,7 +90,7 @@ func assertHistoricalLocation(created, returned entities.HistoricalLocation, t *
 func getAndAssertHistoricalLocations(url string, t *testing.T) {
 	// act
 	r, _ := http.Get(getServer().URL + url)
-	ar := models.ArrayResponseHistoricalLocations{}
+	ar := entities.ArrayResponseHistoricalLocations{}
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &ar)
 

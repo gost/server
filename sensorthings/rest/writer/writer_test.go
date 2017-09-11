@@ -5,7 +5,6 @@ import (
 	"fmt"
 	entities "github.com/gost/core"
 	"github.com/gost/godata"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/gost/server/sensorthings/odata"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
@@ -153,7 +152,7 @@ func TestCountCollection(t *testing.T) {
 	qo := &odata.QueryOptions{}
 	c := odata.GoDataCollectionCountQuery(true)
 	qo.CollectionCount = &c
-	ar := models.ArrayResponse{Count: 10}
+	ar := entities.ArrayResponse{Count: 10}
 
 	// act
 	SendJSONResponse(rr, http.StatusOK, ar, qo, false)
@@ -170,7 +169,7 @@ func TestCountCollectionError(t *testing.T) {
 	qo := &odata.QueryOptions{}
 	c := odata.GoDataCollectionCountQuery(true)
 	qo.CollectionCount = &c
-	ar := models.ArrayResponse{}
+	ar := entities.ArrayResponse{}
 
 	// act
 	SendJSONResponse(rr, http.StatusOK, ar, qo, false)

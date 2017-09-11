@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -88,7 +87,7 @@ func assertObservedProperty(created, returned entities.ObservedProperty, t *test
 func getAndAssertObservedProperties(url string, t *testing.T) {
 	// act
 	r, _ := http.Get(getServer().URL + url)
-	ar := models.ArrayResponseObservedProperty{}
+	ar := entities.ArrayResponseObservedProperty{}
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &ar)
 

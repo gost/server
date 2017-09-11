@@ -171,7 +171,7 @@ func (a *MockAPI) GetConfig() *configuration.Config {
 }
 
 func (a *MockAPI) GetAcceptedPaths() []string { return []string{} }
-func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse {
+func (a *MockAPI) GetBasePathInfo() *entities.ArrayResponse {
 	bpi := []models.Endpoint{}
 	ep := *a.GetEndpoints()
 	for _, e := range ep {
@@ -181,7 +181,7 @@ func (a *MockAPI) GetBasePathInfo() *models.ArrayResponse {
 	}
 
 	var i interface{} = bpi
-	basePathInfo := models.ArrayResponse{
+	basePathInfo := entities.ArrayResponse{
 		Data: &i,
 	}
 
@@ -203,13 +203,13 @@ func (a *MockAPI) CreateNextLink(count int, incomingURL string, qo *odata.QueryO
 func (a *MockAPI) GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	return getMockThing(id)
 }
-func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetThings(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockThings()
 }
 func (a *MockAPI) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
 	return getMockThing(id)
 }
-func (a *MockAPI) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockThings()
 }
 func (a *MockAPI) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error) {
@@ -280,65 +280,65 @@ func getMockObservation(id interface{}) (*entities.Observation, error) {
 	return newMockObservation(intID), nil
 }
 
-func getMockThings() (*models.ArrayResponse, error) {
+func getMockThings() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Thing{newMockThing(1), newMockThing(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockLocations() (*models.ArrayResponse, error) {
+func getMockLocations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Location{newMockLocation(1), newMockLocation(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockHistoricalLocations() (*models.ArrayResponse, error) {
+func getMockHistoricalLocations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.HistoricalLocation{newMockHistoricalLocation(1), newMockHistoricalLocation(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockfeaturesOfInterest() (*models.ArrayResponse, error) {
+func getMockfeaturesOfInterest() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.FeatureOfInterest{newMockFeatureOfInterest(1), newMockFeatureOfInterest(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockSensors() (*models.ArrayResponse, error) {
+func getMockSensors() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Sensor{newMockSensor(1), newMockSensor(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockObservedProperties() (*models.ArrayResponse, error) {
+func getMockObservedProperties() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.ObservedProperty{newMockObservedProperty(1), newMockObservedProperty(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockObservations() (*models.ArrayResponse, error) {
+func getMockObservations() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Observation{newMockObservation(1), newMockObservation(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
 }
 
-func getMockDatastreams() (*models.ArrayResponse, error) {
+func getMockDatastreams() (*entities.ArrayResponse, error) {
 	var data interface{} = []*entities.Datastream{newMockDatastream(1), newMockDatastream(2)}
-	return &models.ArrayResponse{
+	return &entities.ArrayResponse{
 		Count: 2,
 		Data:  &data,
 	}, nil
@@ -359,13 +359,13 @@ func (a *MockAPI) DeleteThing(id interface{}) error { return nil }
 func (a *MockAPI) GetLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Location, error) {
 	return getMockLocation(id)
 }
-func (a *MockAPI) GetLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockLocations()
 }
-func (a *MockAPI) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockLocations()
 }
-func (a *MockAPI) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockLocations()
 }
 func (a *MockAPI) PostLocation(location *entities.Location) (*entities.Location, []error) {
@@ -385,13 +385,13 @@ func (a *MockAPI) DeleteLocation(id interface{}) error { return nil }
 func (a *MockAPI) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.HistoricalLocation, error) {
 	return getMockHistoricalLocation(id)
 }
-func (a *MockAPI) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockHistoricalLocations()
 }
-func (a *MockAPI) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockHistoricalLocations()
 }
-func (a *MockAPI) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockHistoricalLocations()
 }
 func (a *MockAPI) PostHistoricalLocation(hl *entities.HistoricalLocation) (*entities.HistoricalLocation, []error) {
@@ -408,19 +408,19 @@ func (a *MockAPI) DeleteHistoricalLocation(id interface{}) error { return nil }
 func (a *MockAPI) GetDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
 	return getMockDatastream(id)
 }
-func (a *MockAPI) GetDatastreams(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetDatastreams(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockDatastreams()
 }
 func (a *MockAPI) GetDatastreamByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Datastream, error) {
 	return getMockDatastream(id)
 }
-func (a *MockAPI) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockDatastreams()
 }
-func (a *MockAPI) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockDatastreams()
 }
-func (a *MockAPI) GetDatastreamsByObservedProperty(sensorID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetDatastreamsByObservedProperty(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockDatastreams()
 }
 func (a *MockAPI) PostDatastream(datastream *entities.Datastream) (*entities.Datastream, []error) {
@@ -443,7 +443,7 @@ func (a *MockAPI) GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions, p
 func (a *MockAPI) GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.FeatureOfInterest, error) {
 	return getMockFeatureOfInterest(1)
 }
-func (a *MockAPI) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockfeaturesOfInterest()
 }
 func (a *MockAPI) PostFeatureOfInterest(foi *entities.FeatureOfInterest) (*entities.FeatureOfInterest, []error) {
@@ -460,13 +460,13 @@ func (a *MockAPI) DeleteFeatureOfInterest(id interface{}) error { return nil }
 func (a *MockAPI) GetObservation(id interface{}, qo *odata.QueryOptions, path string) (*entities.Observation, error) {
 	return getMockObservation(id)
 }
-func (a *MockAPI) GetObservations(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetObservations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockObservations()
 }
-func (a *MockAPI) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockObservations()
 }
-func (a *MockAPI) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockObservations()
 }
 func (a *MockAPI) PostObservation(observation *entities.Observation) (*entities.Observation, []error) {
@@ -486,7 +486,7 @@ func (a *MockAPI) DeleteObservation(id interface{}) error { return nil }
 func (a *MockAPI) GetObservedProperty(id interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
 	return getMockObservedProperty(id)
 }
-func (a *MockAPI) GetObservedProperties(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetObservedProperties(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockObservedProperties()
 }
 func (a *MockAPI) GetObservedPropertyByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ObservedProperty, error) {
@@ -509,7 +509,7 @@ func (a *MockAPI) GetSensor(id interface{}, qo *odata.QueryOptions, path string)
 func (a *MockAPI) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Sensor, error) {
 	return getMockSensor(id)
 }
-func (a *MockAPI) GetSensors(qo *odata.QueryOptions, path string) (*models.ArrayResponse, error) {
+func (a *MockAPI) GetSensors(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
 	return getMockSensors()
 }
 func (a *MockAPI) PostSensor(sensor *entities.Sensor) (*entities.Sensor, []error) { return sensor, nil }

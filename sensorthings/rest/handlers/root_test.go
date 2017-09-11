@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/gost/server/sensorthings/models"
+	entities "github.com/gost/core"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"testing"
@@ -20,7 +20,7 @@ func TestHandleRoot(t *testing.T) {
 
 	// act
 	r := request("GET", "/v1.0", nil)
-	arrayResponse := models.ArrayResponseEndpoint{}
+	arrayResponse := entities.ArrayResponseEndpoint{}
 	body, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(body, &arrayResponse)
 

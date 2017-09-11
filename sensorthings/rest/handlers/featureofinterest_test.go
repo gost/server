@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -89,7 +88,7 @@ func assertFeatureOfInterest(created, returned entities.FeatureOfInterest, t *te
 func getAndAssertFeaturesOfInterest(url string, t *testing.T) {
 	// act
 	r, _ := http.Get(getServer().URL + url)
-	ar := models.ArrayResponseFeaturesOfInterest{}
+	ar := entities.ArrayResponseFeaturesOfInterest{}
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &ar)
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/models"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -105,7 +104,7 @@ func assertLocation(created, returned entities.Location, t *testing.T) {
 func getAndAssertLocations(url string, t *testing.T) {
 	// act
 	r, _ := http.Get(getServer().URL + url)
-	ar := models.ArrayResponseLocations{}
+	ar := entities.ArrayResponseLocations{}
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &ar)
 
