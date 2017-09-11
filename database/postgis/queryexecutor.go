@@ -43,42 +43,13 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 	count := len(columns)
 	values := make([]interface{}, count)
 	valueP := make([]interface{}, count)
-	deleteIDMap := make(map[int]bool)
-	queryParseInfoMap := make(map[int]*QueryParseInfo)                 // QueryID to QueryParseInfo
 	currentQIDEntityID := make(map[int]interface{})                    // keeps track of the current query id and entity id
 	parentEntities := []entities.Entity{}                              // array of parent entities
 	subEntities := map[int]map[int]map[interface{}][]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
 	relationMap := q.GetQueryIDRelationMap(nil)
-	asMap := make(map[string]string)
 	parsedMap := make(map[int]map[int]map[interface{}]map[interface{}]interface{})
-	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
-	ranges := map[int]*QueryParseInfo{}
-	qpi := q
-	queryID := -1
-	for i, c := range columns {
-		if strings.HasSuffix(c, idAsSuffix) {
-			queryID++
-			qpi = q.GetQueryParseInfoByQueryIndex(queryID)
-			queryParseInfoMap[queryID] = qpi
 
-			// construct deleteIDMap
-			deleteIDMap[qpi.QueryIndex] = false
-			if qpi.ExpandItem != nil && qpi.ExpandItem.Select != nil {
-				found := false
-
-				for _, p := range qpi.ExpandItem.Select.SelectItems {
-					if p.Segments[0].Value == "id" {
-						found = true
-					}
-				}
-				deleteIDMap[qpi.QueryIndex] = !found
-			}
-		}
-		ranges[i] = qpi
-
-		slashIndex := strings.Index(c, "_")
-		asMap[c] = c[slashIndex+1:]
-	}
+	queryParseInfoMap, deleteIDMap, ranges, asMap := prepareExecuteSelect(columns, q)
 
 	for rows.Next() {
 		for i := range columns {
@@ -86,27 +57,9 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 		}
 
 		rows.Scan(valueP...)
-		sortEntities := make(map[int]map[string]interface{})
 
 		// split a row into the desired entities (row can contain multiple entities due to join queries)
-		for i, col := range columns {
-			var v interface{}
-			val := values[i]
-			b, ok := val.([]byte)
-
-			if ok {
-				v = string(b)
-			} else {
-				v = val
-			}
-
-			_, ok = sortEntities[ranges[i].QueryIndex]
-			if !ok {
-				sortEntities[ranges[i].QueryIndex] = make(map[string]interface{})
-			}
-
-			sortEntities[ranges[i].QueryIndex][asMap[col]] = v
-		}
+		sortEntities := rowToEntities(columns, values, ranges, asMap)
 
 		keys := []int{}
 		for k := range sortEntities {
@@ -180,13 +133,89 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 		}
 	}
 
+	// Parse all database results into entities starting with parent entities
 	for _, entity := range parentEntities {
 		parseResults(entity, 0, relationMap, subEntities, deleteIDMap)
 	}
 
-	for _, parentEntity := range parentEntities {
+	// Remove all needed id fields that weren't requested by the user
+	deleteIDFields(parentEntities, deleteIDMap, subEntities)
+
+	// if no parent entities are found return nil, nil
+	if len(parentEntities) == 0 {
+		return nil, nil
+	}
+
+	return parentEntities, nil
+}
+
+func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryParseInfo, map[int]bool, map[int]*QueryParseInfo, map[string]string) {
+	queryID := -1
+	qpi := q
+	queryParseInfoMap := make(map[int]*QueryParseInfo) // QueryID to QueryParseInfo
+	deleteIDMap := make(map[int]bool)
+	ranges := map[int]*QueryParseInfo{}
+	asMap := make(map[string]string)
+
+	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
+
+	for i, c := range columns {
+		if strings.HasSuffix(c, idAsSuffix) {
+			queryID++
+			qpi = q.GetQueryParseInfoByQueryIndex(queryID)
+			queryParseInfoMap[queryID] = qpi
+
+			// construct deleteIDMap
+			deleteIDMap[qpi.QueryIndex] = false
+			if qpi.ExpandItem != nil && qpi.ExpandItem.Select != nil {
+				found := false
+
+				for _, p := range qpi.ExpandItem.Select.SelectItems {
+					if p.Segments[0].Value == "id" {
+						found = true
+					}
+				}
+				deleteIDMap[qpi.QueryIndex] = !found
+			}
+		}
+		ranges[i] = qpi
+
+		slashIndex := strings.Index(c, "_")
+		asMap[c] = c[slashIndex+1:]
+	}
+
+	return queryParseInfoMap, deleteIDMap, ranges, asMap
+}
+
+func rowToEntities(columns []string, values []interface{}, ranges map[int]*QueryParseInfo, asMap map[string]string) map[int]map[string]interface{} {
+	sortEntities := make(map[int]map[string]interface{})
+
+	for i := range columns {
+		var v interface{}
+		val := values[i]
+		b, ok := val.([]byte)
+
+		if ok {
+			v = string(b)
+		} else {
+			v = val
+		}
+
+		_, ok = sortEntities[ranges[i].QueryIndex]
+		if !ok {
+			sortEntities[ranges[i].QueryIndex] = make(map[string]interface{})
+		}
+
+		sortEntities[ranges[i].QueryIndex][asMap[columns[i]]] = v
+	}
+
+	return sortEntities
+}
+
+func deleteIDFields(parentEntities []entities.Entity, deleteIDMap map[int]bool, subEntities map[int]map[int]map[interface{}][]entities.Entity) {
+	for i := range parentEntities {
 		if deleteIDMap[0] {
-			parentEntity.SetID(nil)
+			parentEntities[i].SetID(nil)
 		}
 
 		for subQI := range subEntities {
@@ -197,30 +226,22 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 			for parentQID := range subEntities[subQI] {
 				for parentID := range subEntities[subQI][parentQID] {
 					entityMap := subEntities[subQI][parentQID][parentID]
-					for _, se := range entityMap {
-						se.SetID(nil)
+					for j := range entityMap {
+						entityMap[j].SetID(nil)
 					}
 				}
 			}
 
 			parentIDMap := subEntities[subQI]
 			for pID := range parentIDMap {
-				for _, entityMap := range parentIDMap[pID] {
-					for _, se := range entityMap {
-						se.SetID(nil)
+				for k := range parentIDMap[pID] {
+					for l := range parentIDMap[pID][k] {
+						parentIDMap[pID][k][l].SetID(nil)
 					}
 				}
 			}
-
 		}
 	}
-
-	parentEntitiesLength := len(parentEntities)
-	if parentEntitiesLength == 0 {
-		return nil, nil
-	}
-
-	return parentEntities, nil
 }
 
 func parseResults(entity entities.Entity, from int, relationMap map[int]int, subEntities map[int]map[int]map[interface{}][]entities.Entity, removeIDMap map[int]bool) {
@@ -241,76 +262,108 @@ func parseResults(entity entities.Entity, from int, relationMap map[int]int, sub
 func addRelationToEntity(parent entities.Entity, subEntities []entities.Entity) {
 	switch parentEntity := parent.(type) {
 	case *entities.Thing:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.HistoricalLocation:
-				parentEntity.HistoricalLocations = append(parentEntity.HistoricalLocations, subEntity)
-			case *entities.Location:
-				parentEntity.Locations = append(parentEntity.Locations, subEntity)
-			case *entities.Datastream:
-				parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
-			}
-		}
+		addRelationToThing(parentEntity, subEntities)
 	case *entities.Location:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.HistoricalLocation:
-				parentEntity.HistoricalLocations = append(parentEntity.HistoricalLocations, subEntity)
-			case *entities.Thing:
-				parentEntity.Things = append(parentEntity.Things, subEntity)
-			}
-		}
+		addRelationToLocation(parentEntity, subEntities)
 	case *entities.HistoricalLocation:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Thing:
-				parentEntity.Thing = subEntity
-			case *entities.Location:
-				parentEntity.Locations = append(parentEntity.Locations, subEntity)
-			}
-		}
+		addRelationToHistoricalLocation(parentEntity, subEntities)
 	case *entities.Datastream:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Observation:
-				parentEntity.Observations = append(parentEntity.Observations, subEntity)
-			case *entities.Thing:
-				parentEntity.Thing = subEntity
-			case *entities.Sensor:
-				parentEntity.Sensor = subEntity
-			case *entities.ObservedProperty:
-				parentEntity.ObservedProperty = subEntity
-			}
-		}
+		addRelationToDatastream(parentEntity, subEntities)
 	case *entities.Sensor:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Datastream:
-				parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
-			}
-		}
+		addRelationToSensor(parentEntity, subEntities)
 	case *entities.ObservedProperty:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Datastream:
-				parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
-			}
-		}
+		addRelationToObservedProperty(parentEntity, subEntities)
 	case *entities.Observation:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Datastream:
-				parentEntity.Datastream = subEntity
-			case *entities.FeatureOfInterest:
-				parentEntity.FeatureOfInterest = subEntity
-			}
-		}
+		addRelationToObservation(parentEntity, subEntities)
 	case *entities.FeatureOfInterest:
-		for _, se := range subEntities {
-			switch subEntity := se.(type) {
-			case *entities.Observation:
-				parentEntity.Observations = append(parentEntity.Observations, subEntity)
-			}
+		addRelationToFeatureOfInterest(parentEntity, subEntities)
+	}
+}
+
+func addRelationToThing(parentEntity *entities.Thing, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.HistoricalLocation:
+			parentEntity.HistoricalLocations = append(parentEntity.HistoricalLocations, subEntity)
+		case *entities.Location:
+			parentEntity.Locations = append(parentEntity.Locations, subEntity)
+		case *entities.Datastream:
+			parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
+		}
+	}
+}
+
+func addRelationToLocation(parentEntity *entities.Location, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.HistoricalLocation:
+			parentEntity.HistoricalLocations = append(parentEntity.HistoricalLocations, subEntity)
+		case *entities.Thing:
+			parentEntity.Things = append(parentEntity.Things, subEntity)
+		}
+	}
+}
+
+func addRelationToHistoricalLocation(parentEntity *entities.HistoricalLocation, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Thing:
+			parentEntity.Thing = subEntity
+		case *entities.Location:
+			parentEntity.Locations = append(parentEntity.Locations, subEntity)
+		}
+	}
+}
+
+func addRelationToDatastream(parentEntity *entities.Datastream, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Observation:
+			parentEntity.Observations = append(parentEntity.Observations, subEntity)
+		case *entities.Thing:
+			parentEntity.Thing = subEntity
+		case *entities.Sensor:
+			parentEntity.Sensor = subEntity
+		case *entities.ObservedProperty:
+			parentEntity.ObservedProperty = subEntity
+		}
+	}
+}
+
+func addRelationToSensor(parentEntity *entities.Sensor, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Datastream:
+			parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
+		}
+	}
+}
+
+func addRelationToObservedProperty(parentEntity *entities.ObservedProperty, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Datastream:
+			parentEntity.Datastreams = append(parentEntity.Datastreams, subEntity)
+		}
+	}
+}
+
+func addRelationToObservation(parentEntity *entities.Observation, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Datastream:
+			parentEntity.Datastream = subEntity
+		case *entities.FeatureOfInterest:
+			parentEntity.FeatureOfInterest = subEntity
+		}
+	}
+}
+
+func addRelationToFeatureOfInterest(parentEntity *entities.FeatureOfInterest, subEntities []entities.Entity) {
+	for _, se := range subEntities {
+		switch subEntity := se.(type) {
+		case *entities.Observation:
+			parentEntity.Observations = append(parentEntity.Observations, subEntity)
 		}
 	}
 }
