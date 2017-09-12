@@ -34,6 +34,12 @@ Binaries are build for Windows, Ubuntu and OSX.
 | 2017-09-17 	| 0.6                 	| TBD                                                             	|
 
 
+## Run GOST with Docker-compose
+
+For more information about running GOST with Docker-compose, see <a href="https://github.com/gost/docs/blob/master/gost_docker.md">GOST Docker support</a>.
+
+For more information about running GOST in Raspberry Pi with Docker-compose, see <a href="https://github.com/gost/docs/blob/master/gost_raspberrypi.md">How to run GOST on Raspberry Pi</a>.
+
 ## Run GOST Server in Docker
 
 For making connection to external database use environmental variables GOST_DB_HOST, GOST_DB_PORT, GOST_DB_DATABASE, GOST_DB_USER, GOST_DB_PASSWORD
