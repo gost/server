@@ -57,14 +57,7 @@ $ docker run -v myconfiglocation:/gostserver/config geodan/gost -config /gostser
 ## Build GOST server Docker image 
 
 ```
-$ git clone https://github.com/Geodan/gost.git
-
-$ cd src/github.com/geodan/gost/src
-
-$ docker build -t geodan/gost:latest .
-
-$ docker push geodan/gost
-
+$ docker build -t geodan/gost .
 ```
 
 ## Build GOST server for Raspberry Pi
