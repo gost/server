@@ -34,26 +34,49 @@ Binaries are build for Windows, Ubuntu and OSX.
 | 2017-09-17 	| 0.6                 	| TBD                                                             	|
 
 
-## Docker support
+## Running GOST server with docker run
 
-See [GOST and Docker](https://github.com/gost/docs/blob/master/gost_docker.md)
-
-TL;DR:
+- Start geodan/gost-db which creates an user postgres with password postgres and initialises a database named gost
+- Start geodan/gost and set info to connect to gost-db, gost will be available at http://localhost:8080/v1.0
+- Start geodan/gost-dashboard and link gost to use GOST trough nginx, gost + dashboard available at http://localhost:8081
 
 ```
-$ wget https://raw.githubusercontent.com/gost/docker-compose/master/docker-compose.yml 
-
-$ docker-compose up
+$ docker run -d -p 5432:5432 -e POSTGRES_DB=gost -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres --name gost-db geodan/gost-db
+$ docker run -d -p 8080:8080 --link gost-db:gost-db -e GOST_DB_HOST=gost-db -e GOST_DB_USER=postgres -e GOST_DB_PASSWORD=postgres --name gost geodan/gost
+$ docker run -d -p 8081:8080 --link gost:gost --name gost-dashboard geodan/gost-dashboard		
 ```
 
-or on Raspberry Pi (experimental):
+For making connection to external database use environmental variables GOST_DB_HOST, GOST_DB_PORT, GOST_DB_DATABASE, GOST_DB_USER, GOST_DB_PASSWORD
 ```
-$ wget https://raw.githubusercontent.com/gost/docker-compose/master/docker-compose-rpi.yml
-
-$ sudo docker-compose -f docker-compose-rpi.yml up
+$ docker run -d -p 8080:8080 -t -e GOST_DB_HOST=192.168.40.10 -e GOST_DB_DTABASE=gost --name gost geodan/gost
 ```
 
-For a complete tutorial about installing GOST on Raspberry Pi see https://github.com/gost/docs/blob/master/gost_raspberrypi.md
+If you want to load your own config file, mount a location with your config.yaml file to /gostserver/config. If the filename does not equals config.yaml you have to run gost with the -config parameter:
+```
+$ docker run -v myconfiglocation:/gostserver/config geodan/gost -config /gostserver/config/myconfig.yaml
+```
+
+## Building GOST server 
+
+```
+$ git clone https://github.com/Geodan/gost.git
+
+$ cd src/github.com/geodan/gost/src
+
+$ docker build -t geodan/gost:latest .
+
+$ docker push geodan/gost
+
+```
+## Building GOST server for Raspberry Pi
+
+note: building the Raspberry Pi image must be done on a Raspberry Pi :-(, otherwise errors will occur.
+
+```
+pi@raspberrypi:~/dev/go/src/github.com/Geodan/gost $ sudo docker build -f Dockerfile-rpi -t geodan/rpi-gost .
+
+pi@raspberrypi:~/dev/go/src/github.com/Geodan/gost $ sudo docker push geodan/rpi-gost
+```
 
 ## OGC Compliance testing status
 
