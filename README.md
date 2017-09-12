@@ -72,9 +72,9 @@ $ docker push geodan/gost
 note: building the Raspberry Pi image must be done on a Raspberry Pi :-(, otherwise errors will occur.
 
 ```
-pi@raspberrypi:~/dev/go/src/github.com/Geodan/gost $ sudo docker build -f Dockerfile-rpi -t geodan/rpi-gost .
+$ sudo docker build -f Dockerfile-rpi -t geodan/rpi-gost .
 
-pi@raspberrypi:~/dev/go/src/github.com/Geodan/gost $ sudo docker push geodan/rpi-gost
+$ sudo docker push geodan/rpi-gost
 ```
 
 ## OGC Compliance testing status
