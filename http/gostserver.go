@@ -171,6 +171,7 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 			// the location url too
 			if k == "Location" && len(forwardedURI) > 0 {
 				if origURI == "http://localhost:8080/" {
+					// idea: run net.LookupAddr(forwardeduri) to get hostname instead of ip address?
 					val = strings.Replace(val, "localhost", forwardedURI, -1)
 				}
 			}
