@@ -171,6 +171,7 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 			// the location url too
 			if k == "Location" && len(forwardedURI) > 0 {
 				if origURI == "http://localhost:8080/" {
+					logger.Debugf("proxy + location header detected. forwarded uri: %s", forwardedURI)
 					val = strings.Replace(val, origURI, forwardedURI, -1)
 				}
 			}
