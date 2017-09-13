@@ -87,7 +87,7 @@ GOST is being tested against the OGC SensorThings API Test Suite 1.0 [https://gi
 
 Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/details/?pid=1419](http://www.opengeospatial.org/resource/products/details/?pid=1419)
 
-## Installation and configuration
+## Manual Installation and configuration
 
 [GOST installation](https://github.com/gost/docs/blob/master/gost_installation.md)
 
