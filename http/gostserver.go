@@ -158,7 +158,7 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 			if len(forwardedURI) > 0 {
 				// if both are changed (X-Forwarded-For and External uri environment variabele) use the last one
 				if origURI == "http://localhost:8080/" {
-					s = strings.Replace(s, origURI, forwardedURI, -1)
+					s = strings.Replace(s, "localhost", forwardedURI, -1)
 				}
 			}
 
@@ -171,6 +171,7 @@ func PostProcessHandler(h http.Handler, externalURI string) http.Handler {
 			// the location url too
 			if k == "Location" && len(forwardedURI) > 0 {
 				if origURI == "http://localhost:8080/" {
+					logger.Debugf("proxy + location header detected. forwarded uri: %s", forwardedURI)
 					// idea: run net.LookupAddr(forwardeduri) to get hostname instead of ip address?
 					val = strings.Replace(val, "localhost", forwardedURI, -1)
 				}
