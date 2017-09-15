@@ -9,6 +9,7 @@ import (
 
 	entities "github.com/gost/core"
 	gostLog "github.com/gost/server/log"
+	"github.com/gost/server/sensorthings/odata"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -27,14 +28,15 @@ func ExecuteSelectCount(db *sql.DB, sql string) (int, error) {
 }
 
 // ExecuteSelect executes the select query and creates the retrieved entities
-func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity, error) {
+func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOptions) ([]entities.Entity, bool, error) {
+	hasNextPage := false
 	if logger.Logger.Level == log.DebugLevel {
 		defer gostLog.DebugfWithElapsedTime(logger, time.Now(), "execute select query: %s", sql)
 	}
 
 	rows, err := db.Query(sql)
 	if err != nil {
-		return nil, err
+		return nil, hasNextPage, err
 	}
 
 	defer rows.Close()
@@ -121,7 +123,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 
 			newEntity, err := queryParseInfoMap[qi].Parse(data)
 			if err != nil {
-				return nil, err
+				return nil, hasNextPage, err
 			}
 
 			if qi == 0 {
@@ -143,10 +145,17 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string) ([]entities.Entity
 
 	// if no parent entities are found return nil, nil
 	if len(parentEntities) == 0 {
-		return nil, nil
+		return nil, hasNextPage, nil
 	}
 
-	return parentEntities, nil
+	// To check if there is a next page an additional entity is requested, check if more items
+	// returned than requested and remove the extra entity
+	if qo != nil && qo.Top != nil && len(parentEntities) > int(*qo.Top) {
+		hasNextPage = true
+		parentEntities = append(parentEntities[:int(*qo.Top)])
+	}
+
+	return parentEntities, hasNextPage, nil
 }
 
 func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryParseInfo, map[int]bool, map[int]*QueryParseInfo, map[string]string) {

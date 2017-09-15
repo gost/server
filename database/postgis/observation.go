@@ -7,10 +7,11 @@ import (
 
 	"database/sql"
 
+	"strconv"
+
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/odata"
-	"strconv"
 )
 
 func observationParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -86,38 +87,38 @@ func (gdb *GostDatabase) GetObservation(id interface{}, qo *odata.QueryOptions) 
 }
 
 // GetObservations retrieves all observations
-func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
+func (gdb *GostDatabase) GetObservations(qo *odata.QueryOptions) ([]*entities.Observation, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, nil, nil, qo)
-	return processObservations(gdb.Db, query, qi, countSQL)
+	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetObservationsByFeatureOfInterest retrieves all observations by the given FeatureOfInterest id
-func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
+func (gdb *GostDatabase) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, bool, error) {
 	intID, ok := ToIntID(foiID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.FeatureOfInterest{}, intID, qo)
-	return processObservations(gdb.Db, query, qi, countSQL)
+	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetObservationsByDatastream retrieves all observations by the given datastream id
-func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, error) {
+func (gdb *GostDatabase) GetObservationsByDatastream(dataStreamID interface{}, qo *odata.QueryOptions) ([]*entities.Observation, int, bool, error) {
 	intID, ok := ToIntID(dataStreamID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("FeatureOfInterest does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Observation{}, &entities.Datastream{}, intID, qo)
-	return processObservations(gdb.Db, query, qi, countSQL)
+	return processObservations(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processObservation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Observation, error) {
-	observations, _, err := processObservations(db, sql, qi, "")
+	observations, _, _, err := processObservations(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +130,10 @@ func processObservation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.O
 	return observations[0], nil
 }
 
-func processObservations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Observation, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processObservations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Observation, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
 	}
 
 	o := make([]*entities.Observation, 0)
@@ -145,11 +146,11 @@ func processObservations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL st
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return o, count, nil
+	return o, count, hasNext, nil
 }
 
 // PutObservation replaces an observation to the database

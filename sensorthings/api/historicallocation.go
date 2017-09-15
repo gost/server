@@ -22,23 +22,23 @@ func (a *APIv1) GetHistoricalLocation(id interface{}, qo *odata.QueryOptions, pa
 
 // GetHistoricalLocations retrieves all HistoricalLocations
 func (a *APIv1) GetHistoricalLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	hl, count, err := a.db.GetHistoricalLocations(qo)
-	return processHistoricalLocations(a, hl, qo, path, count, err)
+	hl, count, hasNext, err := a.db.GetHistoricalLocations(qo)
+	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
 // GetHistoricalLocationsByLocation retrieves all HistoricalLocations linked to a given location
 func (a *APIv1) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	hl, count, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
-	return processHistoricalLocations(a, hl, qo, path, count, err)
+	hl, count, hasNext, err := a.db.GetHistoricalLocationsByLocation(locationID, qo)
+	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
 // GetHistoricalLocationsByThing retrieves all HistoricalLocations linked to a given thing
 func (a *APIv1) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	hl, count, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
-	return processHistoricalLocations(a, hl, qo, path, count, err)
+	hl, count, hasNext, err := a.db.GetHistoricalLocationsByThing(thingID, qo)
+	return processHistoricalLocations(a, hl, qo, path, count, hasNext, err)
 }
 
-func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processHistoricalLocations(a *APIv1, historicalLocations []*entities.HistoricalLocation, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range historicalLocations {
 		i := *item
 		a.SetLinks(&i, qo)
@@ -46,7 +46,7 @@ func processHistoricalLocations(a *APIv1, historicalLocations []*entities.Histor
 	}
 
 	var data interface{} = historicalLocations
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostHistoricalLocation adds a new HistoricalLocation to the database

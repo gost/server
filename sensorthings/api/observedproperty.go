@@ -32,7 +32,7 @@ func (a *APIv1) GetObservedPropertyByDatastream(datastreamID interface{}, qo *od
 
 // GetObservedProperties todo
 func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	ops, count, err := a.db.GetObservedProperties(qo)
+	ops, count, hasNext, err := a.db.GetObservedProperties(qo)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (a *APIv1) GetObservedProperties(qo *odata.QueryOptions, path string) (*ent
 	}
 
 	var data interface{} = ops
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostObservedProperty todo

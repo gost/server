@@ -89,23 +89,23 @@ func (a *APIv1) GetLocation(id interface{}, qo *odata.QueryOptions, path string)
 
 // GetLocations retrieves all locations from the database and returns it as and ArrayResponse
 func (a *APIv1) GetLocations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	locations, count, err := a.db.GetLocations(qo)
-	return processLocations(a, locations, qo, path, count, err)
+	locations, count, hasNext, err := a.db.GetLocations(qo)
+	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
 // GetLocationsByHistoricalLocation retrieves the latest locations linked to a HistoricalLocation
 func (a *APIv1) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	locations, count, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
-	return processLocations(a, locations, qo, path, count, err)
+	locations, count, hasNext, err := a.db.GetLocationsByHistoricalLocation(hlID, qo)
+	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
 // GetLocationsByThing retrieves the latest locations linked to a thing
 func (a *APIv1) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	locations, count, err := a.db.GetLocationsByThing(thingID, qo)
-	return processLocations(a, locations, qo, path, count, err)
+	locations, count, hasNext, err := a.db.GetLocationsByThing(thingID, qo)
+	return processLocations(a, locations, qo, path, count, hasNext, err)
 }
 
-func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range locations {
 		i := *item
 		a.SetLinks(&i, qo)
@@ -113,7 +113,7 @@ func processLocations(a *APIv1, locations []*entities.Location, qo *odata.QueryO
 	}
 
 	var data interface{} = locations
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PatchLocation updates the given location in the database

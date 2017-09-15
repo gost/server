@@ -110,10 +110,10 @@ func (gdb *GostDatabase) GetDatastream(id interface{}, qo *odata.QueryOptions) (
 }
 
 // GetDatastreams retrieves all datastreams
-func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, int, error) {
+func (gdb *GostDatabase) GetDatastreams(qo *odata.QueryOptions) ([]*entities.Datastream, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, nil, nil, qo)
-	return processDatastreams(gdb.Db, query, qi, countSQL)
+	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetDatastreamByObservation retrieves a datastream linked to the given observation
@@ -128,43 +128,43 @@ func (gdb *GostDatabase) GetDatastreamByObservation(observationID interface{}, q
 }
 
 // GetDatastreamsByThing retrieves all datastreams linked to the given thing
-func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, error) {
+func (gdb *GostDatabase) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, bool, error) {
 	intID, ok := ToIntID(thingID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Thing{}, intID, qo)
-	return processDatastreams(gdb.Db, query, qi, countSQL)
+	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetDatastreamsBySensor retrieves all datastreams linked to the given sensor
-func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, error) {
+func (gdb *GostDatabase) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, bool, error) {
 	intID, ok := ToIntID(sensorID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.Sensor{}, intID, qo)
-	return processDatastreams(gdb.Db, query, qi, countSQL)
+	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetDatastreamsByObservedProperty retrieves all datastreams linked to the given ObservedProerty
-func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, error) {
+func (gdb *GostDatabase) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions) ([]*entities.Datastream, int, bool, error) {
 	intID, ok := ToIntID(oID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Datastream does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Datastream{}, &entities.ObservedProperty{}, intID, qo)
-	return processDatastreams(gdb.Db, query, qi, countSQL)
+	return processDatastreams(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processDatastream(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Datastream, error) {
-	datastreams, _, err := processDatastreams(db, sql, qi, "")
+	datastreams, _, _, err := processDatastreams(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -176,10 +176,10 @@ func processDatastream(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Da
 	return datastreams[0], nil
 }
 
-func processDatastreams(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Datastream, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processDatastreams(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Datastream, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
 	}
 
 	datastreams := make([]*entities.Datastream, 0)
@@ -192,11 +192,11 @@ func processDatastreams(db *sql.DB, sql string, qi *QueryParseInfo, countSQL str
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, false, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return datastreams, count, nil
+	return datastreams, count, hasNext, nil
 }
 
 // CheckDatastreamRelationsExist check if the related entities exist

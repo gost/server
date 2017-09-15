@@ -24,23 +24,23 @@ func (a *APIv1) GetObservation(id interface{}, qo *odata.QueryOptions, path stri
 
 // GetObservations return all observations by given QueryOptions
 func (a *APIv1) GetObservations(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	observations, count, err := a.db.GetObservations(qo)
-	return processObservations(a, observations, qo, path, count, err)
+	observations, count, hasNext, err := a.db.GetObservations(qo)
+	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
 // GetObservationsByFeatureOfInterest returns all observation by given FeatureOfInterest end QueryOptions
 func (a *APIv1) GetObservationsByFeatureOfInterest(foiID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	observations, count, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
-	return processObservations(a, observations, qo, path, count, err)
+	observations, count, hasNext, err := a.db.GetObservationsByFeatureOfInterest(foiID, qo)
+	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
 // GetObservationsByDatastream returns all observations by given Datastream and QueryOptions
 func (a *APIv1) GetObservationsByDatastream(datastreamID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	observations, count, err := a.db.GetObservationsByDatastream(datastreamID, qo)
-	return processObservations(a, observations, qo, path, count, err)
+	observations, count, hasNext, err := a.db.GetObservationsByDatastream(datastreamID, qo)
+	return processObservations(a, observations, qo, path, count, hasNext, err)
 }
 
-func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processObservations(a *APIv1, observations []*entities.Observation, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func processObservations(a *APIv1, observations []*entities.Observation, qo *oda
 	}
 
 	var data interface{} = observations
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // ConvertLocationToFoi converts a location to FOI

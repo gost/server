@@ -32,11 +32,11 @@ func (a *APIv1) GetFeatureOfInterestByObservation(id interface{}, qo *odata.Quer
 
 // GetFeatureOfInterests return FeaturesOfInterest based on the given QueryOptions
 func (a *APIv1) GetFeatureOfInterests(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	fois, count, err := a.db.GetFeatureOfInterests(qo)
-	return processFeatureOfInterest(a, fois, qo, path, count, err)
+	fois, count, hasNext, err := a.db.GetFeatureOfInterests(qo)
+	return processFeatureOfInterest(a, fois, qo, path, count, hasNext, err)
 }
 
-func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	for idx, item := range fois {
 		i := *item
 		a.SetLinks(&i, qo)
@@ -44,7 +44,7 @@ func processFeatureOfInterest(a *APIv1, fois []*entities.FeatureOfInterest, qo *
 	}
 
 	var data interface{} = fois
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostFeatureOfInterest adds a FeatureOfInterest to the database

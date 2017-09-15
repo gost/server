@@ -33,7 +33,7 @@ func (a *APIv1) GetSensorByDatastream(id interface{}, qo *odata.QueryOptions, pa
 
 // GetSensors retrieves an array of sensors based on the given query
 func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	sensors, count, err := a.db.GetSensors(qo)
+	sensors, count, hasNext, err := a.db.GetSensors(qo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (a *APIv1) GetSensors(qo *odata.QueryOptions, path string) (*entities.Array
 	}
 
 	var data interface{} = sensors
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostSensor adds a new sensor to the database

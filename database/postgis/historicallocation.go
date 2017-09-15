@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"time"
 
+	"strings"
+
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
 	"github.com/gost/server/sensorthings/odata"
-	"strings"
 )
 
 func historicalLocationParamFactory(values map[string]interface{}) (entities.Entity, error) {
@@ -42,36 +43,36 @@ func (gdb *GostDatabase) GetHistoricalLocation(id interface{}, qo *odata.QueryOp
 }
 
 // GetHistoricalLocations retrieves all historicallocations
-func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, error) {
+func (gdb *GostDatabase) GetHistoricalLocations(qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, nil, nil, qo)
-	return processHistoricalLocations(gdb.Db, query, qi, countSQL)
+	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetHistoricalLocationsByLocation retrieves all historicallocations linked to the given location
-func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, error) {
+func (gdb *GostDatabase) GetHistoricalLocationsByLocation(locationID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, bool, error) {
 	intID, ok := ToIntID(locationID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, &entities.Location{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, &entities.Location{}, intID, qo)
-	return processHistoricalLocations(gdb.Db, query, qi, countSQL)
+	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetHistoricalLocationsByThing retrieves all historicallocations linked to the given thing
-func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, error) {
+func (gdb *GostDatabase) GetHistoricalLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.HistoricalLocation, int, bool, error) {
 	intID, ok := ToIntID(thingID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.HistoricalLocation{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.HistoricalLocation{}, &entities.Thing{}, intID, qo)
-	return processHistoricalLocations(gdb.Db, query, qi, countSQL)
+	return processHistoricalLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processHistoricalLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.HistoricalLocation, error) {
-	hls, _, err := processHistoricalLocations(db, sql, qi, "")
+	hls, _, _, err := processHistoricalLocations(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -83,10 +84,10 @@ func processHistoricalLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*ent
 	return hls[0], nil
 }
 
-func processHistoricalLocations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.HistoricalLocation, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processHistoricalLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.HistoricalLocation, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
 	}
 
 	hls := make([]*entities.HistoricalLocation, 0)
@@ -99,11 +100,11 @@ func processHistoricalLocations(db *sql.DB, sql string, qi *QueryParseInfo, coun
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return hls, count, nil
+	return hls, count, hasNext, nil
 }
 
 // PostHistoricalLocation adds a historical location to the database

@@ -88,10 +88,10 @@ func (gdb *GostDatabase) GetFeatureOfInterestByObservation(id interface{}, qo *o
 }
 
 // GetFeatureOfInterests returns all feature of interests
-func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, error) {
+func (gdb *GostDatabase) GetFeatureOfInterests(qo *odata.QueryOptions) ([]*entities.FeatureOfInterest, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.FeatureOfInterest{}, nil, nil, qo)
-	return processFeatureOfInterests(gdb.Db, query, qi, countSQL)
+	return processFeatureOfInterests(gdb.Db, query, qo, qi, countSQL)
 }
 
 // PostFeatureOfInterest inserts a new FeatureOfInterest into the database
@@ -115,7 +115,7 @@ func (gdb *GostDatabase) PutFeatureOfInterest(id interface{}, f *entities.Featur
 }
 
 func processFeatureOfInterest(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.FeatureOfInterest, error) {
-	locations, _, err := processFeatureOfInterests(db, sql, qi, "")
+	locations, _, _, err := processFeatureOfInterests(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -127,10 +127,10 @@ func processFeatureOfInterest(db *sql.DB, sql string, qi *QueryParseInfo) (*enti
 	return locations[0], nil
 }
 
-func processFeatureOfInterests(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.FeatureOfInterest, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processFeatureOfInterests(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.FeatureOfInterest, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, false, fmt.Errorf("Error executing query %v", err)
 	}
 
 	fois := make([]*entities.FeatureOfInterest, 0)
@@ -143,11 +143,11 @@ func processFeatureOfInterests(db *sql.DB, sql string, qi *QueryParseInfo, count
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, false, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return fois, count, nil
+	return fois, count, hasNext, nil
 }
 
 // PatchFeatureOfInterest updates a FeatureOfInterest in the database

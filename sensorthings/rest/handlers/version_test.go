@@ -196,7 +196,7 @@ func (a *MockAPI) GetEndpoints() *map[entities.EntityType]models.Endpoint {
 func (a *MockAPI) initRest()                                               {}
 func (a *MockAPI) GetTopics() *[]models.Topic                              { return nil }
 func (a *MockAPI) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {}
-func (a *MockAPI) CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string {
+func (a *MockAPI) CreateNextLink(incomingURL string, qo *odata.QueryOptions) string {
 	return ""
 }
 

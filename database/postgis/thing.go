@@ -63,15 +63,15 @@ func (gdb *GostDatabase) GetThingByDatastream(id interface{}, qo *odata.QueryOpt
 }
 
 //GetThingsByLocation retrieves the thing linked to a location
-func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, int, error) {
+func (gdb *GostDatabase) GetThingsByLocation(id interface{}, qo *odata.QueryOptions) ([]*entities.Thing, int, bool, error) {
 	intID, ok := ToIntID(id)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Location does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, &entities.Location{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Thing{}, &entities.Location{}, intID, qo)
-	return processThings(gdb.Db, query, qi, countSQL)
+	return processThings(gdb.Db, query, qo, qi, countSQL)
 }
 
 //GetThingByHistoricalLocation retrieves the thing linked to a HistoricalLocation
@@ -86,14 +86,14 @@ func (gdb *GostDatabase) GetThingByHistoricalLocation(id interface{}, qo *odata.
 }
 
 // GetThings returns an array of things
-func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, int, error) {
+func (gdb *GostDatabase) GetThings(qo *odata.QueryOptions) ([]*entities.Thing, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Thing{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Thing{}, nil, nil, qo)
-	return processThings(gdb.Db, query, qi, countSQL)
+	return processThings(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processThing(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Thing, error) {
-	things, _, err := processThings(db, sql, qi, "")
+	things, _, _, err := processThings(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -105,10 +105,10 @@ func processThing(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Thing, 
 	return things[0], nil
 }
 
-func processThings(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Thing, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processThings(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Thing, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
 	}
 
 	things := make([]*entities.Thing, 0)
@@ -121,11 +121,11 @@ func processThings(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) 
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return things, count, nil
+	return things, count, hasNext, nil
 }
 
 // PostThing receives a posted thing entity and adds it to the database

@@ -96,9 +96,9 @@ func TestGetLimit(t *testing.T) {
 	qo := &odata.QueryOptions{}
 
 	// act
-	res := qb.getLimit(qo)
+	res := qb.getLimit(qo, 0)
 	// assert
-	assert.True(t, res == "1")
+	assert.True(t, res == 1)
 }
 
 func TestGetOrderByWithNilOptions(t *testing.T) {
@@ -137,6 +137,9 @@ func TestCreateCountQuery(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
 	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 1) AS thing on true  WHERE thing.thing_id = 1 AND  datastream.name = 'Milk' AND Price < 2.55"
 	qo := &odata.QueryOptions{}
+	cs, _ := godata.ParseCountString("true")
+	qo.Count = cs
+
 	input := "Name eq 'Milk' and Price lt 2.55"
 	filter, _ := godata.ParseFilterString(input)
 	qo.Filter = filter
@@ -145,7 +148,7 @@ func TestCreateCountQuery(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, res)
-	assert.True(t, expected == res)
+	assert.Equal(t, expected, res)
 }
 
 func TestGetOrderByWithQueryOptions(t *testing.T) {
@@ -172,9 +175,9 @@ func TestGetLimitWithQueryTop(t *testing.T) {
 	qo.Top = top
 
 	// act
-	res := qb.getLimit(qo)
+	res := qb.getLimit(qo, 0)
 	// assert
-	assert.True(t, res == "2")
+	assert.True(t, res == 2)
 }
 
 func TestOdataLogicalOperatorToPostgreSQL(t *testing.T) {
@@ -196,6 +199,8 @@ func TestCreateCountQueryWithoutId(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
 	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id ) AS thing on true  WHERE datastream.name = 'Milk' AND Price < 2.55"
 	qo := &odata.QueryOptions{}
+	cs, _ := godata.ParseCountString("true")
+	qo.Count = cs
 	input := "Name eq 'Milk' and Price lt 2.55"
 	filter, _ := godata.ParseFilterString(input)
 	qo.Filter = filter

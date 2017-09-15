@@ -35,8 +35,8 @@ func (a *APIv1) GetThingByDatastream(id interface{}, qo *odata.QueryOptions, pat
 
 // GetThingsByLocation returns things based on the given location id and QueryOptions
 func (a *APIv1) GetThingsByLocation(id interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	things, count, err := a.db.GetThingsByLocation(id, qo)
-	return processThings(a, things, qo, path, count, err)
+	things, count, hasNext, err := a.db.GetThingsByLocation(id, qo)
+	return processThings(a, things, qo, path, count, hasNext, err)
 }
 
 // GetThingByHistoricalLocation returns a thing entity based on the given HistoricalLocation id and QueryOptions
@@ -52,11 +52,11 @@ func (a *APIv1) GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOpti
 
 // GetThings returns an array of thing entities based on the QueryOptions
 func (a *APIv1) GetThings(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	things, count, err := a.db.GetThings(qo)
-	return processThings(a, things, qo, path, count, err)
+	things, count, hasNext, err := a.db.GetThings(qo)
+	return processThings(a, things, qo, path, count, hasNext, err)
 }
 
-func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func processThings(a *APIv1, things []*entities.Thing, qo *odata.QueryOptions, p
 	}
 
 	var data interface{} = things
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostThing checks if a posted thing entity is valid and adds it to the database

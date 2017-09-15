@@ -119,9 +119,9 @@ func TestCreateNextLink(t *testing.T) {
 	qo.Skip = qs
 
 	// act
-	result := stAPI.CreateNextLink(1, "http://www.nu.nl", qo)
+	result := stAPI.CreateNextLink("http://www.nu.nl", qo)
 	assert.NotNil(t, result)
-	assert.True(t, result == "")
+	assert.Equal(t, "http://www.nu.nl?$top=2&$skip=3", result)
 
 	qt, _ = godata.ParseTopString("1")
 	qo.Top = qt
@@ -135,7 +135,7 @@ func TestCreateNextLink(t *testing.T) {
 	qo.RawFilter = filterString
 	// add QueryCount, QueryExpand, QueryOrderBy, QueryResultFormat
 
-	result1 := stAPI.CreateNextLink(10, "http://www.nu.nl", qo)
+	result1 := stAPI.CreateNextLink("http://www.nu.nl", qo)
 	t.Logf("%v", result1)
 	// assert
 	assert.NotNil(t, result1)
@@ -153,12 +153,12 @@ func TestCreateArrayResponseWithCount(t *testing.T) {
 	qo.Count = &countQuery
 
 	// act
-	arrayResponse := testAPI.createArrayResponse(count, path, qo, data)
+	arrayResponse := testAPI.createArrayResponse(count, true, path, qo, data)
 
 	// assert
 	assert.Equal(t, count, arrayResponse.Count)
 	assert.Equal(t, data, fmt.Sprintf("%v", *arrayResponse.Data))
-	assert.Equal(t, testAPI.CreateNextLink(count, path, qo), arrayResponse.NextLink)
+	assert.Equal(t, testAPI.CreateNextLink(path, qo), arrayResponse.NextLink)
 }
 
 func TestCreateArrayResponseWithoutCount(t *testing.T) {
@@ -168,7 +168,7 @@ func TestCreateArrayResponseWithoutCount(t *testing.T) {
 	qo := &odata.QueryOptions{}
 
 	// act
-	arrayResponse := testAPI.createArrayResponse(count, "", qo, "")
+	arrayResponse := testAPI.createArrayResponse(count, false, "", qo, "")
 
 	// assert
 	assert.Equal(t, 0, arrayResponse.Count)

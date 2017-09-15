@@ -58,22 +58,22 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 }
 
 // GetLocations retrieves all locations
-func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, error) {
+func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, nil, nil, qo)
-	return processLocations(gdb.Db, query, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
-func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, error) {
+func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, bool, error) {
 	intID, ok := ToIntID(hlID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("HistoricaLocation does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
-	return processLocations(gdb.Db, query, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 // GetLocationByDatastreamID returns a location linked to an observation
@@ -94,19 +94,19 @@ func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo 
 }
 
 // GetLocationsByThing retrieves all locations linked to the given thing
-func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, error) {
+func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.QueryOptions) ([]*entities.Location, int, bool, error) {
 	intID, ok := ToIntID(thingID)
 	if !ok {
-		return nil, 0, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
+		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
-	return processLocations(gdb.Db, query, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Location, error) {
-	locations, _, err := processLocations(db, sql, qi, "")
+	locations, _, _, err := processLocations(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -118,10 +118,10 @@ func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Loca
 	return locations[0], nil
 }
 
-func processLocations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Location, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Location, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
 	}
 
 	locations := make([]*entities.Location, 0)
@@ -134,11 +134,11 @@ func processLocations(db *sql.DB, sql string, qi *QueryParseInfo, countSQL strin
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("error executing count %v", err)
 		}
 	}
 
-	return locations, count, nil
+	return locations, count, hasNext, nil
 }
 
 // PostLocation receives a posted location entity and adds it to the database

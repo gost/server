@@ -21,14 +21,14 @@ func (a *APIv1) GetDatastream(id interface{}, qo *odata.QueryOptions, path strin
 
 // GetDatastreams retrieves an array of sensors based on the given query
 func (a *APIv1) GetDatastreams(qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	datastreams, count, err := a.db.GetDatastreams(qo)
-	return processDatastreams(a, datastreams, qo, path, count, err)
+	datastreams, count, hasNext, err := a.db.GetDatastreams(qo)
+	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
 // GetDatastreamsByThing returns all datastreams linked to the given thing
 func (a *APIv1) GetDatastreamsByThing(thingID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	datastreams, count, err := a.db.GetDatastreamsByThing(thingID, qo)
-	return processDatastreams(a, datastreams, qo, path, count, err)
+	datastreams, count, hasNext, err := a.db.GetDatastreamsByThing(thingID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
 // GetDatastreamByObservation returns a datastream linked to the given observation
@@ -44,17 +44,17 @@ func (a *APIv1) GetDatastreamByObservation(observationID interface{}, qo *odata.
 
 // GetDatastreamsBySensor returns all datastreams linked to the given sensor
 func (a *APIv1) GetDatastreamsBySensor(sensorID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	datastreams, count, err := a.db.GetDatastreamsBySensor(sensorID, qo)
-	return processDatastreams(a, datastreams, qo, path, count, err)
+	datastreams, count, hasNext, err := a.db.GetDatastreamsBySensor(sensorID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
 // GetDatastreamsByObservedProperty returns all datastreams linked to the given ObservedProperty
 func (a *APIv1) GetDatastreamsByObservedProperty(oID interface{}, qo *odata.QueryOptions, path string) (*entities.ArrayResponse, error) {
-	datastreams, count, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
-	return processDatastreams(a, datastreams, qo, path, count, err)
+	datastreams, count, hasNext, err := a.db.GetDatastreamsByObservedProperty(oID, qo)
+	return processDatastreams(a, datastreams, qo, path, count, hasNext, err)
 }
 
-func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, count int, err error) (*entities.ArrayResponse, error) {
+func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.QueryOptions, path string, count int, hasNext bool, err error) (*entities.ArrayResponse, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func processDatastreams(a *APIv1, datastreams []*entities.Datastream, qo *odata.
 	}
 
 	var data interface{} = datastreams
-	return a.createArrayResponse(count, path, qo, data), nil
+	return a.createArrayResponse(count, hasNext, path, qo, data), nil
 }
 
 // PostDatastream adds a new datastream to the database

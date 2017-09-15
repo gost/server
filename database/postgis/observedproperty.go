@@ -65,15 +65,15 @@ func (gdb *GostDatabase) GetObservedPropertyByDatastream(id interface{}, qo *oda
 	return observedProperty, nil
 }
 
-// GetObservedProperties returns all observed properties
-func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, error) {
+// GetObservedProperties returns all bool, observed properties
+func (gdb *GostDatabase) GetObservedProperties(qo *odata.QueryOptions) ([]*entities.ObservedProperty, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.ObservedProperty{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.ObservedProperty{}, nil, nil, qo)
-	return processObservedProperties(gdb.Db, query, qi, countSQL)
+	return processObservedProperties(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processObservedProperty(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.ObservedProperty, error) {
-	ops, _, err := processObservedProperties(db, sql, qi, "")
+	ops, _, _, err := processObservedProperties(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -85,10 +85,10 @@ func processObservedProperty(db *sql.DB, sql string, qi *QueryParseInfo) (*entit
 	return ops[0], nil
 }
 
-func processObservedProperties(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.ObservedProperty, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processObservedProperties(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.ObservedProperty, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
 	}
 
 	obs := make([]*entities.ObservedProperty, 0)
@@ -101,11 +101,11 @@ func processObservedProperties(db *sql.DB, sql string, qi *QueryParseInfo, count
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return obs, count, nil
+	return obs, count, hasNext, nil
 }
 
 // PostObservedProperty adds an ObservedProperty to the database

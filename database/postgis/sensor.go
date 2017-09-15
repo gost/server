@@ -70,14 +70,14 @@ func (gdb *GostDatabase) GetSensorByDatastream(id interface{}, qo *odata.QueryOp
 }
 
 // GetSensors retrieves all sensors based on the QueryOptions
-func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, error) {
+func (gdb *GostDatabase) GetSensors(qo *odata.QueryOptions) ([]*entities.Sensor, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Sensor{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Sensor{}, nil, nil, qo)
-	return processSensors(gdb.Db, query, qi, countSQL)
+	return processSensors(gdb.Db, query, qo, qi, countSQL)
 }
 
 func processSensor(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Sensor, error) {
-	sensors, _, err := processSensors(db, sql, qi, "")
+	sensors, _, _, err := processSensors(db, sql, nil, qi, "")
 	if err != nil {
 		return nil, err
 	}
@@ -89,10 +89,10 @@ func processSensor(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Sensor
 	return sensors[0], nil
 }
 
-func processSensors(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string) ([]*entities.Sensor, int, error) {
-	data, err := ExecuteSelect(db, qi, sql)
+func processSensors(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Sensor, int, bool, error) {
+	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
-		return nil, 0, fmt.Errorf("Error executing query %v", err)
+		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
 	}
 
 	sensors := make([]*entities.Sensor, 0)
@@ -105,11 +105,11 @@ func processSensors(db *sql.DB, sql string, qi *QueryParseInfo, countSQL string)
 	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
-			return nil, 0, fmt.Errorf("Error executing count %v", err)
+			return nil, 0, hasNext, fmt.Errorf("Error executing count %v", err)
 		}
 	}
 
-	return sensors, count, nil
+	return sensors, count, hasNext, nil
 }
 
 // PostSensor posts a sensor to the database

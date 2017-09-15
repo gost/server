@@ -145,18 +145,11 @@ func (a *APIv1) SetLinks(entity entities.Entity, qo *odata.QueryOptions) {
 }
 
 // CreateNextLink creates the link to the next page with results
-//  count is the number of total entities in the current query
 //  incomingUrl is the url of the request excluding oData query params
-func (a *APIv1) CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string {
+func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) string {
 	// do not create a nextLink when there is no top and skip given
 	if qo == nil || qo.Top == nil || qo.Skip == nil || (int(*qo.Top) == 0 && int(*qo.Skip) == 0) {
 		// todo: check unreachable code here?
-		return ""
-	}
-
-	// do not create a nextLink when the current page has no following one
-	// todo: what if qo.QueryTop.Limit, qo.QuerySkip.Index, qo.QueryTop.Limit are nil?
-	if int(*qo.Top)+int(*qo.Skip) >= count || count < int(*qo.Top) {
 		return ""
 	}
 
@@ -222,10 +215,13 @@ func containsMandatoryParams(entity interface{}) (bool, []error) {
 }
 
 // createArrayResponse creates the ArrayResponse to send back to the user
-func (a *APIv1) createArrayResponse(count int, path string, qo *odata.QueryOptions, data interface{}) *entities.ArrayResponse {
+func (a *APIv1) createArrayResponse(count int, hasNext bool, path string, qo *odata.QueryOptions, data interface{}) *entities.ArrayResponse {
 	ar := &entities.ArrayResponse{
-		NextLink: a.CreateNextLink(count, path, qo),
-		Data:     &data,
+		Data: &data,
+	}
+
+	if hasNext {
+		ar.NextLink = a.CreateNextLink(path, qo)
 	}
 
 	if qo != nil && qo.Count != nil && bool(*qo.Count) == true {

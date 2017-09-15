@@ -101,7 +101,7 @@ type API interface {
 
 	LinkLocation(thingID interface{}, locationID interface{}) error
 	SetLinks(entity entities.Entity, qo *odata.QueryOptions)
-	CreateNextLink(count int, incomingURL string, qo *odata.QueryOptions) string
+	CreateNextLink(incomingURL string, qo *odata.QueryOptions) string
 }
 
 // Database specifies the operations that the database provider needs to support
@@ -111,18 +111,18 @@ type Database interface {
 
 	GetThing(id interface{}, qo *odata.QueryOptions) (*entities.Thing, error)
 	GetThingByDatastream(id interface{}, qo *odata.QueryOptions) (t *entities.Thing, e error)
-	GetThingsByLocation(id interface{}, qo *odata.QueryOptions) (t []*entities.Thing, count int, e error)
+	GetThingsByLocation(id interface{}, qo *odata.QueryOptions) (t []*entities.Thing, count int, hasNext bool, e error)
 	GetThingByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (t *entities.Thing, e error)
-	GetThings(qo *odata.QueryOptions) (t []*entities.Thing, count int, e error)
+	GetThings(qo *odata.QueryOptions) (t []*entities.Thing, count int, hasNext bool, e error)
 	PostThing(*entities.Thing) (*entities.Thing, error)
 	PatchThing(interface{}, *entities.Thing) (*entities.Thing, error)
 	PutThing(interface{}, *entities.Thing) (*entities.Thing, error)
 	DeleteThing(id interface{}) error
 
 	GetLocation(id interface{}, qo *odata.QueryOptions) (*entities.Location, error)
-	GetLocations(qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
-	GetLocationsByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
-	GetLocationsByThing(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, e error)
+	GetLocations(qo *odata.QueryOptions) (l []*entities.Location, count int, hasNext bool, e error)
+	GetLocationsByHistoricalLocation(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, hasNext bool, e error)
+	GetLocationsByThing(id interface{}, qo *odata.QueryOptions) (l []*entities.Location, count int, hasNext bool, e error)
 	GetLocationByDatastreamID(id interface{}, qo *odata.QueryOptions) (*entities.Location, error)
 	PostLocation(*entities.Location) (*entities.Location, error)
 	LinkLocation(id interface{}, locationID interface{}) error
@@ -132,7 +132,7 @@ type Database interface {
 
 	GetObservedProperty(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
 	GetObservedPropertyByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.ObservedProperty, error)
-	GetObservedProperties(qo *odata.QueryOptions) (o []*entities.ObservedProperty, count int, e error)
+	GetObservedProperties(qo *odata.QueryOptions) (o []*entities.ObservedProperty, count int, hasNext bool, e error)
 	PostObservedProperty(*entities.ObservedProperty) (*entities.ObservedProperty, error)
 	PatchObservedProperty(interface{}, *entities.ObservedProperty) (*entities.ObservedProperty, error)
 	PutObservedProperty(interface{}, *entities.ObservedProperty) (*entities.ObservedProperty, error)
@@ -140,18 +140,18 @@ type Database interface {
 
 	GetSensor(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error)
 	GetSensorByDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Sensor, error)
-	GetSensors(qo *odata.QueryOptions) (s []*entities.Sensor, count int, e error)
+	GetSensors(qo *odata.QueryOptions) (s []*entities.Sensor, count int, hasNext bool, e error)
 	PostSensor(*entities.Sensor) (*entities.Sensor, error)
 	PatchSensor(interface{}, *entities.Sensor) (*entities.Sensor, error)
 	PutSensor(interface{}, *entities.Sensor) (*entities.Sensor, error)
 	DeleteSensor(id interface{}) error
 
 	GetDatastream(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error)
-	GetDatastreams(qo *odata.QueryOptions) (d []*entities.Datastream, count int, e error)
+	GetDatastreams(qo *odata.QueryOptions) (d []*entities.Datastream, count int, hasNext bool, e error)
 	GetDatastreamByObservation(id interface{}, qo *odata.QueryOptions) (*entities.Datastream, error)
-	GetDatastreamsByThing(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, e error)
-	GetDatastreamsBySensor(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, e error)
-	GetDatastreamsByObservedProperty(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, e error)
+	GetDatastreamsByThing(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, hasNext bool, e error)
+	GetDatastreamsBySensor(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, hasNext bool, e error)
+	GetDatastreamsByObservedProperty(id interface{}, qo *odata.QueryOptions) (d []*entities.Datastream, count int, hasNext bool, e error)
 	PostDatastream(*entities.Datastream) (*entities.Datastream, error)
 	PatchDatastream(interface{}, *entities.Datastream) (*entities.Datastream, error)
 	DeleteDatastream(id interface{}) error
@@ -161,25 +161,25 @@ type Database interface {
 	GetFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
 	GetFeatureOfInterestIDByLocationID(id interface{}) (interface{}, error)
 	GetFeatureOfInterestByObservation(id interface{}, qo *odata.QueryOptions) (*entities.FeatureOfInterest, error)
-	GetFeatureOfInterests(qo *odata.QueryOptions) (f []*entities.FeatureOfInterest, count int, e error)
+	GetFeatureOfInterests(qo *odata.QueryOptions) (f []*entities.FeatureOfInterest, count int, hasNext bool, e error)
 	PostFeatureOfInterest(*entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	PutFeatureOfInterest(interface{}, *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	PatchFeatureOfInterest(interface{}, *entities.FeatureOfInterest) (*entities.FeatureOfInterest, error)
 	DeleteFeatureOfInterest(id interface{}) error
 
 	GetObservation(id interface{}, qo *odata.QueryOptions) (*entities.Observation, error)
-	GetObservations(qo *odata.QueryOptions) (o []*entities.Observation, count int, e error)
-	GetObservationsByDatastream(id interface{}, qo *odata.QueryOptions) (o []*entities.Observation, count int, e error)
-	GetObservationsByFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (o []*entities.Observation, count int, e error)
+	GetObservations(qo *odata.QueryOptions) (o []*entities.Observation, count int, hasNext bool, e error)
+	GetObservationsByDatastream(id interface{}, qo *odata.QueryOptions) (o []*entities.Observation, count int, hasNext bool, e error)
+	GetObservationsByFeatureOfInterest(id interface{}, qo *odata.QueryOptions) (o []*entities.Observation, count int, hasNext bool, e error)
 	PostObservation(*entities.Observation) (*entities.Observation, error)
 	PatchObservation(interface{}, *entities.Observation) (*entities.Observation, error)
 	PutObservation(interface{}, *entities.Observation) (*entities.Observation, error)
 	DeleteObservation(id interface{}) error
 
 	GetHistoricalLocation(id interface{}, qo *odata.QueryOptions) (*entities.HistoricalLocation, error)
-	GetHistoricalLocations(qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, e error)
-	GetHistoricalLocationsByLocation(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, e error)
-	GetHistoricalLocationsByThing(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, e error)
+	GetHistoricalLocations(qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, hasNext bool, e error)
+	GetHistoricalLocationsByLocation(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, hasNext bool, e error)
+	GetHistoricalLocationsByThing(id interface{}, qo *odata.QueryOptions) (h []*entities.HistoricalLocation, count int, hasNext bool, e error)
 	PostHistoricalLocation(*entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	PutHistoricalLocation(interface{}, *entities.HistoricalLocation) (*entities.HistoricalLocation, error)
 	PatchHistoricalLocation(interface{}, *entities.HistoricalLocation) (*entities.HistoricalLocation, error)

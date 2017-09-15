@@ -43,11 +43,12 @@ func (qb *QueryBuilder) removeSchema(table string) string {
 
 // getLimit returns the max entities to retrieve, this number is set by ODATA's
 // $top, if not provided use the global value
-func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions) string {
+// supply an int to extra to ad to the limit
+func (qb *QueryBuilder) getLimit(qo *odata.QueryOptions, extra int) int {
 	if qo != nil && qo.Top != nil {
-		return fmt.Sprintf("%v", *qo.Top)
+		return int(*qo.Top) + extra
 	}
-	return fmt.Sprintf("%v", qb.maxTop)
+	return qb.maxTop + extra
 }
 
 // getOffset returns the offset, this number is set by ODATA's
@@ -249,7 +250,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 				"SELECT %s FROM %s %s "+
 				"%s "+
 				"ORDER BY %s "+
-				"LIMIT %s OFFSET %s) AS %s on true ",
+				"LIMIT %v OFFSET %s) AS %s on true ",
 				joinString,
 				joinType,
 				qb.getSelect(e2, nqo, qpi, true, true, false, true, ""),
@@ -257,7 +258,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 				join,
 				qb.getFilterQueryString(et2, nqo, filterPrefix),
 				qb.getOrderBy(et2, nqo),
-				qb.getLimit(nqo),
+				qb.getLimit(nqo, 0),
 				qb.getOffset(nqo),
 				qb.addAsPrefix(qpi, tableMappings[et2]))
 		}
@@ -981,6 +982,11 @@ func findFirstCouplingParseNode(pn *godata.ParseNode) *godata.ParseNode {
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) string {
+
+	if queryOptions.Count == nil {
+		return ""
+	}
+
 	if logger.Logger.Level == log.DebugLevel {
 		defer gostLog.DebugWithElapsedTime(logger, time.Now(), "constructing count query")
 	}
@@ -1085,7 +1091,7 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 
 	limit := ""
 	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
-		limit = fmt.Sprintf("LIMIT %s", qb.getLimit(qo))
+		limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
 	}
 	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
 	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
