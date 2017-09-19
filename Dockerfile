@@ -1,4 +1,4 @@
-FROM golang:1.9.0-alpine3.6
+FROM golang:1.9.0-alpine3.6 AS gost-build
 WORKDIR /go/src/github.com/gost/server
 ADD . .
 RUN apk add --update --no-cache git \
@@ -6,5 +6,11 @@ RUN apk add --update --no-cache git \
     && dep ensure \
     && go build -o /gostserver/gost github.com/gost/server \
     && cp config.yaml /gostserver/config.yaml
-ENTRYPOINT ["/gostserver/gost"]
+
+
+# final stage
+FROM alpine
+WORKDIR /app
+COPY --from=gost-build /gostserver /app/
+ENTRYPOINT ./gost
 EXPOSE 8080
