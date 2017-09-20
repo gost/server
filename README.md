@@ -33,6 +33,9 @@ Binaries are build for Windows, Ubuntu and OSX.
 |------------	|---------------------	|-----------------------------------------------------------------	|
 | 2017-09-17 	| 0.6                 	| TBD                                                             	|
 
+## Benchmarks
+
+For benchmarks see http://www.github.com/gost/benchmarks.
 
 ## Run GOST with Docker-compose
 
@@ -113,7 +116,3 @@ MQTT: For getting started with Gost and MQTT for publishing/receiving data see [
 - Benchmarks
 - Authentication
 - Different storage providers such as MongoDB (Now using PostgreSQL)
-
-## Benchmarks
-
-[Publish observation (MQTT)](https://github.com/Geodan/gost/wiki/Benchmark---publish-observation-(MQTT))
