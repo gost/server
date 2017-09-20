@@ -48,7 +48,7 @@ For more information about running GOST in Raspberry Pi with Docker-compose, see
 For making connection to external database use environmental variables GOST_DB_HOST, GOST_DB_PORT, GOST_DB_DATABASE, GOST_DB_USER, GOST_DB_PASSWORD
 
 ```
-$ docker run -d -p 8080:8080 -t -e GOST_DB_HOST=192.168.40.10 -e GOST_DB_DTABASE=gost --name gost geodan/gost
+$ docker run -d -p 8080:8080 -t -e GOST_DB_HOST=192.168.40.10 -e GOST_DB_DATABASE=gost --name gost geodan/gost
 ```
 
 For using your config own file, create a mount:
