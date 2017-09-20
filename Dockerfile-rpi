@@ -12,5 +12,5 @@ FROM hypriot/rpi-alpine
 WORKDIR /app
 COPY --from=gost-build /gostserver /app/
 RUN chmod +x ./gost
-ENTRYPOINT ["/app/gost"]
+ENTRYPOINT ["./gost"]
 EXPOSE 8080
