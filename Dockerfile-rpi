@@ -11,5 +11,5 @@ RUN go get -u github.com/golang/dep/cmd/dep \
 FROM hypriot/rpi-alpine
 WORKDIR /app
 COPY --from=gost-build /gostserver /app/
-ENTRYPOINT /app/gost
+ENTRYPOINT ["/app/gost"]
 EXPOSE 8080
