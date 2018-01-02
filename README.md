@@ -33,6 +33,9 @@ Binaries are build for Windows, Ubuntu and OSX.
 |------------	|---------------------	|-----------------------------------------------------------------	|
 | 2017-09-17 	| 0.6                 	| TBD                                                             	|
 
+## Benchmarks
+
+For benchmarks see http://www.github.com/gost/benchmarks.
 
 ## Run GOST with Docker-compose
 
@@ -45,7 +48,7 @@ For more information about running GOST in Raspberry Pi with Docker-compose, see
 For making connection to external database use environmental variables GOST_DB_HOST, GOST_DB_PORT, GOST_DB_DATABASE, GOST_DB_USER, GOST_DB_PASSWORD
 
 ```
-$ docker run -d -p 8080:8080 -t -e GOST_DB_HOST=192.168.40.10 -e GOST_DB_DTABASE=gost --name gost geodan/gost
+$ docker run -d -p 8080:8080 -t -e GOST_DB_HOST=192.168.40.10 -e GOST_DB_DATABASE=gost --name gost geodan/gost
 ```
 
 For using your config own file, create a mount:
@@ -113,7 +116,3 @@ MQTT: For getting started with Gost and MQTT for publishing/receiving data see [
 - Benchmarks
 - Authentication
 - Different storage providers such as MongoDB (Now using PostgreSQL)
-
-## Benchmarks
-
-[Publish observation (MQTT)](https://github.com/Geodan/gost/wiki/Benchmark---publish-observation-(MQTT))
