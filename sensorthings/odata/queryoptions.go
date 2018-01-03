@@ -130,6 +130,10 @@ func GetQueryOptions(r *http.Request, maxEntities int) (*QueryOptions, []error) 
 	vars := mux.Vars(r)
 	value := vars["params"]
 
+	// Encode semicolon to %3B, semicolon is used in $expand with multiple inline queries: $expand=Datastreams/Observations($select=result;$top=2)
+	// when r.URL.Query() is called the value will be cut off after semicolon, using r.URL.EscapedPath() won't work	either
+	r.URL.RawQuery = strings.Replace(r.URL.RawQuery, ";", "%3B", -1)
+
 	values := r.URL.Query()
 	if len(vars["params"]) > 0 {
 		//If $ref found create select query with id
