@@ -907,28 +907,29 @@ func (qb *QueryBuilder) cleanupFilter(pn *godata.ParseNode) {
 		current := pn.Children[i]
 		current.Parent = pn
 		if current.Children != nil && len(current.Children) > 0 {
-			if len(current.Children) == 2 {
-				// If 2 childs are found with empty token remove the node from it's parent
-				if current.Children[0].Token == nil && current.Children[1].Token == nil {
-					pn.Children = append(pn.Children[:i], pn.Children[i+1:]...)
-					continue
-				}
-
-				// If child is empty, push back child 1
-				if current.Children[0].Token == nil && current.Children[1].Token != nil {
-					current = current.Children[1]
-				} else if current.Children[0].Token != nil && current.Children[1].Token == nil {
-					current = current.Children[0]
-				}
-			}
-
-			if len(current.Children) == 1 {
-				if current.Children[0].Token == nil {
-					pn.Children = append(pn.Children[:i], pn.Children[i+1:]...)
-					continue
-				}
-			}
+			removeUnusedNodeFromParent(i, pn, current)
 		}
+	}
+}
+
+func removeUnusedNodeFromParent(i int, parent *godata.ParseNode, current *godata.ParseNode) {
+	if len(current.Children) == 2 {
+		// If 2 childs are found with empty token remove the node from it's parent
+		if current.Children[0].Token == nil && current.Children[1].Token == nil {
+			parent.Children = append(parent.Children[:i], parent.Children[i+1:]...)
+			return
+		}
+
+		// If child is empty, push back child 1
+		if current.Children[0].Token == nil && current.Children[1].Token != nil {
+			current = current.Children[1]
+		} else if current.Children[0].Token != nil && current.Children[1].Token == nil {
+			current = current.Children[0]
+		}
+	}
+
+	if len(current.Children) == 1 && current.Children[0].Token == nil {
+		parent.Children = append(parent.Children[:i], parent.Children[i+1:]...)
 	}
 }
 
@@ -1067,6 +1068,25 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		}
 	}
 
+	queryString := qb.getMainQueryString(e1, e2, et1, et2, id, qo, qpi)
+
+	limit := ""
+	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
+		limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
+	}
+	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
+	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
+		queryString,
+		qb.addAsPrefix(qpi, tableMappings[et1]),
+		qb.createJoin(e1, e2, id, false, false, qo, qpi, ""),
+		limit,
+		qb.getOffset(qo),
+	)
+
+	return queryString, qpi
+}
+
+func (qb *QueryBuilder) getMainQueryString(e1 entities.Entity, e2 entities.Entity, et1 entities.EntityType, et2 entities.EntityType, id interface{}, qo *odata.QueryOptions, qpi *QueryParseInfo) string {
 	queryString := fmt.Sprintf("SELECT %s FROM (SELECT %s FROM %s",
 		qb.getSelect(e1, qo, qpi, true, true, true, false, ""),
 		qb.getSelect(e1, qo, nil, true, true, false, true, ""),
@@ -1089,18 +1109,5 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		}
 	}
 
-	limit := ""
-	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
-		limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
-	}
-	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
-	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
-		queryString,
-		qb.addAsPrefix(qpi, tableMappings[et1]),
-		qb.createJoin(e1, e2, id, false, false, qo, qpi, ""),
-		limit,
-		qb.getOffset(qo),
-	)
-
-	return queryString, qpi
+	return queryString
 }
