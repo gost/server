@@ -31,7 +31,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	|
 |------------	|---------------------	|-----------------------------------------------------------------	|
-| 2017-09-17 	| 0.6                 	| TBD                                                             	|
+| 2018-01-31	| 0.6                 	| TBD                                                             	|
 
 ## Benchmarks
 
