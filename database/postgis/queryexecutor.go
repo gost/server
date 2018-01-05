@@ -41,10 +41,30 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 
 	defer rows.Close()
 
+	parentEntities, err := resultToEntities(rows, q, qo)
+	if err != nil {
+		return nil, hasNextPage, err
+	}
+
+	// if no parent entities are found return nil, nil
+	if len(parentEntities) == 0 {
+		return nil, hasNextPage, nil
+	}
+
+	// To check if there is a next page an additional entity is requested, check if more items
+	// returned than requested and remove the extra entity
+	if qo != nil && qo.Top != nil && len(parentEntities) > int(*qo.Top) {
+		hasNextPage = true
+		parentEntities = append(parentEntities[:int(*qo.Top)])
+	}
+
+	return parentEntities, hasNextPage, nil
+}
+
+func resultToEntities(rows *sql.Rows, q *QueryParseInfo, qo *odata.QueryOptions) ([]entities.Entity, error) {
 	columns, _ := rows.Columns()
 	count := len(columns)
 	values := make([]interface{}, count)
-	valueP := make([]interface{}, count)
 	currentQIDEntityID := make(map[int]interface{})                    // keeps track of the current query id and entity id
 	parentEntities := []entities.Entity{}                              // array of parent entities
 	subEntities := map[int]map[int]map[interface{}][]entities.Entity{} // map of sub entities with a relation to their parent entity map[qid]map[paren qid]map[parent entity id]map[entity id]entity
@@ -54,20 +74,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 	queryParseInfoMap, deleteIDMap, ranges, asMap := prepareExecuteSelect(columns, q)
 
 	for rows.Next() {
-		for i := range columns {
-			valueP[i] = &values[i]
-		}
-
-		rows.Scan(valueP...)
-
-		// split a row into the desired entities (row can contain multiple entities due to join queries)
-		sortEntities := rowToEntities(columns, values, ranges, asMap)
-
-		keys := []int{}
-		for k := range sortEntities {
-			keys = append(keys, k)
-		}
-		sort.Ints(keys)
+		keys, sortEntities := prepareParseRow(columns, rows, values, ranges, asMap)
 
 		// for every entity found in a row
 		for _, k := range keys {
@@ -94,21 +101,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 					} else {
 						_, skip = parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]][val]
 						if !skip {
-							_, ok := subEntities[qi]
-							if !ok {
-								subEntities[qi] = make(map[int]map[interface{}][]entities.Entity)
-								parsedMap[qi] = make(map[int]map[interface{}]map[interface{}]interface{})
-							}
-							_, ok = subEntities[qi][relationMap[qi]]
-							if !ok {
-								subEntities[qi][relationMap[qi]] = make(map[interface{}][]entities.Entity)
-								parsedMap[qi][relationMap[qi]] = make(map[interface{}]map[interface{}]interface{})
-							}
-							_, ok = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]]
-							if !ok {
-								subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make([]entities.Entity, 0)
-								parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]interface{})
-							}
+							setMaps(subEntities, parsedMap, relationMap, currentQIDEntityID, qi)
 						}
 					}
 
@@ -123,7 +116,7 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 
 			newEntity, err := queryParseInfoMap[qi].Parse(data)
 			if err != nil {
-				return nil, hasNextPage, err
+				return nil, err
 			}
 
 			if qi == 0 {
@@ -143,19 +136,46 @@ func ExecuteSelect(db *sql.DB, q *QueryParseInfo, sql string, qo *odata.QueryOpt
 	// Remove all needed id fields that weren't requested by the user
 	deleteIDFields(parentEntities, deleteIDMap, subEntities)
 
-	// if no parent entities are found return nil, nil
-	if len(parentEntities) == 0 {
-		return nil, hasNextPage, nil
+	return parentEntities, nil
+}
+
+func setMaps(subEntities map[int]map[int]map[interface{}][]entities.Entity, parsedMap map[int]map[int]map[interface{}]map[interface{}]interface{}, relationMap map[int]int, currentQIDEntityID map[int]interface{}, qi int) {
+	_, ok := subEntities[qi]
+	if !ok {
+		subEntities[qi] = make(map[int]map[interface{}][]entities.Entity)
+		parsedMap[qi] = make(map[int]map[interface{}]map[interface{}]interface{})
+	}
+	_, ok = subEntities[qi][relationMap[qi]]
+	if !ok {
+		subEntities[qi][relationMap[qi]] = make(map[interface{}][]entities.Entity)
+		parsedMap[qi][relationMap[qi]] = make(map[interface{}]map[interface{}]interface{})
+	}
+	_, ok = subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]]
+	if !ok {
+		subEntities[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make([]entities.Entity, 0)
+		parsedMap[qi][relationMap[qi]][currentQIDEntityID[relationMap[qi]]] = make(map[interface{}]interface{})
+	}
+}
+
+func prepareParseRow(columns []string, rows *sql.Rows, values []interface{}, ranges map[int]*QueryParseInfo, asMap map[string]string) ([]int, map[int]map[string]interface{}) {
+	valueP := make([]interface{}, len(columns))
+
+	for i := range columns {
+		valueP[i] = &values[i]
 	}
 
-	// To check if there is a next page an additional entity is requested, check if more items
-	// returned than requested and remove the extra entity
-	if qo != nil && qo.Top != nil && len(parentEntities) > int(*qo.Top) {
-		hasNextPage = true
-		parentEntities = append(parentEntities[:int(*qo.Top)])
-	}
+	rows.Scan(valueP...)
 
-	return parentEntities, hasNextPage, nil
+	// split a row into the desired entities (row can contain multiple entities due to join queries)
+	sortEntities := rowToEntities(columns, values, ranges, asMap)
+
+	keys := []int{}
+	for k := range sortEntities {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	return keys, sortEntities
 }
 
 func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryParseInfo, map[int]bool, map[int]*QueryParseInfo, map[string]string) {
@@ -167,7 +187,6 @@ func prepareExecuteSelect(columns []string, q *QueryParseInfo) (map[int]*QueryPa
 	asMap := make(map[string]string)
 
 	// for every _id found store the QueryParseInfo so we know where the column belongs to an create asMap
-
 	for i, c := range columns {
 		if strings.HasSuffix(c, idAsSuffix) {
 			queryID++

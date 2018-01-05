@@ -85,6 +85,35 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 // addID to true if it needs to be added and isn't in QuerySelect.Params, addAs to true if a field needs to be
 // outputted with AS [name]
 func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qpi *QueryParseInfo, addID bool, addAs bool, fromAs bool, isExpand bool, selectString string) string {
+	entityType := et.GetEntityType()
+	properties := qb.getProperties(et, qo, addID)
+
+	// ToDo: this is a fix for supporting $expand=Observations/FeatureOfInterest, try to add observationFeatureOfInterestID in a different way
+	if isExpand {
+		if entityType == entities.EntityTypeObservation {
+			properties = append([]string{observationFeatureOfInterestID}, properties...)
+		}
+
+		if entityType == entities.EntityTypeDatastream {
+			properties = append([]string{datastreamThingID, datastreamObservedPropertyID, datastreamSensorID}, properties...)
+		}
+
+		if entityType == entities.EntityTypeHistoricalLocation {
+			properties = append([]string{historicalLocationThingID}, properties...)
+		}
+
+		if entityType == entities.EntityTypeObservation {
+			properties = append([]string{observationStreamID}, properties...)
+		}
+	}
+
+	selectString = qb.propertiesToSelectString(entityType, qpi, properties, selectString, addAs, fromAs, isExpand)
+	selectString = qb.subEntitiesToSelectString(qpi, selectString)
+
+	return selectString
+}
+
+func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions, addID bool) []string {
 	var properties []string
 
 	if qo == nil || qo.Select == nil || len(qo.Select.SelectItems) == 0 {
@@ -113,31 +142,37 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 		}
 	}
 
-	// ToDo: this is a fix for supporting $expand=Observations/FeatureOfInterest, try to add observationFeatureOfInterestID in a different way
-	if isExpand {
-		if et.GetEntityType() == entities.EntityTypeObservation {
-			properties = append([]string{observationFeatureOfInterestID}, properties...)
-		}
+	return properties
+}
 
-		if et.GetEntityType() == entities.EntityTypeDatastream {
-			properties = append([]string{datastreamThingID, datastreamObservedPropertyID, datastreamSensorID}, properties...)
-		}
+func (qb *QueryBuilder) subEntitiesToSelectString(qpi *QueryParseInfo, selectString string) string {
+	if qpi != nil && len(qpi.SubEntities) > 0 {
+		for _, subQPI := range qpi.SubEntities {
+			qo := &odata.QueryOptions{}
+			if subQPI.ExpandItem != nil {
+				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+			}
 
-		if et.GetEntityType() == entities.EntityTypeHistoricalLocation {
-			properties = append([]string{historicalLocationThingID}, properties...)
-		}
+			if qo.Select != nil && qo.Select.SelectItems != nil && len(qo.Select.SelectItems) > 0 {
+				// skip if a qo has a select with nil (non user requested expand)
+				if qo.Select.SelectItems[0].Segments[0].Value == "nil" {
+					continue
+				}
+			}
 
-		if et.GetEntityType() == entities.EntityTypeObservation {
-			properties = append([]string{observationStreamID}, properties...)
+			selectString = qb.getSelect(subQPI.Entity, qo, subQPI, true, true, true, false, selectString)
 		}
 	}
 
+	return selectString
+}
+
+func (qb *QueryBuilder) propertiesToSelectString(entityType entities.EntityType, qpi *QueryParseInfo, properties []string, selectString string, addAs, fromAs, isExpand bool) string {
 	for _, p := range properties {
 		toAdd := ""
 		if len(selectString) > 0 {
 			toAdd += ", "
 		}
-		entityType := et.GetEntityType()
 
 		field := ""
 		if fromAs {
@@ -154,24 +189,6 @@ func (qb *QueryBuilder) getSelect(et entities.Entity, qo *odata.QueryOptions, qp
 			}
 		} else {
 			selectString += fmt.Sprintf("%s%s", toAdd, field)
-		}
-	}
-
-	if qpi != nil && len(qpi.SubEntities) > 0 {
-		for _, subQPI := range qpi.SubEntities {
-			qo := &odata.QueryOptions{}
-			if subQPI.ExpandItem != nil {
-				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
-			}
-
-			if qo.Select != nil && qo.Select.SelectItems != nil && len(qo.Select.SelectItems) > 0 {
-				// skip if a qo has a select with nil (non user requested expand)
-				if qo.Select.SelectItems[0].Segments[0].Value == "nil" {
-					continue
-				}
-			}
-
-			selectString = qb.getSelect(subQPI.Entity, qo, subQPI, true, true, true, false, selectString)
 		}
 	}
 
@@ -388,224 +405,19 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 }
 
 func (qb *QueryBuilder) createFilter(et entities.EntityType, pn *godata.ParseNode, ignoreSelectAs bool) string {
-	output := ""
 	if pn == nil || pn.Token == nil {
-		return output
+		return ""
 	}
 
-	switch pn.Token.Type {
-	case godata.FilterTokenNav:
-		q := ""
-		for i, part := range pn.Children {
-			if i == 0 {
-				q += fmt.Sprintf("%v ", strings.ToLower(qb.createFilter(et, part, false)))
-				continue
-			}
+	return qb.filterToString(pn, et, ignoreSelectAs)
+}
 
-			arrow := "->"
-			if i+1 == len(pn.Children) {
-				arrow = "->>"
-			}
-			q += fmt.Sprintf("%v '%v'", arrow, part.Token.Value)
-		}
-		return q
-	case godata.FilterTokenLogical:
-		left := qb.createFilter(et, pn.Children[0], false)
-
-		if len(pn.Children) == 1 && strings.ToLower(pn.Token.Value) == "not" {
-			return fmt.Sprintf("%v %v", qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), left)
-		}
-
-		right := qb.createFilter(et, pn.Children[1], false)
-		left, right = qb.prepareFilter(et, pn.Children[0].Token.Value, left, pn.Children[1].Token.Value, right)
-
-		// Workaround for faulty OGC test
-		result := "observation.data -> 'result'"
-		if len(qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value)) > 0 {
-			if left == result {
-				if strings.Index(right, "'") != 0 {
-					left = qb.CastObservationResult(left, "double precision")
-				} else {
-					left = "observation.data ->> 'result'"
-				}
-			} else if right == result {
-				if strings.Index(left, "'") != 0 {
-					right = qb.CastObservationResult(right, "double precision")
-				} else {
-					right = "observation.data ->> 'result'"
-				}
-			}
-		}
-		// End workaround
-
-		return fmt.Sprintf("%v %v %v", left, qb.odataLogicalOperatorToPostgreSQL(pn.Token.Value), right)
-	case godata.FilterTokenFunc:
-		if pn.Token.Value == "contains" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeContains), qb.createLike(right, LikeContains))
-		} else if pn.Token.Value == "substringof" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("%s LIKE %s", qb.createLike(right, LikeContains), qb.createLike(left, LikeContains))
-		} else if pn.Token.Value == "endswith" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeEndsWith), qb.createLike(right, LikeEndsWith))
-		} else if pn.Token.Value == "startswith" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("%s LIKE %s", qb.createLike(left, LikeStartsWith), qb.createLike(right, LikeStartsWith))
-		}
-		if pn.Token.Value == "length" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("LENGTH(%s)", left)
-		} else if pn.Token.Value == "indexof" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("STRPOS(%s, %s) -1", left, right)
-		} else if pn.Token.Value == "substring" {
-			left, right, right2 := "", "", ""
-			left = qb.createFilter(et, pn.Children[0], true)
-			right = qb.createFilter(et, pn.Children[1], true)
-			if len(pn.Children) > 2 {
-				right2 = qb.createFilter(et, pn.Children[2], true)
-				return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for %s)", left, right, right2)
-			}
-
-			return fmt.Sprintf("SUBSTRING(%s from (%s + 1) for LENGTH(%s))", left, right, left)
-		} else if pn.Token.Value == "tolower" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("LOWER(%s)", left)
-		} else if pn.Token.Value == "toupper" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("UPPER(%s)", left)
-		} else if pn.Token.Value == "trim" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("TRIM(both ' ' from %s)", left)
-		} else if pn.Token.Value == "concat" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			right := qb.createFilter(et, pn.Children[1], true)
-			return fmt.Sprintf("CONCAT(%s, %s)", left, right)
-		} else if pn.Token.Value == "round" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("ROUND(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
-		} else if pn.Token.Value == "floor" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("FLOOR(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
-		} else if pn.Token.Value == "ceiling" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("CEILING(CAST(%s as double precision))", strings.Replace(left, "->", "->>", -1))
-		} else if pn.Token.Value == "year" {
-			return qb.createExtractDateQuery(pn, et, "YEAR")
-		} else if pn.Token.Value == "month" {
-			return qb.createExtractDateQuery(pn, et, "MONTH")
-		} else if pn.Token.Value == "day" {
-			return qb.createExtractDateQuery(pn, et, "DAY")
-		} else if pn.Token.Value == "hour" {
-			return qb.createExtractDateQuery(pn, et, "HOUR")
-		} else if pn.Token.Value == "minute" {
-			return qb.createExtractDateQuery(pn, et, "MINUTE")
-		} else if pn.Token.Value == "second" {
-			return qb.createExtractDateQuery(pn, et, "SECOND")
-		} else if pn.Token.Value == "fractionalseconds" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("EXTRACT(MICROSECONDS FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')) / 1000000", left)
-		} else if pn.Token.Value == "date" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("(%s)::date", left)
-		} else if pn.Token.Value == "time" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			if strings.Contains(strings.ToLower(left), "time") {
-				return fmt.Sprintf("((%s)::timestamp)::time", left)
-			}
-
-			return fmt.Sprintf("(%s)::time", left)
-		} else if pn.Token.Value == "totaloffsetminutes" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("EXTRACT(TIMEZONE_MINUTE FROM to_timestamp(%s,'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"'))", left)
-		} else if pn.Token.Value == "now" {
-			return fmt.Sprint("to_char(now()::timestamp at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')")
-		} else if pn.Token.Value == "maxdatetime" {
-			return fmt.Sprint("'9999-12-31T23:59:59.999Z'")
-		} else if pn.Token.Value == "mindatetime" {
-			return fmt.Sprint("'0001-01-01T00:00:00.000Z'")
-		} else if pn.Token.Value == "totalseconds" {
-			left := qb.createFilter(et, pn.Children[0], true)
-			return fmt.Sprintf("SELECT extract(epoch from (%s)::timestamp)", left)
-		} else if pn.Token.Value == "geo.distance" {
-			return qb.createSpatialQuery(pn, et, "ST_DISTANCE(%s, %s)", 2)
-		} else if pn.Token.Value == "geo.length" {
-			return qb.createSpatialQuery(pn, et, "ST_LENGTH(%s)", 1)
-		} else if pn.Token.Value == "st_equals" {
-			return qb.createSpatialQuery(pn, et, "ST_EQUALS(%s, %s)", 2)
-		} else if pn.Token.Value == "st_touches" {
-			return qb.createSpatialQuery(pn, et, "ST_TOUCHES(%s, %s)", 2)
-		} else if pn.Token.Value == "st_overlaps" {
-			return qb.createSpatialQuery(pn, et, "ST_OVERLAPS(%s, %s)", 2)
-		} else if pn.Token.Value == "st_crosses" {
-			return qb.createSpatialQuery(pn, et, "ST_CROSSES(%s, %s)", 2)
-		} else if pn.Token.Value == "st_contains" {
-			return qb.createSpatialQuery(pn, et, "ST_CONTAINS(%s, %s)", 2)
-		} else if pn.Token.Value == "st_disjoint" {
-			return qb.createSpatialQuery(pn, et, "ST_DISJOINT(%s, %s)", 2)
-		} else if pn.Token.Value == "st_relate" {
-			return qb.createSpatialQuery(pn, et, "ST_RELATE(%s, %s, %s)", 3)
-		} else if pn.Token.Value == "st_within" {
-			return qb.createSpatialQuery(pn, et, "ST_WITHIN(%s, %s)", 2)
-		} else if pn.Token.Value == "st_intersects" || pn.Token.Value == "geo.intersects" {
-			return qb.createSpatialQuery(pn, et, "ST_INTERSECTS(%s, %s)", 2)
-		}
-	case godata.FilterTokenOp:
-		if pn.Token.Value == "add" {
-			return qb.createArithmetic(et, pn, "+", "double precision")
-		} else if pn.Token.Value == "sub" {
-			return qb.createArithmetic(et, pn, "-", "double precision")
-		} else if pn.Token.Value == "mul" {
-			return qb.createArithmetic(et, pn, "*", "double precision")
-		} else if pn.Token.Value == "div" {
-			return qb.createArithmetic(et, pn, "/", "double precision")
-		} else if pn.Token.Value == "mod" {
-			return qb.createArithmetic(et, pn, "%", "integer")
-		}
-	case godata.FilterTokenGeography:
-		return fmt.Sprintf("ST_GeomFromText(%v)", pn.Children[0].Token.Value)
-	case godata.FilterTokenLambda:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenNull: // 10
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenIt:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenRoot:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenFloat:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenInteger:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenString: //15
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenDate:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenTime:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenDateTime:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenBoolean:
-		return fmt.Sprintf("%v", pn.Token.Value)
-	case godata.FilterTokenLiteral: // 20
-		p := selectMappings[et][strings.ToLower(pn.Token.Value)]
-		if p != "" {
-			return p
-		}
-
-		if ignoreSelectAs && selectMappingsIgnore[et][pn.Token.Value] {
-			return fmt.Sprintf("%s.%v", et.ToString(), pn.Token.Value)
-		}
-
-		return pn.Token.Value
+func (qb *QueryBuilder) filterToString(pn *godata.ParseNode, et entities.EntityType, ignoreSelectAs bool) string {
+	if convertFunction, ok := filterToStringMap[pn.Token.Type]; ok {
+		return convertFunction(*qb, pn, et, ignoreSelectAs)
 	}
 
-	return output
+	return ""
 }
 
 func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left, originalRight, right string) (string, string) {
@@ -642,7 +454,6 @@ func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left
 		if property == "phenomenontime" || property == "resulttime" || property == "time" {
 			if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
 				*str[1] = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
-			} else {
 			}
 
 			return left, right
@@ -816,69 +627,7 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 			}
 
 			// check if expand exist for current path, if so add a new filter to it
-			addExpand := true
-			if qo.Expand != nil {
-				for i := 0; i < len(qo.Expand.ExpandItems); i++ {
-					e := qo.Expand.ExpandItems[i]
-					if len(cp) != len(e.Path) {
-						continue
-					}
-
-					for j := 0; j < len(cp); j++ {
-						if cp[j] == e.Path[j].Value {
-							if j == len(cp)-1 {
-								addFilterToExpandItem(afterCouplingNode, e)
-								addExpand = false
-							}
-						} else {
-							break
-						}
-					}
-
-					if !addExpand {
-						break
-					}
-				}
-			}
-
-			// expand is not defined, create an expand with filter and define that the data should not be return to the requester
-			if addExpand {
-				// add new expand and set to not export since this data was not requested by the user
-				if qo.Expand == nil {
-					qo.Expand = &godata.GoDataExpandQuery{}
-					qo.Expand.ExpandItems = make([]*godata.ExpandItem, 0)
-				}
-
-				expandString := ""
-				for _, s := range cp {
-					if len(expandString) != 0 {
-						expandString += "/"
-					}
-					expandString += s
-				}
-
-				expand, _ := godata.ParseExpandString(expandString)
-				newExpandItem := &godata.ExpandItem{
-					Path: expand.ExpandItems[0].Path,
-				}
-
-				// add a select of nil, if set to nil the QueryBuilder knows that the expand is generated
-				newExpandItem.Select = &godata.GoDataSelectQuery{
-					SelectItems: []*godata.SelectItem{
-						{
-							Segments: []*godata.Token{
-								{
-									Value: "nil",
-								},
-							},
-						},
-					},
-				}
-
-				// add filter to expand
-				addFilterToExpandItem(afterCouplingNode, newExpandItem)
-				qo.Expand.ExpandItems = append(qo.Expand.ExpandItems, newExpandItem)
-			}
+			qb.addExpand(qo, afterCouplingNode, cp)
 
 			// remove node from filter since it sits inside the expand now
 			*afterCouplingNode = godata.ParseNode{}
@@ -891,6 +640,72 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 			c.Parent = pn
 			qb.sortFilter(qo, c, pn, nil, &ne)
 		}
+	}
+}
+
+func (qb *QueryBuilder) addExpand(qo *odata.QueryOptions, afterCouplingNode *godata.ParseNode, cp []string) {
+	addExpand := true
+	if qo.Expand != nil {
+		for i := 0; i < len(qo.Expand.ExpandItems); i++ {
+			e := qo.Expand.ExpandItems[i]
+			if len(cp) != len(e.Path) {
+				continue
+			}
+
+			for j := 0; j < len(cp); j++ {
+				if cp[j] == e.Path[j].Value {
+					if j == len(cp)-1 {
+						addFilterToExpandItem(afterCouplingNode, e)
+						addExpand = false
+					}
+				} else {
+					break
+				}
+			}
+
+			if !addExpand {
+				break
+			}
+		}
+	}
+
+	// expand is not defined, create an expand with filter and define that the data should not be return to the requester
+	if addExpand {
+		// add new expand and set to not export since this data was not requested by the user
+		if qo.Expand == nil {
+			qo.Expand = &godata.GoDataExpandQuery{}
+			qo.Expand.ExpandItems = make([]*godata.ExpandItem, 0)
+		}
+
+		expandString := ""
+		for _, s := range cp {
+			if len(expandString) != 0 {
+				expandString += "/"
+			}
+			expandString += s
+		}
+
+		expand, _ := godata.ParseExpandString(expandString)
+		newExpandItem := &godata.ExpandItem{
+			Path: expand.ExpandItems[0].Path,
+		}
+
+		// add a select of nil, if set to nil the QueryBuilder knows that the expand is generated
+		newExpandItem.Select = &godata.GoDataSelectQuery{
+			SelectItems: []*godata.SelectItem{
+				{
+					Segments: []*godata.Token{
+						{
+							Value: "nil",
+						},
+					},
+				},
+			},
+		}
+
+		// add filter to expand
+		addFilterToExpandItem(afterCouplingNode, newExpandItem)
+		qo.Expand.ExpandItems = append(qo.Expand.ExpandItems, newExpandItem)
 	}
 }
 
