@@ -29,9 +29,9 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 ## Roadmap
 
-| Date       	|             Version 	| Features                                                        	|
-|------------	|---------------------	|-----------------------------------------------------------------	|
-| 2018-01-31	| 0.6                 	| TBD                                                             	|
+| Date       	|             Version 	| Features                                                        	      |
+|------------	|---------------------	|-----------------------------------------------------------------------	|
+| 2018-01-31	| 0.6                 	| new dashboard (based on polymer/webcomponents) + bugfixes for locations |
 
 ## Benchmarks
 
