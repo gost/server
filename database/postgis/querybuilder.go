@@ -292,9 +292,13 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			// supply qo to createJoin as a non Expand
 			generatedExpand := isExpandGenerated(qo.Select)
 			if !generatedExpand {
-				qo.Select = &godata.GoDataSelectQuery{}
+				//qo.Select = &godata.GoDataSelectQuery{}
 			}
-			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, generatedExpand, qo, subQPI, joinString)
+
+			// set innerjoinExpand to true to left join the expand, maybe change this in future
+			innerjoinExpand := true
+
+			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, innerjoinExpand, qo, subQPI, joinString)
 		}
 	}
 
@@ -599,39 +603,43 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 		if startNavNode == nil {
 			startNavNode = pn
 		}
+
+		// stil navigation node in children move further
 		if pn.Children[0].Token.Type == godata.FilterTokenNav {
 			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
 			qb.sortFilter(qo, pn.Children[0], parentNode, startNavNode, currentExpand)
-		} else {
-			*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
-			*currentExpand = append([]string{pn.Children[0].Token.Value}, *currentExpand...)
-
-			// if [0] is not an entity do nothing
-			_, err := entities.EntityFromString(pn.Children[0].Token.Value)
-			if err != nil {
-				return
-			}
-
-			cp := *currentExpand
-			field := cp[len(cp)-1]
-			cp = cp[:len(cp)-1]
-			afterCouplingNode := findParseNodeAfterCoupling(parentNode)
-
-			// set navigation node to literal with last item from path (which should be the fieldname i.e Datastreams/Observations/id)
-			*startNavNode = godata.ParseNode{
-				Token: &godata.Token{
-					Value: field,
-					Type:  godata.FilterTokenLiteral,
-				},
-				Parent: parentNode,
-			}
-
-			// check if expand exist for current path, if so add a new filter to it
-			qb.addExpand(qo, afterCouplingNode, cp)
-
-			// remove node from filter since it sits inside the expand now
-			*afterCouplingNode = godata.ParseNode{}
+			return
 		}
+
+		// prepend entity and field to keep track of path
+		*currentExpand = append([]string{pn.Children[1].Token.Value}, *currentExpand...)
+		*currentExpand = append([]string{pn.Children[0].Token.Value}, *currentExpand...)
+
+		// if [0] is not an entity do nothing
+		_, err := entities.EntityFromString(pn.Children[0].Token.Value)
+		if err != nil {
+			return
+		}
+
+		cp := *currentExpand
+		field := cp[len(cp)-1]
+		cp = cp[:len(cp)-1]
+		afterCouplingNode := findParseNodeAfterCoupling(parentNode)
+
+		// set navigation node to literal with last item from path (which should be the fieldname i.e Datastreams/Observations/id)
+		*startNavNode = godata.ParseNode{
+			Token: &godata.Token{
+				Value: field,
+				Type:  godata.FilterTokenLiteral,
+			},
+			Parent: parentNode,
+		}
+
+		// check if expand exist for current path, if so add a new filter to it
+		qb.addExpand(qo, afterCouplingNode, cp)
+
+		// remove node from filter since it sits inside the expand now
+		*afterCouplingNode = godata.ParseNode{}
 	} else {
 		// look for more navigational filters
 		for i := 0; i < len(pn.Children); i++ {
@@ -641,6 +649,22 @@ func (qb *QueryBuilder) sortFilter(qo *odata.QueryOptions, pn *godata.ParseNode,
 			qb.sortFilter(qo, c, pn, nil, &ne)
 		}
 	}
+}
+
+func iterateParseNodeChilds(pn *godata.ParseNode, str string) string {
+	if pn == nil || pn.Token == nil {
+		return str
+	}
+
+	str = fmt.Sprintf("%v %v", str, pn.Token.Value)
+
+	for _, p := range pn.Children {
+		if p != nil && len(pn.Children) > 0 {
+			str = iterateParseNodeChilds(p, str)
+		}
+	}
+
+	return str
 }
 
 func (qb *QueryBuilder) addExpand(qo *odata.QueryOptions, afterCouplingNode *godata.ParseNode, cp []string) {
@@ -757,11 +781,14 @@ func addFilterToExpandItem(pn *godata.ParseNode, ei *godata.ExpandItem) {
 		ei.Filter = &godata.GoDataFilterQuery{Tree: copyParseNode}
 	} else {
 		temp := *ei.Filter.Tree
+		copyCouplingNode := &godata.ParseNode{}
 		cpn := findFirstCouplingParseNode(copyParseNode)
-		cpn.Children = make([]*godata.ParseNode, 2)
-		cpn.Children[0] = &temp
-		cpn.Children[1] = copyParseNode
-		ei.Filter = &godata.GoDataFilterQuery{Tree: cpn}
+		*copyCouplingNode = *cpn // make copy else filter will be added to root
+		copyCouplingNode.Children = make([]*godata.ParseNode, 2)
+		copyCouplingNode.Children[0] = &temp
+		copyCouplingNode.Children[1] = copyParseNode
+
+		ei.Filter = &godata.GoDataFilterQuery{Tree: copyCouplingNode}
 	}
 }
 
@@ -770,6 +797,7 @@ func findParseNodeAfterCoupling(pn *godata.ParseNode) *godata.ParseNode {
 		return pn
 	}
 
+	// if parent node is and/or return parseNode whihc is the node after coupling
 	tokenValue := strings.ToLower(pn.Parent.Token.Value)
 	if tokenValue == "and" || tokenValue == "or" {
 		return pn
