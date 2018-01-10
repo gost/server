@@ -397,6 +397,11 @@ func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.Q
 	// Only select last Location since we only have 1 encoding
 	if et == entities.EntityTypeLocation {
 		top := godata.GoDataTopQuery(1)
+		if qo == nil {
+			nQo := &odata.QueryOptions{}
+			qo = nQo
+		}
+
 		qo.Top = &top
 	}
 
