@@ -61,7 +61,7 @@ func (gdb *GostDatabase) GetLocation(id interface{}, qo *odata.QueryOptions) (*e
 func (gdb *GostDatabase) GetLocations(qo *odata.QueryOptions) ([]*entities.Location, int, bool, error) {
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, nil, nil, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, nil, nil, qo)
-	return processLocations(gdb.Db, query, qo, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL, false)
 }
 
 // GetLocationsByHistoricalLocation retrieves all locations linked to the given HistoricalLocation
@@ -73,7 +73,7 @@ func (gdb *GostDatabase) GetLocationsByHistoricalLocation(hlID interface{}, qo *
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.HistoricalLocation{}, intID, qo)
-	return processLocations(gdb.Db, query, qo, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL, true)
 }
 
 // GetLocationByDatastreamID returns a location linked to an observation
@@ -100,13 +100,16 @@ func (gdb *GostDatabase) GetLocationsByThing(thingID interface{}, qo *odata.Quer
 		return nil, 0, false, gostErrors.NewRequestNotFound(errors.New("Thing does not exist"))
 	}
 
+	tq := godata.GoDataTopQuery(1)
+	qo.Top = &tq
+
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
 	countSQL := gdb.QueryBuilder.CreateCountQuery(&entities.Location{}, &entities.Thing{}, intID, qo)
-	return processLocations(gdb.Db, query, qo, qi, countSQL)
+	return processLocations(gdb.Db, query, qo, qi, countSQL, true)
 }
 
 func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Location, error) {
-	locations, _, _, err := processLocations(db, sql, nil, qi, "")
+	locations, _, _, err := processLocations(db, sql, nil, qi, "", false)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +121,7 @@ func processLocation(db *sql.DB, sql string, qi *QueryParseInfo) (*entities.Loca
 	return locations[0], nil
 }
 
-func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string) ([]*entities.Location, int, bool, error) {
+func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryParseInfo, countSQL string, disableNextLink bool) ([]*entities.Location, int, bool, error) {
 	data, hasNext, err := ExecuteSelect(db, qi, sql, qo)
 	if err != nil {
 		return nil, 0, hasNext, fmt.Errorf("Error executing query %v", err)
@@ -131,11 +134,15 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryP
 	}
 
 	var count int
-	if len(countSQL) > 0 {
+	if !disableNextLink && len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
 			return nil, 0, hasNext, fmt.Errorf("error executing count %v", err)
 		}
+	}
+
+	if disableNextLink {
+		hasNext = false
 	}
 
 	return locations, count, hasNext, nil

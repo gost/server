@@ -394,6 +394,12 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
 func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string) string {
+	// Only select last Location since we only have 1 encoding
+	if et == entities.EntityTypeLocation {
+		top := godata.GoDataTopQuery(1)
+		qo.Top = &top
+	}
+
 	q := ""
 	if qo != nil && qo.Filter != nil {
 		filterString := qb.createFilter(et, qo.Filter.Tree, false)
