@@ -58,7 +58,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      PostProcessHandler(LowerCaseURI(router), a.GetConfig().Server.ExternalURI),
+			Handler:      PostProcessHandler(RequestErrorHandler(LowerCaseURI(router)), a.GetConfig().Server.ExternalURI),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},
@@ -92,6 +92,52 @@ func (s *GostServer) Stop() {
 		logger.Info("Stopping HTTP(S) Server")
 		s.httpServer.Shutdown(context.Background())
 	}
+}
+
+// RequestErrorHandler is a middleware function that lower cases the url path
+func RequestErrorHandler(h http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.RawQuery
+		if query != "" {
+			logger.Info("query given:" + query)
+
+			// todo: maybe add some other checks
+			isValid := IsValidOdataQuery(query)
+			if !isValid {
+				// return godata.BadRequestError("Error: Not a valid Odata query given")
+				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+				w.WriteHeader(http.StatusNotFound)
+				w.Write([]byte("Error: Not a valid Odata query given"))
+				return
+			}
+		}
+		h.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
+func partHasKeyword(part string) bool {
+	keywords := []string{"$filter", "$select", "$expand", "$order_by", "$top", "$skip", "$count"}
+	part1 := strings.Split(part, "=")[0]
+
+	for _, kw := range keywords {
+		if part1 == kw {
+			return true
+		}
+	}
+	return false
+}
+
+func IsValidOdataQuery(query string) bool {
+	res := true
+	logger.Debugf("Query %s", query)
+	parts := strings.Split(query, "&")
+	for _, element := range parts {
+		if !partHasKeyword(element) {
+			return false
+		}
+	}
+	return res
 }
 
 // LowerCaseURI is a middleware function that lower cases the url path
