@@ -106,7 +106,7 @@ func TestGetOrderByWithNilOptions(t *testing.T) {
 	qb := CreateQueryBuilder("v1.0", 1)
 	ds := &entities.Datastream{}
 	// act
-	res := qb.getOrderBy(ds.GetEntityType(), nil)
+	res := qb.getOrderBy(ds.GetEntityType(), nil, false)
 
 	// assert
 	assert.NotNil(t, res)
@@ -160,7 +160,7 @@ func TestGetOrderByWithQueryOptions(t *testing.T) {
 	ds := &entities.Datastream{}
 
 	// act
-	res := qb.getOrderBy(ds.GetEntityType(), qo)
+	res := qb.getOrderBy(ds.GetEntityType(), qo, false)
 
 	// assert
 	assert.NotNil(t, res)
@@ -215,7 +215,7 @@ func TestCreateCountQueryWithoutId(t *testing.T) {
 func TestCreateQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
-	expected := "SELECT A_datastream.datastream_id AS A_datastream_id, A_datastream.datastream_name AS A_datastream_name, A_datastream.datastream_description AS A_datastream_description, A_datastream.datastream_unitofmeasurement AS A_datastream_unitofmeasurement, A_datastream.datastream_observationtype AS A_datastream_observationtype, A_datastream.datastream_observedarea AS A_datastream_observedarea, A_datastream.datastream_phenomenontime AS A_datastream_phenomenontime, A_datastream.datastream_resulttime AS A_datastream_resulttime FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream ORDER BY datastream.id DESC ) AS A_datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = A_datastream.datastream_thing_id AND thing.id = 0) AS thing on true   OFFSET 0"
+	expected := "SELECT A_datastream.datastream_id AS A_datastream_id, A_datastream.datastream_name AS A_datastream_name, A_datastream.datastream_description AS A_datastream_description, A_datastream.datastream_unitofmeasurement AS A_datastream_unitofmeasurement, A_datastream.datastream_observationtype AS A_datastream_observationtype, A_datastream.datastream_observedarea AS A_datastream_observedarea, A_datastream.datastream_phenomenontime AS A_datastream_phenomenontime, A_datastream.datastream_resulttime AS A_datastream_resulttime FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream) AS A_datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = A_datastream.datastream_thing_id AND thing.id = 0) AS thing on true  ORDER BY A_datastream_id DESC  OFFSET 0"
 
 	// act
 	query, _ := qb.CreateQuery(&entities.Datastream{}, &entities.Thing{}, 0, nil)
