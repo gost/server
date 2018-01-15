@@ -35,15 +35,14 @@ func TestHandleGetTestWithQueroOptionsError(t *testing.T) {
 func TestHandleGetTestWithError(t *testing.T) {
 	// arrange
 	rr := httptest.NewRecorder()
-	req, _ := http.NewRequest("PATCH", "/bla", nil)
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("GET", "/things?$filter=name nonsens 'test1'", nil)
 	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return testHandlerGetError() }
 
 	// act
 	handleGetRequest(rr, nil, req, &handle, false, 10, "")
 
 	// assert
-	assert.Equal(t, http.StatusBadRequest, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 }
 
 func TestHandleGetTestOk(t *testing.T) {
