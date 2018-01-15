@@ -23,7 +23,9 @@ func handleGetRequest(w http.ResponseWriter, e *models.Endpoint, r *http.Request
 	handler := *h
 	data, err2 := handler(queryOptions, fmt.Sprintf(externalURI+r.URL.RawPath))
 	if err2 != nil {
-		writer.SendError(w, []error{err2}, indentJSON)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(err2.Error()))
 		return
 	}
 

@@ -1,15 +1,16 @@
 package http
 
 import (
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/gost/server/configuration"
 	"github.com/gost/server/database/postgis"
 	"github.com/gost/server/mqtt"
 	"github.com/gost/server/sensorthings/api"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func TestCreateServer(t *testing.T) {
@@ -75,6 +76,23 @@ func TestPostProcessHandler(t *testing.T) {
 		assert.True(t, body == "hello teapot")
 		assert.True(t, res.StatusCode == http.StatusTeapot)
 		assert.True(t, res.Header.Get("Location") == "tea location")
+	} else {
+		t.Fail()
+	}
+}
+
+func TestIsValidRequestHandler(t *testing.T) {
+	n := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		// assert.True(t, req.URL.Path == "/test")
+	})
+	ts := httptest.NewServer(RequestErrorHandler(n))
+	defer ts.Close()
+	res, err := http.Get(ts.URL + "/sensors?$notexisting eq 'ho'")
+	if err == nil && res != nil {
+		defer res.Body.Close()
+		b, _ := ioutil.ReadAll(res.Body)
+		assert.True(t, res.StatusCode == 400)
+		assert.NotNil(t, b)
 	} else {
 		t.Fail()
 	}

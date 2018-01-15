@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	odata "github.com/gost/server/sensorthings/odata"
+
 	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
@@ -102,11 +104,10 @@ func RequestErrorHandler(h http.Handler) http.Handler {
 			logger.Info("query given:" + query)
 
 			// todo: maybe add some other checks
-			isValid := IsValidOdataQuery(query)
+			isValid := odata.IsValidOdataQuery(query)
 			if !isValid {
-				// return godata.BadRequestError("Error: Not a valid Odata query given")
 				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-				w.WriteHeader(http.StatusNotFound)
+				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("Error: Not a valid Odata query given"))
 				return
 			}
@@ -114,30 +115,6 @@ func RequestErrorHandler(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
-}
-
-func partHasKeyword(part string) bool {
-	keywords := []string{"$filter", "$select", "$expand", "$order_by", "$top", "$skip", "$count"}
-	part1 := strings.Split(part, "=")[0]
-
-	for _, kw := range keywords {
-		if part1 == kw {
-			return true
-		}
-	}
-	return false
-}
-
-func IsValidOdataQuery(query string) bool {
-	res := true
-	logger.Debugf("Query %s", query)
-	parts := strings.Split(query, "&")
-	for _, element := range parts {
-		if !partHasKeyword(element) {
-			return false
-		}
-	}
-	return res
 }
 
 // LowerCaseURI is a middleware function that lower cases the url path
