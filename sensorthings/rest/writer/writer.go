@@ -72,12 +72,16 @@ func SendError(w http.ResponseWriter, error []error, indentJSON bool) {
 		errors[idx] = value.Error()
 	}
 
-	// Set the status code, default 500 for error, check if there is an ApiError an get
+	// Set the status code, default   for error, check if there is an ApiError an get
 	var statusCode = http.StatusInternalServerError
 
 	if len(error) > 0 {
 		// if there is Encoding type error, sends bad request (400 range)
-		if strings.Contains(errors[0], "Encoding not supported") {
+		if strings.Contains(errors[0], "Encoding not supported") ||
+			strings.Contains(errors[0], "No matching token") ||
+			strings.Contains(errors[0], "invalid input syntax") ||
+			strings.Contains(errors[0], "Error executing query") {
+
 			statusCode = http.StatusBadRequest
 		}
 

@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	odata "github.com/gost/server/sensorthings/odata"
+
 	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
@@ -58,7 +60,7 @@ func CreateServer(host string, port int, api *models.API, https bool, httpsCert,
 		httpsKey:  httpsKey,
 		httpServer: &http.Server{
 			Addr:         fmt.Sprintf("%s:%s", host, strconv.Itoa(port)),
-			Handler:      PostProcessHandler(LowerCaseURI(router), a.GetConfig().Server.ExternalURI),
+			Handler:      PostProcessHandler(RequestErrorHandler(LowerCaseURI(router)), a.GetConfig().Server.ExternalURI),
 			ReadTimeout:  30 * time.Second,
 			WriteTimeout: 30 * time.Second,
 		},
@@ -92,6 +94,27 @@ func (s *GostServer) Stop() {
 		logger.Info("Stopping HTTP(S) Server")
 		s.httpServer.Shutdown(context.Background())
 	}
+}
+
+// RequestErrorHandler is a middleware function that lower cases the url path
+func RequestErrorHandler(h http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.RawQuery
+		if query != "" {
+			logger.Info("query given:" + query)
+
+			// todo: maybe add some other checks
+			isValid := odata.IsValidOdataQuery(query)
+			if !isValid {
+				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("Error: Not a valid Odata query given"))
+				return
+			}
+		}
+		h.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
 }
 
 // LowerCaseURI is a middleware function that lower cases the url path

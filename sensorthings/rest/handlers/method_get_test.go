@@ -2,12 +2,13 @@ package handlers
 
 import (
 	"errors"
-	entities "github.com/gost/core"
-	"github.com/gost/server/sensorthings/odata"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	entities "github.com/gost/core"
+	"github.com/gost/server/sensorthings/odata"
+	"github.com/stretchr/testify/assert"
 )
 
 func testHandlerGet() (*entities.Thing, error) {
@@ -34,8 +35,7 @@ func TestHandleGetTestWithQueroOptionsError(t *testing.T) {
 func TestHandleGetTestWithError(t *testing.T) {
 	// arrange
 	rr := httptest.NewRecorder()
-	req, _ := http.NewRequest("PATCH", "/bla", nil)
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest("GET", "/things?$filter=name nonsens 'test1'", nil)
 	handle := func(q *odata.QueryOptions, path string) (interface{}, error) { return testHandlerGetError() }
 
 	// act
