@@ -5,7 +5,7 @@ import (
 )
 
 func partHasKeyword(part string) bool {
-	keywords := []string{"$filter", "$select", "$expand", "$order_by", "$top", "$skip", "$count"}
+	keywords := []string{"$filter", "$select", "$expand", "$orderby", "$top", "$skip", "$count"}
 	part1 := strings.Split(part, "=")[0]
 
 	for _, kw := range keywords {
