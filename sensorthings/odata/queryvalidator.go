@@ -4,9 +4,10 @@ import (
 	"strings"
 )
 
+var keywords = []string{"$filter", "$select", "$expand", "$orderby", "$top", "$skip", "$count"}
+
 func partHasKeyword(part string) bool {
-	keywords := []string{"$filter", "$select", "$expand", "$orderby", "$top", "$skip", "$count"}
-	part1 := strings.Split(part, "=")[0]
+	part1 := strings.ToLower(strings.Split(part, "=")[0])
 
 	for _, kw := range keywords {
 		if part1 == kw {
