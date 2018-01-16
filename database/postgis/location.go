@@ -134,7 +134,7 @@ func processLocations(db *sql.DB, sql string, qo *odata.QueryOptions, qi *QueryP
 	}
 
 	var count int
-	if !disableNextLink && len(countSQL) > 0 {
+	if len(countSQL) > 0 {
 		count, err = ExecuteSelectCount(db, countSQL)
 		if err != nil {
 			return nil, 0, hasNext, fmt.Errorf("error executing count %v", err)

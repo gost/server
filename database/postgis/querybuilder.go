@@ -62,11 +62,17 @@ func (qb *QueryBuilder) getOffset(qo *odata.QueryOptions) string {
 
 // getOrderBy returns the string that needs to be placed after ORDER BY, this is set using
 // ODATA's $orderby if not given use the default ORDER BY "table".id DESC
-func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions) string {
+func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOptions, fromAs bool) string {
 	if qo != nil && qo.OrderBy != nil && len(qo.OrderBy.OrderByItems) > 0 {
 		obString := ""
 		for _, obi := range qo.OrderBy.OrderByItems {
-			propertyName := selectMappings[et][strings.ToLower(obi.Field.Value)]
+			propertyName := ""
+			if fromAs {
+				propertyName = asMappings[et][strings.ToLower(obi.Field.Value)]
+			} else {
+				propertyName = selectMappings[et][strings.ToLower(obi.Field.Value)]
+			}
+
 			if len(obString) == 0 {
 				obString = fmt.Sprintf("%s %s", propertyName, obi.Order)
 			} else {
@@ -75,6 +81,10 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 		}
 
 		return obString
+	}
+
+	if fromAs {
+		return fmt.Sprintf("%s DESC", asMappings[et][idField])
 	}
 
 	return fmt.Sprintf("%s DESC", selectMappings[et][idField])
@@ -274,7 +284,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 				qb.tables[et2],
 				join,
 				qb.getFilterQueryString(et2, nqo, filterPrefix),
-				qb.getOrderBy(et2, nqo),
+				qb.getOrderBy(et2, nqo, false),
 				qb.getLimit(nqo, 0),
 				qb.getOffset(nqo),
 				qb.addAsPrefix(qpi, tableMappings[et2]))
@@ -928,11 +938,12 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
 		limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
 	}
-	queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
-	queryString = fmt.Sprintf("%s AS %s %s %s OFFSET %s",
+	//queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
+	queryString = fmt.Sprintf("%s) AS %s %s ORDER BY %s %s OFFSET %s",
 		queryString,
 		qb.addAsPrefix(qpi, tableMappings[et1]),
 		qb.createJoin(e1, e2, id, false, false, qo, qpi, ""),
+		fmt.Sprintf("%s_%s", qpi.AsPrefix, qb.getOrderBy(et1, qo, true)),
 		limit,
 		qb.getOffset(qo),
 	)
