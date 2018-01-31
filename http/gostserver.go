@@ -101,7 +101,10 @@ func RequestErrorHandler(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.RawQuery
 		if query != "" {
-			logger.Info("query given:" + query)
+
+			if logger.Logger.Level == log.DebugLevel {
+				logger.Info("query given:" + query)
+			}
 
 			// todo: maybe add some other checks
 			isValid := odata.IsValidOdataQuery(query)

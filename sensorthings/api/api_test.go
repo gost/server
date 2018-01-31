@@ -113,19 +113,23 @@ func TestCreateNextLink(t *testing.T) {
 	stAPI := NewAPI(database, cfg, mqttServer)
 	qo := &odata.QueryOptions{}
 
+	expand := "Datastreams/Sensor"
 	qt, _ := godata.ParseTopString("2")
 	qo.Top = qt
 	qs, _ := godata.ParseSkipString("1")
 	qo.Skip = qs
+	qe, _ := godata.ParseExpandString(expand)
+	qo.Expand = qe
+	qo.RawExpand = expand
 
 	// act
 	result := stAPI.CreateNextLink("http://www.nu.nl", qo)
 	assert.NotNil(t, result)
-	assert.Equal(t, "http://www.nu.nl?$top=2&$skip=3", result)
+	assert.Equal(t, "http://www.nu.nl?$expand=Datastreams%2FSensor&$top=2&$skip=3", result)
 
 	qt, _ = godata.ParseTopString("1")
 	qo.Top = qt
-	filterString := "id eq 1"
+	filterString := "name eq 'test'"
 	qf, err := godata.ParseFilterString(filterString)
 	if err != nil {
 		t.Errorf("Error parsing filter string: %v", err)
@@ -139,7 +143,7 @@ func TestCreateNextLink(t *testing.T) {
 	t.Logf("%v", result1)
 	// assert
 	assert.NotNil(t, result1)
-	assert.True(t, strings.Contains(result1, "id eq 1"))
+	assert.True(t, strings.Contains(result1, "name+eq+%27test%27"))
 }
 
 func TestCreateArrayResponseWithCount(t *testing.T) {
