@@ -154,39 +154,6 @@ func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) strin
 		return ""
 	}
 
-	/*var nextLink *url.URL
-	nextLink, err := url.Parse(incomingURL)
-	if err != nil {
-		panic("error")
-	}
-
-	parameters := url.Values{}
-
-	if qo.Filter != nil {
-		parameters.Add("$filter", qo.RawFilter)
-	}
-	if qo.Count != nil {
-		parameters.Add("$count", fmt.Sprintf("%v", *qo.Count))
-	}
-	if qo.Expand != nil {
-		parameters.Add("$expand", qo.RawExpand)
-	}
-	if qo.OrderBy != nil {
-		parameters.Add("$orderby", qo.RawOrderBy)
-	}
-	if qo.Format != nil {
-		parameters.Add("$format", fmt.Sprintf("%v", qo.Format))
-	}
-	if qo.Top != nil {
-		parameters.Add("$top", fmt.Sprintf("%v", *qo.Top))
-	}
-	if qo.Skip != nil {
-		parameters.Add("$skip", fmt.Sprintf("%v", int(*qo.Skip)+int(*qo.Top)))
-	}
-
-	nextLink.RawQuery = parameters.Encode()
-	return nextLink.String()*/
-
 	queryString := ""
 	if qo.Filter != nil {
 		queryString = appendQueryPart(queryString, fmt.Sprintf("$filter=%s", url.QueryEscape(qo.RawFilter)))
@@ -211,33 +178,6 @@ func (a *APIv1) CreateNextLink(incomingURL string, qo *odata.QueryOptions) strin
 	}
 
 	return fmt.Sprintf("%s%s", incomingURL, queryString)
-
-	/*
-		queryString := ""
-		if qo.Filter != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$filter=%s", qo.RawFilter))
-		}
-		if qo.Count != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$count=%v", *qo.Count))
-		}
-		if qo.Expand != nil {
-			queryString = appendueryPart(queryString, fmt.Sprintf("$expand=%s", qo.RawExpand))
-		}
-		if qo.OrderBy != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$orderby=%s", qo.RawOrderBy))
-		}
-		if qo.Format != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$format=%s", qo.Format))
-		}
-		if qo.Top != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$top=%v", *qo.Top))
-		}
-		if qo.Skip != nil {
-			queryString = appendQueryPart(queryString, fmt.Sprintf("$skip=%v", int(*qo.Skip)+int(*qo.Top)))
-		}
-
-		return fmt.Sprintf("%s%s", incomingURL, queryString)
-	*/
 }
 
 func containsMandatoryParams(entity interface{}) (bool, []error) {
