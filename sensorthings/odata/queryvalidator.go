@@ -8,9 +8,10 @@ var keywords = []string{"$filter", "$select", "$expand", "$orderby", "$top", "$s
 
 func partHasKeyword(part string) bool {
 	part1 := strings.ToLower(strings.Split(part, "=")[0])
+	decoded := strings.Replace(part1, "%24", "$", -1)
 
 	for _, kw := range keywords {
-		if part1 == kw {
+		if decoded == kw {
 			return true
 		}
 	}
