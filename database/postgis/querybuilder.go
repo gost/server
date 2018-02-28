@@ -229,37 +229,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			}
 		}
 
-		if !isExpand {
-			nqo = &odata.QueryOptions{}
-			nqo.Select = &godata.GoDataSelectQuery{SelectItems: []*godata.SelectItem{{Segments: []*godata.Token{{Value: "id"}}}}}
-			if id != nil {
-				var err error
-				nqo.Filter, err = godata.ParseFilterString(fmt.Sprintf("id eq %v", id))
-				if err != nil {
-					fmt.Printf("\n\n ERROR %v \n\n", err)
-				}
-			}
-
-			join := getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix)
-			lowerJoin := strings.ToLower(join)
-			filterPrefix := "WHERE"
-			if strings.Contains(lowerJoin, "where") {
-				filterPrefix = "AND"
-			}
-
-			filter := qb.getFilterQueryString(et2, nqo, filterPrefix)
-
-			joinString = fmt.Sprintf("%s"+
-				"INNER JOIN LATERAL ("+
-				"SELECT %s FROM %s %s "+
-				"%s) "+
-				"AS %s on true ", joinString,
-				qb.getSelect(e2, nqo, nil, true, true, false, false, ""),
-				qb.tables[et2],
-				join,
-				filter,
-				tableMappings[et2])
-		} else {
+		if isExpand {
 			join := getJoin(qb.tables, et2, e1.GetEntityType(), asPrefix)
 			lowerJoin := strings.ToLower(join)
 			filterPrefix := "WHERE"
@@ -311,6 +281,41 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, innerjoinExpand, qo, subQPI, joinString)
 		}
 	}
+
+	return joinString
+}
+
+func (qb *QueryBuilder) createSelectByRelationString(e1 entities.Entity, e2 entities.Entity, id interface{}, qpi *QueryParseInfo) string {
+	et2 := e2.GetEntityType()
+
+	nqo := &odata.QueryOptions{}
+	nqo.Select = &godata.GoDataSelectQuery{SelectItems: []*godata.SelectItem{{Segments: []*godata.Token{{Value: "id"}}}}}
+	if id != nil {
+		var err error
+		nqo.Filter, err = godata.ParseFilterString(fmt.Sprintf("id eq %v", id))
+		if err != nil {
+			fmt.Printf("\n\n ERROR %v \n\n", err)
+		}
+	}
+
+	join := getJoin(qb.tables, et2, e1.GetEntityType(), "")
+	lowerJoin := strings.ToLower(join)
+	filterPrefix := "WHERE"
+	if strings.Contains(lowerJoin, "where") {
+		filterPrefix = "AND"
+	}
+
+	filter := qb.getFilterQueryString(et2, nqo, filterPrefix)
+
+	joinString := fmt.Sprintf(
+		"(SELECT %s "+
+			"FROM %s %s "+
+			"%s) "+
+			"IS NOT NULL",
+		qb.getSelect(e2, nqo, nil, true, true, false, false, ""),
+		qb.tables[et2],
+		join,
+		filter)
 
 	return joinString
 }
@@ -847,7 +852,6 @@ func findFirstCouplingParseNode(pn *godata.ParseNode) *godata.ParseNode {
 // Returns an empty string if ODATA Query Count is set to false.
 // example: Datastreams(1)/Thing = CreateCountQuery(&entities.Thing, &entities.Datastream, 1, nil)
 func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions) string {
-
 	if queryOptions.Count == nil {
 		return ""
 	}
@@ -856,32 +860,7 @@ func (qb *QueryBuilder) CreateCountQuery(e1 entities.Entity, e2 entities.Entity,
 		defer gostLog.DebugWithElapsedTime(logger, time.Now(), "constructing count query")
 	}
 
-	var qo *odata.QueryOptions
-
-	if queryOptions != nil {
-		qo = &odata.QueryOptions{}
-		*qo = *queryOptions
-		qb.sortQueryOptions(qo)
-	}
-
-	et1 := e1.GetEntityType()
-	et2 := e1.GetEntityType()
-	if e2 != nil { // 2nd entity is given, this means get e1 by e2
-		et2 = e2.GetEntityType()
-	}
-
-	queryString := fmt.Sprintf("SELECT COUNT(*) FROM %s %s", qb.tables[et1], qb.createJoin(e1, e2, id, false, false, nil, nil, ""))
-	if id != nil {
-		queryString = fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
-	}
-
-	if qo != nil && qo.Filter != nil {
-		if id != nil {
-			queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
-		} else {
-			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
-		}
-	}
+	queryString, _ := qb.getQueryString(e1, e2, id, queryOptions, true)
 
 	return queryString
 }
@@ -896,6 +875,12 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		defer gostLog.DebugWithElapsedTime(logger, time.Now(), "constructing select query")
 	}
 
+	queryString, qpi := qb.getQueryString(e1, e2, id, queryOptions, false)
+
+	return queryString, qpi
+}
+
+func (qb *QueryBuilder) getQueryString(e1 entities.Entity, e2 entities.Entity, id interface{}, queryOptions *odata.QueryOptions, isCount bool) (string, *QueryParseInfo) {
 	var qo *odata.QueryOptions
 	qo = nil
 
@@ -906,10 +891,6 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 	}
 
 	et1 := e1.GetEntityType()
-	et2 := e1.GetEntityType()
-	if e2 != nil { // 2nd entity is given, this means get e1 by e2
-		et2 = e2.GetEntityType()
-	}
 
 	eo := &godata.ExpandItem{}
 	if qo != nil {
@@ -932,47 +913,73 @@ func (qb *QueryBuilder) CreateQuery(e1 entities.Entity, e2 entities.Entity, id i
 		}
 	}
 
-	queryString := qb.getMainQueryString(e1, e2, et1, et2, id, qo, qpi)
-
-	limit := ""
-	if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
-		limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
+	firstSelect := fmt.Sprintf("COUNT(DISTINCT %s)", qb.addAsPrefix(qpi, fmt.Sprintf("%s.%s", tableMappings[et1], asMappings[et1][idField])))
+	if !isCount {
+		firstSelect = qb.getSelect(e1, qo, qpi, true, true, true, false, "")
 	}
-	//queryString = fmt.Sprintf("%s ORDER BY %s )", queryString, qb.getOrderBy(et1, qo))
-	queryString = fmt.Sprintf("%s) AS %s %s ORDER BY %s %s OFFSET %s",
-		queryString,
-		qb.addAsPrefix(qpi, tableMappings[et1]),
-		qb.createJoin(e1, e2, id, false, false, qo, qpi, ""),
-		fmt.Sprintf("%s_%s", qpi.AsPrefix, qb.getOrderBy(et1, qo, true)),
-		limit,
-		qb.getOffset(qo),
-	)
 
-	return queryString, qpi
-}
-
-func (qb *QueryBuilder) getMainQueryString(e1 entities.Entity, e2 entities.Entity, et1 entities.EntityType, et2 entities.EntityType, id interface{}, qo *odata.QueryOptions, qpi *QueryParseInfo) string {
 	queryString := fmt.Sprintf("SELECT %s FROM (SELECT %s FROM %s",
-		qb.getSelect(e1, qo, qpi, true, true, true, false, ""),
+		firstSelect,
 		qb.getSelect(e1, qo, nil, true, true, false, true, ""),
 		qb.tables[et1],
 	)
 
+	where := ""
+
 	if id != nil && e2 == nil {
-		queryString = fmt.Sprintf("%s WHERE %s = %v", queryString, selectMappings[et2][idField], id)
+		where = fmt.Sprintf("%s WHERE %s = %v", where, selectMappings[et1][idField], id)
 	}
 
 	if qo != nil && qo.Filter != nil {
 		if id != nil {
 			if e2 == nil {
-				queryString = fmt.Sprintf("%s AND %s", queryString, qb.getFilterQueryString(et1, qo, ""))
+				where = fmt.Sprintf("%s AND %s", where, qb.getFilterQueryString(et1, qo, ""))
 			} else {
-				queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
+				where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE"))
 			}
 		} else {
-			queryString = fmt.Sprintf("%s %s", queryString, qb.getFilterQueryString(et1, qo, "WHERE"))
+			where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE"))
 		}
 	}
 
-	return queryString
+	queryString = fmt.Sprintf("%s %s", queryString, strings.TrimSpace(where))
+
+	// get entity by other entity
+	if e2 != nil {
+		selectBy := qb.createSelectByRelationString(e1, e2, id, qpi)
+		prefix := "WHERE"
+		if where != "" {
+			prefix = "AND"
+		}
+
+		queryString = fmt.Sprintf("%s %s %s", queryString, prefix, selectBy)
+	}
+
+	if isCount {
+		queryString = fmt.Sprintf("%s ORDER BY %s) AS %s",
+			queryString,
+			qb.getOrderBy(et1, qo, true),
+			qb.addAsPrefix(qpi, tableMappings[et1]),
+		)
+	} else {
+		limit := ""
+		if qo != nil && qo.Top != nil && int(*qo.Top) != -1 {
+			limit = fmt.Sprintf("LIMIT %v", qb.getLimit(qo, 1))
+		}
+
+		queryString = fmt.Sprintf("%s ORDER BY %s %s OFFSET %s) AS %s",
+			queryString,
+			qb.getOrderBy(et1, qo, true),
+			limit,
+			qb.getOffset(qo),
+			qb.addAsPrefix(qpi, tableMappings[et1]),
+		)
+	}
+
+	queryString = fmt.Sprintf("%s %s",
+		queryString,
+		qb.createJoin(e1, e2, id, false, false, qo, qpi, ""),
+	)
+
+	return queryString, qpi
 }

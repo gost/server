@@ -113,16 +113,6 @@ func TestGetOrderByWithNilOptions(t *testing.T) {
 	assert.True(t, res == "datastream.id DESC")
 }
 
-func TestCreateJoin(t *testing.T) {
-	// arrange
-	qb := CreateQueryBuilder("v1.0", 1)
-	thing := &entities.Thing{}
-	location := &entities.Location{}
-
-	join := qb.createJoin(thing, location, 1, false, false, nil, nil, "")
-	assert.True(t, join == "INNER JOIN LATERAL (SELECT location.id AS location_id FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id WHERE location.id = 1) AS location on true ")
-}
-
 func TestCreateJoinWithExpand(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
@@ -130,12 +120,12 @@ func TestCreateJoinWithExpand(t *testing.T) {
 	location := &entities.Location{}
 
 	join := qb.createJoin(thing, location, 1, true, false, nil, nil, "")
-	assert.True(t, join == "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id  ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ")
+	assert.Equal(t, "LEFT JOIN LATERAL (SELECT location.id AS location_id, location.name AS location_name, location.description AS location_description, location.encodingtype AS location_encodingtype, public.ST_AsGeoJSON(location.location) AS location_location FROM v1.0.location INNER JOIN v1.0.thing_to_location ON thing_to_location.location_id = location.id AND thing_to_location.thing_id = thing.id  ORDER BY location.id DESC LIMIT 1 OFFSET 0) AS location on true ", join, join)
 }
 func TestCreateCountQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
-	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 1) AS thing on true  WHERE thing.thing_id = 1 AND  datastream.name = 'Milk' AND Price < 2.55"
+	expected := "SELECT COUNT(DISTINCT A_datastream.datastream_id) FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream WHERE datastream.name = 'Milk' AND Price < 2.55 AND (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 1) IS NOT NULL ORDER BY datastream_id DESC) AS A_datastream "
 	qo := &odata.QueryOptions{}
 	cs, _ := godata.ParseCountString("true")
 	qo.Count = cs
@@ -197,7 +187,7 @@ func TestOdataLogicalOperatorToPostgreSQL(t *testing.T) {
 func TestCreateCountQueryWithoutId(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
-	expected := "SELECT COUNT(*) FROM v1.0.datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id ) AS thing on true  WHERE datastream.name = 'Milk' AND Price < 2.55"
+	expected := "SELECT COUNT(DISTINCT A_datastream.datastream_id) FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream WHERE datastream.name = 'Milk' AND Price < 2.55 AND (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id ) IS NOT NULL ORDER BY datastream_id DESC) AS A_datastream "
 	qo := &odata.QueryOptions{}
 	cs, _ := godata.ParseCountString("true")
 	qo.Count = cs
@@ -209,20 +199,20 @@ func TestCreateCountQueryWithoutId(t *testing.T) {
 
 	// assert
 	assert.NotNil(t, res)
-	assert.True(t, expected == res)
+	assert.Equal(t, expected, res)
 }
 
 func TestCreateQuery(t *testing.T) {
 	// arrange
 	qb := CreateQueryBuilder("v1.0", 1)
-	expected := "SELECT A_datastream.datastream_id AS A_datastream_id, A_datastream.datastream_name AS A_datastream_name, A_datastream.datastream_description AS A_datastream_description, A_datastream.datastream_unitofmeasurement AS A_datastream_unitofmeasurement, A_datastream.datastream_observationtype AS A_datastream_observationtype, A_datastream.datastream_observedarea AS A_datastream_observedarea, A_datastream.datastream_phenomenontime AS A_datastream_phenomenontime, A_datastream.datastream_resulttime AS A_datastream_resulttime FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream) AS A_datastream INNER JOIN LATERAL (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = A_datastream.datastream_thing_id AND thing.id = 0) AS thing on true  ORDER BY A_datastream_id DESC  OFFSET 0"
+	expected := "SELECT A_datastream.datastream_id AS A_datastream_id, A_datastream.datastream_name AS A_datastream_name, A_datastream.datastream_description AS A_datastream_description, A_datastream.datastream_unitofmeasurement AS A_datastream_unitofmeasurement, A_datastream.datastream_observationtype AS A_datastream_observationtype, A_datastream.datastream_observedarea AS A_datastream_observedarea, A_datastream.datastream_phenomenontime AS A_datastream_phenomenontime, A_datastream.datastream_resulttime AS A_datastream_resulttime FROM (SELECT datastream.thing_id AS datastream_thing_id, datastream.observedproperty_id AS datastream_observedproperty_id, datastream.sensor_id AS datastream_sensor_id, datastream.id AS datastream_id, datastream.name AS datastream_name, datastream.description AS datastream_description, datastream.unitofmeasurement AS datastream_unitofmeasurement, datastream.observationtype AS datastream_observationtype, public.ST_AsGeoJSON(datastream.observedarea) AS datastream_observedarea, datastream.phenomenontime AS datastream_phenomenontime, datastream.resulttime AS datastream_resulttime FROM v1.0.datastream  WHERE (SELECT thing.id AS thing_id FROM v1.0.thing WHERE thing.id = datastream.thing_id AND thing.id = 0) IS NOT NULL ORDER BY datastream_id DESC  OFFSET 0) AS A_datastream "
 
 	// act
 	query, _ := qb.CreateQuery(&entities.Datastream{}, &entities.Thing{}, 0, nil)
 
 	// assert
 	assert.NotNil(t, query)
-	assert.True(t, expected == query)
+	assert.True(t, expected == query, query)
 }
 
 func TestConstructQueryParseInfo(t *testing.T) {
