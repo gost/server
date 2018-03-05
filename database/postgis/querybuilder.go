@@ -263,9 +263,17 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 
 	if qpi != nil && len(qpi.SubEntities) > 0 {
 		for _, subQPI := range qpi.SubEntities {
+			// set innerjoinExpand to false to left join the expand
+			innerjoinExpand := false
+
 			qo := &odata.QueryOptions{}
 			if subQPI.ExpandItem != nil {
 				qo = odata.ExpandItemToQueryOptions(subQPI.ExpandItem)
+
+				// Inner join if there was an outer filter found and added to the expandItem
+				if subQPI.ExpandItem.HasOuterFilter {
+					innerjoinExpand = true
+				}
 			}
 
 			// if first select value is nil means the expand is not requested by the user so
@@ -274,9 +282,6 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 			if !generatedExpand {
 				//qo.Select = &godata.GoDataSelectQuery{}
 			}
-
-			// set innerjoinExpand to true to left join the expand, maybe change this in future
-			innerjoinExpand := true
 
 			joinString = qb.createJoin(subQPI.Parent.Entity, subQPI.Entity, nil, true, innerjoinExpand, qo, subQPI, joinString)
 		}
@@ -389,6 +394,7 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 				ei = nil
 
 				// if expand was generated and there is a select with nil value forward it into the inner expand
+
 				if isExpandGenerated(o.Select) {
 					ei = &godata.ExpandItem{
 						Select: o.Select,
@@ -741,6 +747,7 @@ func (qb *QueryBuilder) addExpand(qo *odata.QueryOptions, afterCouplingNode *god
 		}
 
 		// add a select of nil, if set to nil the QueryBuilder knows that the expand is generated
+		newExpandItem.IsGenerated = true
 		newExpandItem.Select = &godata.GoDataSelectQuery{
 			SelectItems: []*godata.SelectItem{
 				{
@@ -816,6 +823,8 @@ func addFilterToExpandItem(pn *godata.ParseNode, ei *godata.ExpandItem) {
 
 		ei.Filter = &godata.GoDataFilterQuery{Tree: copyCouplingNode}
 	}
+
+	ei.HasOuterFilter = true
 }
 
 func findParseNodeAfterCoupling(pn *godata.ParseNode) *godata.ParseNode {

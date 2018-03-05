@@ -35,7 +35,7 @@
   branch = "master"
   name = "github.com/gost/godata"
   packages = ["."]
-  revision = "1c205feb3cb84948f2c509f4d05c085454feb4e1"
+  revision = "edab045e03f8b7cf5a89e66191951cfdc2a0a012"
 
 [[projects]]
   name = "github.com/gost/now"
