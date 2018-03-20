@@ -29,7 +29,7 @@ func featureOfInterestParamFactory(values map[string]interface{}) (entities.Enti
 			if encodingType != 0 {
 				foi.EncodingType = entities.EncodingValues[encodingType].Value
 			}
-		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiFeature] {
+		} else if as == asMappings[entities.EntityTypeFeatureOfInterest][foiFeature] || as == asMappings[entities.EntityTypeFeatureOfInterest][foiGeoJSON] {
 			t := value.(string)
 			featureMap, err := JSONToMap(&t)
 			if err != nil {
@@ -99,8 +99,8 @@ func (gdb *GostDatabase) PostFeatureOfInterest(f *entities.FeatureOfInterest) (*
 	var fID int
 	locationBytes, _ := json.Marshal(f.Feature)
 	encoding, _ := entities.CreateEncodingType(f.EncodingType)
-	sql2 := fmt.Sprintf("INSERT INTO %s.featureofinterest (name, description, encodingtype, feature, original_location_id) VALUES ($1, $2, $3, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $4) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql2, f.Name, f.Description, encoding.Code, f.OriginalLocationID).Scan(&fID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.featureofinterest (name, description, encodingtype, feature, original_location_id, geojson) VALUES ($1, $2, $3, ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326), $4, $5) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql2, f.Name, f.Description, encoding.Code, f.OriginalLocationID, string(locationBytes[:])).Scan(&fID)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +177,7 @@ func (gdb *GostDatabase) PatchFeatureOfInterest(id interface{}, foi *entities.Fe
 	if len(foi.Feature) > 0 {
 		locationBytes, _ := json.Marshal(foi.Feature)
 		updates["feature"] = fmt.Sprintf("ST_SetSRID(public.ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
+		updates["geojson"] = string(locationBytes[:])
 	}
 
 	if err = gdb.updateEntityColumns("featureofinterest", updates, intID); err != nil {

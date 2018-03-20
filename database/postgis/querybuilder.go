@@ -66,11 +66,13 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 	if qo != nil && qo.OrderBy != nil && len(qo.OrderBy.OrderByItems) > 0 {
 		obString := ""
 		for _, obi := range qo.OrderBy.OrderByItems {
-			propertyName := ""
+			propertyName := strings.ToLower(obi.Field.Value)
+			propertyName = qb.changeLocationField(propertyName)
+
 			if fromAs {
-				propertyName = asMappings[et][strings.ToLower(obi.Field.Value)]
+				propertyName = asMappings[et][propertyName]
 			} else {
-				propertyName = selectMappings[et][strings.ToLower(obi.Field.Value)]
+				propertyName = selectMappings[et][propertyName]
 			}
 
 			if len(obString) == 0 {
@@ -88,6 +90,16 @@ func (qb *QueryBuilder) getOrderBy(et entities.EntityType, qo *odata.QueryOption
 	}
 
 	return fmt.Sprintf("%s DESC", selectMappings[et][idField])
+}
+
+// if location or feature is requested get the geojson field
+func (qb *QueryBuilder) changeLocationField(input string) string {
+	field := strings.ToLower(input)
+	if field == "location" || field == "feature" {
+		field = "geojson"
+	}
+
+	return field
 }
 
 // getSelect return the select string that needs to be placed after SELECT in the query
@@ -149,6 +161,16 @@ func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions
 		}
 		if addID && !idAdded {
 			properties = append([]string{"id"}, properties...)
+		}
+	}
+
+	// Select geojson instead of location or feature when requested
+	currentType := et.GetEntityType()
+	if currentType == entities.EntityTypeLocation || currentType == entities.EntityTypeFeatureOfInterest {
+		for i, p := range properties {
+			if p == "location" || p == "feature" {
+				properties[i] = "geojson"
+			}
 		}
 	}
 
@@ -291,6 +313,13 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 }
 
 func (qb *QueryBuilder) createSelectByRelationString(e1 entities.Entity, e2 entities.Entity, id interface{}, qpi *QueryParseInfo) string {
+	// getJoinByID to get by id if the e1 table has an e2 fk
+	joinOnID := getJoinByID(qb.tables, e1.GetEntityType(), e2.GetEntityType(), id)
+	if joinOnID != "" {
+		return joinOnID
+	}
+
+	// no e2 foreign key in e1, generate inner join and check on given id
 	et2 := e2.GetEntityType()
 
 	nqo := &odata.QueryOptions{}

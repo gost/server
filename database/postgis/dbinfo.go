@@ -36,6 +36,7 @@ var (
 	locationDescription  = "description"
 	locationEncodingType = "encodingtype"
 	locationLocation     = "location"
+	locationGeoJSON      = "geojson"
 )
 
 // thingToLocationTable fields
@@ -116,6 +117,7 @@ var (
 	foiDescription        = "description"
 	foiEncodingType       = "encodingtype"
 	foiFeature            = "feature"
+	foiGeoJSON            = "geojson"
 	foiOriginalLocationID = "original_location_id"
 )
 
@@ -346,6 +348,7 @@ var asMappings = map[entities.EntityType]map[string]string{
 		locationDescription:  constructAs(locationTable, locationDescription),
 		locationEncodingType: constructAs(locationTable, locationEncodingType),
 		locationLocation:     constructAs(locationTable, locationLocation),
+		locationGeoJSON:      constructAs(locationTable, locationGeoJSON),
 	},
 	entities.EntityTypeThingToLocation: {
 		thingToLocationThingID:    constructAs(thingToLocationTable, thingToLocationThingID),
@@ -392,6 +395,7 @@ var asMappings = map[entities.EntityType]map[string]string{
 		foiDescription:        constructAs(featureOfInterestTable, foiDescription),
 		foiEncodingType:       constructAs(featureOfInterestTable, foiEncodingType),
 		foiFeature:            constructAs(featureOfInterestTable, foiFeature),
+		foiGeoJSON:            constructAs(featureOfInterestTable, foiGeoJSON),
 		foiOriginalLocationID: constructAs(featureOfInterestTable, foiOriginalLocationID),
 	},
 	entities.EntityTypeDatastream: {
@@ -480,6 +484,7 @@ var selectMappings = map[entities.EntityType]map[string]string{
 		locationDescription:  fmt.Sprintf("%s.%s", locationTable, locationDescription),
 		locationEncodingType: fmt.Sprintf("%s.%s", locationTable, locationEncodingType),
 		locationLocation:     fmt.Sprintf("public.ST_AsGeoJSON(%s.%s)", locationTable, locationLocation),
+		locationGeoJSON:      fmt.Sprintf("%s.%s::text", locationTable, locationGeoJSON),
 	},
 	entities.EntityTypeThingToLocation: {
 		thingToLocationThingID:    fmt.Sprintf("%s.%s", thingToLocationTable, thingToLocationThingID),
@@ -526,6 +531,7 @@ var selectMappings = map[entities.EntityType]map[string]string{
 		foiDescription:        fmt.Sprintf("%s.%s", featureOfInterestTable, foiDescription),
 		foiEncodingType:       fmt.Sprintf("%s.%s", featureOfInterestTable, foiEncodingType),
 		foiFeature:            fmt.Sprintf("public.ST_AsGeoJSON(%s.%s)", featureOfInterestTable, foiFeature),
+		foiGeoJSON:            fmt.Sprintf("%s.%s::text", featureOfInterestTable, foiGeoJSON),
 		foiOriginalLocationID: fmt.Sprintf("%s.%s", featureOfInterestTable, foiOriginalLocationID),
 	},
 	entities.EntityTypeDatastream: {
@@ -705,6 +711,63 @@ func getJoinFeatureOfInterest(tableMap map[entities.EntityType]string, by entiti
 	switch by {
 	case entities.EntityTypeObservation:
 		return fmt.Sprintf("WHERE %s = %s", selectMappings[entities.EntityTypeFeatureOfInterest][foiID], createWhereIs(entities.EntityTypeObservation, observationFeatureOfInterestID, asPrefix))
+	}
+
+	return ""
+}
+
+func getJoinByID(tableMap map[entities.EntityType]string, get entities.EntityType, by entities.EntityType, id interface{}) string {
+	switch get {
+
+	case entities.EntityTypeHistoricalLocation: // get HistoricalLocation by ... //fmt.Sprintf("%s WHERE %s.%s = %v", queryString, tableMappings[et2], asMappings[et2][idField], id)
+		{
+			return getJoinHistoricalLocationByID(tableMap, by, id)
+
+		}
+	case entities.EntityTypeObservation: // get observation by ...
+		{
+			return getJoinObservationsByID(tableMap, by, id)
+
+		}
+	case entities.EntityTypeDatastream: // get Datastream by ...
+		{
+			return getJoinDatastreamByID(tableMap, by, id)
+		}
+	}
+
+	return ""
+}
+
+func getJoinHistoricalLocationByID(tableMap map[entities.EntityType]string, by entities.EntityType, id interface{}) string {
+	switch by {
+	case entities.EntityTypeThing:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeHistoricalLocation][historicalLocationThingID], id)
+	}
+
+	return ""
+}
+
+// Sensor(1)/Datastream
+func getJoinDatastreamByID(tableMap map[entities.EntityType]string, by entities.EntityType, id interface{}) string {
+	switch by {
+	case entities.EntityTypeThing:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeDatastream][datastreamThingID], id)
+	case entities.EntityTypeSensor:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeDatastream][datastreamSensorID], id)
+	case entities.EntityTypeObservedProperty:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeDatastream][datastreamObservedPropertyID], id)
+	}
+
+	return ""
+}
+
+// Datastreams(1)/Observations
+func getJoinObservationsByID(tableMap map[entities.EntityType]string, by entities.EntityType, id interface{}) string {
+	switch by {
+	case entities.EntityTypeDatastream:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeObservation][observationStreamID], id)
+	case entities.EntityTypeFeatureOfInterest:
+		return fmt.Sprintf("%s = %v", selectMappings[entities.EntityTypeObservation][observationFeatureOfInterestID], id)
 	}
 
 	return ""

@@ -1,10 +1,11 @@
 package postgis
 
 import (
+	"testing"
+
 	entities "github.com/gost/core"
 	"github.com/gost/godata"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCreateTableMappings(t *testing.T) {

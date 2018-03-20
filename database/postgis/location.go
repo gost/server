@@ -32,7 +32,7 @@ func locationParamFactory(values map[string]interface{}) (entities.Entity, error
 			if encodingType != 0 {
 				l.EncodingType = entities.EncodingValues[encodingType].Value
 			}
-		} else if as == asMappings[entities.EntityTypeLocation][locationLocation] {
+		} else if as == asMappings[entities.EntityTypeLocation][locationLocation] || as == asMappings[entities.EntityTypeLocation][locationGeoJSON] {
 			t := value.(string)
 			locationMap, err := JSONToMap(&t)
 			if err != nil {
@@ -155,8 +155,8 @@ func (gdb *GostDatabase) PostLocation(location *entities.Location) (*entities.Lo
 	locationBytes, _ := json.Marshal(location.Location)
 	encoding, _ := entities.CreateEncodingType(location.EncodingType)
 
-	sql2 := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, location) VALUES ($1, $2, $3, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
-	err := gdb.Db.QueryRow(sql2, location.Name, location.Description, encoding.Code).Scan(&locationID)
+	sql2 := fmt.Sprintf("INSERT INTO %s.location (name, description, encodingtype, geojson, location) VALUES ($1, $2, $3, $4, ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)) RETURNING id", gdb.Schema, string(locationBytes[:]))
+	err := gdb.Db.QueryRow(sql2, location.Name, location.Description, encoding.Code, string(locationBytes[:])).Scan(&locationID)
 	if err != nil {
 		return nil, err
 	}
@@ -192,6 +192,7 @@ func (gdb *GostDatabase) PatchLocation(id interface{}, l *entities.Location) (*e
 	if len(l.Location) > 0 {
 		locationBytes, _ := json.Marshal(l.Location)
 		updates["location"] = fmt.Sprintf("ST_SetSRID(ST_GeomFromGeoJSON('%s'),4326)", string(locationBytes[:]))
+		updates["geojson"] = string(locationBytes[:])
 	}
 
 	if len(l.EncodingType) > 0 {
