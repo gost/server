@@ -152,7 +152,30 @@ func setEnvironmentMQTTSettings(conf *Config) {
 	if gostMQTTPort != "" {
 		port, err := strconv.Atoi(gostMQTTPort)
 		if err == nil {
-			conf.MQTT.Port = int(port)
+			conf.MQTT.Port = port
+		}
+	}
+
+	gostMQTTPrefix := os.Getenv("GOST_MQTT_PREFIX")
+	if gostMQTTPrefix != "" {
+		conf.MQTT.Prefix = gostMQTTPrefix
+	}
+
+	gostMQTTClientID := os.Getenv("GOST_MQTT_CLIENTID")
+	if gostMQTTClientID != "" {
+		conf.MQTT.ClientID = gostMQTTClientID
+	}
+
+	gostMQTTSubscriptionQOS := os.Getenv("GOST_MQTT_SUBSCRIPTIONQOS")
+	if gostMQTTSubscriptionQOS != "" {
+		conf.MQTT.SubscriptionQos = []byte(gostMQTTSubscriptionQOS)[0]
+	}
+
+	gostMQTTPersistant := os.Getenv("GOST_MQTT_PERSISTANT")
+	if gostMQTTPersistant != "" {
+		persistant, err := strconv.ParseBool(gostMQTTPersistant)
+		if err == nil {
+			conf.MQTT.Persistant = persistant
 		}
 	}
 }

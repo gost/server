@@ -126,9 +126,9 @@ func (a *APIv1) initRest() {
 }
 
 // GetTopics returns all configured topics for the MQTT client
-func (a *APIv1) GetTopics() *[]models.Topic {
+func (a *APIv1) GetTopics(prefix string) *[]models.Topic {
 	if a.topics == nil {
-		a.topics = mqtt.CreateTopics()
+		a.topics = mqtt.CreateTopics(prefix)
 	}
 
 	return &a.topics

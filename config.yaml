@@ -2,7 +2,7 @@ server:
     name: GOST Server
     host:
     port: 8080
-    externalUri: http://localhost:8080/
+    externalUri: http://localhost:8080
     maxEntityResponse: 20
     indentedJson: true
     https: false
@@ -22,6 +22,10 @@ mqtt:
     enabled: true
     host: localhost
     port: 1883
+    prefix: GOST
+    clientId: gost
+    subscriptionQos: 1
+    persistant: true
 logger:
     fileName:
     verbose: false

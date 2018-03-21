@@ -22,7 +22,7 @@ type API interface {
 	GetVersionInfo() *VersionInfo
 	GetBasePathInfo() *entities.ArrayResponse
 	GetEndpoints() *map[entities.EntityType]Endpoint
-	GetTopics() *[]Topic
+	GetTopics(prefix string) *[]Topic
 
 	GetThing(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
 	GetThingByDatastream(id interface{}, qo *odata.QueryOptions, path string) (*entities.Thing, error)
@@ -235,7 +235,7 @@ type Topic struct {
 }
 
 // MQTTHandler func defines the format of the handler to process the incoming MQTT publish message
-type MQTTHandler func(a *API, topic string, message []byte)
+type MQTTHandler func(a *API, prefix, topic string, message []byte)
 
 // MQTTInternalHandler func defines the format of the handler to process the incoming MQTT publish message
 type MQTTInternalHandler func(a *API, message []byte, id string)

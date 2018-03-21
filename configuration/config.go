@@ -44,9 +44,13 @@ type DatabaseConfig struct {
 
 // MQTTConfig contains the MQTT client information
 type MQTTConfig struct {
-	Enabled bool   `yaml:"enabled"`
-	Host    string `yaml:"host"`
-	Port    int    `yaml:"port"`
+	Enabled         bool   `yaml:"enabled"`
+	Host            string `yaml:"host"`
+	Prefix          string `yaml:"prefix"`
+	ClientID        string `yaml:"clientId"`
+	Port            int    `yaml:"port"`
+	SubscriptionQos byte   `yaml:"subscriptionQos"`
+	Persistant      bool   `yaml:"persistant"`
 }
 
 // LoggerConfig contains the logging configuration used to initialize the logger

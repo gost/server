@@ -1,14 +1,16 @@
 package mqtt
 
 import (
+	"fmt"
+
 	"github.com/gost/server/sensorthings/models"
 )
 
 // CreateTopics creates the pre-defined MQTT Topics
-func CreateTopics() []models.Topic {
+func CreateTopics(prefix string) []models.Topic {
 	topics := []models.Topic{
 		{
-			Path:    "GOST/#",
+			Path:    fmt.Sprintf("%s/#", prefix),
 			Handler: MainMqttHandler,
 		},
 	}

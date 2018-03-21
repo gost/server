@@ -1,6 +1,7 @@
 package mqtt
 
 import (
+	"fmt"
 	"strings"
 
 	entities "github.com/gost/core"
@@ -8,13 +9,14 @@ import (
 )
 
 var topics = map[string]models.MQTTInternalHandler{
-	"GOST/Datastreams()/Observations": observationsByDatastream,
+	"Datastreams()/Observations": observationsByDatastream,
 }
 
 // MainMqttHandler handles all messages on GOST/# and maps them to the appropriate
 // handler. Mapping is needed because of the ODATA (id) format
-func MainMqttHandler(a *models.API, topic string, message []byte) {
-	topicMapName := topic
+func MainMqttHandler(a *models.API, prefix, topic string, message []byte) {
+	topic = strings.Replace(topic, fmt.Sprintf("%s/", prefix), "", 1)
+	topicMapName := ""
 	id := ""
 	if strings.Contains(topic, "(") {
 		i := strings.Index(topic, "(")

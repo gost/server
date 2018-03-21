@@ -49,7 +49,7 @@ func TestGetTopics(t *testing.T) {
 	stAPI := NewAPI(database, cfg, mqttServer)
 
 	// act
-	topics := stAPI.GetTopics()
+	topics := stAPI.GetTopics("GOST")
 
 	// assert
 	assert.NotNil(t, topics)
