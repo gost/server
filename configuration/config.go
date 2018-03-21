@@ -50,7 +50,7 @@ type MQTTConfig struct {
 	ClientID        string `yaml:"clientId"`
 	Port            int    `yaml:"port"`
 	SubscriptionQos byte   `yaml:"subscriptionQos"`
-	Persistant      bool   `yaml:"persistant"`
+	Persistent      bool   `yaml:"persistent"`
 }
 
 // LoggerConfig contains the logging configuration used to initialize the logger

@@ -171,11 +171,11 @@ func setEnvironmentMQTTSettings(conf *Config) {
 		conf.MQTT.SubscriptionQos = []byte(gostMQTTSubscriptionQOS)[0]
 	}
 
-	gostMQTTPersistant := os.Getenv("GOST_MQTT_PERSISTANT")
-	if gostMQTTPersistant != "" {
-		persistant, err := strconv.ParseBool(gostMQTTPersistant)
+	gostMQTTPersistent := os.Getenv("GOST_MQTT_PERSISTENT")
+	if gostMQTTPersistent != "" {
+		persistent, err := strconv.ParseBool(gostMQTTPersistent)
 		if err == nil {
-			conf.MQTT.Persistant = persistant
+			conf.MQTT.Persistent = persistent
 		}
 	}
 }

@@ -25,7 +25,7 @@ mqtt:
     prefix: GOST
     clientId: gost
     subscriptionQos: 1
-    persistant: true
+    persistent: true
 logger:
     fileName:
     verbose: false
