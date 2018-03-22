@@ -31,7 +31,7 @@ Binaries are build for Windows, Ubuntu and OSX.
 
 | Date       	|             Version 	| Features                                                        	      |
 |------------	|---------------------	|-----------------------------------------------------------------------	|
-| 2018-03-01	| 0.6                 	| new dashboard (based on polymer/webcomponents) + bugfixes for locations |
+| 2018-05-01	| 0.6                 	| new dashboard (based on polymer/webcomponents) + bugfixes for locations |
 
 ## Benchmarks
 
