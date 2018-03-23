@@ -20,7 +20,7 @@ type MQTT struct {
 	prefix          string
 	clientID        string
 	subscriptionQos byte
-	persitent       bool
+	persistent      bool
 	connecting      bool
 	disconnected    bool
 	client          paho.Client
@@ -46,7 +46,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		prefix:          config.Prefix,
 		clientID:        config.ClientID,
 		subscriptionQos: config.SubscriptionQos,
-		persitent:       config.Persistent,
+		persistent:      config.Persistent,
 	}
 
 	opts := paho.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%v", config.Host, config.Port)).SetClientID(config.ClientID)
@@ -126,7 +126,7 @@ func (m *MQTT) connectHandler(c paho.Client) {
 	logger.Infof("MQTT client connected")
 
 	// on first connect or connection lost and persistance is off
-	if !m.disconnected || (m.disconnected && !m.persitent) {
+	if !m.disconnected || (m.disconnected && !m.persistent) {
 		m.subscribe()
 	}
 
