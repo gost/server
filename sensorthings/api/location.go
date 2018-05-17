@@ -28,7 +28,7 @@ func (a *APIv1) PostLocation(location *entities.Location) (*entities.Location, [
 		return nil, []error{err2}
 	}
 	l.SetAllLinks(a.config.GetExternalServerURI())
-	a.sendLocationOverMQTT(nil, l, "Locations")
+	a.sendOverMQTT(l, "Locations")
 
 	return l, nil
 }
