@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -230,6 +231,20 @@ func (a *APIv1) createArrayResponse(count int, hasNext bool, path string, qo *od
 	}
 
 	return ar
+}
+
+func (a *APIv1) sendOverMQTT(t entities.Entity, channel string) {
+	json, _ := json.Marshal(t)
+	s := string(json)
+
+	//ToDo: MQTT TEST
+	if a.config.MQTT.Enabled {
+		topics := []string{
+			channel,
+		}
+
+		go a.MQTTPublish(topics, s, 0)
+	}
 }
 
 func appendQueryPart(base string, q string) string {

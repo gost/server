@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -77,23 +76,9 @@ func (a *APIv1) PostLocationByThing(thingID interface{}, location *entities.Loca
 
 	l.SetAllLinks(a.config.GetExternalServerURI())
 
-	a.sendLocationOverMQTT(thingID, l, fmt.Sprintf("Things(%v)/Locations", thingID))
+	a.sendOverMQTT(l, fmt.Sprintf("Things(%v)/Locations", thingID))
 
 	return l, nil
-}
-
-func (a *APIv1) sendLocationOverMQTT(thingID interface{}, l *entities.Location, channel string) {
-	json, _ := json.Marshal(l)
-	s := string(json)
-
-	//ToDo: MQTT TEST
-	if a.config.MQTT.Enabled {
-		topics := []string{
-			channel,
-		}
-
-		go a.MQTTPublish(topics, s, 0)
-	}
 }
 
 // GetLocation retrieves a single location by id

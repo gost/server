@@ -146,7 +146,10 @@ func (a *APIv1) PostThing(thing *entities.Thing) (*entities.Thing, []error) {
 	}
 
 	nt.SetAllLinks(a.config.GetExternalServerURI())
+
 	//push to mqtt
+	a.sendOverMQTT(nt, "Things")
+
 	return nt, nil
 }
 
