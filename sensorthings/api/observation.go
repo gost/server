@@ -111,8 +111,8 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 		foiID, err := CopyLocationToFoi(&a.db, datastreamID)
 
 		if err != nil {
-			errorMessage := "Unable to copy location of thing to featureofinterest."
-			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage))}
+			errorMessage := "Missing Observation.FeatureOfInterest. Unable to create it from the Location: "
+			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage+err.Error()))}
 		}
 
 		observation.FeatureOfInterest = &entities.FeatureOfInterest{}
