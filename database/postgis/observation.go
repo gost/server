@@ -1,13 +1,11 @@
 package postgis
 
 import (
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
-
-	"database/sql"
-
-	"strconv"
 
 	entities "github.com/gost/core"
 	gostErrors "github.com/gost/server/errors"
@@ -37,18 +35,7 @@ func observationParamFactory(values map[string]interface{}) (entities.Entity, er
 			o.PhenomenonTime = value.(string)
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationResult] {
-			var result interface{}
-			var err error
-			if strings.HasPrefix(value.(string), "\"") {
-				result = strings.Replace(value.(string), "\"", "", 2)
-			} else {
-				result, err = strconv.ParseFloat(value.(string), 64)
-				if err != nil {
-					result = strings.Replace(value.(string), "\"", "", 2)
-				}
-			}
-
-			o.Result = result
+			o.Result = json.RawMessage(value.(string))
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationValidTime] {
 			o.ValidTime = value.(string)

@@ -112,7 +112,7 @@ func (a *APIv1) PostObservation(observation *entities.Observation) (*entities.Ob
 
 		if err != nil {
 			errorMessage := "Missing Observation.FeatureOfInterest. Unable to create it from the Location: "
-			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage+err.Error()))}
+			return nil, []error{gostErrors.NewBadRequestError(errors.New(errorMessage + err.Error()))}
 		}
 
 		observation.FeatureOfInterest = &entities.FeatureOfInterest{}

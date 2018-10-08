@@ -120,7 +120,7 @@ func newMockObservedProperty(id int) *entities.ObservedProperty {
 }
 
 func newMockObservation(id int) *entities.Observation {
-	op := &entities.Observation{Result: 35, PhenomenonTime: "2017-07-17T07:03:09.194Z", ResultQuality: "high"}
+	op := &entities.Observation{Result: json.RawMessage("35"), PhenomenonTime: "2017-07-17T07:03:09.194Z", ResultQuality: "high"}
 	op.ID = id
 	return op
 }

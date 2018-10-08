@@ -2,98 +2,150 @@
 
 
 [[projects]]
+  digest = "1:56c130d885a4aacae1dd9c7b71cfe39912c7ebc1ff7d2b46083c8812996dc43b"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = ""
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:eecb3e6cef98036972582ffff7d3e340aef15f075236da353aa3e7fb798fdb21"
   name = "github.com/eclipse/paho.mqtt.golang"
-  packages = [".","packets"]
+  packages = [
+    ".",
+    "packets",
+  ]
+  pruneopts = ""
   revision = "aff15770515e3c57fc6109da73d42b0d46f7f483"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:20ed7daa9b3b38b6d1d39b48ab3fd31122be5419461470d0c28de3e121c93ecf"
   name = "github.com/gorilla/context"
   packages = ["."]
+  pruneopts = ""
   revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
   version = "v1.1"
 
 [[projects]]
+  digest = "1:74f252b12d195c61ef5e54a4e2ab677af765d9e4b68b42c8c64fd16a4502a0c8"
   name = "github.com/gorilla/mux"
   packages = ["."]
+  pruneopts = ""
   revision = "24fca303ac6da784b9e8269f724ddeb0b2eea5e7"
   version = "v1.5.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:a94e87116c8a0fc13564c579b0534692854de7e6bddfceeca983d75b9a8c26a1"
   name = "github.com/gost/core"
   packages = ["."]
-  revision = "86b03f2e52f7b39f2a87ebf5e1a3e36d7e1a9c96"
+  pruneopts = ""
+  revision = "802abad4f2f152b4d60ee427a131f696ed63fa5d"
 
 [[projects]]
   branch = "master"
+  digest = "1:e2615475989ae640830ee08b609c47cb2d671738eed4cced265c4edde4e27e38"
   name = "github.com/gost/godata"
   packages = ["."]
+  pruneopts = ""
   revision = "edab045e03f8b7cf5a89e66191951cfdc2a0a012"
 
 [[projects]]
+  digest = "1:d85416b6b2deb088f59b4db9706065f947b7f7e8a0b7c5f585d6abda61991b4a"
   name = "github.com/gost/now"
   packages = ["."]
+  pruneopts = ""
   revision = "3be40983ef1c9b51654829678cbe3882b4eab6ac"
   version = "1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:1559e09937fb91848d3d201213ef6e0aac0a521934d6f88166f0e381f085ef5f"
   name = "github.com/lib/pq"
-  packages = [".","oid"]
+  packages = [
+    ".",
+    "oid",
+  ]
+  pruneopts = ""
   revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
 
 [[projects]]
+  digest = "1:256484dbbcd271f9ecebc6795b2df8cad4c458dd0f5fd82a8c2fa0c29f233411"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = ""
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:3ac248add5bb40a3c631c5334adcd09aa72d15af2768a5bc0274084ea7b2e5ba"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
+  pruneopts = ""
   revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
   version = "v1.0.3"
 
 [[projects]]
+  digest = "1:3926a4ec9a4ff1a072458451aa2d9b98acd059a45b38f7335d31e06c3d6a0159"
   name = "github.com/stretchr/testify"
   packages = ["assert"]
+  pruneopts = ""
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
 [[projects]]
   branch = "master"
+  digest = "1:71051c4cbf7a4503b4f6d0e815da76f2731a08a68ac813e84076fb84db8bf5ca"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
+  pruneopts = ""
   revision = "faadfbdc035307d901e69eea569f5dda451a3ee3"
 
 [[projects]]
   branch = "master"
+  digest = "1:8240f80d73999e42db1451c60defa181e12a49f0a903dfb7512c08f1ee7eb742"
   name = "golang.org/x/net"
-  packages = ["proxy","websocket"]
+  packages = [
+    "proxy",
+    "websocket",
+  ]
+  pruneopts = ""
   revision = "b129b8e0fbeb39c8358e51a07ab6c50ad415e72e"
 
 [[projects]]
   branch = "master"
+  digest = "1:cc11c1cd2fbbd5a2e883bb581b74c0a61857239fa9cd5cf96e274eb447689354"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = ""
   revision = "062cd7e4e68206d8bab9b18396626e855c992658"
 
 [[projects]]
   branch = "v2"
+  digest = "1:81314a486195626940617e43740b4fa073f265b0715c9f54ce2027fee1cb5f61"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = ""
   revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "513889b1a7a539a7adcd58a1959a7290bacf20c81644b8d3f8d7396930c3cf49"
+  input-imports = [
+    "github.com/eclipse/paho.mqtt.golang",
+    "github.com/gorilla/mux",
+    "github.com/gost/core",
+    "github.com/gost/godata",
+    "github.com/gost/now",
+    "github.com/lib/pq",
+    "github.com/sirupsen/logrus",
+    "github.com/stretchr/testify/assert",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
