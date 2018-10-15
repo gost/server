@@ -73,9 +73,13 @@ func NewDatabase(host string, port int, user string, password string, database s
 
 // Start the database
 func (gdb *GostDatabase) Start() {
-	//ToDo: implement SSL
+	ssl := "disable"
+	if gdb.Ssl {
+		ssl = "require"
+	}
+
 	logger.Infof("Creating database connection, host: %v, port: %v user: %v, database: %v, schema: %v ssl: %v", gdb.Host, gdb.Port, gdb.User, gdb.Database, gdb.Schema, gdb.Ssl)
-	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", gdb.Host, gdb.User, gdb.Password, gdb.Database)
+	dbInfo := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=%s", gdb.Host, gdb.User, gdb.Password, gdb.Database, ssl)
 	db, err := sql.Open("postgres", dbInfo)
 	db.SetMaxIdleConns(gdb.MaxIdeConns)
 	db.SetMaxOpenConns(gdb.MaxOpenConns)
