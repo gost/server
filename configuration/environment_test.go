@@ -72,7 +72,7 @@ func TestEnvironmentVariabels(t *testing.T) {
 	os.Setenv("GOST_DB_PASSWORD", dbPassword)
 	os.Setenv("GOST_DB_DATABASE", dbDB)
 	os.Setenv("GOST_DB_SCHEMA", dbSchema)
-	os.Setenv("GOST_MQTT_SSL_ENABLED", dbSSLEnabled)
+	os.Setenv("GOST_DB_SSL_ENABLED", dbSSLEnabled)
 	os.Setenv("GOST_DB_MAX_IDLE_CONS", dbMaxIdleCons)
 	os.Setenv("GOST_DB_MAX_OPEN_CONS", dbMaxOpenCons)
 
