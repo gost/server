@@ -109,7 +109,7 @@ func setEnvironmentDatabaseSettings(conf *Config) {
 		conf.Database.Schema = gostDbSchema
 	}
 
-	gostDbSSL := os.Getenv("GOST_MQTT_SSL_ENABLED")
+	gostDbSSL := os.Getenv("GOST_DB_SSL_ENABLED")
 	if gostDbSSL != "" {
 		h, err := strconv.ParseBool(gostDbSSL)
 		if err == nil {
