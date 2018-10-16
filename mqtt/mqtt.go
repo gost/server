@@ -22,6 +22,7 @@ type MQTT struct {
 	port            int
 	prefix          string
 	clientID        string
+	sslEnabled		bool
 	username        string
 	password        string
 	caCertPath      string
@@ -45,7 +46,7 @@ func setupLogger() {
 }
 
 func (m *MQTT) getProtocol() string{
-	if(m.clientCertPath != "" && m.privateKeyPath != ""){
+	if(m.sslEnabled == true){
 		return "ssl"
 	}else {
 		return "tcp"
@@ -114,11 +115,12 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		clientID:        config.ClientID,
 		subscriptionQos: config.SubscriptionQos,
 		persistent:      config.Persistent,
+		sslEnabled:		 config.SSL,
 		username:        config.Username,
 		password:        config.Password,
-		caCertPath:      config.CaCertPath,
-		clientCertPath:  config.ClientCertPath,
-		privateKeyPath:  config.PrivateKeyPath,
+		caCertPath:      config.CaCertFile,
+		clientCertPath:  config.ClientCertFile,
+		privateKeyPath:  config.PrivateKeyFile,
 	}
 
 	opts,err := initMQTTClientOptions(mqttClient)

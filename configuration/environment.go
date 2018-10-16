@@ -178,6 +178,40 @@ func setEnvironmentMQTTSettings(conf *Config) {
 			conf.MQTT.Persistent = persistent
 		}
 	}
+
+	gostMQTTssl := os.Getenv("GOST_MQTT_SSL")
+	if gostMQTTssl != "" {
+		ssl, err := strconv.ParseBool(gostMQTTssl)
+		if err == nil {
+			conf.MQTT.SSL = ssl
+		}
+	}
+
+	gostMQTTUsername := os.Getenv("GOST_MQTT_USERNAME")
+	if gostMQTTUsername != "" {
+		conf.MQTT.Username = gostMQTTUsername
+	}
+
+	gostMQTTPassword := os.Getenv("GOST_MQTT_PASSWORD")
+	if gostMQTTPassword != "" {
+		conf.MQTT.Password = gostMQTTPassword
+	}
+
+	gostMQTTCaCertFile := os.Getenv("GOST_MQTT_CA_CERT_FILE")
+	if gostMQTTCaCertFile != "" {
+		conf.MQTT.CaCertFile = gostMQTTCaCertFile
+	}
+
+	gostMQTTClientCertFile := os.Getenv("GOST_MQTT_CLIENT_CERT_FILE")
+	if gostMQTTClientCertFile != ""{
+		conf.MQTT.ClientCertFile = gostMQTTClientCertFile
+	}
+
+
+	gostMQTTPrivateKeyFile := os.Getenv("GOST_MQTT_PRIVATE_KEY_FILE")
+	if gostMQTTPrivateKeyFile != ""{
+		conf.MQTT.PrivateKeyFile = gostMQTTPrivateKeyFile
+	}
 }
 
 func setEnvironmentLoggerSettings(conf *Config) {

@@ -26,6 +26,7 @@ mqtt:
     clientId: gost
     subscriptionQos: 1
     persistent: true
+    ssl: false
 logger:
     fileName:
     verbose: false
