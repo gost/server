@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
+	"crypto/tls"
+	"crypto/x509"
 	paho "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gost/server/configuration"
 	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
-	"crypto/tls"
-	"crypto/x509"
 	"io/ioutil"
 )
 
@@ -22,7 +22,7 @@ type MQTT struct {
 	port            int
 	prefix          string
 	clientID        string
-	sslEnabled		bool
+	sslEnabled      bool
 	username        string
 	password        string
 	caCertPath      string
@@ -45,10 +45,10 @@ func setupLogger() {
 	logger = l.WithFields(log.Fields{"package": "gost.server.mqtt"})
 }
 
-func (m *MQTT) getProtocol() string{
-	if(m.sslEnabled == true){
+func (m *MQTT) getProtocol() string {
+	if m.sslEnabled == true {
 		return "ssl"
-	}else {
+	} else {
 		return "tcp"
 	}
 }
@@ -91,7 +91,7 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	opts.AddBroker(fmt.Sprintf("%s://%s:%v",client.getProtocol() , client.host, client.port))
+	opts.AddBroker(fmt.Sprintf("%s://%s:%v", client.getProtocol(), client.host, client.port))
 	opts.SetTLSConfig(tlsConfig)
 
 	opts.SetClientID(client.clientID)
@@ -115,7 +115,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		clientID:        config.ClientID,
 		subscriptionQos: config.SubscriptionQos,
 		persistent:      config.Persistent,
-		sslEnabled:		 config.SSL,
+		sslEnabled:      config.SSL,
 		username:        config.Username,
 		password:        config.Password,
 		caCertPath:      config.CaCertFile,
@@ -123,7 +123,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		privateKeyPath:  config.PrivateKeyFile,
 	}
 
-	opts,err := initMQTTClientOptions(mqttClient)
+	opts, err := initMQTTClientOptions(mqttClient)
 	if err != nil {
 		logger.Errorf("unable to configure MQTT client: %s", err)
 	}
@@ -137,7 +137,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 // Start running the MQTT client
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
-	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("%s://%s:%v", m.getProtocol(),m.host, m.port))
+	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("%s://%s:%v", m.getProtocol(), m.host, m.port))
 	m.connect()
 }
 
