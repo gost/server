@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"time"
 
+	"crypto/tls"
+	"crypto/x509"
 	paho "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gost/server/configuration"
 	gostLog "github.com/gost/server/log"
 	"github.com/gost/server/sensorthings/models"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 )
 
 var logger *log.Entry
@@ -19,6 +22,12 @@ type MQTT struct {
 	port            int
 	prefix          string
 	clientID        string
+	sslEnabled      bool
+	username        string
+	password        string
+	caCertPath      string
+	clientCertPath  string
+	privateKeyPath  string
 	subscriptionQos byte
 	persistent      bool
 	connecting      bool
@@ -36,6 +45,65 @@ func setupLogger() {
 	logger = l.WithFields(log.Fields{"package": "gost.server.mqtt"})
 }
 
+func (m *MQTT) getProtocol() string {
+	if m.sslEnabled == true {
+		return "ssl"
+	} else {
+		return "tcp"
+	}
+}
+
+func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
+
+	opts := paho.NewClientOptions() // uses defaults: https://godoc.org/github.com/eclipse/paho.mqtt.golang#NewClientOptions
+
+	if client.username != "" {
+		opts.SetUsername(client.username)
+	}
+	if client.password != "" {
+		opts.SetPassword(client.password)
+	}
+
+	// TLS CONFIG
+	tlsConfig := &tls.Config{}
+	if client.caCertPath != "" {
+
+		// Import trusted certificates from CAfile.pem.
+		// Alternatively, manually add CA certificates to
+		// default openssl CA bundle.
+		tlsConfig.RootCAs = x509.NewCertPool()
+		pemCerts, err := ioutil.ReadFile(client.caCertPath)
+		if err == nil {
+			tlsConfig.RootCAs.AppendCertsFromPEM(pemCerts)
+		}
+	}
+	if client.clientCertPath != "" && client.privateKeyPath != "" {
+		// Import client certificate/key pair
+		cert, err := tls.LoadX509KeyPair(client.clientCertPath, client.privateKeyPath)
+		if err != nil {
+			return nil, fmt.Errorf("error loading client keypair: %s", err)
+		}
+		// Just to print out the client certificate..
+		cert.Leaf, err = x509.ParseCertificate(cert.Certificate[0])
+		if err != nil {
+			return nil, fmt.Errorf("error parsing client certificate: %s", err)
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+
+	opts.AddBroker(fmt.Sprintf("%s://%s:%v", client.getProtocol(), client.host, client.port))
+	opts.SetTLSConfig(tlsConfig)
+
+	opts.SetClientID(client.clientID)
+	opts.SetCleanSession(!client.persistent)
+	opts.SetKeepAlive(300 * time.Second)
+	opts.SetPingTimeout(20 * time.Second)
+	opts.SetAutoReconnect(true)
+	opts.SetConnectionLostHandler(client.connectionLostHandler)
+	opts.SetOnConnectHandler(client.connectHandler)
+	return opts, nil
+}
+
 // CreateMQTTClient creates a new MQTT client
 func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 	setupLogger()
@@ -47,15 +115,18 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		clientID:        config.ClientID,
 		subscriptionQos: config.SubscriptionQos,
 		persistent:      config.Persistent,
+		sslEnabled:      config.SSL,
+		username:        config.Username,
+		password:        config.Password,
+		caCertPath:      config.CaCertFile,
+		clientCertPath:  config.ClientCertFile,
+		privateKeyPath:  config.PrivateKeyFile,
 	}
 
-	opts := paho.NewClientOptions().AddBroker(fmt.Sprintf("tcp://%s:%v", config.Host, config.Port)).SetClientID(config.ClientID)
-	opts.SetCleanSession(!config.Persistent)
-	opts.SetKeepAlive(300 * time.Second)
-	opts.SetPingTimeout(20 * time.Second)
-	opts.SetAutoReconnect(true)
-	opts.SetConnectionLostHandler(mqttClient.connectionLostHandler)
-	opts.SetOnConnectHandler(mqttClient.connectHandler)
+	opts, err := initMQTTClientOptions(mqttClient)
+	if err != nil {
+		logger.Errorf("unable to configure MQTT client: %s", err)
+	}
 
 	pahoClient := paho.NewClient(opts)
 	mqttClient.client = pahoClient
@@ -66,7 +137,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 // Start running the MQTT client
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
-	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("tcp://%s:%v", m.host, m.port))
+	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("%s://%s:%v", m.getProtocol(), m.host, m.port))
 	m.connect()
 }
 
