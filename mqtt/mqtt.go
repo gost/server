@@ -17,6 +17,7 @@ import (
 var logger *log.Entry
 
 // MQTT is the implementation of the MQTT server
+
 type MQTT struct {
 	host            string
 	port            int
@@ -28,6 +29,8 @@ type MQTT struct {
 	caCertPath      string
 	clientCertPath  string
 	privateKeyPath  string
+	keepAliveSec 	int
+	pingTimeoutSec	int
 	subscriptionQos byte
 	persistent      bool
 	connecting      bool
@@ -96,8 +99,8 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 
 	opts.SetClientID(client.clientID)
 	opts.SetCleanSession(!client.persistent)
-	opts.SetKeepAlive(300 * time.Second)
-	opts.SetPingTimeout(20 * time.Second)
+	opts.SetKeepAlive(time.Duration(client.keepAliveSec) * time.Second)
+	opts.SetPingTimeout(time.Duration(client.pingTimeoutSec) * time.Second)
 	opts.SetAutoReconnect(true)
 	opts.SetConnectionLostHandler(client.connectionLostHandler)
 	opts.SetOnConnectHandler(client.connectHandler)
@@ -121,6 +124,8 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		caCertPath:      config.CaCertFile,
 		clientCertPath:  config.ClientCertFile,
 		privateKeyPath:  config.PrivateKeyFile,
+		keepAliveSec:	 config.KeepAliveSec,
+		pingTimeoutSec:	 config.PingTimeoutSec,
 	}
 
 	opts, err := initMQTTClientOptions(mqttClient)

@@ -30,6 +30,8 @@ mqtt:
     caCertFile:
     clientCertFile:
     privateKeyFile:
+    keepAliveSec: 300
+    pingTimeoutSec: 20
 logger:
     fileName:
     verbose: false
