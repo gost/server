@@ -142,7 +142,8 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 // Start running the MQTT client
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
-	logger.Infof("Starting MQTT client on %s", fmt.Sprintf("%s://%s:%v", m.getProtocol(), m.host, m.port))
+	logger.Infof("Starting MQTT client on %s://%s:%v with Prefix:%v, Persistence:%v, keep ALive:%v, PingTimeout:%v, QOS:%v",
+		m.getProtocol(), m.host, m.port,m.prefix,m.persistent,m.keepAliveSec,m.pingTimeoutSec,m.subscriptionQos )
 	m.connect()
 }
 
