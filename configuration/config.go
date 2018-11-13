@@ -57,6 +57,8 @@ type MQTTConfig struct {
 	CaCertFile      string `yaml:"caCertFile"`
 	ClientCertFile  string `yaml:"clientCertFile"`
 	PrivateKeyFile  string `yaml:"privateKeyFile"`
+	KeepAliveSec	int    `yaml:"keepAliveSec"`
+	PingTimeoutSec	int    `yaml:"pingTimeoutSec"`
 }
 
 // LoggerConfig contains the logging configuration used to initialize the logger
