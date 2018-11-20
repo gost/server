@@ -143,6 +143,14 @@ func setEnvironmentMQTTSettings(conf *Config) {
 		}
 	}
 
+	gostMQTTVerbose := os.Getenv("GOST_MQTT_VERBOSE")
+	if gostMQTTVerbose != "" {
+		h, err := strconv.ParseBool(gostMQTTVerbose)
+		if err == nil {
+			conf.MQTT.Verbose = h
+		}
+	}
+
 	gostMQTTHost := os.Getenv("GOST_MQTT_HOST")
 	if gostMQTTHost != "" {
 		conf.MQTT.Host = gostMQTTHost
@@ -180,6 +188,14 @@ func setEnvironmentMQTTSettings(conf *Config) {
 		persistent, err := strconv.ParseBool(gostMQTTPersistent)
 		if err == nil {
 			conf.MQTT.Persistent = persistent
+		}
+	}
+
+	gostMQTTOrder := os.Getenv("GOST_MQTT_ORDER_MATTERS")
+	if gostMQTTOrder != "" {
+		order, err := strconv.ParseBool(gostMQTTOrder)
+		if err == nil {
+			conf.MQTT.Order = order
 		}
 	}
 

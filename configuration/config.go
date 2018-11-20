@@ -45,12 +45,14 @@ type DatabaseConfig struct {
 // MQTTConfig contains the MQTT client information
 type MQTTConfig struct {
 	Enabled         bool   `yaml:"enabled"`
+	Verbose         bool   `yaml:"verbose"`
 	Host            string `yaml:"host"`
 	Prefix          string `yaml:"prefix"`
 	ClientID        string `yaml:"clientId"`
 	Port            int    `yaml:"port"`
 	SubscriptionQos byte   `yaml:"subscriptionQos"`
 	Persistent      bool   `yaml:"persistent"`
+	Order           bool   `yaml:"order"`
 	SSL             bool   `yaml:"ssl"`
 	Username        string `yaml:"username"`
 	Password        string `yaml:"password"`

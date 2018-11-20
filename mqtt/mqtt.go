@@ -33,19 +33,28 @@ type MQTT struct {
 	pingTimeoutSec	int
 	subscriptionQos byte
 	persistent      bool
+	order           bool
 	connecting      bool
 	disconnected    bool
 	client          paho.Client
+	verbose         bool
 	api             *models.API
 }
 
-func setupLogger() {
+func setupLogger(verbose bool) {
 	l, err := gostLog.GetLoggerInstance()
 	if err != nil {
 		log.Error(err)
 	}
 
 	logger = l.WithFields(log.Fields{"package": "gost.server.mqtt"})
+
+	if verbose {
+		paho.ERROR = logger
+		paho.CRITICAL = logger
+		paho.WARN = logger
+		paho.DEBUG = logger
+	}
 }
 
 func (m *MQTT) getProtocol() string {
@@ -99,6 +108,7 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 
 	opts.SetClientID(client.clientID)
 	opts.SetCleanSession(!client.persistent)
+	opts.SetOrderMatters(client.order)
 	opts.SetKeepAlive(time.Duration(client.keepAliveSec) * time.Second)
 	opts.SetPingTimeout(time.Duration(client.pingTimeoutSec) * time.Second)
 	opts.SetAutoReconnect(true)
@@ -109,7 +119,7 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 
 // CreateMQTTClient creates a new MQTT client
 func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
-	setupLogger()
+	setupLogger(config.Verbose)
 
 	mqttClient := &MQTT{
 		host:            config.Host,
@@ -118,6 +128,7 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 		clientID:        config.ClientID,
 		subscriptionQos: config.SubscriptionQos,
 		persistent:      config.Persistent,
+		order:           config.Order,
 		sslEnabled:      config.SSL,
 		username:        config.Username,
 		password:        config.Password,
@@ -142,8 +153,8 @@ func CreateMQTTClient(config configuration.MQTTConfig) models.MQTTClient {
 // Start running the MQTT client
 func (m *MQTT) Start(api *models.API) {
 	m.api = api
-	logger.Infof("Starting MQTT client on %s://%s:%v with Prefix:%v, Persistence:%v, keep ALive:%v, PingTimeout:%v, QOS:%v",
-		m.getProtocol(), m.host, m.port,m.prefix,m.persistent,m.keepAliveSec,m.pingTimeoutSec,m.subscriptionQos )
+	logger.Infof("Starting MQTT client on %s://%s:%v with Prefix:%v, Persistence:%v, OrderMatters:%v, KeepAlive:%v, PingTimeout:%v, QOS:%v",
+		m.getProtocol(), m.host, m.port,m.prefix,m.persistent,m.order,m.keepAliveSec,m.pingTimeoutSec,m.subscriptionQos )
 	m.connect()
 }
 

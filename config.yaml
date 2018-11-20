@@ -20,12 +20,14 @@ database:
     maxOpenConns: 100
 mqtt:
     enabled: true
+    verbose: false
     host: localhost
     port: 1883
     prefix: GOST
     clientId: gost
     subscriptionQos: 1
     persistent: true
+    order: true
     ssl: false
     caCertFile:
     clientCertFile:
