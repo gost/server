@@ -143,6 +143,14 @@ func setEnvironmentMQTTSettings(conf *Config) {
 		}
 	}
 
+	gostMQTTVerbose := os.Getenv("GOST_MQTT_VERBOSE")
+	if gostMQTTVerbose != "" {
+		h, err := strconv.ParseBool(gostMQTTVerbose)
+		if err == nil {
+			conf.MQTT.Verbose = h
+		}
+	}
+
 	gostMQTTHost := os.Getenv("GOST_MQTT_HOST")
 	if gostMQTTHost != "" {
 		conf.MQTT.Host = gostMQTTHost
@@ -168,7 +176,11 @@ func setEnvironmentMQTTSettings(conf *Config) {
 
 	gostMQTTSubscriptionQOS := os.Getenv("GOST_MQTT_SUBSCRIPTIONQOS")
 	if gostMQTTSubscriptionQOS != "" {
-		conf.MQTT.SubscriptionQos = []byte(gostMQTTSubscriptionQOS)[0]
+		qos,err := strconv.ParseInt(gostMQTTSubscriptionQOS,0,8)
+		if err == nil {
+			conf.MQTT.SubscriptionQos = byte(qos)
+		}
+
 	}
 
 	gostMQTTPersistent := os.Getenv("GOST_MQTT_PERSISTENT")
@@ -176,6 +188,14 @@ func setEnvironmentMQTTSettings(conf *Config) {
 		persistent, err := strconv.ParseBool(gostMQTTPersistent)
 		if err == nil {
 			conf.MQTT.Persistent = persistent
+		}
+	}
+
+	gostMQTTOrder := os.Getenv("GOST_MQTT_ORDER_MATTERS")
+	if gostMQTTOrder != "" {
+		order, err := strconv.ParseBool(gostMQTTOrder)
+		if err == nil {
+			conf.MQTT.Order = order
 		}
 	}
 
@@ -212,6 +232,23 @@ func setEnvironmentMQTTSettings(conf *Config) {
 	if gostMQTTPrivateKeyFile != ""{
 		conf.MQTT.PrivateKeyFile = gostMQTTPrivateKeyFile
 	}
+
+	keepaliveSecs := os.Getenv("GOST_MQTT_KEEPALIVE_SECS")
+	if keepaliveSecs != "" {
+		keepalive, err := strconv.Atoi(keepaliveSecs)
+		if err == nil {
+			conf.MQTT.KeepAliveSec = keepalive
+		}
+	}
+
+	pingTimeoutSecs := os.Getenv("GOST_MQTT_PINGTIMEOUT_SECS")
+	if pingTimeoutSecs != "" {
+		pingTimeout, err := strconv.Atoi(pingTimeoutSecs)
+		if err == nil {
+			conf.MQTT.PingTimeoutSec = pingTimeout
+		}
+	}
+
 }
 
 func setEnvironmentLoggerSettings(conf *Config) {
