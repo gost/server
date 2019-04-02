@@ -38,11 +38,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a94e87116c8a0fc13564c579b0534692854de7e6bddfceeca983d75b9a8c26a1"
+  digest = "1:3f5897231d3fefd30f53c24ca7b2141c6381d7f320ccbcc5c5dfa018956359a6"
   name = "github.com/gost/core"
   packages = ["."]
   pruneopts = ""
-  revision = "802abad4f2f152b4d60ee427a131f696ed63fa5d"
+  revision = "c7385ff4b5cd35dd62317d539a7cc56dc16d1412"
 
 [[projects]]
   branch = "master"

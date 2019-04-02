@@ -532,6 +532,11 @@ func (a *MockAPI) GetVersionInfo() *models.VersionInfo {
 	return &versionInfo
 }
 
+func (a *MockAPI) PostCreateObservations(data *entities.CreateObservations) ([]string, []error) {
+	resp := make([]string, 0)
+	return resp, nil
+}
+
 // ToIntID converts an interface to int id used for the id's in the database
 func toIntID(id interface{}) (int, bool) {
 	switch t := id.(type) {

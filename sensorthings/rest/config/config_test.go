@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/gost/server/sensorthings/models"
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/gost/server/sensorthings/models"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateEndPoints(t *testing.T) {
@@ -12,7 +13,7 @@ func TestCreateEndPoints(t *testing.T) {
 	endpoints := CreateEndPoints("http://test.com")
 
 	//assert
-	assert.Equal(t, 10, len(endpoints))
+	assert.Equal(t, 11, len(endpoints))
 }
 
 func TestCreateEndPointVersion(t *testing.T) {

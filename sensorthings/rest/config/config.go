@@ -24,6 +24,7 @@ func CreateEndPoints(externalURL string) map[entities.EntityType]models.Endpoint
 		entities.EntityTypeObservation:        CreateObservationsEndpoint(externalURL),
 		entities.EntityTypeFeatureOfInterest:  CreateFeaturesOfInterestEndpoint(externalURL),
 		entities.EntityTypeHistoricalLocation: CreateHistoricalLocationsEndpoint(externalURL),
+		entities.EntityTypeCreateObservations: CreateCreateObservationsEndpoint(externalURL),
 	}
 
 	return Endpoints

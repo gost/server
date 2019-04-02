@@ -99,6 +99,8 @@ type API interface {
 	DeleteSensor(id interface{}) error
 	PutSensor(id interface{}, sensor *entities.Sensor) (*entities.Sensor, []error)
 
+	PostCreateObservations(co *entities.CreateObservations) ([]string, []error)
+
 	LinkLocation(thingID interface{}, locationID interface{}) error
 	SetLinks(entity entities.Entity, qo *odata.QueryOptions)
 	CreateNextLink(incomingURL string, qo *odata.QueryOptions) string
