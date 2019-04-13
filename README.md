@@ -8,7 +8,7 @@
 [![Join the chat at https://gitter.im/gost/Lobby](https://badges.gitter.im/gost/gost.svg)](https://gitter.im/gost/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Join Slack](https://slackinvitergost.herokuapp.com/badge.svg)](https://slackinvitergost.herokuapp.com/)<br />
 
-GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API] (http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
+GOST (Go-SensorThings) is an IoT Platform written in Golang (Go). It implements the Sensing profile (part 1) of the [OGC SensorThings API](http://ogc-iot.github.io/ogc-iot-api/api.html) standard including the MQTT extension.
 
 <a href="http://www.opengeospatial.org/resource/products/details/?pid=1468"><img src ="https://raw.githubusercontent.com/gost/docs/master/images/Certified_OGC_Compliant_Logo_Web.png"/><br/></a>
 
