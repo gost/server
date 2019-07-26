@@ -10,15 +10,15 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:3fa846cb3feb4e65371fe3c347c299de9b5bc3e71e256c0d940cd19b767a6ba0"
+  branch = "master"
+  digest = "1:0324f38cd62cb1eedf329e9375e8f16fd82b0c292b13236d22ee35519d12b2db"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
     ".",
     "packets",
   ]
   pruneopts = ""
-  revision = "36d01c2b4cbeb3d2a12063e4880ce30800af9560"
-  version = "v1.1.1"
+  revision = "93c8a06e1e6dfeb17dd18a44e3e2f4e1db778237"
 
 [[projects]]
   digest = "1:20ed7daa9b3b38b6d1d39b48ab3fd31122be5419461470d0c28de3e121c93ecf"
@@ -35,6 +35,14 @@
   pruneopts = ""
   revision = "24fca303ac6da784b9e8269f724ddeb0b2eea5e7"
   version = "v1.5.0"
+
+[[projects]]
+  digest = "1:09aa5dd1332b93c96bde671bafb053249dc813febf7d5ca84e8f382ba255d67d"
+  name = "github.com/gorilla/websocket"
+  packages = ["."]
+  pruneopts = ""
+  revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
+  version = "v1.4.0"
 
 [[projects]]
   branch = "master"
@@ -107,10 +115,7 @@
   branch = "master"
   digest = "1:8240f80d73999e42db1451c60defa181e12a49f0a903dfb7512c08f1ee7eb742"
   name = "golang.org/x/net"
-  packages = [
-    "proxy",
-    "websocket",
-  ]
+  packages = ["proxy"]
   pruneopts = ""
   revision = "b129b8e0fbeb39c8358e51a07ab6c50ad415e72e"
 

@@ -16,8 +16,7 @@ import (
 
 var logger *log.Entry
 
-// MQTT is the implementation of the MQTT server
-
+// MQTT is the implementation of the MQTT client
 type MQTT struct {
 	host            string
 	port            int
@@ -39,6 +38,7 @@ type MQTT struct {
 	client          paho.Client
 	verbose         bool
 	api             *models.API
+	connectToken 	*paho.ConnectToken
 }
 
 func setupLogger(verbose bool) {
@@ -111,7 +111,7 @@ func initMQTTClientOptions(client *MQTT) (*paho.ClientOptions, error) {
 	opts.SetOrderMatters(client.order)
 	opts.SetKeepAlive(time.Duration(client.keepAliveSec) * time.Second)
 	opts.SetPingTimeout(time.Duration(client.pingTimeoutSec) * time.Second)
-	opts.SetAutoReconnect(true)
+	opts.SetAutoReconnect(false)
 	opts.SetConnectionLostHandler(client.connectionLostHandler)
 	opts.SetOnConnectHandler(client.connectHandler)
 	return opts, nil
@@ -169,6 +169,8 @@ func (m *MQTT) subscribe() {
 
 	for _, t := range topics {
 		topic := t
+		logger.Infof("MQTT client subscribing to %s", topic.Path)
+
 		if token := m.client.Subscribe(topic.Path, m.subscriptionQos, func(client paho.Client, msg paho.Message) {
 			go topic.Handler(m.api, m.prefix, msg.Topic(), msg.Payload())
 		}); token.Wait() && token.Error() != nil {
@@ -184,9 +186,10 @@ func (m *MQTT) Publish(topic string, message string, qos byte) {
 }
 
 func (m *MQTT) connect() {
-	if token := m.client.Connect(); token.Wait() && token.Error() != nil {
+	m.connectToken = m.client.Connect().(*paho.ConnectToken)
+	if m.connectToken.Wait() && m.connectToken.Error() != nil {
 		if !m.connecting {
-			logger.Errorf("MQTT client %v", token.Error())
+			logger.Errorf("MQTT client %s", m.connectToken.Error())
 			m.retryConnect()
 		}
 	}
@@ -212,9 +215,11 @@ func (m *MQTT) retryConnect() {
 
 func (m *MQTT) connectHandler(c paho.Client) {
 	logger.Infof("MQTT client connected")
+	hasSession := m.connectToken.SessionPresent()
+	logger.Infof("MQTT Session present: %v", hasSession);
 
-	// on first connect or connection lost and persistance is off
-	if !m.disconnected || (m.disconnected && !m.persistent) {
+	// on first connect, connection lost and persistance is off or no previous session found
+	if !m.disconnected || (m.disconnected && !m.persistent) || !hasSession {
 		m.subscribe()
 	}
 
@@ -225,4 +230,5 @@ func (m *MQTT) connectHandler(c paho.Client) {
 func (m *MQTT) connectionLostHandler(c paho.Client, err error) {
 	logger.Warnf("MQTT client lost connection: %v", err)
 	m.disconnected = true
+	m.retryConnect()
 }
