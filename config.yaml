@@ -9,7 +9,7 @@ server:
     httpsCert:
     httpsKey:
 database:
-    host: localhost
+    host: 192.168.99.100
     port: 5432
     user: postgres
     password: postgres
@@ -36,5 +36,5 @@ mqtt:
     pingTimeoutSec: 20
 logger:
     fileName:
-    verbose: false
+    verbose: true
  

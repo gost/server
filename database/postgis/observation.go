@@ -162,7 +162,16 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 
 	json, _ := o.MarshalPostgresJSON()
 	obs := fmt.Sprintf("'%s'", string(json[:]))
-	sql2 := fmt.Sprintf("INSERT INTO %s.observation (data, stream_id, featureofinterest_id) VALUES (%v, %v, %v) RETURNING id", gdb.Schema, obs, dID, fID)
+	phenomenonTime :=  strings.Split(o.PhenomenonTime, "/")
+	phenomenonTimeStart := phenomenonTime[0]
+	phenomenonTimeEnd := phenomenonTimeStart
+	if len(phenomenonTime) > 1{
+		phenomenonTimeEnd = phenomenonTime[1]
+	}
+
+	fmt.Printf("%s - %s\n", phenomenonTimeStart, phenomenonTimeEnd)
+
+	sql2 := fmt.Sprintf("INSERT INTO %s.observation (data, phenomenontime_start, phenomenontime_end, stream_id, featureofinterest_id) VALUES (%v, '%v', '%v', %v, %v) RETURNING id", gdb.Schema, obs, phenomenonTimeStart, phenomenonTimeEnd, dID, fID)
 
 	err := gdb.Db.QueryRow(sql2).Scan(&oID)
 	if err != nil {
