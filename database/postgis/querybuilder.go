@@ -174,6 +174,16 @@ func (qb *QueryBuilder) getProperties(et entities.Entity, qo *odata.QueryOptions
 		}
 	}
 
+	// if phenomenonTime is found remove and add phenomenonTimeStart and phenomenonTimeEnd
+	if currentType == entities.EntityTypeObservation {
+		for i, p := range properties {
+			if p == "phenomenonTime"  {
+				properties[i] = "phenomenonTimeStart"
+				properties = append(properties, "phenomenonTimeEnd")
+			}
+		}
+	}
+
 	return properties
 }
 
@@ -519,6 +529,10 @@ func (qb *QueryBuilder) prepareFilter(et entities.EntityType, originalLeft, left
 		if property == "phenomenontime" || property == "resulttime" || property == "time" {
 			if t, err := time.Parse(time.RFC3339Nano, e); err == nil {
 				*str[1] = fmt.Sprintf("'%s'", t.UTC().Format("2006-01-02T15:04:05.000Z"))
+			}
+
+			if property == "phenomenontime" {
+				left = "phenomenontimestart"
 			}
 
 			return left, right

@@ -86,7 +86,7 @@ func (gdb *GostDatabase) GetLocationByDatastreamID(datastreamID interface{}, qo 
 	}
 
 	qo = &odata.QueryOptions{}
-	tq := godata.GoDataTopQuery(-1)
+	tq := godata.GoDataTopQuery(1)
 	qo.Top = &tq
 
 	query, qi := gdb.QueryBuilder.CreateQuery(&entities.Location{}, &entities.Datastream{}, intID, qo)

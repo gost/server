@@ -31,8 +31,21 @@ func observationParamFactory(values map[string]interface{}) (entities.Entity, er
 		if as == asMappings[entities.EntityTypeObservation][observationID] {
 			o.ID = value
 		}
-		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTime] {
-			o.PhenomenonTime = value.(string)
+		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTimeStart] {
+			timeValue := value.(string)
+			if(o.PhenomenonTime != "" && timeValue != o.PhenomenonTime){
+				o.PhenomenonTime = fmt.Sprintf("%s/%s", timeValue, o.PhenomenonTime) 
+			}else {
+				o.PhenomenonTime = timeValue
+			}
+		}
+		if as == asMappings[entities.EntityTypeObservation][observationPhenomenonTimeEnd] {
+			timeValue := value.(string)
+			if(o.PhenomenonTime != "" && timeValue != o.PhenomenonTime){
+				o.PhenomenonTime = fmt.Sprintf("%s/%s", o.PhenomenonTime, timeValue) 
+			}else {				
+				o.PhenomenonTime = timeValue
+			}
 		}
 		if as == asMappings[entities.EntityTypeObservation][observationResult] {
 			o.Result = json.RawMessage(value.(string))
@@ -160,8 +173,6 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 
 	fID := o.FeatureOfInterest.ID
 
-	json, _ := o.MarshalPostgresJSON()
-	obs := fmt.Sprintf("'%s'", string(json[:]))
 	phenomenonTime :=  strings.Split(o.PhenomenonTime, "/")
 	phenomenonTimeStart := phenomenonTime[0]
 	phenomenonTimeEnd := phenomenonTimeStart
@@ -169,9 +180,35 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 		phenomenonTimeEnd = phenomenonTime[1]
 	}
 
-	fmt.Printf("%s - %s\n", phenomenonTimeStart, phenomenonTimeEnd)
+	rt := "null"
+	if o.ResultTime != nil {
+		rt = fmt.Sprintf("'%s'", *o.ResultTime)
+	}
 
-	sql2 := fmt.Sprintf("INSERT INTO %s.observation (data, phenomenontime_start, phenomenontime_end, stream_id, featureofinterest_id) VALUES (%v, '%v', '%v', %v, %v) RETURNING id", gdb.Schema, obs, phenomenonTimeStart, phenomenonTimeEnd, dID, fID)
+	rq := "null"
+	if len(o.ResultQuality) > 0 {
+		rq = fmt.Sprintf("'%s'", o.ResultQuality)
+	}
+
+	vt := "null"
+	if len(o.ValidTime) > 0 {		
+		validTime :=  strings.Replace(o.ValidTime, "/", ",", 1)
+		vt = fmt.Sprintf("'[%v]'", validTime)
+	}
+
+	params := "null"
+	if len(o.Parameters) > 0 {
+		jsonParams, _ := json.Marshal(o.Parameters)
+		params = string(jsonParams[:])
+	}
+
+	sql2 := fmt.Sprintf("INSERT INTO %s.observation " + 
+	"(phenomenontimestart, phenomenontimeend, resulttime, validtime, resultquality, result, parameters, stream_id, featureofinterest_id) " + 
+	"VALUES ('%s', '%s', %s, %s, %s, '%s', '%s', %v, %v) RETURNING id", 
+	gdb.Schema, phenomenonTimeStart, phenomenonTimeEnd, rt, vt, rq, string(o.Result[:]), params, dID, fID)
+
+
+	fmt.Println(sql2)
 
 	err := gdb.Db.QueryRow(sql2).Scan(&oID)
 	if err != nil {

@@ -99,8 +99,9 @@ var (
 // observation fields
 var (
 	observationID                  = idField
-	observationData                = "data"
-	observationPhenomenonTime      = "phenomenontime"
+	observationData                = "data"	
+	observationPhenomenonTimeStart = "phenomenontimestart"
+	observationPhenomenonTimeEnd   = "phenomenontimeend"
 	observationResultTime          = "resulttime"
 	observationResult              = "result"
 	observationValidTime           = "validtime"
@@ -380,7 +381,8 @@ var asMappings = map[entities.EntityType]map[string]string{
 	entities.EntityTypeObservation: {
 		observationID:                  constructAs(observationTable, observationID),
 		observationData:                constructAs(observationTable, observationData),
-		observationPhenomenonTime:      constructAs(observationTable, observationPhenomenonTime),
+		observationPhenomenonTimeStart: constructAs(observationTable, observationPhenomenonTimeStart),
+		observationPhenomenonTimeEnd:   constructAs(observationTable, observationPhenomenonTimeEnd),
 		observationResultTime:          constructAs(observationTable, observationResultTime),
 		observationResult:              constructAs(observationTable, observationResult),
 		observationValidTime:           constructAs(observationTable, observationValidTime),
@@ -515,13 +517,13 @@ var selectMappings = map[entities.EntityType]map[string]string{
 	},
 	entities.EntityTypeObservation: {
 		observationID:                  fmt.Sprintf("%s.%s", observationTable, observationID),
-		observationData:                fmt.Sprintf("%s.%s", observationTable, observationData),
-		observationPhenomenonTime:      fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "phenomenonTime"),
-		observationResultTime:          fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "resultTime"),
-		observationResult:              fmt.Sprintf("%s.%s -> '%s'", observationTable, observationData, observationResult),
-		observationValidTime:           fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "validTime"),
-		observationResultQuality:       fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, "resultQuality"),
-		observationParameters:          fmt.Sprintf("%s.%s ->> '%s'", observationTable, observationData, observationParameters),
+		observationPhenomenonTimeStart: fmt.Sprintf("to_char(%s.%s at time zone 'UTC', '%s')", observationTable, observationPhenomenonTimeStart, TimeFormat),
+		observationPhenomenonTimeEnd:   fmt.Sprintf("to_char(%s.%s at time zone 'UTC', '%s')", observationTable, observationPhenomenonTimeEnd, TimeFormat),
+		observationResultTime:          fmt.Sprintf("to_char(%s.%s at time zone 'UTC', '%s')", observationTable, observationResultTime, TimeFormat),
+		observationResult:              fmt.Sprintf("%s.%s", observationTable, observationResult),		
+		observationValidTime:           fmt.Sprintf("to_char(lower(%s.%s) at time zone 'UTC', '%s') || '/' || to_char(upper(%s.%s) at time zone 'UTC', '%s')", observationTable, observationValidTime, TimeFormat, observationTable, observationValidTime, TimeFormat),
+		observationResultQuality:       fmt.Sprintf("%s.%s", observationTable, observationResultQuality),
+		observationParameters:          fmt.Sprintf("%s.%s", observationTable, observationParameters),
 		observationStreamID:            fmt.Sprintf("%s.%s", observationTable, observationStreamID),
 		observationFeatureOfInterestID: fmt.Sprintf("%s.%s", observationTable, observationFeatureOfInterestID),
 	},
