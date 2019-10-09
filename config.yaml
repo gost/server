@@ -36,5 +36,5 @@ mqtt:
     pingTimeoutSec: 20
 logger:
     fileName:
-    verbose: true
+    verbose: false
  

@@ -207,9 +207,6 @@ func (gdb *GostDatabase) PostObservation(o *entities.Observation) (*entities.Obs
 	"VALUES ('%s', '%s', %s, %s, %s, '%s', '%s', %v, %v) RETURNING id", 
 	gdb.Schema, phenomenonTimeStart, phenomenonTimeEnd, rt, vt, rq, string(o.Result[:]), params, dID, fID)
 
-
-	fmt.Println(sql2)
-
 	err := gdb.Db.QueryRow(sql2).Scan(&oID)
 	if err != nil {
 		errString := fmt.Sprintf("%v", err.Error())
