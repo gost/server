@@ -16,10 +16,6 @@ Implementation of the Tasking profile (part 2) and Rules Engine profile (part 3)
 
 The GOST website and blog can be found at [www.gostserver.xyz](https://www.gostserver.xyz)
 
-## Disclaimer
-
-GOST is alpha software and is not (yet) considered appropriate for customer use. Feel free to help development :-)
-
 ## Binaries
 
 Current release [V0.5](https://github.com/gost/server/releases/tag/0.5): 2017-07-17
