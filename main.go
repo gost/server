@@ -30,7 +30,7 @@ var (
 	installFlag = flag.String("install", "", "path to the database creation file")
 )
 
-func init() {
+func initialize() {
 	flag.Parse()
 	cfg := *cfgFlag
 	var err error
@@ -51,6 +51,7 @@ func init() {
 }
 
 func main() {
+	initialize()
 	stop := make(chan os.Signal, 2)
 	signal.Notify(stop, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
