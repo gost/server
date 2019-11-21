@@ -275,7 +275,7 @@ func (qb *QueryBuilder) createJoin(e1 entities.Entity, e2 entities.Entity, id in
 				qb.getSelect(e2, nqo, qpi, true, true, false, true, ""),
 				qb.tables[et2],
 				join,
-				qb.getFilterQueryString(et2, nqo, filterPrefix),
+				qb.getFilterQueryString(et2, nqo, filterPrefix, true),
 				qb.getOrderBy(et2, nqo, false),
 				qb.getLimit(nqo, 0),
 				qb.getOffset(nqo),
@@ -339,7 +339,7 @@ func (qb *QueryBuilder) createSelectByRelationString(e1 entities.Entity, e2 enti
 		filterPrefix = "AND"
 	}
 
-	filter := qb.getFilterQueryString(et2, nqo, filterPrefix)
+	filter := qb.getFilterQueryString(et2, nqo, filterPrefix, true)
 
 	joinString := fmt.Sprintf(
 		"(SELECT %s "+
@@ -443,9 +443,9 @@ func (qb *QueryBuilder) constructQueryParseInfo(operations []*godata.ExpandItem,
 // ParamFactory is used for converting SensorThings parameter names to postgres field names
 // Convert receives a name such as phenomenonTime and returns "data ->> 'id'" true, returns
 // false if parameter cannot be converted
-func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string) string {
-	// Only select last Location since we only have 1 encoding
-	if et == entities.EntityTypeLocation {
+func (qb *QueryBuilder) getFilterQueryString(et entities.EntityType, qo *odata.QueryOptions, prefix string, alterLocation bool) string {
+	// Only select last Location since we only have 1 encoding	
+	if alterLocation && et == entities.EntityTypeLocation {
 		top := godata.GoDataTopQuery(1)
 		if qo == nil {
 			nQo := &odata.QueryOptions{}
@@ -970,13 +970,13 @@ func (qb *QueryBuilder) getQueryString(e1 entities.Entity, e2 entities.Entity, i
 
 	if qo != nil && qo.Filter != nil {
 		if id != nil {
-			if e2 == nil {
-				where = fmt.Sprintf("%s AND %s", where, qb.getFilterQueryString(et1, qo, ""))
-			} else {
-				where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE"))
+			if e2 == nil {				
+				where = fmt.Sprintf("%s AND %s", where, qb.getFilterQueryString(et1, qo, "", true))
+			} else {				
+				where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE", true))
 			}
-		} else {
-			where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE"))
+		} else {			
+			where = fmt.Sprintf("%s %s", where, qb.getFilterQueryString(et1, qo, "WHERE", false))
 		}
 	}
 

@@ -240,7 +240,7 @@ func strelateToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityT
 }
 
 func stwithinToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
-	return qb.createSpatialQuery(pn, et, "ST_RELATE(%s, %s, %s)", 3)
+	return qb.createSpatialQuery(pn, et, "ST_WITHIN(%s, %s)", 2)
 }
 
 func stintersectsToString(qb QueryBuilder, pn *godata.ParseNode, et entities.EntityType) string {
