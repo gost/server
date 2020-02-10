@@ -80,9 +80,9 @@ GOST is being tested against the OGC SensorThings API Test Suite 1.0 [https://gi
 | Create-Update-Delete                  | A.3       | beta                  | 9/9                      |
 | Batch Request                         | A.4       | -                     | Tests not implemented    |
 | Sensing MultiDatastream Extension     | A.5       | -                     | Tests not implemented    |
-| Sensing Data Array Extension          | A.6       | -                     | Tests not implemented    |
-| MQTT Extension for Create and Update  | A.7       | alpha                 | Tests not implemented    |
-| MQTT Extension for Receiving Updates  | A.8       | alpha                 | Tests not implemented    |
+| Sensing Data Array Extension          | A.6       | beta                  | Tests not implemented    |
+| MQTT Extension for Create and Update  | A.7       | beta                  | Tests not implemented    |
+| MQTT Extension for Receiving Updates  | A.8       | beta                  | Tests not implemented    |
 
 Status GOST on OGC site: [http://www.opengeospatial.org/resource/products/details/?pid=1419](http://www.opengeospatial.org/resource/products/details/?pid=1419)
 
