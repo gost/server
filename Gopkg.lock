@@ -54,11 +54,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e2615475989ae640830ee08b609c47cb2d671738eed4cced265c4edde4e27e38"
+  digest = "1:987eacc4310bdd5f132551cdb8ca7420cbd552cada7b641cd267e358f2cb8f3a"
   name = "github.com/gost/godata"
   packages = ["."]
   pruneopts = ""
-  revision = "edab045e03f8b7cf5a89e66191951cfdc2a0a012"
+  revision = "5d9cf5efac7daf6cac36af9e7339546e5ab9cfec"
 
 [[projects]]
   digest = "1:d85416b6b2deb088f59b4db9706065f947b7f7e8a0b7c5f585d6abda61991b4a"
